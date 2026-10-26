@@ -46,7 +46,7 @@ function appendChildren(el, children) {
 
 /** Crea un elemento HTML: h('div', {class:'x'}, 'texto', otroNodo) */
 export function h(tag, attrs, ...children) {
-  const el = document.createElement(tag);
+  const el = tag === 'svg' ? document.createElementNS(SVG_NS, 'svg') : document.createElement(tag);
   applyAttrs(el, attrs);
   appendChildren(el, children);
   return el;

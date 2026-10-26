@@ -40,7 +40,7 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
  * Sincroniza con location.hash (#id-del-panel) para enlaces directos.
  */
 export function initTabs(root, { onChange } = {}) {
-  const tablist = root.querySelector('[role="tablist"]');
+  const tablist = root?.matches?.('[role="tablist"]') ? root : (root?.querySelector('[role="tablist"]') || root);
   const tabs = qsa('[role="tab"]', tablist);
   const panelOf = (tab) => document.getElementById(tab.getAttribute('aria-controls'));
 

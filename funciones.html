@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laboratorio de Funciones · Unidad 8</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules/funciones.css">
+  <script type="module" src="js/modules/funciones/index.js"></script>
+</head>
+
+<body data-page="funciones">
+  <header data-site-nav="funciones"></header>
+
+  <main class="page page--wide">
+    <h1>Laboratorio de Funciones</h1>
+    <p class="intro">
+      Cuatro simuladores interactivos para desarmar la Unidad 8 de Precálculo e Ingreso a Exactas con rigor:
+      existencia y unicidad, conjuntos sobre el eje X, tasa de cambio promedio con unidades e inversión por propiedad uniforme.
+    </p>
+
+    <div class="tabs" role="tablist" aria-label="Módulos del Laboratorio de Funciones">
+      <button type="button" class="tab" role="tab" id="tab-scanner" aria-controls="panel-scanner" aria-selected="true">
+        <span class="tab__num">1</span>Escáner de Unicidad y Dominio
+      </button>
+      <button type="button" class="tab" role="tab" id="tab-radiografia" aria-controls="panel-radiografia" aria-selected="false" tabindex="-1">
+        <span class="tab__num">2</span>Radiografía Cartesiana
+      </button>
+      <button type="button" class="tab" role="tab" id="tab-secante" aria-controls="panel-secante" aria-selected="false" tabindex="-1">
+        <span class="tab__num">3</span>El Puente Secante (TCP)
+      </button>
+      <button type="button" class="tab" role="tab" id="tab-inversa" aria-controls="panel-inversa" aria-selected="false" tabindex="-1">
+        <span class="tab__num">4</span>Máquina Inversa y Espejo
+      </button>
+    </div>
+
+    <section id="panel-scanner" class="tabpanel" role="tabpanel" aria-labelledby="tab-scanner"></section>
+    <section id="panel-radiografia" class="tabpanel" role="tabpanel" aria-labelledby="tab-radiografia" hidden></section>
+    <section id="panel-secante" class="tabpanel" role="tabpanel" aria-labelledby="tab-secante" hidden></section>
+    <section id="panel-inversa" class="tabpanel" role="tabpanel" aria-labelledby="tab-inversa" hidden></section>
+  </main>
+</body>
+
+</html>
