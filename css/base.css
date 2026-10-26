@@ -1,0 +1,182 @@
+/* ==========================================================================
+   base.css — Design tokens, reset, modo claro/oscuro y tipografía
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* Superficies y texto */
+  --bg: #faf9f5;
+  --surface: #f1efe8;
+  --card: #ffffff;
+  --ink: #1f1e1d;
+  --muted: #5f5e5a;
+  --border: rgba(0, 0, 0, .14);
+  --border-strong: rgba(0, 0, 0, .3);
+
+  /* Semántica */
+  --blue: #185fa5;      /* objetivo / identidad */
+  --bluebg: #e6f1fb;
+  --blue-line: #378add; /* trazos SVG */
+  --green: #27500a;     /* acierto / neutro / unicidad válida */
+  --greenbg: #eaf3de;
+  --green-line: #639922;
+  --amber: #633806;     /* corriente / advertencia / pendiente */
+  --amberbg: #faeeda;
+  --amber-line: #ef9f27;
+  --red: #791f1f;       /* error / colisión / violación de dominio */
+  --redbg: #fcebeb;
+  --red-line: #e24b4a;
+  --violet-line: #7f77dd;
+  --teal-line: #1d9e75;
+
+  /* Lámpara (circuito) */
+  --lamp-fill: #fac775;
+  --lamp-stroke: #ba7517;
+  --lamp-x: #854f0b;
+
+  /* Geometría */
+  --radius: 10px;
+  --radius-lg: 14px;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f1e1d;
+    --surface: #2c2c2a;
+    --card: #262624;
+    --ink: #f1efe8;
+    --muted: #b4b2a9;
+    --border: rgba(255, 255, 255, .16);
+    --border-strong: rgba(255, 255, 255, .32);
+
+    --blue: #b5d4f4;
+    --bluebg: #0c447c;
+    --blue-line: #6aa9ec;
+    --green: #c0dd97;
+    --greenbg: #27500a;
+    --green-line: #8cc152;
+    --amber: #fac775;
+    --amberbg: #633806;
+    --amber-line: #f0a83a;
+    --red: #f7c1c1;
+    --redbg: #791f1f;
+    --red-line: #f07070;
+    --violet-line: #a59ff0;
+    --teal-line: #3cc497;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 var(--font-sans);
+}
+
+h1 {
+  font-size: clamp(22px, 4vw, 30px);
+  line-height: 1.2;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 28px 0 8px;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 18px 0 6px;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+a {
+  color: var(--blue);
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.intro,
+.muted {
+  color: var(--muted);
+}
+
+.intro {
+  margin: 0 0 22px;
+}
+
+.small {
+  font-size: 13px;
+}
+
+.math {
+  font-family: var(--font-math);
+  font-style: italic;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden],
+.hidden {
+  display: none !important;
+}
+
+/* Texto SVG: siempre via tokens para que el modo oscuro sea legible */
+.svg-t {
+  font-size: 14px;
+  fill: var(--ink);
+}
+
+.svg-ts {
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+.svg-th {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

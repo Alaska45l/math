@@ -1,0 +1,437 @@
+/* ==========================================================================
+   components.css — Botones, inputs, chips, badges, fracciones .fr y fichas
+   ========================================================================== */
+
+/* ---------- Controles de formulario ---------- */
+button,
+select,
+input[type="number"],
+input[type="text"] {
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  min-height: 36px;
+  padding: 6px 12px;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+button:active:not(:disabled) {
+  transform: scale(.98);
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+input[type="number"] {
+  width: 96px;
+}
+
+input[type="range"] {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--blue-line);
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Botón conmutable (aria-pressed) */
+.toggle[aria-pressed="true"],
+.btn--on {
+  background: var(--bluebg);
+  color: var(--blue);
+  border-color: var(--blue-line);
+}
+
+.btn--primary {
+  background: var(--bluebg);
+  color: var(--blue);
+  border-color: var(--blue-line);
+  font-weight: 600;
+}
+
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Chips (presets) */
+.chip {
+  min-height: auto;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* Campo slider: <label> + range + <output> */
+.field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 10px;
+}
+
+.field__label {
+  font-size: 14px;
+  color: var(--muted);
+  min-width: 90px;
+}
+
+.field__out {
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 600;
+  min-width: 56px;
+  text-align: right;
+}
+
+.label-sm {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Badges / diagnósticos ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+}
+
+.badge--ok {
+  background: var(--greenbg);
+  color: var(--green);
+  border-color: var(--green-line);
+}
+
+.badge--warn {
+  background: var(--amberbg);
+  color: var(--amber);
+  border-color: var(--amber-line);
+}
+
+.badge--err {
+  background: var(--redbg);
+  color: var(--red);
+  border-color: var(--red-line);
+}
+
+.badge--info {
+  background: var(--bluebg);
+  color: var(--blue);
+  border-color: var(--blue-line);
+}
+
+.badge--sm {
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 6px;
+}
+
+.text-ok {
+  color: var(--green);
+}
+
+.text-err {
+  color: var(--red);
+}
+
+.text-warn {
+  color: var(--amber);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+/* Avisos */
+.notice {
+  padding: 11px 14px;
+  border-left: 4px solid var(--blue-line);
+  background: var(--bluebg);
+  color: var(--ink);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 0 0 12px;
+}
+
+.notice--ok {
+  border-left-color: var(--green-line);
+  background: var(--greenbg);
+}
+
+.notice--warn {
+  border-left-color: var(--amber-line);
+  background: var(--amberbg);
+}
+
+.notice--err {
+  border-left-color: var(--red-line);
+  background: var(--redbg);
+}
+
+.notice strong {
+  font-weight: 650;
+}
+
+.status {
+  min-height: 26px;
+  font-weight: 500;
+}
+
+.form-error {
+  font-size: 13px;
+  color: var(--red);
+  min-height: 20px;
+  margin: 4px 0 0;
+}
+
+/* ---------- Fracción horizontal estricta (dos pisos) ---------- */
+.fr {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  min-width: max-content;
+  padding: 0 3px;
+}
+
+.fr > .top,
+.fr > .bot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 0 4px;
+}
+
+.fr > .bar {
+  align-self: stretch;
+  height: 1.5px;
+  background: currentColor;
+  opacity: .75;
+}
+
+.fr--sm > .top,
+.fr--sm > .bot {
+  min-height: 20px;
+}
+
+/* Expresión matemática en línea */
+.eq {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-math);
+  font-size: 18px;
+}
+
+.eq--lg {
+  font-size: 22px;
+}
+
+.eq .op {
+  color: var(--muted);
+  font-size: 1.1em;
+  padding: 0 2px;
+}
+
+.eq var,
+.math-var {
+  font-style: italic;
+}
+
+.num {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: .78em;
+  color: var(--muted);
+}
+
+/* Contenedor de expresión destacado */
+.expr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 7px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  min-height: 72px;
+  overflow-x: auto;
+  margin: 0 0 8px;
+}
+
+.expr > .op {
+  font-size: 22px;
+  color: var(--muted);
+}
+
+.dot {
+  color: var(--muted);
+}
+
+/* ---------- Fichas (tokens) ---------- */
+.token {
+  position: relative;
+  display: inline-block;
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 600;
+  line-height: 1.25;
+  transition: transform .25s, opacity .25s;
+}
+
+.token--wanted {
+  background: var(--bluebg);
+  color: var(--blue);
+  border-color: var(--blue-line);
+}
+
+.token--pending {
+  background: var(--amberbg);
+  color: var(--amber);
+  border-color: var(--amber-line);
+}
+
+.token--stacked {
+  background: var(--redbg);
+  color: var(--red);
+  border-color: var(--red-line);
+}
+
+.token--neutral {
+  background: var(--greenbg);
+  color: var(--green);
+  border-color: var(--green-line);
+}
+
+/* Lista de pasos */
+.steps {
+  padding-left: 22px;
+  color: var(--muted);
+}
+
+.steps li {
+  margin: 7px 0;
+}
+
+/* Tarjetas de dato (stat) */
+.stat {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.stat__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stat__value {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ---------- Plano cartesiano (js/core/plot.js) ---------- */
+.plot {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  touch-action: none;
+  user-select: none;
+}
+
+.plot-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.plot-axis {
+  stroke: var(--muted);
+  stroke-width: 1.4;
+}
+
+.plot-arrowhead {
+  fill: var(--muted);
+}
+
+.plot-tick {
+  font-size: 11px;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.plot-axis-label {
+  font-size: 14px;
+  font-style: italic;
+  font-family: var(--font-math);
+  fill: var(--ink);
+}
+
+.plot-label {
+  font-size: 13px;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.plot-label--muted {
+  fill: var(--muted);
+}
+
+.plot-curve {
+  fill: none;
+  stroke: var(--blue-line);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.plot-dot {
+  fill: var(--blue-line);
+  stroke: var(--card);
+  stroke-width: 1.5;
+}
+
+.plot-dot--open {
+  fill: var(--card);
+  stroke: var(--blue-line);
+  stroke-width: 2.5;
+}

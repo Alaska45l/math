@@ -1,0 +1,178 @@
+/* ==========================================================================
+   circuitos.css — Simulador de desigualdades compuestas (AND / OR)
+   ========================================================================== */
+
+.circ-modes {
+  margin: 0 0 12px;
+}
+
+.cond {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.cond__name {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cond input[type="number"] {
+  width: 90px;
+}
+
+.circ-solution {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 2px 0;
+}
+
+.circ-reto {
+  max-width: 100%;
+}
+
+/* ---------- Circuito SVG ---------- */
+.wire-base {
+  stroke: var(--border-strong);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.wire-flow {
+  stroke: var(--amber-line);
+  stroke-width: 3;
+  stroke-dasharray: 6 6;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.wire-flow.is-on {
+  opacity: 1;
+}
+
+@keyframes circ-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wire-flow {
+    animation: circ-flow 1s linear infinite;
+  }
+}
+
+.lever {
+  stroke: var(--muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform .25s, stroke .2s;
+}
+
+.lever.is-open {
+  transform: rotate(-20deg);
+}
+
+.lever.is-powered {
+  stroke: var(--amber-line);
+}
+
+.pivot {
+  fill: var(--ink);
+}
+
+.terminal {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+
+.junction {
+  fill: var(--muted);
+}
+
+.lamp-rays {
+  stroke: var(--amber-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.lamp-bulb {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: fill .2s;
+}
+
+.lamp-x {
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.lamp.is-lit .lamp-rays {
+  opacity: 1;
+}
+
+.lamp.is-lit .lamp-bulb {
+  fill: var(--lamp-fill);
+  stroke: var(--lamp-stroke);
+}
+
+.lamp.is-lit .lamp-x {
+  stroke: var(--lamp-x);
+}
+
+/* ---------- Recta numérica ---------- */
+.nl-track {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.nl-axis {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.nl-cursor {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.nl--a { --c: var(--teal-line); }
+.nl--b { --c: var(--violet-line); }
+.nl--res { --c: var(--amber-line); }
+
+.nl-seg {
+  stroke: var(--c);
+  stroke-width: 3;
+}
+
+.nl-seg.is-thick {
+  stroke-width: 5;
+}
+
+.nl-end {
+  fill: var(--card);
+  stroke: var(--c);
+  stroke-width: 2;
+}
+
+.nl-end.is-closed {
+  fill: var(--c);
+}
+
+.nl-arrow {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 2;
+  stroke-linecap: round;
+}

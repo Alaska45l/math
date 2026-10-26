@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Análisis dimensional y neutro multiplicativo · Laboratorio de Matemática</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules/dimensional.css">
+  <script type="module" src="js/modules/dimensional/index.js"></script>
+</head>
+
+<body>
+  <header data-site-nav="unidades"></header>
+
+  <main class="page">
+    <h1>Laboratorio de Análisis Dimensional y Neutro Multiplicativo</h1>
+    <p class="intro">Las conversiones no borran letras: multiplican por fracciones que valen <strong>1</strong>.
+      Encajá el pin de una unidad con el hueco de la misma unidad y observá qué permanece.</p>
+
+    <div class="panel row">
+      <label for="problem">Problema</label>
+      <select id="problem"></select>
+      <label for="value">Valor</label>
+      <input id="value" type="number" min="0" step="any" class="dim-value">
+      <div class="btn-group" role="group" aria-label="Predicción">
+        <button type="button" id="predict-up" class="toggle" aria-pressed="false">Creo que crece</button>
+        <button type="button" id="predict-down" class="toggle" aria-pressed="false">Creo que se achica</button>
+      </div>
+    </div>
+    <p id="dim-error" class="form-error" aria-live="polite"></p>
+
+    <div id="goal" class="notice"></div>
+
+    <h2>Construcción de la igualdad</h2>
+    <div id="expr" class="expr" aria-live="polite"></div>
+    <div class="dim-legend">
+      <span class="token token--pin token--neutral">forma el neutro 1</span>
+      <span class="token token--pin token--wanted">unidad pedida</span>
+      <span class="token token--pin token--pending">falta convertir</span>
+      <span class="token token--pin token--stacked">apilada</span>
+      <span class="label-sm">El pin está arriba; el hueco, abajo. Dos conectores del mismo tipo no encastran.</span>
+    </div>
+    <p id="status" class="status" aria-live="polite"></p>
+    <div id="power-note" class="dim-power" hidden></div>
+
+    <div class="row">
+      <button type="button" id="show-middle" class="toggle" aria-pressed="false" aria-controls="middle">Mostrar paso
+        intermedio: agrupar factores</button>
+    </div>
+    <section id="middle" class="dim-middle" aria-live="polite" hidden></section>
+
+    <h2>Factores unitarios disponibles</h2>
+    <p class="muted">Cada alternativa es una fracción igual a 1; elegí la orientación que permita encastrar.</p>
+    <div id="tools" class="dim-tools"></div>
+    <div class="row dim-actions">
+      <button type="button" id="undo">Deshacer</button>
+      <button type="button" id="reset">Reiniciar</button>
+      <button type="button" id="solve">Ver solución</button>
+    </div>
+
+    <h2>Registro de pasos</h2>
+    <ol id="log" class="steps"></ol>
+  </main>
+</body>
+
+</html>

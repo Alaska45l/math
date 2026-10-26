@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desigualdades compuestas como circuito · Laboratorio de Matemática</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules/circuitos.css">
+  <script type="module" src="js/modules/circuitos/index.js"></script>
+</head>
+
+<body>
+  <header data-site-nav="desigualdades"></header>
+
+  <main class="page page--narrow">
+    <h1>Desigualdades compuestas como circuito</h1>
+    <p class="intro">Cada desigualdad es un interruptor que conduce cuando es verdadera para el x elegido.
+      Serie = AND (intersección), paralelo = OR (unión). El ámbar marca hasta dónde llega la corriente.</p>
+
+    <h2 class="sr-only">Simulador de circuito: dos desigualdades como interruptores conectados en serie (AND) o en
+      paralelo (OR), con recta numérica y conjunto solución.</h2>
+
+    <div class="btn-group circ-modes" role="group" aria-label="Tipo de conexión">
+      <button type="button" id="mode-and" class="toggle" aria-pressed="false">Serie · AND ∧</button>
+      <button type="button" id="mode-or" class="toggle" aria-pressed="true">Paralelo · OR ∨</button>
+    </div>
+
+    <div class="grid-auto">
+      <div class="cond">
+        <span class="cond__name" aria-hidden="true">A</span>
+        <span class="math">x</span>
+        <label for="op-a" class="sr-only">Operador de la condición A</label>
+        <select id="op-a"></select>
+        <label for="val-a" class="sr-only">Valor de la condición A</label>
+        <input type="number" id="val-a" min="-12" max="12" step="0.5">
+      </div>
+      <div class="cond">
+        <span class="cond__name" aria-hidden="true">B</span>
+        <span class="math">x</span>
+        <label for="op-b" class="sr-only">Operador de la condición B</label>
+        <select id="op-b"></select>
+        <label for="val-b" class="sr-only">Valor de la condición B</label>
+        <input type="number" id="val-b" min="-12" max="12" step="0.5">
+      </div>
+    </div>
+    <p id="cond-error" class="form-error" aria-live="polite"></p>
+
+    <svg id="circuit" class="circuit" viewBox="0 0 680 300" role="img"
+      aria-label="Circuito con dos interruptores y una lámpara"></svg>
+
+    <div class="field">
+      <label for="x-slider" class="field__label">Valor de x</label>
+      <input type="range" id="x-slider" min="-15" max="15" step="0.5">
+      <output id="x-value" for="x-slider" class="field__out"></output>
+    </div>
+
+    <div class="grid-auto grid-auto--sm" aria-live="polite">
+      <div class="stat">
+        <div id="lab-a" class="stat__label">A</div>
+        <div id="truth-a" class="stat__value"></div>
+      </div>
+      <div class="stat">
+        <div id="lab-b" class="stat__label">B</div>
+        <div id="truth-b" class="stat__value"></div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">Lámpara</div>
+        <div id="truth-lamp" class="stat__value"></div>
+      </div>
+    </div>
+
+    <div class="panel" aria-live="polite">
+      <div class="panel__label">Conjunto solución (todos los x que encienden la lámpara)</div>
+      <div id="solution" class="circ-solution"></div>
+      <div id="verdict" class="muted small"></div>
+    </div>
+
+    <svg id="number-line" class="number-line" viewBox="0 0 680 226" role="img"
+      aria-label="Recta numérica con los conjuntos de A, B y el resultado"></svg>
+
+    <div class="row circ-presets">
+      <span class="label-sm">Ejemplos</span>
+      <div id="presets" class="btn-group"></div>
+    </div>
+
+    <div class="row">
+      <label for="reto" class="label-sm">Reto</label>
+      <select id="reto" class="circ-reto"></select>
+      <span id="reto-status" class="status" aria-live="polite"></span>
+    </div>
+  </main>
+</body>
+
+</html>
