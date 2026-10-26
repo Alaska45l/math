@@ -1,264 +1,219 @@
 /**
- * secante.js — Submódulo 3: El Puente Secante y Tasa de Cambio Promedio (TCP).
- * Conecta la pendiente lineal, el análisis dimensional (unidades físicas reales)
- * y el cálculo riguroso con fracciones horizontales de dos pisos (.fr).
+ * secante.js — Submódulo 3: El Puente Secante y la Tasa de Cambio Promedio.
+ * Los puntos P₁ y P₂ se arrastran directamente sobre el gráfico (o con los
+ * sliders, paso 0,1). El cálculo se muestra en fracciones de dos pisos (.fr),
+ * con paréntesis protectores para los negativos y las unidades a la vista.
  */
 import { h, s, mount, byId, on } from '../../core/dom.js';
-import { fmt, paren, frac, MINUS } from '../../core/math-format.js';
-import { createPlane } from '../../core/plot.js';
+import { fmt, paren, frac } from '../../core/math-format.js';
+import { createPlane, bindSvgDrag } from '../../core/plot.js';
 
 const CONTEXTS = [
   {
-    id: 'playa',
-    title: 'A. Temperatura en la playa: T(t) en °C vs. tiempo t en horas (h)',
-    xLabel: 't (h)',
-    yLabel: 'T (°C)',
-    xUnit: 'h',
-    yUnit: '°C',
-    rateUnit: '°C/h',
-    fn: (t) => -0.5 * (t - 4) * (t - 4) + 26,
-    xMin: 0,
-    xMax: 8,
-    yMin: 14,
-    yMax: 28,
-    zeroPair: [2, 6],
-    defaultPair: [1, 4],
+    title: 'A. Temperatura en la playa a lo largo de la mañana',
+    rule: 'T(t) = −0,5·(t − 4)² + 26',
+    xLabel: 't (h)', yLabel: 'T (°C)', xUnit: 'h', yUnit: '°C',
+    qty: 'la temperatura', up: 'subió', down: 'bajó', rateText: 'grados por hora',
+    fn: (t) => -0.5 * (t - 4) ** 2 + 26,
+    xMin: 0, xMax: 8, yMin: 14, yMax: 28, yStep: 2,
+    zeroPair: [2, 6], defaultPair: [1, 4],
   },
   {
-    id: 'basquet',
-    title: 'B. Tiro de básquetbol: Altura h(t) en m vs. tiempo t en segundos (s)',
-    xLabel: 't (s)',
-    yLabel: 'h (m)',
-    xUnit: 's',
-    yUnit: 'm',
-    rateUnit: 'm/s',
-    fn: (t) => -1.2 * (t - 3) * (t - 3) + 12,
-    xMin: 0,
-    xMax: 6,
-    yMin: 0,
-    yMax: 14,
-    zeroPair: [1, 5],
-    defaultPair: [1, 3],
+    title: 'B. Altura de un tiro de básquet',
+    rule: 'h(t) = −1,2·(t − 3)² + 12',
+    xLabel: 't (s)', yLabel: 'h (m)', xUnit: 's', yUnit: 'm',
+    qty: 'la altura de la pelota', up: 'subió', down: 'bajó', rateText: 'metros por segundo',
+    fn: (t) => -1.2 * (t - 3) ** 2 + 12,
+    xMin: 0, xMax: 6, yMin: 0, yMax: 14, yStep: 2,
+    zeroPair: [1, 5], defaultPair: [1, 3],
   },
   {
-    id: 'tanque',
-    title: 'C. Vaciado de reserva: Volumen V(t) en L vs. tiempo t en minutos (min)',
-    xLabel: 't (min)',
-    yLabel: 'V (L)',
-    xUnit: 'min',
-    yUnit: 'L',
-    rateUnit: 'L/min',
-    fn: (t) => 0.8 * (t - 3.5) * (t - 3.5) + 4,
-    xMin: 0,
-    xMax: 7,
-    yMin: 0,
-    yMax: 16,
-    zeroPair: [1.5, 5.5],
-    defaultPair: [0.5, 3.5],
+    title: 'C. Tanque de reserva: se vacía y se vuelve a llenar',
+    rule: 'V(t) = 0,8·(t − 3,5)² + 4',
+    xLabel: 't (min)', yLabel: 'V (L)', xUnit: 'min', yUnit: 'L',
+    qty: 'el volumen de agua', up: 'aumentó', down: 'disminuyó', rateText: 'litros por minuto',
+    fn: (t) => 0.8 * (t - 3.5) ** 2 + 4,
+    xMin: 0, xMax: 7, yMin: 0, yMax: 16, yStep: 2,
+    zeroPair: [1.5, 5.5], defaultPair: [0.5, 3.5],
   },
 ];
 
+const round1 = (v) => Math.round(v * 10) / 10;
+const unitSpan = (u) => h('span', { class: 'unit' }, ` ${u}`);
+
 export function initSecante(container) {
-  const state = {
-    ctxIdx: 0,
-    x1: 1,
-    x2: 4,
-  };
+  const state = { ctxIdx: 0, x1: 1, x2: 4 };
+  let dragTarget = null;
 
   mount(container,
     h('div', { class: 'panel' },
       h('div', { class: 'row' },
-        h('label', { for: 'sec-ctx', class: 'label-sm' }, 'Contexto físico'),
-        h('select', { id: 'sec-ctx' },
-          CONTEXTS.map((c, i) => h('option', { value: i }, c.title)),
-        ),
-        h('button', { type: 'button', id: 'sec-zero-btn', class: 'chip' }, 'Preset: Caso Tasa Cero (Δy = 0)'),
+        h('label', { for: 'sec-ctx', class: 'label-sm' }, 'Contexto'),
+        h('select', { id: 'sec-ctx' }, CONTEXTS.map((c, i) => h('option', { value: i }, c.title))),
+        h('button', { type: 'button', id: 'sec-zero-btn', class: 'chip' }, 'Probar el caso tasa cero (Δy = 0)'),
       ),
       h('div', { class: 'field' },
         h('label', { for: 'sec-x1', class: 'field__label' }, 'Instante x₁'),
-        h('input', { type: 'range', id: 'sec-x1', min: '0', max: '8', step: '0.5', value: state.x1 }),
+        h('input', { type: 'range', id: 'sec-x1', step: '0.1' }),
         h('output', { id: 'sec-x1-val', for: 'sec-x1', class: 'field__out' }),
-
         h('label', { for: 'sec-x2', class: 'field__label' }, 'Instante x₂'),
-        h('input', { type: 'range', id: 'sec-x2', min: '0', max: '8', step: '0.5', value: state.x2 }),
+        h('input', { type: 'range', id: 'sec-x2', step: '0.1' }),
         h('output', { id: 'sec-x2-val', for: 'sec-x2', class: 'field__out' }),
       ),
     ),
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
-        s('svg', { id: 'sec-svg', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Curva con recta secante y triángulo de incrementos' }),
+        s('svg', { id: 'sec-svg', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Curva con recta secante y triángulo de incrementos; arrastrá P₁ o P₂' }),
+        h('p', { class: 'fn-hint' }, 'Tip: agarrá P₁ o P₂ y arrastralos sobre el gráfico. Se mueve el que esté más cerca de tu dedo o del mouse.'),
       ),
       h('div', { class: 'fn-side' },
+        h('p', { id: 'sec-rule', class: 'muted small' }),
         h('div', { class: 'fn-formula-box', id: 'sec-math', 'aria-live': 'polite' }),
         h('div', { id: 'sec-verdict', class: 'notice', 'aria-live': 'polite' }),
       ),
     ),
   );
 
-  const selCtx = byId('sec-ctx', container);
-  const rngX1 = byId('sec-x1', container);
-  const rngX2 = byId('sec-x2', container);
-  const valX1 = byId('sec-x1-val', container);
-  const valX2 = byId('sec-x2-val', container);
-  const btnZero = byId('sec-zero-btn', container);
-  const svg = byId('sec-svg', container);
-  const mathBox = byId('sec-math', container);
-  const verdictEl = byId('sec-verdict', container);
+  const el = {
+    ctx: byId('sec-ctx', container), r1: byId('sec-x1', container), r2: byId('sec-x2', container),
+    v1: byId('sec-x1-val', container), v2: byId('sec-x2-val', container), zero: byId('sec-zero-btn', container),
+    svg: byId('sec-svg', container), math: byId('sec-math', container), verdict: byId('sec-verdict', container),
+    rule: byId('sec-rule', container),
+  };
 
   let plane = null;
-
-  function syncPlane() {
+  function buildPlane() {
     const c = CONTEXTS[state.ctxIdx];
-    rngX1.min = String(c.xMin);
-    rngX1.max = String(c.xMax);
-    rngX2.min = String(c.xMin);
-    rngX2.max = String(c.xMax);
-    rngX1.value = String(state.x1);
-    rngX2.value = String(state.x2);
-
-    plane = createPlane(svg, {
+    [el.r1, el.r2].forEach((r) => { r.min = String(c.xMin); r.max = String(c.xMax); });
+    plane = createPlane(el.svg, {
       width: 600, height: 380, xMin: c.xMin, xMax: c.xMax, yMin: c.yMin, yMax: c.yMax,
-      xLabel: c.xLabel, yLabel: c.yLabel,
+      yStep: c.yStep, xLabel: c.xLabel, yLabel: c.yLabel,
     });
+  }
+
+  function setPoint(which, x) {
+    const c = CONTEXTS[state.ctxIdx];
+    state[which] = Math.min(c.xMax, Math.max(c.xMin, round1(x)));
+    render();
+  }
+
+  /* ---------- Render ---------- */
+  function renderMath(c, x1, x2, y1, y2, dx, dy) {
+    if (Math.abs(dx) < 1e-9) {
+      mount(el.math, h('strong', null, 'Separá los dos instantes'), ': con x₁ = x₂ no hay "puente" que trazar.');
+      el.verdict.className = 'notice notice--err';
+      mount(el.verdict,
+        h('strong', null, 'Así no se puede calcular. '),
+        `Si los dos puntos coinciden, Δx = 0 ${c.xUnit} y la fracción quedaría con un 0 en el denominador, que no está definido. Hacen falta dos instantes distintos para medir un cambio.`);
+      return;
+    }
+    const tcp = dy / dx;
+    mount(el.math,
+      h('span', { class: 'math' }, 'TCP'), ' = ',
+      frac('f(x₂) − f(x₁)', 'x₂ − x₁'), ' = ',
+      frac(['(', fmt(y2), ' − ', paren(y1), ')', unitSpan(c.yUnit)], ['(', fmt(x2), ' − ', paren(x1), ')', unitSpan(c.xUnit)]), ' = ',
+      frac([fmt(dy), unitSpan(c.yUnit)], [fmt(dx), unitSpan(c.xUnit)]), ' = ',
+      h('strong', null, fmt(tcp)), ' ', frac(c.yUnit, c.xUnit, { className: 'fr--sm' }),
+    );
+
+    const span = `Entre ${fmt(Math.min(x1, x2))} ${c.xUnit} y ${fmt(Math.max(x1, x2))} ${c.xUnit}`;
+    const swapped = x1 > x2
+      ? h('p', { class: 'muted small' }, 'Pusiste x₁ después de x₂. No pasa nada: el numerador y el denominador cambian de signo juntos, y la TCP da exactamente lo mismo.')
+      : null;
+
+    if (Math.abs(dy) < 1e-9) {
+      el.verdict.className = 'notice notice--warn';
+      mount(el.verdict,
+        h('strong', null, 'Tasa cero, aunque en el medio pasaron cosas. '),
+        `${span}, ${c.qty} empezó y terminó en el mismo valor: f(${fmt(x1)}) = f(${fmt(x2)}) = ${fmt(y1)} ${c.yUnit}. `,
+        'En el camino subió y bajó (mirá la curva), pero el cambio neto es Δy = 0. Por eso la secante queda horizontal: su pendiente es 0. ',
+        'La TCP solo compara el principio con el final; no ve lo que pasó entre medio.',
+        swapped);
+      return;
+    }
+    const grew = (y2 - y1) * Math.sign(x2 - x1) > 0;
+    el.verdict.className = grew ? 'notice notice--ok' : 'notice';
+    mount(el.verdict,
+      h('strong', null, `${span}, ${c.qty} ${grew ? c.up : c.down} ${fmt(Math.abs(dy))} ${c.yUnit} en ${fmt(Math.abs(dx))} ${c.xUnit}. `),
+      `En promedio, es como si hubiera ${grew ? 'subido' : 'bajado'} a un ritmo parejo de ${fmt(Math.abs(tcp))} ${c.rateText}. `,
+      grew ? '' : 'El signo negativo de la TCP te avisa justamente eso: la magnitud disminuyó. ',
+      'Esa es la pendiente de la secante: la recta que une los dos instantes como si el cambio hubiera sido constante.',
+      swapped);
   }
 
   function render() {
     const c = CONTEXTS[state.ctxIdx];
-    const x1 = state.x1;
-    const x2 = state.x2;
-    const y1 = c.fn(x1);
-    const y2 = c.fn(x2);
-    const dx = x2 - x1;
-    const dy = y2 - y1;
+    const { x1, x2 } = state;
+    const y1 = c.fn(x1), y2 = c.fn(x2), dx = x2 - x1, dy = y2 - y1;
 
-    valX1.textContent = `${fmt(x1)} ${c.xUnit}`;
-    valX2.textContent = `${fmt(x2)} ${c.xUnit}`;
+    el.ctx.value = String(state.ctxIdx);
+    el.r1.value = String(x1);
+    el.r2.value = String(x2);
+    el.v1.textContent = `${fmt(x1)} ${c.xUnit}`;
+    el.v2.textContent = `${fmt(x2)} ${c.xUnit}`;
+    el.rule.textContent = `Modelo: ${c.rule}`;
 
     plane.clear('under', 'curve', 'marks', 'labels');
+    const { under, curve, marks, labels } = plane.layers;
+    curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve' }));
 
-    // Trazo de la curva
-    const curvePath = plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 100 });
-    plane.layers.curve.append(s('path', { d: curvePath, class: 'plot-curve' }));
-
-    if (Math.abs(dx) > 1e-4) {
-      const m = dy / dx;
-      const secFn = (x) => y1 + m * (x - x1);
-      const secPath = plane.linePath([[c.xMin, secFn(c.xMin)], [c.xMax, secFn(c.xMax)]]);
-      plane.layers.under.append(s('path', { d: secPath, class: 'fn-secant' }));
-
-      // Triángulo rectángulo de incrementos: cateto horizontal (Δx) y vertical (Δy)
-      plane.layers.marks.append(
-        s('line', {
-          x1: plane.sx(x1), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y1),
-          class: 'fn-triangle-dx',
-        }),
-        s('line', {
-          x1: plane.sx(x2), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y2),
-          class: 'fn-triangle-dy',
-        }),
+    if (Math.abs(dx) > 1e-9) {
+      const m = dy / dx, sec = (x) => y1 + m * (x - x1);
+      under.append(s('path', { d: plane.linePath([[c.xMin, sec(c.xMin)], [c.xMax, sec(c.xMax)]]), class: 'fn-secant' }));
+      marks.append(
+        s('line', { x1: plane.sx(x1), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y1), class: 'fn-triangle-dx' }),
+        s('line', { x1: plane.sx(x2), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y2), class: 'fn-triangle-dy' }),
       );
-
-      const dXSign = dx < 0 ? `${MINUS} ` : '';
-      const dYSign = dy < 0 ? `${MINUS} ` : '';
-
-      plane.layers.labels.append(
+      const midY = (c.yMin + c.yMax) / 2, rightSide = x2 >= (c.xMin + c.xMax) / 2;
+      labels.append(
         s('text', {
-          x: plane.sx((x1 + x2) / 2), y: plane.sy(y1) + (y1 < (c.yMin + c.yMax) / 2 ? -10 : 20),
+          x: plane.sx((x1 + x2) / 2), y: plane.sy(y1) + (y1 > midY ? 20 : -10),
           class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--green)',
-        }, `Δx = ${dXSign}${fmt(Math.abs(dx))} ${c.xUnit}`),
+        }, `Δx = ${fmt(dx)} ${c.xUnit}`),
         s('text', {
-          x: plane.sx(x2) + (x2 < (c.xMin + c.xMax) / 2 ? 8 : -8), y: plane.sy((y1 + y2) / 2),
-          class: 'plot-label', 'text-anchor': x2 < (c.xMin + c.xMax) / 2 ? 'start' : 'end', fill: 'var(--amber)',
-        }, `Δy = ${dYSign}${fmt(Math.abs(dy))} ${c.yUnit}`),
+          x: plane.sx(x2) + (rightSide ? -8 : 8), y: plane.sy((y1 + y2) / 2) + 4,
+          class: 'plot-label', 'text-anchor': rightSide ? 'end' : 'start', fill: 'var(--amber)',
+        }, `Δy = ${fmt(dy)} ${c.yUnit}`),
       );
     }
 
-    // Puntos P1 y P2
-    plane.layers.marks.append(
-      s('circle', { cx: plane.sx(x1), cy: plane.sy(y1), r: 6, fill: 'var(--blue-line)' }),
-      s('circle', { cx: plane.sx(x2), cy: plane.sy(y2), r: 6, fill: 'var(--amber-line)' }),
-    );
-    plane.layers.labels.append(
-      s('text', { x: plane.sx(x1), y: plane.sy(y1) - 10, class: 'plot-label', 'text-anchor': 'middle' }, `P₁(${fmt(x1)}; ${fmt(y1)})`),
-      s('text', { x: plane.sx(x2), y: plane.sy(y2) - 10, class: 'plot-label', 'text-anchor': 'middle' }, `P₂(${fmt(x2)}; ${fmt(y2)})`),
-    );
-
-    // Panel de cálculo con fracción horizontal .fr
-    if (Math.abs(dx) < 1e-4) {
-      mount(mathBox,
-        h('strong', null, 'Elegí dos instantes distintos (x₁ ≠ x₂)'),
-        ' para que el denominador Δx no sea 0.',
+    [[x1, y1, 'P₁', 'p1', 'var(--blue-line)'], [x2, y2, 'P₂', 'p2', 'var(--amber-line)']].forEach(([x, y, name, key, color]) => {
+      const cx = plane.sx(x), cy = plane.sy(y);
+      marks.append(
+        s('circle', { cx, cy, r: 13, class: `fn-handle-ring fn-handle-ring--${key}` }),
+        s('circle', { cx, cy, r: 7, fill: color, stroke: 'var(--card)', 'stroke-width': 2 }),
+        s('circle', { cx, cy, r: 20, class: 'fn-handle' }),
       );
-      verdictEl.className = 'notice notice--err';
-      verdictEl.innerHTML = `<strong>Indefinición:</strong> Con x₁ = x₂ el incremento es <strong>Δx = 0 ${c.xUnit}</strong>. La división por cero está indefinida (no existe pendiente de una secante sin dos puntos separados).`;
-      return;
-    }
+      labels.append(s('text', { x: cx, y: cy - 18, class: 'plot-label', 'text-anchor': 'middle' }, `${name}(${fmt(x)}; ${fmt(y)})`));
+    });
 
-    const tcp = dy / dx;
-
-    // Desarrollo en 4 pasos con fracciones horizontales estrictas
-    const f1 = frac('f(x₂) − f(x₁)', 'x₂ − x₁');
-    const f2 = frac(
-      [fmt(y2), ' − ', paren(y1), h('span', { class: 'unit' }, ` ${c.yUnit}`)],
-      [fmt(x2), ' − ', paren(x1), h('span', { class: 'unit' }, ` ${c.xUnit}`)],
-    );
-    const f3 = frac(
-      [fmt(dy), h('span', { class: 'unit' }, ` ${c.yUnit}`)],
-      [fmt(dx), h('span', { class: 'unit' }, ` ${c.xUnit}`)],
-    );
-    const fUnit = frac(c.yUnit, c.xUnit, { className: 'fr--sm' });
-
-    mount(mathBox,
-      h('span', { class: 'math' }, 'TCP'), ' = ',
-      f1, ' = ', f2, ' = ', f3, ' = ',
-      h('strong', null, fmt(tcp)), ' ', fUnit,
-    );
-
-    if (Math.abs(dy) < 1e-4) {
-      verdictEl.className = 'notice notice--warn';
-      verdictEl.innerHTML = `
-        <strong>Tasa de Cambio Promedio NULA (m = 0):</strong>
-        Aunque la magnitud subió y bajó en el medio, como <em>f(${fmt(x1)}) = f(${fmt(x2)}) = ${fmt(y1)} ${c.yUnit}</em>,
-        el cambio neto total entre ambos instantes es <strong>Δy = 0 ${c.yUnit}</strong>.
-        Por eso la recta secante es perfectamente horizontal (pendiente 0).
-      `;
-    } else {
-      verdictEl.className = tcp > 0 ? 'notice notice--ok' : 'notice notice--blue';
-      const dir = tcp > 0 ? 'creció' : 'disminuyó';
-      verdictEl.innerHTML = `
-        <strong>Interpretación dimensional:</strong> Entre ${fmt(x1)} ${c.xUnit} y ${fmt(x2)} ${c.xUnit}, la magnitud ${dir} a un ritmo promedio equivalente a
-        <strong>${fmt(tcp)} ${c.rateUnit}</strong> (la velocidad constante que conectaría ambos puntos en línea recta).
-      `;
-    }
+    renderMath(c, x1, x2, y1, y2, dx, dy);
   }
 
-  on(selCtx, 'change', (e) => {
+  /* ---------- Eventos ---------- */
+  on(el.ctx, 'change', (e) => {
     state.ctxIdx = Number(e.target.value);
-    const c = CONTEXTS[state.ctxIdx];
-    state.x1 = c.defaultPair[0];
-    state.x2 = c.defaultPair[1];
-    syncPlane();
+    [state.x1, state.x2] = CONTEXTS[state.ctxIdx].defaultPair;
+    buildPlane();
+    render();
+  });
+  on(el.r1, 'input', (e) => setPoint('x1', Number(e.target.value)));
+  on(el.r2, 'input', (e) => setPoint('x2', Number(e.target.value)));
+  on(el.zero, 'click', () => {
+    [state.x1, state.x2] = CONTEXTS[state.ctxIdx].zeroPair;
     render();
   });
 
-  on(rngX1, 'input', (e) => {
-    state.x1 = Number(e.target.value);
-    render();
-  });
-  on(rngX2, 'input', (e) => {
-    state.x2 = Number(e.target.value);
-    render();
-  });
-
-  on(btnZero, 'click', () => {
-    const c = CONTEXTS[state.ctxIdx];
-    state.x1 = c.zeroPair[0];
-    state.x2 = c.zeroPair[1];
-    rngX1.value = String(state.x1);
-    rngX2.value = String(state.x2);
-    render();
+  bindSvgDrag(el.svg, () => plane, ({ x, y, phase }) => {
+    if (phase === 'start') {
+      const c = CONTEXTS[state.ctxIdx];
+      const dist = (xi) => Math.hypot(plane.sx(xi) - plane.sx(x), plane.sy(c.fn(xi)) - plane.sy(y));
+      dragTarget = dist(state.x1) <= dist(state.x2) ? 'x1' : 'x2';
+    }
+    if (phase === 'end') { dragTarget = null; return; }
+    if (dragTarget) setPoint(dragTarget, x);
   });
 
-  syncPlane();
+  buildPlane();
   render();
 }

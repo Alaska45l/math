@@ -1,129 +1,154 @@
 /**
  * radiografia.js — Submódulo 2: La Radiografía Cartesiana.
- * Inspección profunda de C₀, C⁺, C⁻, intervalos de monotonía (↑/↓),
- * extremos locales vs. absolutos y el "Candado del Eje X".
+ * C₀, C⁺, C⁻, monotonía (↑/↓), extremos locales vs. absolutos,
+ * la trampa "negativa pero creciente" y el Candado del Eje X.
  */
 import { h, s, mount, byId, on, setPressed } from '../../core/dom.js';
 import { createPlane } from '../../core/plot.js';
 
+/* ------------------------------------------------------------------ */
+/* Curva C¹ por tramos (Hermite cúbico)                                 */
+/* ------------------------------------------------------------------ */
 /**
- * Curva continua suave en [−4; 5] armada por tramos C¹:
- * - Raíces exactas (C₀): x = −3, x = 0, x = 4
- * - Mínimo local en (−1,8; −3)
- * - Máximo local y absoluto en (2; 4)
- * - Mínimo absoluto en el borde derecho (5; −5)
+ * Nodos [x, y, pendiente]. Entre nodos consecutivos se usa el polinomio
+ * cúbico de Hermite que respeta valor y pendiente en ambos extremos, así
+ * que la curva es continua y su derivada también (C¹): no hay quiebres.
+ * Las pendientes cumplen la condición de Fritsch–Carlson (α, β ∈ [0; 3]),
+ * por lo que cada tramo es estrictamente monótono: las raíces y los
+ * extremos están exactamente donde se declaran.
+ *
+ *   (−4; 2,5) borde · máximo local (no absoluto)
+ *   (−3; 0)   raíz
+ *   (−1,8; −3) mínimo local (f' = 0)
+ *   (0; 0)    raíz, pendiente 2,5 compartida por ambos lados
+ *   (2; 4)    máximo local y absoluto (f' = 0)
+ *   (4; 0)    raíz
+ *   (5; −5)   borde · mínimo absoluto
  */
-function evalWave(x) {
-  if (x <= -1.8) {
-    const d = x + 1.8;
-    return (25 / 12) * d * d - 3;
+const KNOTS = [
+  [-4, 2.5, -2],
+  [-3, 0, -3.5],
+  [-1.8, -3, 0],
+  [0, 0, 2.5],
+  [2, 4, 0],
+  [4, 0, -3.5],
+  [5, -5, -6],
+];
+const X0 = KNOTS[0][0], X1 = KNOTS[KNOTS.length - 1][0];
+
+function segmentOf(x) {
+  for (let i = 0; i < KNOTS.length - 1; i++) {
+    if (x <= KNOTS[i + 1][0]) return i;
   }
-  if (x <= 2) {
-    if (x <= 0) {
-      const u = (x + 1.8) / 1.8;
-      return -3 + 3 * (u * u * (2 - u));
-    }
-    const v = x / 2;
-    return 4 * (v * (2 - v * v));
-  }
-  const d = x - 2;
-  return 4 - d * d;
+  return KNOTS.length - 2;
 }
+
+export function evalWave(x) {
+  const i = segmentOf(x);
+  const [xa, ya, ma] = KNOTS[i];
+  const [xb, yb, mb] = KNOTS[i + 1];
+  const d = xb - xa, t = (x - xa) / d, t2 = t * t, t3 = t2 * t;
+  return (2 * t3 - 3 * t2 + 1) * ya + (t3 - 2 * t2 + t) * d * ma + (-2 * t3 + 3 * t2) * yb + (t3 - t2) * d * mb;
+}
+
+export function slopeWave(x) {
+  const i = segmentOf(x);
+  const [xa, ya, ma] = KNOTS[i];
+  const [xb, yb, mb] = KNOTS[i + 1];
+  const d = xb - xa, t = (x - xa) / d, t2 = t * t;
+  return ((6 * t2 - 6 * t) * ya + (3 * t2 - 4 * t + 1) * d * ma + (-6 * t2 + 6 * t) * yb + (3 * t2 - 2 * t) * d * mb) / d;
+}
+
+/* ------------------------------------------------------------------ */
 
 const LENSES = [
   {
     id: 'signos',
     label: 'Lente 1: C₀, C⁺ y C⁻',
-    title: 'Conjuntos de Positividad (C⁺), Negatividad (C⁻) y Ceros (C₀)',
-    desc: `
-      <ul>
-        <li><strong>Ceros o Raíces (C₀ = {−3; 0; 4}):</strong> valores de <em>x</em> donde la curva interseca al eje X (<em>f(x) = 0</em>).</li>
-        <li><strong>Conjunto de Positividad (C⁺ = [−4; −3) ∪ (0; 4)):</strong> tramos sobre el eje horizontal (<em>f(x) &gt; 0</em>).</li>
-        <li><strong>Conjunto de Negatividad (C⁻ = (−3; 0) ∪ (4; 5]):</strong> tramos bajo el eje horizontal (<em>f(x) &lt; 0</em>).</li>
-      </ul>
-    `,
+    title: '¿Arriba o abajo del eje X?',
+    body: [
+      h('p', null, 'Esta lente solo mira el ', h('strong', null, 'signo'), ' de la salida: si la curva anda por arriba del eje X, por abajo, o justo encima.'),
+      h('ul', null,
+        h('li', null, h('strong', null, 'Ceros o raíces: C₀ = {−3; 0; 4}. '), 'Son los x donde la curva toca el eje: ahí f(x) = 0.'),
+        h('li', null, h('strong', null, 'Positividad: C⁺ = [−4; −3) ∪ (0; 4). '), 'Los x para los que la curva queda arriba del eje (f(x) > 0).'),
+        h('li', null, h('strong', null, 'Negatividad: C⁻ = (−3; 0) ∪ (4; 5]. '), 'Los x para los que la curva queda abajo (f(x) < 0).'),
+      ),
+      h('p', { class: 'muted small' }, 'Fijate que las tres respuestas son conjuntos de valores de x: las franjas de colores sobre el eje horizontal.'),
+    ],
   },
   {
     id: 'monotonia',
-    label: 'Lente 2: Crecimiento (↑) y Decrecimiento (↓)',
-    title: 'Intervalos de Crecimiento (I↑) y Decrecimiento (I↓)',
-    desc: `
-      <ul>
-        <li><strong>Crecimiento (I↑ = (−1,8; 2)):</strong> al recorrer la curva de izquierda a derecha, la función sube desde el valle en <em>x = −1,8</em> hasta la cima en <em>x = 2</em>.</li>
-        <li><strong>Decrecimiento (I↓ = (−4; −1,8) y (2; 5)):</strong> al aumentar <em>x</em>, la altura <em>f(x)</em> disminuye.</li>
-      </ul>
-    `,
+    label: 'Lente 2: Crecimiento (↑) y decrecimiento (↓)',
+    title: '¿Sube o baja mientras avanzás hacia la derecha?',
+    body: [
+      h('p', null, 'Ahora no importa a qué altura está la curva, sino ', h('strong', null, 'hacia dónde va'), '. Imaginá que la recorrés de izquierda a derecha: las flechas te muestran la dirección en cada tramo.'),
+      h('ul', null,
+        h('li', null, h('strong', null, 'Crece en I↑ = (−1,8; 2). '), 'Desde el valle en x = −1,8 hasta la cima en x = 2, cada paso a la derecha te lleva más arriba.'),
+        h('li', null, h('strong', null, 'Decrece en I↓ = (−4; −1,8) y en (2; 5). '), 'En esos tramos, avanzar en x hace que f(x) baje.'),
+      ),
+      h('p', { class: 'muted small' }, 'Los intervalos se escriben abiertos en los extremos donde la curva "da la vuelta": en el punto exacto del valle o de la cima no está ni subiendo ni bajando.'),
+    ],
   },
   {
     id: 'extremos',
-    label: 'Lente 3: Extremos Locales vs. Absolutos',
-    title: 'Puntos Máximos y Mínimos (Relativos vs. Absolutos)',
-    desc: `
-      <ul>
-        <li><strong>Máximo local y absoluto en (2; 4):</strong> es la cima de su entorno y el techo absoluto de todo el dominio.</li>
-        <li><strong>Mínimo local (relativo) en (−1,8; −3):</strong> es el punto más bajo de su vecindario, pero <strong>no es absoluto</strong> porque en el borde derecho la curva cae más abajo.</li>
-        <li><strong>Mínimo absoluto en (5; −5):</strong> se alcanza en el borde del dominio con <em>f(5) = −5</em>.</li>
-      </ul>
-    `,
+    label: 'Lente 3: Extremos locales vs. absolutos',
+    title: 'Cimas y valles: ¿del barrio o de todo el mapa?',
+    body: [
+      h('p', null, 'Un extremo ', h('strong', null, 'local'), ' es el más alto (o más bajo) comparado con sus vecinos cercanos. Uno ', h('strong', null, 'absoluto'), ' le gana a todo el dominio.'),
+      h('ul', null,
+        h('li', null, h('strong', null, '(2; 4): máximo local y absoluto. '), 'Es la cima de su zona y además ningún punto de la gráfica llega más alto.'),
+        h('li', null, h('strong', null, '(−1,8; −3): mínimo solo local. '), 'Es el fondo de su valle, pero no del mapa entero: más a la derecha la curva cae todavía más.'),
+        h('li', null, h('strong', null, '(5; −5): mínimo absoluto. '), 'Está en el borde del dominio. Los extremos absolutos pueden caer en los bordes, aunque ahí la curva no "dé la vuelta".'),
+        h('li', null, h('strong', null, '(−4; 2,5): máximo local de borde. '), 'Es lo más alto de su vecindario inmediato, pero (2; 4) le gana.'),
+      ),
+    ],
   },
   {
     id: 'trampa',
-    label: 'Lente 4: Trampa "Negativa pero Creciente"',
-    title: '¡Alerta de Examen! Negativa (f(x) < 0) pero Creciente (↑) en (−1,8; 0)',
-    desc: `
-      <p>En el intervalo <strong>x ∈ (−1,8; 0)</strong> ocurren las dos cosas al mismo tiempo:</p>
-      <ul>
-        <li>Es <strong>NEGATIVA (pertenece a C⁻)</strong> porque la curva está por debajo del eje X (entre <em>y = −3</em> e <em>y = 0</em>).</li>
-        <li>Es <strong>CRECIENTE (pertenece a I↑)</strong> porque a medida que avanzás hacia la derecha, la gráfica está <strong>subiendo</strong> hacia la superficie.</li>
-      </ul>
-    `,
+    label: 'Lente 4: La trampa "negativa pero creciente"',
+    title: 'Alerta de examen: negativa y creciente a la vez',
+    body: [
+      h('p', null, 'Mirá el tramo resaltado, ', h('strong', null, 'x ∈ (−1,8; 0)'), '. Ahí pasan dos cosas que muchos creen incompatibles:'),
+      h('ul', null,
+        h('li', null, 'La función es ', h('strong', null, 'NEGATIVA'), ' (está en C⁻): la curva va por debajo del eje X, como un submarino bajo el nivel del mar.'),
+        h('li', null, 'Y al mismo tiempo es ', h('strong', null, 'CRECIENTE'), ' (está en I↑): ese submarino está subiendo hacia la superficie.'),
+      ),
+      h('p', null, 'Estar abajo no significa estar bajando. El signo de f(x) te dice ', h('em', null, 'dónde estás'), '; el crecimiento te dice ', h('em', null, 'hacia dónde vas'), '.'),
+    ],
   },
 ];
 
 export function initRadiografia(container) {
-  const state = {
-    lens: 'signos',
-  };
+  const state = { lens: 'signos' };
 
   mount(container,
     h('div', { class: 'panel' },
-      h('span', { class: 'label-sm' }, 'Seleccioná un Lente de Rayos X para inspeccionar la curva en Dom(f) = [−4; 5]:'),
+      h('span', { class: 'label-sm' }, 'Elegí una lente de rayos X para mirar la misma curva, con Dom(f) = [−4; 5]:'),
       h('div', { class: 'fn-lens-bar', id: 'rad-lenses' },
-        LENSES.map((l) => h('button', {
-          type: 'button', class: 'toggle', dataset: { lens: l.id },
-          'aria-pressed': l.id === state.lens ? 'true' : 'false',
-        }, l.label)),
+        LENSES.map((l) => h('button', { type: 'button', class: 'toggle', dataset: { lens: l.id }, 'aria-pressed': l.id === state.lens ? 'true' : 'false' }, l.label)),
       ),
     ),
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
-        s('svg', { id: 'rad-svg', viewBox: '0 0 620 390', role: 'img', 'aria-label': 'Gráfica de análisis de positividad, crecimiento y extremos' }),
+        s('svg', { id: 'rad-svg', viewBox: '0 0 620 390', role: 'img', 'aria-label': 'Gráfica para analizar signo, crecimiento y extremos' }),
       ),
       h('div', { class: 'fn-side' },
-        h('div', { id: 'rad-explain', class: 'notice notice--blue', 'aria-live': 'polite' }),
+        h('div', { id: 'rad-explain', class: 'notice', 'aria-live': 'polite' }),
         h('div', { class: 'notice notice--warn' },
-          h('strong', null, '🔒 Candado del Eje X (Regla de oro para parciales): '),
-          'Los conjuntos ', h('em', null, 'C⁺, C⁻, I↑, I↓'), ' responden a ',
-          h('em', null, '«¿para qué valores de x ocurre esto?»'),
-          '. Se escriben ', h('strong', null, 'siempre leyendo las abscisas en el piso (Eje X)'),
-          ', jamás las alturas del Eje Y.',
+          h('strong', null, '🔒 Candado del eje X. '),
+          'C⁺, C⁻, I↑ e I↓ responden siempre a la misma pregunta: ',
+          h('em', null, '¿para qué valores de x pasa esto?'),
+          ' Por eso se escriben leyendo el eje X (el "piso"), nunca las alturas del eje Y. Las líneas punteadas te bajan cada borde hasta el piso.',
         ),
         h('div', { class: 'fn-readout' },
-          h('div', { class: 'fn-readout__title' }, 'Caza de errores: «Corregí la tarea de Guillermo»'),
+          h('div', { class: 'fn-readout__title' }, 'Caza de errores: corregí la tarea de Guillermo'),
           h('p', { class: 'muted small' },
-            'Observando el tramo donde la curva sube desde el valle (−1,8; −3) hasta la cima (2; 4), Guillermo escribió en su examen: ',
-            h('code', null, 'I↑ = (−3; 4)'), '. ¿Por qué le pusieron Mal (M)?',
-          ),
+            'Guillermo miró el tramo que sube desde el valle (−1,8; −3) hasta la cima (2; 4) y escribió ',
+            h('code', null, 'I↑ = (−3; 4)'), '. Le pusieron mal. ¿Por qué?'),
           h('div', { class: 'fn-quiz-options', id: 'rad-quiz' },
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'wrong1' } },
-              'A) Porque tendría que haber puesto corchetes cerrados [−3; 4].',
-            ),
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'correct' } },
-              'B) Porque leyó las alturas en el Eje Y (de y = −3 a y = 4) en vez de leer las coordenadas del Eje X: el intervalo correcto es (−1,8; 2).',
-            ),
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'wrong2' } },
-              'C) Porque entre x = −1,8 y x = 0 la función es negativa, entonces ahí no crece.',
-            ),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'brackets' } }, 'A) Porque tenía que usar corchetes: [−3; 4].'),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'correct' } }, 'B) Porque copió las alturas (y = −3 e y = 4) en vez de los valores de x. Lo correcto es (−1,8; 2).'),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'negative' } }, 'C) Porque entre x = −1,8 y x = 0 la función es negativa, así que ahí no puede crecer.'),
           ),
           h('p', { id: 'rad-quiz-msg', class: 'status', 'aria-live': 'polite' }),
         ),
@@ -137,155 +162,110 @@ export function initRadiografia(container) {
   const lensesBar = byId('rad-lenses', container);
   const quizBox = byId('rad-quiz', container);
 
-  const plane = createPlane(svg, {
-    width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5, xStep: 1, yStep: 1,
+  const plane = createPlane(svg, { width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5 });
+  const curve = (a, b, attrs) => s('path', { d: plane.fnPath(evalWave, a, b, { samples: Math.ceil((b - a) * 60) }), fill: 'none', ...attrs });
+  const guide = (x, color) => s('line', {
+    x1: plane.sx(x), y1: plane.sy(evalWave(x)), x2: plane.sx(x), y2: plane.xAxisY,
+    stroke: color, 'stroke-width': 1.6, 'stroke-dasharray': '4 4',
   });
+  const bar = (a, b, color, offset = 0) => s('line', {
+    x1: plane.sx(a), y1: plane.xAxisY + offset, x2: plane.sx(b), y2: plane.xAxisY + offset,
+    class: 'fn-shadow-x', stroke: color,
+  });
+  const dot = (x, y, color, r = 6) => s('circle', { cx: plane.sx(x), cy: plane.sy(y), r, fill: color, stroke: 'var(--card)', 'stroke-width': 1.5 });
+  const label = (x, y, text, anchor = 'middle', color = null) => s('text', { x, y, class: 'plot-label', 'text-anchor': anchor, fill: color }, text);
+
+  /** Flecha tangente en x, apuntando en el sentido de x creciente. */
+  function tangentArrow(x) {
+    const m = slopeWave(x);
+    const px = plane.sx(x), py = plane.sy(evalWave(x));
+    let dx = plane.sx(x + 0.01) - px, dy = plane.sy(evalWave(x) + m * 0.01) - py;
+    const len = Math.hypot(dx, dy); dx /= len; dy /= len;
+    const L = 22, color = m > 0 ? 'var(--green-line)' : 'var(--amber-line)';
+    const ex = px + dx * L, ey = py + dy * L;
+    const nx = -dy, ny = dx;
+    return s('g', null,
+      s('line', { x1: px - dx * L, y1: py - dy * L, x2: ex, y2: ey, stroke: color, 'stroke-width': 2.5, 'stroke-linecap': 'round' }),
+      s('path', { d: `M${ex + dx * 6} ${ey + dy * 6}L${ex + nx * 5} ${ey + ny * 5}L${ex - nx * 5} ${ey - ny * 5}Z`, fill: color }),
+    );
+  }
 
   function render() {
-    const active = LENSES.find((l) => l.id === state.lens);
-    explain.innerHTML = `<strong>${active.title}</strong>${active.desc}`;
-
+    const lens = LENSES.find((l) => l.id === state.lens);
+    mount(explain, h('strong', null, lens.title), ...lens.body);
     plane.clear('shade', 'under', 'curve', 'marks', 'labels');
+    const { shade, under, curve: cv, marks, labels } = plane.layers;
 
     if (state.lens === 'signos') {
-      // Semiplano superior tintado de verde, inferior de rojo
-      const yZero = plane.xAxisY;
-      plane.layers.shade.append(
-        s('rect', {
-          x: plane.box.x, y: plane.box.y, width: plane.box.w, height: yZero - plane.box.y,
-          fill: 'var(--greenbg)', opacity: 0.6,
-        }),
-        s('rect', {
-          x: plane.box.x, y: yZero, width: plane.box.w, height: plane.box.y + plane.box.h - yZero,
-          fill: 'var(--redbg)', opacity: 0.6,
-        }),
+      const y0 = plane.xAxisY, b = plane.box;
+      shade.append(
+        s('rect', { x: b.x, y: b.y, width: b.w, height: y0 - b.y, fill: 'var(--greenbg)', opacity: 0.6 }),
+        s('rect', { x: b.x, y: y0, width: b.w, height: b.y + b.h - y0, fill: 'var(--redbg)', opacity: 0.6 }),
       );
-
-      const pPos1 = plane.fnPath(evalWave, -4, -3, { samples: 40 });
-      const pNeg1 = plane.fnPath(evalWave, -3, 0, { samples: 60 });
-      const pPos2 = plane.fnPath(evalWave, 0, 4, { samples: 80 });
-      const pNeg2 = plane.fnPath(evalWave, 4, 5, { samples: 40 });
-
-      plane.layers.curve.append(
-        s('path', { d: pPos1, fill: 'none', stroke: 'var(--green-line)', 'stroke-width': 3.5 }),
-        s('path', { d: pNeg1, fill: 'none', stroke: 'var(--red-line)', 'stroke-width': 3.5 }),
-        s('path', { d: pPos2, fill: 'none', stroke: 'var(--green-line)', 'stroke-width': 3.5 }),
-        s('path', { d: pNeg2, fill: 'none', stroke: 'var(--red-line)', 'stroke-width': 3.5 }),
+      const pos = { stroke: 'var(--green-line)', 'stroke-width': 3.5 };
+      const neg = { stroke: 'var(--red-line)', 'stroke-width': 3.5 };
+      cv.append(curve(X0, -3, pos), curve(-3, 0, neg), curve(0, 4, pos), curve(4, X1, neg));
+      under.append(
+        bar(X0, -3, 'var(--green-line)'), bar(0, 4, 'var(--green-line)'),
+        bar(-3, 0, 'var(--red-line)'), bar(4, X1, 'var(--red-line)'),
+        guide(X0, 'var(--green-line)'), guide(X1, 'var(--red-line)'),
       );
-
       [-3, 0, 4].forEach((r) => {
-        plane.layers.marks.append(
-          s('circle', { cx: plane.sx(r), cy: plane.sy(0), r: 6, fill: 'var(--blue-line)' }),
-        );
-        plane.layers.labels.append(
-          s('text', {
-            x: plane.sx(r), y: plane.sy(0) - 10,
-            class: 'plot-label', 'text-anchor': 'middle',
-          }, `C₀ (${r}; 0)`),
-        );
+        marks.append(dot(r, 0, 'var(--blue-line)'));
+        labels.append(label(plane.sx(r), plane.xAxisY - 12, `(${r}; 0)`));
       });
     } else if (state.lens === 'monotonia') {
-      const dec1 = plane.fnPath(evalWave, -4, -1.8, { samples: 50 });
-      const inc = plane.fnPath(evalWave, -1.8, 2, { samples: 80 });
-      const dec2 = plane.fnPath(evalWave, 2, 5, { samples: 70 });
-
-      plane.layers.curve.append(
-        s('path', { d: dec1, fill: 'none', stroke: 'var(--amber-line)', 'stroke-width': 3.5 }),
-        s('path', { d: inc, fill: 'none', stroke: 'var(--green-line)', 'stroke-width': 4 }),
-        s('path', { d: dec2, fill: 'none', stroke: 'var(--amber-line)', 'stroke-width': 3.5 }),
+      cv.append(
+        curve(X0, -1.8, { stroke: 'var(--amber-line)', 'stroke-width': 3.5 }),
+        curve(-1.8, 2, { stroke: 'var(--green-line)', 'stroke-width': 4 }),
+        curve(2, X1, { stroke: 'var(--amber-line)', 'stroke-width': 3.5 }),
       );
-
-      // Líneas guía que bajan al eje X (Candado del eje X)
-      plane.layers.under.append(
-        s('line', {
-          x1: plane.sx(-1.8), y1: plane.sy(-3), x2: plane.sx(-1.8), y2: plane.xAxisY,
-          stroke: 'var(--green-line)', 'stroke-width': 1.8, 'stroke-dasharray': '4 4',
-        }),
-        s('line', {
-          x1: plane.sx(2), y1: plane.sy(4), x2: plane.sx(2), y2: plane.xAxisY,
-          stroke: 'var(--green-line)', 'stroke-width': 1.8, 'stroke-dasharray': '4 4',
-        }),
-        s('line', {
-          x1: plane.sx(-1.8), y1: plane.xAxisY, x2: plane.sx(2), y2: plane.xAxisY,
-          class: 'fn-shadow-x', stroke: 'var(--green-line)',
-        }),
+      under.append(
+        bar(-1.8, 2, 'var(--green-line)'),
+        bar(X0, -1.8, 'var(--amber-line)'), bar(2, X1, 'var(--amber-line)'),
+        guide(-1.8, 'var(--muted)'), guide(2, 'var(--muted)'),
       );
-
-      plane.layers.labels.append(
-        s('text', {
-          x: plane.sx(0.1), y: plane.xAxisY + 28,
-          class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--green)',
-        }, 'I↑ = (−1,8; 2) leído en el Eje X'),
-      );
+      [-3.5, -2.6, -1, 0.9, 3, 4.5].forEach((x) => marks.append(tangentArrow(x)));
+      labels.append(label(plane.sx(0.1), plane.xAxisY + 30, 'I↑ = (−1,8; 2), leído en el eje X', 'middle', 'var(--green)'));
     } else if (state.lens === 'extremos') {
-      const full = plane.fnPath(evalWave, -4, 5, { samples: 140 });
-      plane.layers.curve.append(s('path', { d: full, class: 'plot-curve' }));
-
-      plane.layers.marks.append(
-        s('circle', { cx: plane.sx(2), cy: plane.sy(4), r: 7, fill: 'var(--green-line)' }),
-        s('circle', { cx: plane.sx(-1.8), cy: plane.sy(-3), r: 7, fill: 'var(--amber-line)' }),
-        s('circle', { cx: plane.sx(5), cy: plane.sy(-5), r: 7, fill: 'var(--red-line)' }),
+      cv.append(curve(X0, X1, { class: 'plot-curve' }));
+      under.append(guide(2, 'var(--muted)'), guide(-1.8, 'var(--muted)'), guide(X1, 'var(--muted)'), guide(X0, 'var(--muted)'));
+      marks.append(
+        dot(2, 4, 'var(--green-line)', 7), dot(-1.8, -3, 'var(--amber-line)', 7),
+        dot(X1, -5, 'var(--red-line)', 7), dot(X0, 2.5, 'var(--blue-line)', 6),
       );
-
-      plane.layers.labels.append(
-        s('text', { x: plane.sx(2), y: plane.sy(4) - 12, class: 'plot-label', 'text-anchor': 'middle' }, 'Máx. local y absoluto (2; 4)'),
-        s('text', { x: plane.sx(-1.8), y: plane.sy(-3) + 20, class: 'plot-label', 'text-anchor': 'middle' }, 'Mín. solo local (−1,8; −3)'),
-        s('text', { x: plane.sx(5) - 60, y: plane.sy(-5) - 8, class: 'plot-label', 'text-anchor': 'middle' }, 'Mín. absoluto de borde (5; −5)'),
+      labels.append(
+        label(plane.sx(2), plane.sy(4) - 12, 'Máx. local y absoluto (2; 4)'),
+        label(plane.sx(-1.8), plane.sy(-3) + 22, 'Mín. solo local (−1,8; −3)'),
+        label(plane.sx(X1) - 10, plane.sy(-5) + 4, 'Mín. absoluto (5; −5)', 'end'),
+        label(plane.sx(X0) + 10, plane.sy(2.5) - 8, 'Máx. local de borde', 'start'),
       );
-    } else if (state.lens === 'trampa') {
-      const full = plane.fnPath(evalWave, -4, 5, { samples: 140 });
-      const trap = plane.fnPath(evalWave, -1.8, 0, { samples: 60 });
-
-      plane.layers.curve.append(
-        s('path', { d: full, fill: 'none', stroke: 'var(--border-strong)', 'stroke-width': 2.5 }),
-        s('path', { d: trap, fill: 'none', stroke: 'var(--amber-line)', 'stroke-width': 5 }),
+    } else {
+      cv.append(
+        curve(X0, X1, { stroke: 'var(--border-strong)', 'stroke-width': 2.5 }),
+        curve(-1.8, 0, { stroke: 'var(--amber-line)', 'stroke-width': 5 }),
       );
-
-      plane.layers.under.append(
-        s('line', {
-          x1: plane.sx(-1.8), y1: plane.xAxisY, x2: plane.sx(0), y2: plane.xAxisY,
-          class: 'fn-shadow-x', stroke: 'var(--amber-line)',
-        }),
-        s('line', {
-          x1: plane.sx(-1.8), y1: plane.sy(-3), x2: plane.sx(-1.8), y2: plane.xAxisY,
-          stroke: 'var(--amber-line)', 'stroke-width': 1.8, 'stroke-dasharray': '4 4',
-        }),
-      );
-
-      plane.layers.marks.append(
-        s('circle', { cx: plane.sx(-1.8), cy: plane.sy(-3), r: 6, fill: 'var(--amber-line)' }),
-        s('circle', { cx: plane.sx(0), cy: plane.sy(0), r: 6, fill: 'var(--amber-line)' }),
-      );
-
-      plane.layers.labels.append(
-        s('text', {
-          x: plane.sx(-0.9), y: plane.sy(-1.5) + 20,
-          class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--amber)',
-        }, 'Subiendo (I↑) pero bajo el mar (C⁻)'),
-      );
+      under.append(bar(-1.8, 0, 'var(--amber-line)'), guide(-1.8, 'var(--amber-line)'));
+      marks.append(dot(-1.8, -3, 'var(--amber-line)'), dot(0, 0, 'var(--amber-line)'), tangentArrow(-0.9));
+      labels.append(label(plane.sx(-0.9), plane.sy(-3.6), 'Abajo del eje, pero subiendo', 'middle', 'var(--amber)'));
     }
   }
 
   on(lensesBar, 'click', 'button[data-lens]', (_e, btn) => {
     state.lens = btn.dataset.lens;
-    lensesBar.querySelectorAll('button').forEach((b) => {
-      setPressed(b, b.dataset.lens === state.lens);
-    });
+    lensesBar.querySelectorAll('button').forEach((b) => setPressed(b, b.dataset.lens === state.lens));
     render();
   });
 
+  const FEEDBACK = {
+    correct: ['text-ok', '¡Exacto! −3 y 4 son alturas, valores de y. Un intervalo de crecimiento contesta "¿para qué x sube?", así que hay que bajar al piso: la curva sube desde x = −1,8 hasta x = 2, o sea I↑ = (−1,8; 2).'],
+    brackets: ['text-err', 'No es un tema de corchetes. El problema de fondo es que −3 y 4 ni siquiera son valores de x: son las alturas del valle y de la cima.'],
+    negative: ['text-err', 'Cuidado, esa es justamente la trampa de la Lente 4: estar debajo del eje no impide estar subiendo. La función crece en todo (−1,8; 2).'],
+  };
   on(quizBox, 'click', 'button[data-ans]', (_e, btn) => {
-    const ans = btn.dataset.ans;
-    if (ans === 'correct') {
-      quizMsg.className = 'status text-ok';
-      quizMsg.textContent = '¡Exacto! (−3; 4) son valores en el Eje Y. Los intervalos de crecimiento se escriben siempre leyendo las coordenadas del Eje X: (−1,8; 2).';
-    } else if (ans === 'wrong1') {
-      quizMsg.className = 'status text-err';
-      quizMsg.textContent = 'Incorrecto: el error fundamental es que −3 y 4 son alturas (y), no valores de x en el dominio.';
-    } else {
-      quizMsg.className = 'status text-err';
-      quizMsg.textContent = 'Cuidado: que la función sea negativa (bajo el eje X) no le impide estar subiendo. Crece en todo (−1,8; 2).';
-    }
+    const [cls, text] = FEEDBACK[btn.dataset.ans];
+    quizMsg.className = `status ${cls}`;
+    quizMsg.textContent = text;
   });
 
   render();

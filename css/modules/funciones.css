@@ -185,3 +185,99 @@
   stroke-width: 1.8;
   stroke-dasharray: 4 4;
 }
+
+/* ---------- Interacción directa sobre el SVG ---------- */
+.plot.is-interactive {
+  cursor: crosshair;
+}
+
+.plot.is-dragging,
+.plot.is-dragging .fn-handle {
+  cursor: grabbing;
+}
+
+/* Área de agarre amplia e invisible alrededor de los puntos arrastrables */
+.fn-handle {
+  fill: transparent;
+  stroke: none;
+  cursor: grab;
+}
+
+.fn-handle-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  opacity: .55;
+  pointer-events: none;
+}
+
+.fn-handle-ring--p1 { color: var(--blue-line); }
+.fn-handle-ring--p2 { color: var(--amber-line); }
+
+@keyframes fn-pulse {
+  0%, 100% { opacity: .25; }
+  50% { opacity: .7; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fn-handle-ring {
+    animation: fn-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+.fn-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 8px 4px 0;
+}
+
+/* ---------- Lecturas ---------- */
+.fn-text-blue {
+  color: var(--blue);
+}
+
+.fn-text-green {
+  color: var(--green);
+}
+
+.fn-reveal {
+  min-height: auto;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+/* ---------- Tubería con valores vivos ---------- */
+.fn-pipe-box small {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: .8;
+}
+
+.fn-pipe-box--mid {
+  background: var(--card);
+  color: var(--ink);
+  border-style: dashed;
+}
+
+.fn-pipe-op {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--amberbg);
+  color: var(--amber);
+  border: 1px solid var(--amber-line);
+}
+
+.fn-pipe-op--inv {
+  background: var(--greenbg);
+  color: var(--green);
+  border-color: var(--green-line);
+}
+
+.fn-pipeline--inv .fn-pipe-arrow {
+  color: var(--green-line);
+}

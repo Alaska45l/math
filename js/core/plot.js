@@ -2,10 +2,76 @@
  * plot.js — Plano cartesiano SVG reutilizable (escalas, grilla, ejes,
  * capas y muestreo de curvas con cortes en discontinuidades).
  */
-import { s, mount } from './dom.js';
+import { s, mount, svgPoint } from './dom.js';
 import { fmt } from './math-format.js';
 
 let uid = 0;
+
+/**
+ * Interacción directa sobre un plano: clic o arrastre (mouse, lápiz o dedo).
+ * Convierte la posición del puntero (coordenadas del viewBox) a coordenadas
+ * matemáticas usando las escalas inversas del plano.
+ *
+ * @param {SVGSVGElement} svg
+ * @param {object|Function} planeOrGetter  plano de createPlane() o función que lo devuelve
+ *                                          (útil si el plano se recrea al cambiar de contexto)
+ * @param {Function} onMove  ({ x, y, phase: 'start'|'move'|'end', event }) => void
+ *                           x e y llegan recortados al rango visible del plano.
+ * @returns {Function} función para desvincular los eventos
+ */
+export function bindSvgDrag(svg, planeOrGetter, onMove) {
+  const getPlane = typeof planeOrGetter === 'function' ? planeOrGetter : () => planeOrGetter;
+  let dragging = false;
+
+  const emit = (event, phase) => {
+    const plane = getPlane();
+    if (!plane) return;
+    const p = svgPoint(svg, event);
+    const { xMin, xMax, yMin, yMax } = plane.cfg;
+    const x = Math.min(xMax, Math.max(xMin, plane.invX(p.x)));
+    const y = Math.min(yMax, Math.max(yMin, plane.invY(p.y)));
+    onMove({ x, y, phase, event });
+  };
+
+  const down = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragging = true;
+    try { svg.setPointerCapture?.(e.pointerId); } catch (_) {}
+    svg.classList.add('is-dragging');
+    e.preventDefault();
+    emit(e, 'start');
+  };
+  const move = (e) => { if (dragging) emit(e, 'move'); };
+  const up = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    try { svg.releasePointerCapture?.(e.pointerId); } catch (_) {}
+    svg.classList.remove('is-dragging');
+    emit(e, 'end');
+  };
+
+  svg.classList.add('is-interactive');
+  svg.addEventListener('pointerdown', down);
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerup', up);
+  svg.addEventListener('pointercancel', up);
+  return () => {
+    svg.removeEventListener('pointerdown', down);
+    svg.removeEventListener('pointermove', move);
+    svg.removeEventListener('pointerup', up);
+    svg.removeEventListener('pointercancel', up);
+  };
+}
+
+/** Imán suave: si v está a menos de `radius` de algún valor clave, se pega a él. */
+export function snapTo(v, keys = [], radius = 0.1) {
+  let best = v, bestD = radius;
+  keys.forEach((k) => {
+    const d = Math.abs(v - k);
+    if (d <= bestD) { best = k; bestD = d; }
+  });
+  return best;
+}
 
 /**
  * @param {SVGSVGElement} svg
