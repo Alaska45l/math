@@ -119,7 +119,7 @@ export function createPlane(svg, cfg) {
   );
 
   const layers = {};
-  const order = ['bg', 'grid', 'shade', 'axes', 'axisLabels', 'under', 'curve', 'over', 'marks', 'labels'];
+  const order = ['bg', 'grid', 'shade', 'axes', 'under', 'curve', 'over', 'marks', 'axisLabels', 'labels'];
   const root = [];
   order.forEach((name) => {
     const clipped = ['bg', 'shade', 'under', 'curve', 'over'].includes(name);
@@ -184,14 +184,12 @@ export function createPlane(svg, cfg) {
     s('text', { x: P.l + pw + 6, y: xAxisY - 8, class: 'plot-axis-label', 'text-anchor': 'end' }, c.xLabel),
     s('text', { x: yAxisX + 8, y: P.t + 4, class: 'plot-axis-label' }, c.yLabel),
   );
-  const isMobileScreen = typeof window !== 'undefined' ? (window.innerWidth <= 600) : false;
   const helpers = { sx, sy, xAxisY, yAxisX };
   ticks(c.xMin, c.xMax, c.xStep).forEach((t) => {
     if (Math.abs(t) < 1e-9 && c.xMin < 0) return;
     axes.append(
       s('line', { x1: sx(t), y1: xAxisY - 3, x2: sx(t), y2: xAxisY + 3, class: 'plot-axis' }),
     );
-    if (isMobileScreen && (c.xMax - c.xMin) >= 7 && c.xStep === 1 && Math.abs(t % 2) > 0.01) return;
     const txt = c.xFmt(t);
     if (!txt) return;
     const pos = (typeof c.xTickPos === 'function' && c.xTickPos(t, helpers)) || { x: sx(t), y: xAxisY + 26, anchor: 'middle' };
@@ -204,7 +202,6 @@ export function createPlane(svg, cfg) {
     axes.append(
       s('line', { x1: yAxisX - 3, y1: sy(t), x2: yAxisX + 3, y2: sy(t), class: 'plot-axis' }),
     );
-    if (isMobileScreen && (c.yMax - c.yMin) >= 7 && c.yStep === 1 && Math.abs(t % 2) > 0.01) return;
     const txt = c.yFmt(t);
     if (!txt) return;
     const pos = (typeof c.yTickPos === 'function' && c.yTickPos(t, helpers)) || { x: yAxisX - 8, y: sy(t) + 4, anchor: 'end' };

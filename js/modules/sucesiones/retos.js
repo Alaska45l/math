@@ -257,11 +257,24 @@ export function initRetos(root) {
           b.classList.remove('is-active', 'is-correct', 'is-incorrect');
           const tag = b.querySelector('.quiz-opt-tag');
           if (tag) tag.classList.remove('encerrado', 'tachado');
+          const oldIcon = b.querySelector('.quiz-opt-icon');
+          if (oldIcon) oldIcon.remove();
         });
         btn.classList.add('is-active');
         btn.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
         const tag = btn.querySelector('.quiz-opt-tag');
-        if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
+        if (tag) {
+          tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'quiz-opt-icon';
+          iconSpan.innerHTML = `
+            <svg class="chalk-icon chalk-icon--${isCorrect ? 'check' : 'cross'}" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+              ${isCorrect ? '<path d="M3 8.5l3.5 3.5 6.5-8"/>' : '<path d="M4 4l8 8M12 4l-8 8"/>'}
+            </svg>
+            <span class="sr-only">${isCorrect ? 'correcta' : 'incorrecta'}</span>
+          `;
+          tag.after(iconSpan);
+        }
 
         const { label, vals } = task.evalGen(ansIdx);
         const table = verifyTableHtml(task.realIndices, task.realVals, vals, label);

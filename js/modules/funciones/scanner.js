@@ -298,7 +298,7 @@ export function initScanner(container) {
 
   const plane = createPlane(el.svg, {
     width: 600, height: 380, xMin: X_MIN, xMax: X_MAX, yMin: Y_MIN, yMax: Y_MAX,
-    xStep: 2, yStep: 2,
+    xStep: 1, yStep: 1,
     xTickPos: (t, { sx, xAxisY }) => (t === -2 ? { x: sx(-2) - 8, y: xAxisY + 22, anchor: 'end' } : null),
   });
 

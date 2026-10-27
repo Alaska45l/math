@@ -6,9 +6,18 @@
 
 /* SVG Border-Image de tiza dibujada a mano */
 :root {
-  --chalk-border-rest: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='2' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.5' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='none' stroke='%23ece8dc' stroke-width='1.8' stroke-opacity='0.45' filter='url(%23r)'/%3E%3C/svg%3E") 8 round;
-  --chalk-border-hover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='2' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.5' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='none' stroke='%23e6d38a' stroke-width='2.0' filter='url(%23r)'/%3E%3C/svg%3E") 8 round;
-  --chalk-border-active: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='2' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.5' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='none' stroke='%23e6d38a' stroke-width='2.8' filter='url(%23r)'/%3E%3C/svg%3E") 8 round;
+  --chalk-border-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-3: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%2523ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-1-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-2-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-3-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-1-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-2-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-3-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%2523e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-rest: var(--chalk-border-1);
+  --chalk-border-hover: var(--chalk-border-1-hover);
+  --chalk-border-active: var(--chalk-border-1-pressed);
 }
 
 button,
@@ -21,9 +30,9 @@ input[type="text"] {
   font-size: 16px;
   font-weight: 400;
   color: var(--ink);
-  background: transparent;
+  background-color: transparent;
   border: 2px solid transparent;
-  border-image: var(--chalk-border-rest);
+  border-image: var(--chalk-border-1);
   min-height: 44px;
   padding: 8px 14px;
   max-width: 100%;
@@ -35,6 +44,28 @@ input[type="text"] {
   transition: color 0.15s, transform 0.1s;
 }
 
+/* Asignación de 3 variantes de bordes dibujados a mano */
+button:nth-of-type(3n+1),
+.button:nth-of-type(3n+1),
+.btn:nth-of-type(3n+1),
+select:nth-of-type(3n+1) {
+  border-image: var(--chalk-border-1);
+}
+
+button:nth-of-type(3n+2),
+.button:nth-of-type(3n+2),
+.btn:nth-of-type(3n+2),
+select:nth-of-type(3n+2) {
+  border-image: var(--chalk-border-2);
+}
+
+button:nth-of-type(3n),
+.button:nth-of-type(3n),
+.btn:nth-of-type(3n),
+select:nth-of-type(3n) {
+  border-image: var(--chalk-border-3);
+}
+
 /* Select nativo con flecha de tiza */
 select {
   -webkit-appearance: none;
@@ -44,9 +75,9 @@ select {
   font-size: 16px;
   font-weight: 400;
   color: var(--ink);
-  background-color: var(--bg);
+  background-color: transparent;
   border: 2px solid transparent;
-  border-image: var(--chalk-border-rest);
+  border-image: var(--chalk-border-1);
   min-height: 44px;
   padding: 8px 34px 8px 12px;
   max-width: 100%;
@@ -60,20 +91,35 @@ select {
   transition: color 0.15s;
 }
 
-select option {
+select option,
+select optgroup {
   background-color: var(--bg);
   color: var(--ink);
 }
 
 @media (hover: hover) {
-  button:hover:not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .button:hover:not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .btn:hover:not(:disabled),
-  .fn-reveal:hover,
-  select:hover {
+  button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .btn:hover:nth-of-type(3n+1):not(:disabled),
+  select:hover:nth-of-type(3n+1) {
     color: var(--yellow);
-    border-image: var(--chalk-border-hover);
-    background-color: transparent;
+    border-image: var(--chalk-border-1-hover);
+  }
+
+  button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .btn:hover:nth-of-type(3n+2):not(:disabled),
+  select:hover:nth-of-type(3n+2) {
+    color: var(--yellow);
+    border-image: var(--chalk-border-2-hover);
+  }
+
+  button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
+  .btn:hover:nth-of-type(3n):not(:disabled),
+  select:hover:nth-of-type(3n) {
+    color: var(--yellow);
+    border-image: var(--chalk-border-3-hover);
   }
 
   .tab:hover,
@@ -83,41 +129,59 @@ select option {
   }
 }
 
-/* Clases de simulación para contact sheet y pruebas */
-button.is-hover:not(:disabled):not(.tab):not(.fn-quiz-btn),
-.button.is-hover:not(:disabled):not(.tab):not(.fn-quiz-btn),
-.btn.is-hover:not(:disabled),
-select.is-hover {
+/* Estado presionado persistente (aria-pressed="true", botones de lentes y filtros) */
+button[aria-pressed="true"],
+.btn[aria-pressed="true"],
+.btn--on {
   color: var(--yellow);
-  border-image: var(--chalk-border-hover);
-  background-color: transparent;
-}
-.tab.is-hover {
-  color: var(--ink);
-  background: transparent;
-}
-.fn-quiz-btn.is-hover {
-  background: transparent;
-  color: var(--yellow);
-  text-decoration: underline;
-  text-underline-offset: 4px;
 }
 
-/* Estado pressed / active: borde más grueso en var(--yellow), rotación sutil (<= 1deg) sin saltar layout */
+button[aria-pressed="true"]:nth-of-type(3n+1),
+.btn[aria-pressed="true"]:nth-of-type(3n+1) {
+  border-image: var(--chalk-border-1-pressed);
+  transform: rotate(-0.6deg);
+}
+
+button[aria-pressed="true"]:nth-of-type(3n+2),
+.btn[aria-pressed="true"]:nth-of-type(3n+2) {
+  border-image: var(--chalk-border-2-pressed);
+  transform: rotate(0.6deg);
+}
+
+button[aria-pressed="true"]:nth-of-type(3n),
+.btn[aria-pressed="true"]:nth-of-type(3n) {
+  border-image: var(--chalk-border-3-pressed);
+  transform: rotate(-0.4deg);
+}
+
+/* Estado :active momentáneo */
 button:active:not(:disabled):not(.tab):not(.fn-quiz-btn),
-button.is-active:not(:disabled):not(.tab):not(.fn-quiz-btn),
 .button:active:not(:disabled):not(.tab):not(.fn-quiz-btn),
 .btn:active:not(:disabled),
-.btn.is-active:not(:disabled),
 .fn-reveal:active {
-  border-image: var(--chalk-border-active);
   color: var(--yellow);
+}
+
+button:active:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
+.btn:active:nth-of-type(3n+1):not(:disabled) {
+  border-image: var(--chalk-border-1-pressed);
   transform: rotate(-0.6deg) scale(0.98);
 }
 
-select:active,
-select.is-active {
-  border-image: var(--chalk-border-active);
+button:active:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
+.btn:active:nth-of-type(3n+2):not(:disabled) {
+  border-image: var(--chalk-border-2-pressed);
+  transform: rotate(0.6deg) scale(0.98);
+}
+
+button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
+.btn:active:nth-of-type(3n):not(:disabled) {
+  border-image: var(--chalk-border-3-pressed);
+  transform: rotate(-0.4deg) scale(0.98);
+}
+
+select:active {
+  border-image: var(--chalk-border-1-pressed);
   color: var(--yellow);
 }
 
@@ -127,9 +191,10 @@ button:disabled,
 select:disabled {
   opacity: .5;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Foco accesible universal: outline 2px solid var(--yellow) con 3px offset */
+/* Foco accesible universal: outline 2px solid var(--yellow) con 3px offset (NO se anula en :active) */
 button:focus-visible,
 button.is-focus-visible,
 .button:focus-visible,
@@ -149,19 +214,10 @@ a.is-focus-visible,
   outline-offset: 3px;
 }
 
-/* Sin doble anillo en pulsación */
-button:active:focus-visible,
-button.is-active:focus-visible,
-.button:active:focus-visible,
-.btn:active:focus-visible,
-select:active:focus-visible {
-  outline: none;
-}
-
 input[type="number"],
 input[type="text"] {
   cursor: text;
-  background-color: var(--bg);
+  background-color: transparent;
 }
 
 input[type="number"] {
@@ -178,9 +234,9 @@ input[type="checkbox"] {
   min-width: 28px;
   min-height: 28px;
   margin: 0;
-  background-color: var(--bg);
+  background-color: transparent;
   border: 2px solid transparent;
-  border-image: var(--chalk-border-rest);
+  border-image: var(--chalk-border-1);
   border-radius: var(--radius);
   cursor: pointer;
   display: inline-grid;
@@ -188,6 +244,10 @@ input[type="checkbox"] {
   position: relative;
   box-sizing: border-box;
   flex: none;
+}
+
+input[type="checkbox"]:hover {
+  border-image: var(--chalk-border-1-hover);
 }
 
 input[type="checkbox"]::after {
@@ -203,7 +263,7 @@ input[type="checkbox"]::after {
 }
 
 input[type="checkbox"]:checked {
-  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='2' result='n'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='n' scale='1.5' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='none' stroke='%23aed1a2' stroke-width='2.2' filter='url(%23r)'/%3E%3C/svg%3E") 8 round;
+  border-image: var(--chalk-border-1-hover);
 }
 
 input[type="checkbox"]:checked::after {

@@ -114,28 +114,35 @@
   }
 
   .site-nav__inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    padding: 0 14px 2px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 10px;
     box-sizing: border-box;
+    height: 48px;
   }
 
   .site-nav__brand {
     margin-right: 0;
-    max-width: 100%;
-    font-size: 15px;
+    max-width: 140px;
+    font-size: 14px;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
+    flex: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .site-nav__list {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    width: 100%;
-    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    gap: 8px;
     padding: 0 4px;
     mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);

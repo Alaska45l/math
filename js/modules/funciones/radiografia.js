@@ -227,7 +227,7 @@ export function initRadiografia(container) {
       [-3, 0, 4].forEach((r) => {
         marks.append(dot(r, 0, 'var(--yellow)'));
       });
-      const lx = plane.sx(-1.5), ly = plane.sy(2.2);
+      const lx = plane.sx(-1.6), ly = plane.sy(0.7);
       labels.append(label(lx, ly, 'C₀', 'middle', 'var(--yellow)'));
     } else if (state.lens === 'monotonia') {
       const pos = { stroke: 'var(--blue)', 'stroke-width': 4 };
@@ -285,11 +285,20 @@ export function initRadiografia(container) {
       b.classList.remove('is-active', 'is-correct', 'is-incorrect');
       const tag = b.querySelector('.quiz-opt-tag');
       if (tag) tag.classList.remove('encerrado', 'tachado');
+      const oldIcon = b.querySelector('.quiz-opt-icon');
+      if (oldIcon) oldIcon.remove();
     });
     btn.classList.add('is-active');
     btn.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
     const tag = btn.querySelector('.quiz-opt-tag');
-    if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
+    if (tag) {
+      tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
+      const icon = h('span', { class: 'quiz-opt-icon' },
+        chalkIcon(isCorrect ? 'check' : 'cross'),
+        h('span', { class: 'sr-only' }, isCorrect ? 'correcta' : 'incorrecta')
+      );
+      tag.after(icon);
+    }
     const [cls, lead, text] = FEEDBACK[btn.dataset.ans];
     quizMsg.className = 'status';
     mount(quizMsg, h('strong', { class: cls }, lead), text);
