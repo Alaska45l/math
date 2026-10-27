@@ -9,7 +9,8 @@ select,
 input[type="number"],
 input[type="text"] {
   font: inherit;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 400;
   color: var(--ink);
   background: var(--card);
   border: 1px solid var(--border-strong);
@@ -80,7 +81,7 @@ output {
   background: var(--bluebg);
   color: var(--blue);
   border-color: var(--blue-line);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .btn-group {
@@ -92,7 +93,7 @@ output {
 /* Chips (presets) */
 .chip {
   min-height: auto;
-  font-size: 13px;
+  font-size: 16px;
   padding: 4px 10px;
   border-radius: var(--radius);
 }
@@ -107,7 +108,7 @@ output {
 }
 
 .field__label {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   min-width: 90px;
 }
@@ -121,7 +122,7 @@ output {
 }
 
 .label-sm {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--muted);
 }
 
@@ -300,7 +301,7 @@ output {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-math);
+  font-family: var(--font-hand);
   font-size: 18px;
 }
 
@@ -325,9 +326,9 @@ output {
 }
 
 .unit {
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
   font-style: normal;
-  font-size: .78em;
+  font-size: .88em;
   color: var(--muted);
 }
 
@@ -454,20 +455,20 @@ output {
 }
 
 .plot-tick {
-  font-size: 16px;
+  font-size: 19px;
   fill: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .plot-axis-label {
-  font-size: 18px;
+  font-size: 20px;
   font-style: italic;
   font-family: var(--font-math);
   fill: var(--ink);
 }
 
 .plot-label {
-  font-size: 16px;
+  font-size: 19px;
   fill: var(--ink);
   paint-order: stroke;
   stroke: var(--card);

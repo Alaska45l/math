@@ -37,7 +37,9 @@ export function initPostes(root) {
     <div class="seq-grid">
       <div class="seq-card">
         <p class="small muted" style="margin-bottom:8px">Hacé clic sobre cualquier poste en el riel para seleccionarlo directamente:</p>
-        <svg id="seq-track" class="seq-track" viewBox="0 0 700 195" role="img" aria-label="Riel de postes y saltos"></svg>
+        <div class="seq-track-wrap">
+          <svg id="seq-track" class="seq-track" viewBox="0 0 700 195" role="img" aria-label="Riel de postes y saltos"></svg>
+        </div>
       </div>
       <aside class="seq-readout" id="seq-count"></aside>
     </div>

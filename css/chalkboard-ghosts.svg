@@ -70,26 +70,26 @@
   <!-- Fórmulas matemáticas medio borradas (enmascaradas) -->
   <g class="ghost-eq" mask="url(#ghost-erase-mask)">
     <!-- Fila 1 -->
-    <text x="60" y="80" class="ghost-md">∇ × E = −∂B/∂t</text>
-    <text x="440" y="75" class="ghost-lg">E = mc<tspan dy="-0.5em" font-size="0.75em">2</tspan></text>
-    <text x="760" y="80" class="ghost-md">iℏ ∂ψ/∂t = Ĥψ</text>
-    <text x="1020" y="75" class="ghost-sm">∇ · B = 0</text>
+    <text x="60" y="80" class="ghost-md">F = m · a</text>
+    <text x="440" y="75" class="ghost-lg">E = m · c²</text>
+    <text x="760" y="80" class="ghost-md">(a + b)² = a² + 2ab + b²</text>
+    <text x="1050" y="75" class="ghost-sm">v = d / t</text>
 
     <!-- Diagrama: Triángulo y Pitágoras -->
     <g transform="translate(280, 70)">
       <polygon points="0,50 60,50 60,10" class="ghost-draw" />
-      <text x="15" y="66" class="ghost-sm">a<tspan dy="-0.5em" font-size="0.75em">2</tspan><tspan dy="0.5em"> + b</tspan><tspan dy="-0.5em" font-size="0.75em">2</tspan><tspan dy="0.5em"> = c</tspan><tspan dy="-0.5em" font-size="0.75em">2</tspan></text>
+      <text x="15" y="66" class="ghost-sm">a² + b² = c²</text>
     </g>
 
     <!-- Fila 2 -->
-    <text x="80" y="190" class="ghost-sm">∮ B · dℓ = μ₀ I</text>
-    <text x="400" y="200" class="ghost-lg">e<tspan dy="-0.5em" font-size="0.75em">iπ</tspan><tspan dy="0.5em"> + 1 = 0</tspan></text>
-    <text x="780" y="195" class="ghost-md">∫<tspan dy="0.4em" font-size="0.7em">−∞</tspan><tspan dy="-0.8em" font-size="0.7em">∞</tspan><tspan dy="0.4em"> e</tspan><tspan dy="-0.5em" font-size="0.75em">−x²</tspan><tspan dy="0.5em"> dx = √π</tspan></text>
+    <text x="80" y="190" class="ghost-sm">d/dx (x³) = 3x²</text>
+    <text x="400" y="200" class="ghost-lg">y = m · x + b</text>
+    <text x="780" y="195" class="ghost-md">sin²(x) + cos²(x) = 1</text>
 
     <!-- Fila 3 -->
-    <text x="60" y="310" class="ghost-md">Δx · Δp ≥ ℏ/2</text>
-    <text x="420" y="320" class="ghost-sm">G<tspan dy="0.3em" font-size="0.75em">μν</tspan><tspan dy="-0.3em"> + Λg</tspan><tspan dy="0.3em" font-size="0.75em">μν</tspan><tspan dy="-0.3em"> = κT</tspan><tspan dy="0.3em" font-size="0.75em">μν</tspan></text>
-    <text x="820" y="315" class="ghost-md">S = k<tspan dy="0.3em" font-size="0.75em">B</tspan><tspan dy="-0.3em"> ln Ω</tspan></text>
+    <text x="60" y="310" class="ghost-md">x = (−b ± D) / 2a</text>
+    <text x="420" y="320" class="ghost-sm">(f · g)' = f' · g + f · g'</text>
+    <text x="820" y="315" class="ghost-md">K = ½ m · v²</text>
 
     <!-- Diagrama: Parábola en mini-ejes -->
     <g transform="translate(220, 390)">
@@ -100,19 +100,19 @@
     </g>
 
     <!-- Fila 4 -->
-    <text x="60" y="440" class="ghost-sm">dU = T dS − P dV</text>
-    <text x="460" y="450" class="ghost-lg">∑ 1/n<tspan dy="-0.5em" font-size="0.75em">2</tspan><tspan dy="0.5em"> = π</tspan><tspan dy="-0.5em" font-size="0.75em">2</tspan><tspan dy="0.5em">/6</tspan></text>
-    <text x="860" y="440" class="ghost-sm">ℒ = T − V</text>
+    <text x="60" y="440" class="ghost-sm">dU = T · dS − P · dV</text>
+    <text x="460" y="450" class="ghost-lg">f(x) = a · x² + b · x + c</text>
+    <text x="880" y="440" class="ghost-sm">W = F · d</text>
 
     <!-- Fila 5 -->
-    <text x="100" y="560" class="ghost-md">lim<tspan dy="0.4em" font-size="0.7em">x→0</tspan><tspan dy="-0.4em"> sin(x)/x = 1</tspan></text>
-    <text x="500" y="570" class="ghost-md">f'(x) = lim Δf/h</text>
-    <text x="840" y="560" class="ghost-sm">λ = h / p</text>
+    <text x="100" y="560" class="ghost-md">lim (x² − 1) / (x − 1) = 2</text>
+    <text x="500" y="570" class="ghost-md">f'(x) = lim (f(x+h) − f(x)) / h</text>
+    <text x="880" y="560" class="ghost-sm">p = m · v</text>
 
     <!-- Fila 6 -->
-    <text x="70" y="680" class="ghost-sm">PV = nRT</text>
-    <text x="380" y="690" class="ghost-lg">∮_∂Σ ω = ∫_Σ dω</text>
-    <text x="820" y="685" class="ghost-md">ℵ<tspan dy="0.3em" font-size="0.75em">0</tspan><tspan dy="-0.3em"> &lt; 2</tspan><tspan dy="-0.5em" font-size="0.75em">ℵ₀</tspan></text>
+    <text x="70" y="680" class="ghost-sm">P · V = n · R · T</text>
+    <text x="380" y="690" class="ghost-lg">tan(x) = sin(x) / cos(x)</text>
+    <text x="820" y="685" class="ghost-md">log(a · b) = log(a) + log(b)</text>
 
     <!-- Diagrama: Campana normal -->
     <g transform="translate(680, 760)">
@@ -121,8 +121,8 @@
     </g>
 
     <!-- Fila 7 -->
-    <text x="90" y="800" class="ghost-md">⟨ ∇ · ∂ · ∫ · ∮ · ∑ · ∏ · ℏ ⟩</text>
-    <text x="460" y="810" class="ghost-sm">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ</text>
-    <text x="840" y="805" class="ghost-sm">{ ∀x, ∃! y : y = f(x) }</text>
+    <text x="90" y="800" class="ghost-md">s = v · t + ½ a · t²</text>
+    <text x="460" y="810" class="ghost-sm">a/sin(A) = b/sin(B)</text>
+    <text x="840" y="805" class="ghost-sm">V = (4/3) · r³</text>
   </g>
 </svg>

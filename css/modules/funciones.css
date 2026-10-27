@@ -140,14 +140,23 @@
 
 .fn-formula-box {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  row-gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 6px 0;
   background: transparent;
   border: none;
   border-radius: 0;
-  font-size: 15px;
+  font-size: 16px;
+}
+
+.tcp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .fn-shadow-x {
@@ -241,7 +250,7 @@
 }
 
 .fn-hint {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--muted);
   margin: 8px 4px 0;
 }
@@ -257,7 +266,7 @@
 
 .fn-reveal {
   min-height: auto;
-  font-size: 12px;
+  font-size: 16px;
   padding: 2px 10px;
   border-radius: var(--radius);
 }

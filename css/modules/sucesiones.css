@@ -38,8 +38,8 @@
 .seq-controls label {
   display: grid;
   gap: 5px;
-  font-weight: 600;
-  font-size: 13.5px;
+  font-weight: 400;
+  font-size: 16px;
 }
 
 .seq-controls input,
@@ -53,8 +53,15 @@
 }
 
 /* ---------- Lienzo de postes (Postes y Saltos) ---------- */
+.seq-track-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .seq-track {
   width: 100%;
+  min-width: 560px;
   min-height: 190px;
   overflow: visible;
   touch-action: manipulation;
@@ -108,18 +115,18 @@
 .seq-label {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
 }
 
 /* Etiquetas numéricas de salto sobre los arcos */
 .seq-arc-label {
   text-anchor: middle;
   fill: var(--muted);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
 }
 
 .seq-arc-label.is-travelled {
@@ -131,9 +138,9 @@
 .seq-post-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
 }
 
 /* Cuando el poste está activo (fondo amarillo brillante), el número va en pizarra oscuro para máximo contraste */
@@ -148,8 +155,9 @@
 .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
+  font-family: var(--font-hand);
 }
 
 /* ---------- Elementos Neutros y Salto Cero ---------- */
@@ -247,9 +255,9 @@
 .seq-chart-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
   paint-order: stroke fill;
   stroke: var(--card);
   stroke-width: 3.5px;
@@ -259,8 +267,9 @@
 .seq-chart .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
+  font-family: var(--font-hand);
 }
 
 /* ---------- Muñecas Rusas (Sustitución Regresiva) ---------- */
@@ -285,14 +294,14 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  font-family: var(--font-sans);
+  font-family: var(--font-hand);
 }
 
 .seq-doll-step {
   padding: 4px 0 4px 12px;
   border-left: 2px solid var(--blue);
   background: transparent;
-  font-size: 13.5px;
+  font-size: 16px;
   border-radius: 0;
 }
 
@@ -473,9 +482,9 @@
 }
 
 .seq-equation {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin: 8px 0;
-  font-family: var(--font-math);
+  font-family: var(--font-hand);
 }
 
 .seq-equation--highlight {

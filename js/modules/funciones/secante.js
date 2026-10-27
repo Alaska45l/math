@@ -108,13 +108,17 @@ export function initSecante(container) {
       return;
     }
     const tcp = dy / dx;
-    mount(el.math,
+    const row1 = h('div', { class: 'tcp-row' },
       h('span', { class: 'math' }, 'TCP'), ' = ',
-      frac('f(x₂) − f(x₁)', 'x₂ − x₁'), ' = ',
+      frac('f(x₂) − f(x₁)', 'x₂ − x₁'),
+    );
+    const row2 = h('div', { class: 'tcp-row' },
+      '= ',
       frac(['(', fmt(y2), ' − ', paren(y1), ')', unitSpan(c.yUnit)], ['(', fmt(x2), ' − ', paren(x1), ')', unitSpan(c.xUnit)]), ' = ',
       frac([fmt(dy), unitSpan(c.yUnit)], [fmt(dx), unitSpan(c.xUnit)]), ' = ',
       h('strong', null, fmt(tcp)), ' ', frac(c.yUnit, c.xUnit, { className: 'fr--sm' }),
     );
+    mount(el.math, row1, row2);
 
     const span = `Entre ${fmt(Math.min(x1, x2))} ${c.xUnit} y ${fmt(Math.max(x1, x2))} ${c.xUnit}`;
     const swapped = x1 > x2
