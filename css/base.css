@@ -113,6 +113,12 @@ svg {
   color: var(--muted);
 }
 
+.fn-canvas-card,
+.seq-card {
+  contain: paint;
+  isolation: isolate;
+}
+
 .intro {
   margin: 0 0 22px;
   font-size: 17px;

@@ -1,1 +1,418 @@
-.seq-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:16px;margin:14px 0;align-items:start}.seq-card,.seq-readout,.seq-exercise{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}.seq-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0}.seq-controls label{display:grid;gap:5px;font-weight:600}.seq-controls input,.seq-controls select{max-width:220px}.seq-track{width:100%;min-height:180px;overflow:visible}.seq-post{cursor:pointer;fill:var(--card);stroke:var(--blue-line);stroke-width:3}.seq-post.is-active{fill:var(--amber-line);stroke:var(--amber)}.seq-arc{fill:none;stroke:var(--border-strong);stroke-width:2;marker-end:url(#seq-arrow)}.seq-arc.is-travelled{stroke:var(--green-line);stroke-width:4}.seq-label{text-anchor:middle;fill:var(--text);font-size:12px}.seq-index{text-anchor:middle;fill:var(--muted);font-size:11px}.seq-cases{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;border-left:3px solid var(--amber-line);padding:10px 14px}.seq-token{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--bluebg);color:var(--blue);font-weight:700}.seq-token--change{background:var(--amberbg);color:var(--amber)}.seq-table{width:100%;border-collapse:collapse;margin-top:12px}.seq-table td,.seq-table th{border-bottom:1px solid var(--border);padding:8px;text-align:left}.seq-good{color:var(--green)}.seq-bad{color:var(--red)}.seq-chart{width:100%;height:300px}.seq-point{cursor:pointer}.seq-alert{padding:12px;background:var(--amberbg);border:1px solid var(--amber-line);border-radius:var(--radius);margin-top:12px}.seq-feedback{min-height:2em;margin-top:10px;font-weight:650}.seq-exercises{display:grid;gap:12px}.seq-exercise button{margin:5px}.seq-pill{display:inline-flex;gap:6px;align-items:center}.seq-range{min-width:180px}.seq-equation{font-size:1.1rem;margin:8px 0}.seq-arrow{color:var(--muted)}@media(max-width:800px){.seq-grid{grid-template-columns:1fr}}
+/* ==========================================================================
+   sucesiones.css — Estilos específicos del Laboratorio de Sucesiones
+   ========================================================================== */
+
+.seq-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  gap: 16px;
+  margin: 14px 0;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .seq-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.seq-card,
+.seq-readout,
+.seq-exercise {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  contain: paint;
+  isolation: isolate;
+}
+
+.seq-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.seq-controls label {
+  display: grid;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.seq-controls input,
+.seq-controls select {
+  max-width: 240px;
+}
+
+.seq-range {
+  min-width: 170px;
+}
+
+/* ---------- Lienzo de postes (Postes y Saltos) ---------- */
+.seq-track {
+  width: 100%;
+  min-height: 190px;
+  overflow: visible;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.seq-point {
+  cursor: pointer;
+  outline: none;
+}
+
+.seq-point:focus-visible .seq-post {
+  stroke: var(--amber);
+  stroke-width: 4;
+}
+
+.seq-post {
+  cursor: pointer;
+  fill: var(--card);
+  stroke: var(--blue-line);
+  stroke-width: 3;
+  transition: transform .15s ease, fill .15s ease, stroke .15s ease;
+}
+
+.seq-point:hover .seq-post {
+  fill: var(--bluebg);
+  stroke: var(--blue);
+}
+
+.seq-post.is-active {
+  fill: var(--amber-line);
+  stroke: var(--amber);
+}
+
+.seq-arc {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  marker-end: url(#seq-arrow);
+  transition: stroke .2s ease;
+}
+
+.seq-arc.is-travelled {
+  stroke: var(--green-line);
+  stroke-width: 4;
+}
+
+.seq-label {
+  text-anchor: middle;
+  fill: var(--text);
+  font-size: 12px;
+  font-family: var(--font-sans);
+}
+
+.seq-index {
+  text-anchor: middle;
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+/* ---------- Elementos Neutros y Salto Cero ---------- */
+.seq-neutral-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border-left: 4px solid var(--amber-line);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.seq-neutral-box h4 {
+  margin: 0 0 6px;
+  color: var(--amber);
+  font-size: 14px;
+}
+
+.seq-neutral-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.seq-neutral-badge--add {
+  background: var(--bluebg);
+  color: var(--blue);
+}
+
+.seq-neutral-badge--mul {
+  background: var(--greenbg);
+  color: var(--green);
+}
+
+/* ---------- Radar Geométrico y Zoom ---------- */
+.seq-chart {
+  width: 100%;
+  height: 310px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.seq-zoom-group {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  background: var(--surface);
+  padding: 3px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.seq-zoom-btn {
+  font-size: 12.5px;
+  padding: 4px 10px;
+  min-height: 28px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.seq-zoom-btn:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, .05);
+}
+
+.seq-zoom-btn.is-active {
+  background: var(--card);
+  border-color: var(--blue-line);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.seq-bounce-line {
+  fill: none;
+  stroke: var(--violet-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  opacity: 0.8;
+}
+
+/* ---------- Muñecas Rusas (Sustitución Regresiva) ---------- */
+.seq-doll-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+
+.seq-doll-box summary {
+  cursor: pointer;
+  font-weight: 650;
+  color: var(--amber);
+  outline: none;
+  user-select: none;
+}
+
+.seq-doll-steps {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-family: var(--font-sans);
+}
+
+.seq-doll-step {
+  padding: 6px 10px;
+  border-left: 3px solid var(--blue-line);
+  background: rgba(147, 197, 253, .06);
+  font-size: 13.5px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.seq-doll-step b {
+  color: var(--blue);
+}
+
+.seq-doll-conclusion {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--greenbg);
+  border: 1px solid var(--green-line);
+  border-radius: var(--radius);
+  color: var(--green);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ---------- Puente con Función Lineal ---------- */
+.seq-linear-bridge {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.seq-linear-bridge h4 {
+  margin: 0 0 6px;
+  color: var(--amber);
+  font-size: 14px;
+}
+
+/* ---------- Alerta de Paréntesis ---------- */
+.seq-paren-alert {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--redbg);
+  border: 1px solid var(--red-line);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.seq-token-paren {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--radius);
+  background: var(--amberbg);
+  color: var(--amber);
+  font-weight: 700;
+  border: 1px solid var(--amber-line);
+}
+
+/* ---------- Tablas y Comprobación en Retos ---------- */
+.seq-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 13.5px;
+}
+
+.seq-table td,
+.seq-table th {
+  border-bottom: 1px solid var(--border);
+  padding: 7px 10px;
+  text-align: left;
+}
+
+.seq-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.seq-verify-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.seq-verify-table th,
+.seq-verify-table td {
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.seq-verify-table th {
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.seq-cell-good {
+  background: rgba(74, 222, 128, .12);
+  color: var(--green);
+  font-weight: 700;
+}
+
+.seq-cell-bad {
+  background: rgba(248, 113, 113, .12);
+  color: var(--red);
+  font-weight: 700;
+}
+
+.seq-good { color: var(--green); }
+.seq-bad { color: var(--red); }
+
+.seq-pill {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.seq-pill--good {
+  background: var(--greenbg);
+  color: var(--green);
+}
+
+.seq-pill--bad {
+  background: var(--redbg);
+  color: var(--red);
+}
+
+.seq-cases {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  border-left: 3px solid var(--amber-line);
+  padding: 10px 14px;
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.seq-token {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--bluebg);
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.seq-token--change {
+  background: var(--amberbg);
+  color: var(--amber);
+}
+
+.seq-alert {
+  padding: 12px 14px;
+  background: var(--amberbg);
+  border: 1px solid var(--amber-line);
+  border-radius: var(--radius);
+  margin-top: 12px;
+  font-size: 13.5px;
+}
+
+.seq-feedback {
+  min-height: 2em;
+  margin-top: 10px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.seq-exercises {
+  display: grid;
+  gap: 16px;
+}
+
+.seq-exercise button {
+  margin: 4px;
+}
+
+.seq-equation {
+  font-size: 1.1rem;
+  margin: 8px 0;
+  font-family: var(--font-math);
+}
+

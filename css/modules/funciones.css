@@ -189,6 +189,9 @@
 /* ---------- Interacción directa sobre el SVG ---------- */
 .plot.is-interactive {
   cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 .plot.is-dragging,

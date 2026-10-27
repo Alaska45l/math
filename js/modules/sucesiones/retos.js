@@ -1,2 +1,265 @@
 import { fmt, fractionHtml } from '../../core/math-format.js';
-export function initRetos(root){const tasks=[['Woo-Jin o Kiran','64, 16, 4, 1 · f(1) = 64','¿Quién escribió la explícita correcta?',['Woo-Jin: 64 · (1/4)ⁿ','Kiran: 16 · (1/4)ⁿ⁻¹','Ambos'],1,'En n = 1 debe dar 64. Kiran parte de 16; Woo-Jin aplica la razón una vez de más. La correcta es 64 · (1/4)ⁿ⁻¹.'],['Ahorro de Caden','70 iniciales · interés anual 10%','¿Cómo se clasifica?',['Aritmética, se suma 10','Geométrica, factor 1,1','Geométrica, factor 0,1'],1,'El 10% se calcula sobre el saldo: f(n) = f(n−1) · 1,1; f(1) = 70.'],['Razón negativa decimal','h(1) = −5,3; h(n) = h(n−1) · (−11)','Elegí la explícita',['−5,3 · (−11)ⁿ⁻¹','−5,3 · (−11)ⁿ','5,3 · (−11)ⁿ⁻¹'],0,'Se parte de h(1), así que hay n−1 saltos. Los paréntesis mantienen toda la base negativa elevada.'],['Dominio de Supriya','−11, −6, −1, 4 · t(0) = −11; paso +5','¿Qué dominio corresponde?',['n ≥ 1','n ≥ 0','n > 0'],1,'El término inicial está etiquetado t(0), por eso el dominio comienza en 0: ℕ₀.'],['Geométrica alternante','d(1) = 8; d(n) = d(n−1) · (−5)','¿Cuál es d(4)?',['−1000','1000','−125'],0,'d(n) = 8 · (−5)ⁿ⁻¹. Entonces d(4) = 8 · (−5)³ = −1000.']];root.innerHTML=`<h2>Entrenador · cinco situaciones de la unidad</h2><p>Elegí una respuesta y mirá la comprobación. Las fracciones se escriben en formato horizontal.</p><div class="seq-exercises">${tasks.map((t,i)=>`<article class="seq-exercise" data-task="${i}"><h3>Reto ${i+1} · ${t[0]}</h3><p>${t[1]}</p><p>${t[2]}</p><div>${t[3].map((a,j)=>`<button type="button" data-answer="${j}">${a.replace('1/4','<span class="seq-frac"></span>')}</button>`).join('')}</div><div class="seq-feedback" aria-live="polite"></div></article>`).join('')}</div>`;root.querySelectorAll('.seq-frac').forEach(slot=>slot.replaceWith(fractionHtml('1','4')));const caden=root.querySelector('[data-task="1"]');caden.insertAdjacentHTML('beforeend','<p>Completá la regla: f(1) = <input aria-label="Término inicial de Caden" data-caden="start" type="number" value="70">; factor de cada año = <input aria-label="Factor anual de Caden" data-caden="factor" type="number" step="0.1" value="1.1"><button type="button" data-caden-check>Verificar fórmula</button></p>');caden.querySelector('[data-caden-check]').onclick=()=>{let good=+caden.querySelector('[data-caden="start"]').value===70&&Math.abs(+caden.querySelector('[data-caden="factor"]').value-1.1)<1e-9;caden.querySelector('.seq-feedback').innerHTML=`<span class="${good?'seq-good':'seq-bad'}">${good?'¡Correcto!':'Revisá los valores.'}</span> f(1) = 70 y f(n) = f(n − 1) · 1,1.`};root.querySelectorAll('.seq-exercise').forEach(card=>card.querySelectorAll('[data-answer]').forEach(btn=>btn.onclick=()=>{let i=+card.dataset.task,t=tasks[i],ok=+btn.dataset.answer===t[4];card.querySelector('.seq-feedback').innerHTML=`<span class="${ok?'seq-good':'seq-bad'}">${ok?'¡Bien!':'Todavía no.'}</span> ${t[5]}${i===0?`<p>Chequeo en n = 1: ${64} · ${fractionHtml('1','4')}<sup>0</sup> = 64.</p>`:''}${i===2?`<p>Explícita: −5,3 · (−11)<sup>n−1</sup>.</p>`:''}${i===4?'<p>d(4) = 8 · (−5)³ = −1000.</p>':''}`}))}
+
+export function initRetos(root) {
+  function verifyTableHtml(indices, realVals, genVals, formulaLabel) {
+    const headerCols = indices.map(idx => `<th>n = ${idx}</th>`).join('');
+    const realCols = realVals.map(v => `<td><strong>${fmt(v, 2)}</strong></td>`).join('');
+    const genCols = genVals.map((v, i) => {
+      const match = typeof v === 'number' && Math.abs(v - realVals[i]) < 1e-4;
+      return `<td class="${match ? 'seq-cell-good' : 'seq-cell-bad'}">${typeof v === 'number' ? fmt(v, 2) : v} ${match ? '✓' : '✗'}</td>`;
+    }).join('');
+
+    return `
+      <div style="margin-top:10px;">
+        <p class="small" style="margin-bottom:4px"><strong>Balanza de comprobación (primeros términos):</strong></p>
+        <table class="seq-verify-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Fórmula / Sucesión</th>
+              ${headerCols}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left;"><b>Sucesión pedida:</b></td>
+              ${realCols}
+            </tr>
+            <tr>
+              <td style="text-align:left;"><b>${formulaLabel}:</b></td>
+              ${genCols}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  const tasks = [
+    {
+      title: 'Reto 1 · Woo-Jin o Kiran',
+      desc: 'Sucesión pedida: <strong>64, 16, 4, 1</strong> comenzando en <i>n = 1</i> con <i>f(1) = 64</i>.',
+      question: '¿Quién escribió la fórmula explícita correcta?',
+      answers: [
+        'Woo-Jin: 64 · (1/4)ⁿ',
+        'Kiran: 16 · (1/4)ⁿ⁻¹',
+        'Ambos escribieron fórmulas equivalentes'
+      ],
+      correctIndex: -1, // Ninguno de los dos
+      realIndices: [1, 2, 3],
+      realVals: [64, 16, 4],
+      evalGen: (ansIdx) => {
+        if (ansIdx === 0) {
+          // Woo-Jin: 64 * (0.25^n)
+          return { label: 'Woo-Jin: 64 · (1/4)ⁿ', vals: [64 * 0.25, 64 * (0.25 ** 2), 64 * (0.25 ** 3)] };
+        } else if (ansIdx === 1) {
+          // Kiran: 16 * (0.25^(n-1))
+          return { label: 'Kiran: 16 · (1/4)ⁿ⁻¹', vals: [16, 16 * 0.25, 16 * (0.25 ** 2)] };
+        } else {
+          return { label: 'Ambos', vals: [16, 4, 1] };
+        }
+      },
+      feedback: (ansIdx) => {
+        return `
+          <p><span class="seq-bad">¡Ninguno de los dos acertó!</span></p>
+          <p>Al evaluar en <b>n = 1</b>:</p>
+          <ul class="small" style="margin:4px 0; padding-left:18px;">
+            <li><b>Woo-Jin</b> obtiene <code>64 · (1/4)¹ = 16</code>. Al poner exponente <i>n</i> en vez de <i>n − 1</i>, no llega al neutro 1 y da un salto de más antes de empezar.</li>
+            <li><b>Kiran</b> obtiene <code>16 · (1/4)⁰ = 16</code>. Su exponente es correcto, pero partió de 16 en vez de 64.</li>
+          </ul>
+          <p>La fórmula correcta era: <strong>f(n) = 64 · (1/4)ⁿ⁻¹</strong>.</p>
+        `;
+      }
+    },
+    {
+      title: 'Reto 2 · Ahorro e interés de Caden',
+      desc: 'Caden deposita <strong>$70</strong> en el año 1. Cada año su saldo aumenta un <strong>10%</strong> de lo que tenía.',
+      question: '¿Cómo se clasifica y modela el saldo anual?',
+      answers: [
+        'Aritmética: suma fija d = 10 cada año',
+        'Geométrica: razón r = 1,1 (100% + 10%)',
+        'Geométrica: razón r = 0,1'
+      ],
+      correctIndex: 1,
+      realIndices: [1, 2, 3],
+      realVals: [70, 77, 84.7],
+      evalGen: (ansIdx) => {
+        if (ansIdx === 0) return { label: 'Aritmética (+10)', vals: [70, 80, 90] };
+        if (ansIdx === 1) return { label: 'Geométrica (×1,1)', vals: [70, 77, 84.7] };
+        return { label: 'Geométrica (×0,1)', vals: [70, 7, 0.7] };
+      },
+      feedback: (ansIdx) => {
+        const ok = ansIdx === 1;
+        return `
+          <p><span class="${ok ? 'seq-good' : 'seq-bad'}">${ok ? '¡Exacto!' : 'Revisá el concepto:'}</span>
+          El 10% se calcula sobre el saldo acumulado en cada paso, no como una suma estática:
+          <code>70 + 0,10 · 70 = 70 · (1 + 0,10) = 70 · 1,1</code>. Es geométrica con razón <b>r = 1,1</b>.
+          </p>
+        `;
+      }
+    },
+    {
+      title: 'Reto 3 · Razón negativa decimal',
+      desc: 'Dada la definición recursiva: <i>h(1) = −5,3</i> con <i>h(n) = h(n − 1) · (−11)</i>.',
+      question: '¿Cuál es la fórmula explícita correcta?',
+      answers: [
+        'h(n) = −5,3 · (−11)ⁿ⁻¹',
+        'h(n) = −5,3 · (−11)ⁿ',
+        'h(n) = 5,3 · (−11)ⁿ⁻¹'
+      ],
+      correctIndex: 0,
+      realIndices: [1, 2, 3],
+      realVals: [-5.3, 58.3, -641.3],
+      evalGen: (ansIdx) => {
+        if (ansIdx === 0) return { label: '−5,3 · (−11)ⁿ⁻¹', vals: [-5.3, 58.3, -641.3] };
+        if (ansIdx === 1) return { label: '−5,3 · (−11)ⁿ', vals: [58.3, -641.3, 7054.3] };
+        return { label: '5,3 · (−11)ⁿ⁻¹', vals: [5.3, -58.3, 641.3] };
+      },
+      feedback: (ansIdx) => {
+        const ok = ansIdx === 0;
+        return `
+          <p><span class="${ok ? 'seq-good' : 'seq-bad'}">${ok ? '¡Perfecto!' : 'Atención al índice y signo:'}</span>
+          Como arranca en <i>n = 1</i>, el exponente debe ser <b>n − 1</b> para que en <i>n = 1</i> el exponente sea 0 y <code>(−11)⁰ = 1</code> (neutro multiplicativo).
+          Además, los <strong>paréntesis en (−11)</strong> son obligatorios para mantener el signo negativo dentro de la base elevada.
+          </p>
+        `;
+      }
+    },
+    {
+      title: 'Reto 4 · Dominio de Supriya',
+      desc: 'Supriya escribe la regla: <i>t(n) = −11 + 5 · n</i> para generar <strong>−11, −6, −1, 4, …</strong> con <i>t(0) = −11</i>.',
+      question: '¿Qué dominio corresponde al conjunto de índices de Supriya?',
+      answers: [
+        'n ≥ 1 · Dominio ℕ = {1, 2, 3, …}',
+        'n ≥ 0 · Dominio ℕ₀ = {0, 1, 2, …}',
+        'n > 0 · Dominio de enteros positivos estrictos'
+      ],
+      correctIndex: 1,
+      realIndices: [0, 1, 2],
+      realVals: [-11, -6, -1],
+      evalGen: (ansIdx) => {
+        if (ansIdx === 1) return { label: 'Dominio n ≥ 0 (arranca en 0)', vals: [-11, -6, -1] };
+        return { label: 'Dominio n ≥ 1 (arranca en 1)', vals: [-6, -1, 4] };
+      },
+      feedback: (ansIdx) => {
+        const ok = ansIdx === 1;
+        return `
+          <p><span class="${ok ? 'seq-good' : 'seq-bad'}">${ok ? '¡Muy bien!' : 'Cuidado con el punto de partida:'}</span>
+          El enunciado dice explícitamente que el primer término es <b>t(0) = −11</b>. Por eso el dominio arranca en <b>0 (ℕ₀)</b>.
+          Si usáramos <i>n ≥ 1</i>, el primer valor evaluado sería <code>t(1) = −11 + 5·1 = −6</code>, perdiéndose el −11 inicial.
+          </p>
+        `;
+      }
+    },
+    {
+      title: 'Reto 5 · Geométrica alternante',
+      desc: 'Dada <i>d(1) = 8</i> y <i>d(n) = d(n − 1) · (−5)</i>. Sucesión: 8, −40, 200, …',
+      question: '¿Cuál es el valor del término d(4)?',
+      answers: [
+        'd(4) = −1000',
+        'd(4) = +1000',
+        'd(4) = −125'
+      ],
+      correctIndex: 0,
+      realIndices: [1, 2, 3, 4],
+      realVals: [8, -40, 200, -1000],
+      evalGen: (ansIdx) => {
+        if (ansIdx === 0) return { label: 'Opción −1000: 8 · (−5)³', vals: [8, -40, 200, -1000] };
+        if (ansIdx === 1) return { label: 'Opción +1000: signo invertido', vals: [8, 40, 200, 1000] };
+        return { label: 'Opción −125: solo (−5)³ sin multiplicar por 8', vals: [1, -5, 25, -125] };
+      },
+      feedback: (ansIdx) => {
+        const ok = ansIdx === 0;
+        return `
+          <p><span class="${ok ? 'seq-good' : 'seq-bad'}">${ok ? '¡Impecable!' : 'Atención al exponente impar:'}</span>
+          La fórmula es <code>d(n) = 8 · (−5)ⁿ⁻¹</code>. En <i>n = 4</i> tenemos 3 saltos:
+          <code>d(4) = 8 · (−5)³ = 8 · (−125) = −1000</code>.
+          Como la potencia tiene exponente impar (3), la base negativa conserva el signo menos.
+          </p>
+        `;
+      }
+    }
+  ];
+
+  root.innerHTML = `
+    <h2>Entrenador · cinco situaciones de la unidad</h2>
+    <p>Elegí una respuesta en cada reto. Se desplegará la <strong>Balanza de Comprobación</strong> comparando los primeros términos reales contra la opción elegida, para que veas exactamente dónde encaja o dónde se desfasa.</p>
+    <div class="seq-exercises">
+      ${tasks.map((t, i) => `
+        <article class="seq-exercise" data-task="${i}">
+          <h3>${t.title}</h3>
+          <p>${t.desc}</p>
+          <p><strong>${t.question}</strong></p>
+          <div class="seq-options">
+            ${t.answers.map((ans, j) => `
+              <button type="button" class="button" data-answer="${j}">
+                ${ans.replace('1/4', '<span class="seq-frac"></span>')}
+              </button>
+            `).join('')}
+          </div>
+          <div class="seq-feedback" aria-live="polite"></div>
+        </article>
+      `).join('')}
+    </div>
+  `;
+
+  // Reemplazar fracciones tipográficas
+  root.querySelectorAll('.seq-frac').forEach(slot => {
+    slot.replaceWith(fractionHtml('1', '4'));
+  });
+
+  // Reto 2 interactivo adicional (fórmula de Caden)
+  const cadenCard = root.querySelector('[data-task="1"]');
+  cadenCard.insertAdjacentHTML('beforeend', `
+    <div style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--border);">
+      <p class="small"><b>Comprobá con tus propios valores de Caden:</b></p>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <label class="small">Saldo f(1): <input data-caden="start" type="number" value="70" style="width:75px;"></label>
+        <label class="small">Factor anual r: <input data-caden="factor" type="number" step="0.1" value="1.1" style="width:75px;"></label>
+        <button type="button" data-caden-check>Verificar prueba</button>
+      </div>
+      <div class="seq-caden-feedback" style="margin-top:8px;"></div>
+    </div>
+  `);
+
+  cadenCard.querySelector('[data-caden-check]').onclick = () => {
+    const aVal = +cadenCard.querySelector('[data-caden="start"]').value;
+    const rVal = +cadenCard.querySelector('[data-caden="factor"]').value;
+    const isGood = aVal === 70 && Math.abs(rVal - 1.1) < 1e-4;
+    const gen = [aVal, aVal * rVal, aVal * (rVal ** 2)];
+    const table = verifyTableHtml([1, 2, 3], [70, 77, 84.7], gen, `Tu fórmula: ${aVal} · (${rVal})ⁿ⁻¹`);
+
+    cadenCard.querySelector('.seq-caden-feedback').innerHTML = `
+      <p><span class="${isGood ? 'seq-good' : 'seq-bad'}">${isGood ? '¡Excelente configuración!' : 'Revisá los valores:'}</span>
+      Saldo inicial = 70, factor multiplicador = 1,1 (100% de base + 10% de ganancia anual).
+      </p>
+      ${table}
+    `;
+  };
+
+  // Manejador de clics en las opciones de retos
+  root.querySelectorAll('.seq-exercise').forEach(card => {
+    const taskIdx = Number(card.dataset.task);
+    const task = tasks[taskIdx];
+
+    card.querySelectorAll('[data-answer]').forEach(btn => {
+      btn.onclick = () => {
+        const ansIdx = Number(btn.dataset.answer);
+        card.querySelectorAll('[data-answer]').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+
+        const { label, vals } = task.evalGen(ansIdx);
+        const table = verifyTableHtml(task.realIndices, task.realVals, vals, label);
+        const fbText = task.feedback(ansIdx);
+
+        card.querySelector('.seq-feedback').innerHTML = `
+          ${fbText}
+          ${table}
+          <p class="small muted" style="margin-top:6px;">
+            Estrategia de examen: calcular <i>n = 1</i> y <i>n = 2</i> descarta al instante opciones desfasadas o con bases erróneas sin recurrir a adivinanzas.
+          </p>
+        `;
+      };
+    });
+  });
+}
+
