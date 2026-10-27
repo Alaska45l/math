@@ -4,6 +4,7 @@
 
 /* ---------- Controles de formulario ---------- */
 button,
+.button,
 select,
 input[type="number"],
 input[type="text"] {
@@ -17,25 +18,30 @@ input[type="text"] {
   padding: 6px 12px;
 }
 
-button {
+button,
+.button {
   cursor: pointer;
   background: transparent;
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:disabled),
+.button:hover:not(:disabled) {
   background: var(--surface);
 }
 
-button:active:not(:disabled) {
+button:active:not(:disabled),
+.button:active:not(:disabled) {
   transform: scale(.98);
 }
 
-button:disabled {
+button:disabled,
+.button:disabled {
   opacity: .5;
   cursor: not-allowed;
 }
 
 button:focus-visible,
+.button:focus-visible,
 select:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--blue);
@@ -124,41 +130,50 @@ output {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+}
+
+.inline-mark {
+  display: inline-block !important;
+  width: 15px !important;
+  height: 15px !important;
+  vertical-align: middle;
+  margin-left: 6px;
 }
 
 .badge--ok {
-  background: var(--greenbg);
   color: var(--green);
-  border-color: var(--green-line);
+  background: transparent;
+  border: none;
 }
 
 .badge--warn {
-  background: var(--amberbg);
-  color: var(--amber);
-  border-color: var(--amber-line);
+  color: var(--yellow);
+  background: transparent;
+  border: none;
 }
 
 .badge--err {
-  background: var(--redbg);
-  color: var(--red);
-  border-color: var(--red-line);
+  color: var(--pink);
+  background: transparent;
+  border: none;
 }
 
 .badge--info {
-  background: var(--bluebg);
   color: var(--blue);
-  border-color: var(--blue-line);
+  background: transparent;
+  border: none;
 }
 
 .badge--sm {
-  font-size: 12px;
-  padding: 1px 8px;
-  border-radius: var(--radius);
+  font-size: 13px;
+  padding: 0;
+  border-radius: 0;
 }
 
 .text-ok {
@@ -166,11 +181,11 @@ output {
 }
 
 .text-err {
-  color: var(--red);
+  color: var(--pink);
 }
 
 .text-warn {
-  color: var(--amber);
+  color: var(--yellow);
 }
 
 .text-muted {
@@ -179,27 +194,37 @@ output {
 
 /* Avisos */
 .notice {
-  padding: 11px 14px;
-  border-left: 4px solid var(--blue-line);
-  background: var(--bluebg);
+  padding: 6px 0;
+  background: transparent;
+  border: none;
   color: var(--ink);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-radius: 0;
   margin: 0 0 12px;
 }
 
 .notice--ok {
-  border-left-color: var(--green-line);
-  background: var(--greenbg);
+  color: var(--green);
+  background: transparent;
 }
 
 .notice--warn {
-  border-left-color: var(--amber-line);
-  background: var(--amberbg);
+  color: var(--yellow);
+  background: transparent;
 }
 
 .notice--err {
-  border-left-color: var(--red-line);
-  background: var(--redbg);
+  color: var(--pink);
+  background: transparent;
+}
+
+.notice--err strong {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e3a1a1' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom / 100% 4px repeat-x;
+  padding-bottom: 2px;
+}
+
+.notice--blue {
+  color: var(--blue);
+  background: transparent;
 }
 
 .notice strong {
@@ -293,12 +318,13 @@ output {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px 7px;
-  padding: 16px;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  min-height: 72px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  min-height: auto;
   overflow-x: auto;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
 }
 
 .expr > .op {
@@ -315,35 +341,36 @@ output {
   position: relative;
   display: inline-block;
   padding: 3px 9px;
-  border: 1px solid transparent;
+  border: 1.5px solid currentColor;
   border-radius: var(--radius);
   font-weight: 600;
   line-height: 1.25;
+  background: transparent;
   transition: transform .25s, opacity .25s;
 }
 
 .token--wanted {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
-  border-color: var(--blue-line);
+  border-color: var(--blue);
 }
 
 .token--pending {
-  background: var(--amberbg);
-  color: var(--amber);
-  border-color: var(--amber-line);
+  background: transparent;
+  color: var(--yellow);
+  border-color: var(--yellow);
 }
 
 .token--stacked {
-  background: var(--redbg);
-  color: var(--red);
-  border-color: var(--red-line);
+  background: transparent;
+  color: var(--pink);
+  border-color: var(--pink);
 }
 
 .token--neutral {
-  background: var(--greenbg);
+  background: transparent;
   color: var(--green);
-  border-color: var(--green-line);
+  border-color: var(--green);
 }
 
 /* Lista de pasos */
@@ -358,26 +385,37 @@ output {
 
 /* Tarjetas de dato (stat) */
 .stat {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 12px;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .stat__label {
-  font-size: 13px;
+  font-size: 15px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.stat__label::after {
+  content: " → ";
   color: var(--muted);
 }
 
 .stat__value {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* ---------- Plano cartesiano (js/core/plot.js) ---------- */
 .plot {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: transparent;
+  border: none;
+  border-radius: 0;
   touch-action: none;
   user-select: none;
 }

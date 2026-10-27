@@ -364,7 +364,7 @@ export function initScanner(container) {
       return;
     }
     const isFn = c.isFunction && !state.sawCollision;
-    mount(el.isFn, h('span', { class: ['badge', 'badge--sm', isFn ? 'badge--ok' : 'badge--err'] },
+    mount(el.isFn, h('span', { class: isFn ? ['encerrado', 'text-ok'] : ['tachado', 'text-err'] },
       isFn ? 'Sí, es función' : 'No es función'));
     el.caseVerdict.hidden = false;
     el.caseVerdict.textContent = c.verdict;

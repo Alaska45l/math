@@ -10,9 +10,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 10px 12px;
+  background: transparent;
+  border-radius: 0;
+  padding: 4px 0;
 }
 
 .cond__name {

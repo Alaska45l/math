@@ -5,53 +5,44 @@
 :root {
   color-scheme: dark;
 
-  /* Superficies de pizarrón escolar / universitario de exactas */
-  --bg: #141f18;          /* Pizarrón verde pizarra oscuro */
-  --surface: #19271f;     /* Paneles y cajas secundarias */
-  --card: #1e3127;        /* Tarjetas, lienzos interactivos y cajas de fórmulas con fondo sólido */
-  --ink: #f2f4ec;         /* Tiza blanca nítida */
-  --text: var(--ink);     /* Alias de texto principal para contraste */
-  --muted: #a3b8aa;       /* Tiza blanca atenuada / polvo de tiza */
-  --border: rgba(255, 255, 255, .15);
-  --border-strong: rgba(255, 255, 255, .30);
+  /* Superficie de pizarrón real */
+  --bg: #26352d;          /* pizarrón verde pizarra */
+  --card: #26352d;        /* igual que el pizarrón (usado en halos SVG) */
+  --surface: #26352d;     /* igual que el pizarrón */
+  --ink: #ece8dc;         /* blanco tiza: estructura y texto */
+  --text: var(--ink);     /* alias de texto principal */
+  --muted: #a9b3a6;       /* tiza gastada */
+  --yellow: #e6d38a;     /* "mirá acá": respuesta, resultado, selección */
+  --blue: #9bbfd9;       /* datos, entradas, lo que el usuario mueve */
+  --pink: #e3a1a1;       /* error, cuidado, tachado */
+  --green: #aed1a2;      /* correcto, neutro multiplicativo, cancelación */
 
-  /* Tizas de colores (Chalk colors con alto contraste) */
-  --blue: #93c5fd;        /* Tiza celeste */
-  --bluebg: #113450;
-  --blue-line: #60a5fa;
-  --green: #86efac;       /* Tiza verde menta */
-  --greenbg: #133b21;
-  --green-line: #4ade80;
-  --amber: #fde047;       /* Tiza amarilla */
-  --amberbg: #40320a;
-  --amber-line: #facc15;
-  --red: #fca5a5;         /* Tiza rosa/roja */
-  --redbg: #401616;
-  --red-line: #f87171;
-  --violet-line: #c084fc; /* Tiza lila */
-  --teal-line: #2dd4bf;   /* Tiza turquesa */
+  /* Alias temporales de compatibilidad para no romper JS ni CSS existente */
+  --blue-line: var(--blue);
+  --bluebg: transparent;
+  --green-line: var(--green);
+  --greenbg: transparent;
+  --amber: var(--yellow);
+  --amberbg: transparent;
+  --amber-line: var(--yellow);
+  --red: var(--pink);
+  --redbg: transparent;
+  --red-line: var(--pink);
+  --violet-line: var(--blue);
+  --teal-line: var(--green);
+  --border: rgba(236, 232, 220, .15);
+  --border-strong: rgba(236, 232, 220, .30);
 
   /* Lámpara (circuito) */
-  --lamp-fill: #fef08a;
-  --lamp-stroke: #ca8a04;
-  --lamp-x: #854d0e;
+  --lamp-fill: var(--yellow);
+  --lamp-stroke: var(--yellow);
+  --lamp-x: var(--bg);
 
-  /* Geometría sobria y académica (sin bordes redondeados excesivos) */
+  /* Geometría sobria y académica */
   --radius: 3px;
   --radius-lg: 4px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #141e17;
-    --surface: #18251d;
-    --card: #1c2b22;
-    --ink: #f2f4ec;
-    --text: var(--ink);
-    --muted: #9eb2a3;
-  }
 }
 
 *,
@@ -119,17 +110,55 @@ svg text {
   color: var(--muted);
 }
 
-.fn-canvas-card,
-.seq-card {
-  contain: paint;
-  isolation: isolate;
-}
-
 .intro {
   margin: 0 0 22px;
   font-size: 17px;
   max-width: 68ch;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Utilidades de Pizarrón ---------- */
+.encerrado {
+  position: relative;
+  display: inline-block;
+  padding: 0 .35em;
+}
+
+.encerrado::after {
+  content: "";
+  position: absolute;
+  inset: -.15em -.2em;
+  pointer-events: none;
+  border: 2px solid var(--yellow);
+  border-radius: 58% 42% 55% 45% / 48% 56% 44% 52%;
+  transform: rotate(-2deg);
+}
+
+.tachado {
+  position: relative;
+  display: inline-block;
+}
+
+.tachado::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cline x1='-2' y1='78' x2='102' y2='24' stroke='%23e3a1a1' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+
+.nota {
+  transform: rotate(-.8deg);
+  max-width: 34ch;
+}
+
+.nota:nth-of-type(even) {
+  transform: rotate(.6deg);
+}
+
+.subrayado-ondulado {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e6d38a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom / 100% 4px repeat-x;
+  padding-bottom: 2px;
 }
 
 .small {

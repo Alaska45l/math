@@ -6,26 +6,33 @@ export function initRetos(root) {
     const realCols = realVals.map(v => `<td><strong>${fmt(v, 2)}</strong></td>`).join('');
     const genCols = genVals.map((v, i) => {
       const match = typeof v === 'number' && Math.abs(v - realVals[i]) < 1e-4;
-      return `<td class="${match ? 'seq-cell-good' : 'seq-cell-bad'}">${typeof v === 'number' ? fmt(v, 2) : v} ${match ? '✓' : '✗'}</td>`;
+      const vStr = typeof v === 'number' ? fmt(v, 2) : v;
+      const checkSvg = `<svg class="inline-mark" viewBox="0 0 16 16" aria-label="correcto"><path d="M2 8.5 L6 12 L14 3.5" fill="none" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      const crossSvg = `<svg class="inline-mark" viewBox="0 0 16 16" aria-label="incorrecto"><path d="M3.5 3.5 L12.5 12.5 M12.5 3.5 L3.5 12.5" fill="none" stroke="var(--pink)" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+      if (match) {
+        return `<td class="seq-cell-good">${vStr} ${checkSvg}</td>`;
+      } else {
+        return `<td class="seq-cell-bad"><span class="tachado seq-verify-bad-val">${vStr}</span> <span class="encerrado">${fmt(realVals[i], 2)}</span> ${crossSvg}</td>`;
+      }
     }).join('');
 
     return `
-      <div style="margin-top:10px;">
-        <p class="small" style="margin-bottom:4px"><strong>Balanza de comprobación (primeros términos):</strong></p>
+      <div class="seq-verify-block">
+        <p class="small seq-verify-label"><strong>Balanza de comprobación (primeros términos):</strong></p>
         <table class="seq-verify-table">
           <thead>
             <tr>
-              <th style="text-align:left;">Fórmula / Sucesión</th>
+              <th class="seq-cell-left">Fórmula / Sucesión</th>
               ${headerCols}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style="text-align:left;"><b>Sucesión pedida:</b></td>
+              <td class="seq-cell-left"><b>Sucesión pedida:</b></td>
               ${realCols}
             </tr>
             <tr>
-              <td style="text-align:left;"><b>${formulaLabel}:</b></td>
+              <td class="seq-cell-left"><b>${formulaLabel}:</b></td>
               ${genCols}
             </tr>
           </tbody>
@@ -62,7 +69,7 @@ export function initRetos(root) {
         return `
           <p><span class="seq-bad">¡Ninguno de los dos acertó!</span></p>
           <p>Al evaluar en <b>n = 1</b>:</p>
-          <ul class="small" style="margin:4px 0; padding-left:18px;">
+          <ul class="small seq-compact-list">
             <li><b>Woo-Jin</b> obtiene <code>64 · (1/4)¹ = 16</code>. Al poner exponente <i>n</i> en vez de <i>n − 1</i>, no llega al neutro 1 y da un salto de más antes de empezar.</li>
             <li><b>Kiran</b> obtiene <code>16 · (1/4)⁰ = 16</code>. Su exponente es correcto, pero partió de 16 en vez de 64.</li>
           </ul>
@@ -191,7 +198,7 @@ export function initRetos(root) {
           <p><strong>${t.question}</strong></p>
           <div class="seq-options">
             ${t.answers.map((ans, j) => `
-              <button type="button" class="button" data-answer="${j}">
+              <button type="button" class="btn" data-answer="${j}">
                 ${ans.replace('1/4', '<span class="seq-frac"></span>')}
               </button>
             `).join('')}
@@ -210,14 +217,14 @@ export function initRetos(root) {
   // Reto 2 interactivo adicional (fórmula de Caden)
   const cadenCard = root.querySelector('[data-task="1"]');
   cadenCard.insertAdjacentHTML('beforeend', `
-    <div style="margin-top:14px; padding-top:12px; border-top:1px dashed var(--border);">
+    <div class="seq-caden-block">
       <p class="small"><b>Comprobá con tus propios valores de Caden:</b></p>
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <label class="small">Saldo f(1): <input data-caden="start" type="number" value="70" style="width:75px;"></label>
-        <label class="small">Factor anual r: <input data-caden="factor" type="number" step="0.1" value="1.1" style="width:75px;"></label>
-        <button type="button" data-caden-check>Verificar prueba</button>
+      <div class="seq-caden-controls">
+        <label class="small">Saldo f(1): <input data-caden="start" class="seq-input-sm" type="number" value="70"></label>
+        <label class="small">Factor anual r: <input data-caden="factor" class="seq-input-sm" type="number" step="0.1" value="1.1"></label>
+        <button type="button" class="btn" data-caden-check>Verificar prueba</button>
       </div>
-      <div class="seq-caden-feedback" style="margin-top:8px;"></div>
+      <div class="seq-caden-feedback"></div>
     </div>
   `);
 
@@ -244,8 +251,11 @@ export function initRetos(root) {
     card.querySelectorAll('[data-answer]').forEach(btn => {
       btn.onclick = () => {
         const ansIdx = Number(btn.dataset.answer);
-        card.querySelectorAll('[data-answer]').forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
+        const isCorrect = ansIdx === task.correctIndex;
+        card.querySelectorAll('[data-answer]').forEach(b => {
+          b.classList.remove('is-active', 'encerrado', 'tachado');
+        });
+        btn.classList.add('is-active', isCorrect ? 'encerrado' : 'tachado');
 
         const { label, vals } = task.evalGen(ansIdx);
         const table = verifyTableHtml(task.realIndices, task.realVals, vals, label);
@@ -254,7 +264,7 @@ export function initRetos(root) {
         card.querySelector('.seq-feedback').innerHTML = `
           ${fbText}
           ${table}
-          <p class="small muted" style="margin-top:6px;">
+          <p class="small muted seq-hint-text">
             Estrategia de examen: calcular <i>n = 1</i> y <i>n = 2</i> descarta al instante opciones desfasadas o con bases erróneas sin recurrir a adivinanzas.
           </p>
         `;

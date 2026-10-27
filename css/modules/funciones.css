@@ -17,27 +17,34 @@
 }
 
 .fn-canvas-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  contain: none;
+  isolation: auto;
 }
 
 .fn-side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .fn-readout {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 14px 16px;
-  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  border: none;
+  transform: rotate(-.8deg);
+}
+
+.fn-readout:nth-of-type(even) {
+  transform: rotate(.6deg);
 }
 
 .fn-readout__title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 650;
   margin: 0 0 8px;
 }
@@ -47,8 +54,8 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px dashed var(--border);
+  padding: 4px 0;
+  border-bottom: none;
 }
 
 .fn-readout__row:last-child {
@@ -71,16 +78,20 @@
 .fn-quiz-btn {
   text-align: left;
   height: auto;
-  min-height: 40px;
-  padding: 10px 14px;
+  min-height: 0;
+  padding: 6px 4px;
   line-height: 1.4;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-strong);
-  background: var(--card);
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: block;
 }
 
 .fn-quiz-btn:hover {
-  background: var(--surface);
+  background: transparent;
+  color: var(--yellow);
 }
 
 .fn-pipeline {
@@ -88,37 +99,37 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 12px;
-  background: var(--surface);
-  border-radius: var(--radius);
+  padding: 6px 0;
+  background: transparent;
+  border-radius: 0;
   margin: 8px 0;
 }
 
 .fn-pipe-box {
-  padding: 8px 12px;
+  padding: 4px 8px;
   border-radius: var(--radius);
-  background: var(--card);
+  background: transparent;
   border: 1.5px solid var(--border-strong);
   font-weight: 600;
   font-size: 14px;
 }
 
 .fn-pipe-box--io {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
-  border-color: var(--blue-line);
+  border-color: var(--blue);
 }
 
 .fn-pipe-box--op {
-  background: var(--amberbg);
-  color: var(--amber);
-  border-color: var(--amber-line);
+  background: transparent;
+  color: var(--yellow);
+  border-color: var(--yellow);
 }
 
 .fn-pipe-box--inv {
-  background: var(--greenbg);
+  background: transparent;
   color: var(--green);
-  border-color: var(--green-line);
+  border-color: var(--green);
 }
 
 .fn-pipe-arrow {
@@ -132,10 +143,10 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 12px 14px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   font-size: 15px;
 }
 
@@ -260,25 +271,25 @@
 }
 
 .fn-pipe-box--mid {
-  background: var(--card);
+  background: transparent;
   color: var(--ink);
   border-style: dashed;
 }
 
 .fn-pipe-op {
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: var(--radius);
   font-size: 13px;
   font-weight: 600;
-  background: var(--amberbg);
-  color: var(--amber);
-  border: 1px solid var(--amber-line);
+  background: transparent;
+  color: var(--yellow);
+  border: 1.5px solid var(--yellow);
 }
 
 .fn-pipe-op--inv {
-  background: var(--greenbg);
+  background: transparent;
   color: var(--green);
-  border-color: var(--green-line);
+  border-color: var(--green);
 }
 
 .fn-pipeline--inv .fn-pipe-arrow {

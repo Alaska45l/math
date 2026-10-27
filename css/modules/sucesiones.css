@@ -19,12 +19,12 @@
 .seq-card,
 .seq-readout,
 .seq-exercise {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  contain: paint;
-  isolation: isolate;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  contain: none;
+  isolation: auto;
 }
 
 .seq-controls {
@@ -153,36 +153,35 @@
 /* ---------- Elementos Neutros y Salto Cero ---------- */
 .seq-neutral-box {
   margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border-left: 4px solid var(--amber-line);
-  font-size: 13.5px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-size: 14px;
   line-height: 1.5;
 }
 
 .seq-neutral-box h4 {
   margin: 0 0 6px;
-  color: var(--amber);
+  color: var(--yellow);
   font-size: 14px;
 }
 
 .seq-neutral-badge {
   display: inline-block;
-  padding: 2px 7px;
-  border-radius: 99px;
-  font-size: 11.5px;
+  padding: 0;
+  border-radius: 0;
+  font-size: 13px;
   font-weight: 700;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 .seq-neutral-badge--add {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
 }
 
 .seq-neutral-badge--mul {
-  background: var(--greenbg);
+  background: transparent;
   color: var(--green);
 }
 
@@ -260,17 +259,17 @@
 
 /* ---------- Muñecas Rusas (Sustitución Regresiva) ---------- */
 .seq-doll-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
   margin-top: 14px;
 }
 
 .seq-doll-box summary {
   cursor: pointer;
   font-weight: 650;
-  color: var(--amber);
+  color: var(--yellow);
   outline: none;
   user-select: none;
 }
@@ -284,11 +283,11 @@
 }
 
 .seq-doll-step {
-  padding: 6px 10px;
-  border-left: 3px solid var(--blue-line);
-  background: rgba(147, 197, 253, .06);
+  padding: 4px 0 4px 12px;
+  border-left: 2px solid var(--blue);
+  background: transparent;
   font-size: 13.5px;
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-radius: 0;
 }
 
 .seq-doll-step b {
@@ -297,49 +296,48 @@
 
 .seq-doll-conclusion {
   margin-top: 8px;
-  padding: 8px 12px;
-  background: var(--greenbg);
-  border: 1px solid var(--green-line);
-  border-radius: var(--radius);
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   color: var(--green);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 /* ---------- Puente con Función Lineal ---------- */
 .seq-linear-bridge {
   margin-top: 14px;
-  padding: 12px 14px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
 }
 
 .seq-linear-bridge h4 {
   margin: 0 0 6px;
-  color: var(--amber);
+  color: var(--yellow);
   font-size: 14px;
 }
 
 /* ---------- Alerta de Paréntesis ---------- */
 .seq-paren-alert {
   margin-top: 12px;
-  padding: 10px 14px;
-  background: var(--redbg);
-  border: 1px solid var(--red-line);
-  border-radius: var(--radius);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   font-size: 13.5px;
   line-height: 1.5;
 }
 
 .seq-token-paren {
   display: inline-block;
-  padding: 1px 6px;
-  border-radius: var(--radius);
-  background: var(--amberbg);
-  color: var(--amber);
+  padding: 0 4px;
+  background: transparent;
+  color: var(--yellow);
   font-weight: 700;
-  border: 1px solid var(--amber-line);
+  border: none;
 }
 
 /* ---------- Tablas y Comprobación en Retos ---------- */
@@ -366,86 +364,89 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .seq-verify-table th,
 .seq-verify-table td {
-  border: 1px solid var(--border);
-  padding: 6px 8px;
+  border: none;
+  border-bottom: 1px dashed rgba(236, 232, 220, 0.2);
+  padding: 6px 10px;
   text-align: center;
 }
 
 .seq-verify-table th {
-  background: var(--surface);
+  background: transparent;
   color: var(--muted);
   font-weight: 600;
+  border-bottom: 1.5px solid rgba(236, 232, 220, 0.3);
 }
 
 .seq-cell-good {
-  background: rgba(74, 222, 128, .12);
+  background: transparent !important;
   color: var(--green);
   font-weight: 700;
 }
 
 .seq-cell-bad {
-  background: rgba(248, 113, 113, .12);
-  color: var(--red);
+  background: transparent !important;
+  color: var(--pink);
   font-weight: 700;
 }
 
 .seq-good { color: var(--green); }
-.seq-bad { color: var(--red); }
+.seq-bad { color: var(--pink); }
 
 .seq-pill {
   display: inline-flex;
   gap: 5px;
   align-items: center;
-  padding: 2px 7px;
-  border-radius: 99px;
-  font-size: 11.5px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .seq-pill--good {
-  background: var(--greenbg);
+  background: transparent;
   color: var(--green);
 }
 
 .seq-pill--bad {
-  background: var(--redbg);
-  color: var(--red);
+  background: transparent;
+  color: var(--pink);
 }
 
 .seq-cases {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 6px 14px;
-  border-left: 3px solid var(--amber-line);
-  padding: 10px 14px;
-  background: var(--surface);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-left: 2px solid var(--yellow);
+  padding: 6px 12px;
+  background: transparent;
+  border-radius: 0;
 }
 
 .seq-token {
   display: inline-block;
-  padding: 3px 8px;
-  border-radius: 99px;
-  background: var(--bluebg);
+  padding: 0 4px;
+  border-radius: 0;
+  background: transparent;
   color: var(--blue);
   font-weight: 700;
 }
 
 .seq-token--change {
-  background: var(--amberbg);
-  color: var(--amber);
+  background: transparent;
+  color: var(--yellow);
 }
 
 .seq-alert {
-  padding: 12px 14px;
-  background: var(--amberbg);
-  border: 1px solid var(--amber-line);
-  border-radius: var(--radius);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   margin-top: 12px;
   font-size: 13.5px;
 }
@@ -471,4 +472,73 @@
   margin: 8px 0;
   font-family: var(--font-math);
 }
+
+.seq-equation--highlight {
+  color: var(--yellow);
+}
+
+.seq-verify-block {
+  margin-top: 10px;
+}
+
+.seq-verify-label {
+  margin-bottom: 4px;
+}
+
+.seq-cell-left {
+  text-align: left !important;
+}
+
+.seq-compact-list {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.seq-caden-block {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.seq-caden-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.seq-input-sm {
+  width: 75px !important;
+}
+
+.seq-caden-feedback {
+  margin-top: 8px;
+}
+
+.seq-hint-text {
+  margin-top: 6px;
+}
+
+.seq-title-spaced {
+  margin-top: 16px;
+}
+
+.seq-card--spaced {
+  margin-top: 16px;
+}
+
+.seq-sublist {
+  margin: 4px 0 0 16px;
+  padding: 0;
+}
+
+.seq-eval-out {
+  font-size: 1.2rem;
+  color: var(--green);
+}
+
+.seq-verify-bad-val {
+  margin-right: 8px;
+}
+
 

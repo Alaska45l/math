@@ -263,6 +263,11 @@ export function initRadiografia(container) {
     negative: ['text-err', 'Cuidado, esa es justamente la trampa de la Lente 4: estar debajo del eje no impide estar subiendo. La función crece en todo (−1,8; 2).'],
   };
   on(quizBox, 'click', 'button[data-ans]', (_e, btn) => {
+    const isCorrect = btn.dataset.ans === 'correct';
+    quizBox.querySelectorAll('button[data-ans]').forEach((b) => {
+      b.classList.remove('encerrado', 'tachado');
+    });
+    btn.classList.add(isCorrect ? 'encerrado' : 'tachado');
     const [cls, text] = FEEDBACK[btn.dataset.ans];
     quizMsg.className = `status ${cls}`;
     quizMsg.textContent = text;

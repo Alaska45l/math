@@ -132,28 +132,28 @@
 }
 
 .panel {
-  padding: 14px 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  margin: 0 0 12px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  margin: 0 0 24px;
 }
 
 .panel--card {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: none;
 }
 
 .panel__label {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 }
 
 .section-divider {
-  margin-top: 40px;
-  padding-top: 28px;
-  border-top: 1px solid var(--border);
+  margin-top: 48px;
+  padding-top: 0;
+  border-top: none;
 }
 
 /* ---------- Pestañas (tabs) ---------- */

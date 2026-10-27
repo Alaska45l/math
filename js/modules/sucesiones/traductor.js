@@ -28,13 +28,13 @@ export function initTraductor(root) {
           <strong>inicio</strong><span>f(1) = <b class="seq-token" id="tr-a-token">3</b></span>
           <strong>paso</strong><span id="tr-rec"></span>
         </div>
-        <h3 style="margin-top:16px">El teletransportador explícito</h3>
+        <h3 class="seq-title-spaced">El teletransportador explícito</h3>
         <p id="tr-exp" class="seq-equation"></p>
         <div id="tr-pedagogy-slot"></div>
       </article>
       <article class="seq-readout" id="tr-cost"></article>
     </div>
-    <div class="seq-card" style="margin-top:16px">
+    <div class="seq-card seq-card--spaced">
       <h3>Sucesiones generales recursivas</h3>
       <p class="small muted">Cuando la regla involucra multiplicaciones y sumas combinadas, potencias o términos anteriores múltiples.</p>
       <div class="seq-controls">
@@ -146,7 +146,7 @@ export function initTraductor(root) {
           <p>Al aplicar propiedad distributiva en la fórmula explícita:</p>
           <p class="seq-equation">f(n) = ${fmt(a)} + ${fmt(c)} · (n − 1) = <strong>${fmt(c)} · n ${b0Str}</strong></p>
           <p>¡Es exactamente la ecuación de una recta <i>y = m · x + b</i> restringida a valores enteros de <i>n</i>!</p>
-          <ul class="small" style="margin:4px 0 0 16px; padding:0;">
+          <ul class="small seq-sublist">
             <li><strong>Pendiente m = ${fmt(c)}:</strong> Es la diferencia común <i>d</i>. Como entre términos contiguos avanzás <i>Δn = 1</i>, la tasa de cambio es <i>m = Δy / Δn = ${fmt(c)} / 1 = ${fmt(c)}</i>.</li>
             <li><strong>Ordenada al origen b = ${fmt(b0)}:</strong> Es el valor del <strong>"Poste 0"</strong> <i>(f(0) = a₁ − d)</i> si retrocedieras un paso antes de <i>f(1)</i>.</li>
           </ul>
@@ -157,7 +157,7 @@ export function initTraductor(root) {
         <div class="seq-paren-alert">
           <strong>¡Alerta de Paréntesis Obligatorios!</strong><br>
           Como la razón es negativa (<i>r = ${fmt(c)}</i>), es fundamental escribir <code>(${fmt(c)})ⁿ⁻¹</code> con paréntesis:
-          <ul style="margin:4px 0 0 16px; padding:0;">
+          <ul class="seq-sublist">
             <li><strong>Con paréntesis (${fmt(c)})ⁿ⁻¹:</strong> Toda la base negativa se eleva. En exponentes pares da positivo y en impares da negativo, produciendo la alternancia de signos.</li>
             <li><strong>Sin paréntesis −${Math.abs(c)}ⁿ⁻¹:</strong> Por precedencia algebraica, la potencia afecta únicamente al ${Math.abs(c)} y el signo menos queda afuera: <code>−(${Math.abs(c)}ⁿ⁻¹)</code>. ¡Todos los términos darían negativos, invalidando el ejercicio!</li>
           </ul>
@@ -191,7 +191,7 @@ export function initTraductor(root) {
         <span class="small">${chain.slice(-5).reverse().join(' ← ')}${n > 5 ? ' ← …' : ''}</span>
       </p>
       <p><b>Teletransportador explícito (1 solo cálculo directo):</b><br>
-        ${evalExpStr} = <strong style="font-size:1.2rem; color:var(--green);">${fmt(v, 2)}</strong>
+        ${evalExpStr} = <strong class="seq-eval-out">${fmt(v, 2)}</strong>
       </p>
       ${renderRussianDolls(isGeo, a, c, n)}
     `;
@@ -231,7 +231,7 @@ export function initTraductor(root) {
         : 'f(1) = 1; &nbsp; f(2) = 1; &nbsp; f(n) = f(n − 1) + f(n − 2)';
 
     $('#tr-general-out').innerHTML = `
-      <p class="seq-equation" style="color:var(--amber);">${formulaTitle}</p>
+      <p class="seq-equation seq-equation--highlight">${formulaTitle}</p>
       <table class="seq-table">
         <thead>
           <tr>
