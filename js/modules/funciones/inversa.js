@@ -163,7 +163,7 @@ export function initInversa(container) {
     if (Math.abs(m) < 1e-4) {
       mount(el.pipe,
         h('div', { class: 'notice notice--err' },
-          h('strong', null, '✗ ¡Falla de inyectividad: la trampa de la función constante (m = 0)!'),
+          h('strong', null, '¡Falla de inyectividad: la trampa de la función constante (m = 0)!'),
           h('p', null,
             `Fijate en la recta horizontal f(x) = ${fmt(b)}: todos los valores de entrada dan exactamente ${fmt(b)}. `,
             'Si querés dar marcha atrás y te preguntan: «¿qué entrada produjo la salida ',

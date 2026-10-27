@@ -462,20 +462,20 @@ output {
 }
 
 .plot-tick {
-  font-size: 19px;
+  font-size: var(--svg-scale-caveat, 20px);
   fill: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .plot-axis-label {
-  font-size: 20px;
+  font-size: var(--svg-scale-caveat, 20px);
   font-style: italic;
   font-family: var(--font-math);
   fill: var(--ink);
 }
 
 .plot-label {
-  font-size: 19px;
+  font-size: var(--svg-scale-caveat, 20px);
   fill: var(--ink);
   paint-order: stroke;
   stroke: var(--card);

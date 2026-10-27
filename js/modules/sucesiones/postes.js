@@ -183,8 +183,8 @@ export function initPostes(root) {
                     <td><b>n = ${i}</b></td>
                     <td><strong>${real}</strong></td>
                     <td class="seq-good"><strong>${good}</strong> ✓</td>
-                    <td class="${woo === real ? 'seq-good' : 'seq-bad'}">${woo} ${woo === real ? '✓' : '✗ (desfasado 1 salto)'}</td>
-                    <td class="${kir === real ? 'seq-good' : 'seq-bad'}">${kir} ${kir === real ? '✓' : '✗ (base incorrecta)'}</td>
+                    <td class="${woo === real ? 'seq-good' : 'seq-bad'}">${woo === real ? woo + ' ✓' : '<span class="tachado">' + woo + '</span> <span class="small pink">(desfasado 1 salto)</span>'}</td>
+                    <td class="${kir === real ? 'seq-good' : 'seq-bad'}">${kir === real ? kir + ' ✓' : '<span class="tachado">' + kir + '</span> <span class="small pink">(base incorrecta)</span>'}</td>
                   </tr>
                 `;
               }).join('')}

@@ -369,6 +369,13 @@
 }
 
 /* ---------- Tablas y Comprobación en Retos ---------- */
+#seq-compare {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .seq-table {
   width: 100%;
   border-collapse: collapse;

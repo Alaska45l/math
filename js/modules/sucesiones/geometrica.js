@@ -35,6 +35,18 @@ export function initGeometrica(root) {
   const $ = s => root.querySelector(s);
   let termsCount = 6;
 
+  const geoSvg = $('#geo-svg');
+  function updateGeoScale() {
+    const clientW = geoSvg.clientWidth || geoSvg.getBoundingClientRect().width;
+    if (!clientW) return;
+    const scale = clientW / 620;
+    if (scale <= 0) return;
+    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
+    geoSvg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
+  }
+  updateGeoScale();
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(updateGeoScale).observe(geoSvg);
+
   function updateZoomButtons() {
     root.querySelectorAll('.seq-zoom-btn').forEach(btn => {
       btn.classList.toggle('is-active', Number(btn.dataset.terms) === termsCount);

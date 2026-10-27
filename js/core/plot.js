@@ -115,6 +115,23 @@ export function createPlane(svg, cfg) {
   });
   mount(svg, defs, ...root);
 
+  /* ---------- Escala dinámica de fuentes SVG (>= 14px efectivos) ---------- */
+  function updateSvgFontScale() {
+    const clientW = svg.clientWidth || svg.getBoundingClientRect().width;
+    if (!clientW || !W) return;
+    const scale = clientW / W;
+    if (scale <= 0) return;
+    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
+    const kalamSize = Math.max(12, Math.round((12 / scale) * 10) / 10);
+    svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
+    svg.style.setProperty('--svg-scale-kalam', `${kalamSize}px`);
+  }
+  updateSvgFontScale();
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(updateSvgFontScale);
+    ro.observe(svg);
+  }
+
   /* ---------- Grilla y ejes ---------- */
   const xAxisY = sy(Math.min(Math.max(0, c.yMin), c.yMax));
   const yAxisX = sx(Math.min(Math.max(0, c.xMin), c.xMax));

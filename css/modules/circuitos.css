@@ -177,12 +177,12 @@
   stroke-linecap: round;
 }
 
-/* Escala de texto en SVG para asegurar >= 11px efectivos en pantallas de 390px */
+/* Escala de texto en SVG para asegurar >= 14px efectivos recalculados dinámicamente */
 .circuit text,
 .number-line text {
-  font-size: 22px;
+  font-size: var(--svg-scale-caveat, 24px);
 }
 
 .circuit .svg-th {
-  font-size: 24px;
+  font-size: calc(var(--svg-scale-caveat, 24px) * 1.08);
 }

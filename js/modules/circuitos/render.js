@@ -55,8 +55,25 @@ function lamp(refs, cx, y) {
   return refs.lamp;
 }
 
+function bindSvgScale(svg, viewBoxW = 680) {
+  function update() {
+    const clientW = svg.clientWidth || svg.getBoundingClientRect().width;
+    if (!clientW) return;
+    const scale = clientW / viewBoxW;
+    if (scale <= 0) return;
+    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
+    svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
+  }
+  update();
+  if (typeof ResizeObserver !== 'undefined' && !svg._roBound) {
+    svg._roBound = true;
+    new ResizeObserver(update).observe(svg);
+  }
+}
+
 /** Construye el esqueleto del circuito para el modo dado. */
 export function buildCircuit(svg, mode) {
+  bindSvgScale(svg, 680);
   const refs = { mode, wires: {}, sw: {}, lamp: null };
   if (mode === 'and') {
     svg.setAttribute('viewBox', '0 0 680 200');
@@ -140,6 +157,7 @@ function row(list, y, cls, label, thick = false) {
 }
 
 export function renderNumberLine(svg, state, { iA, iB, res }) {
+  bindSvgScale(svg, 680);
   const ticks = [];
   for (let t = X_MIN; t <= X_MAX; t += 5) {
     ticks.push(

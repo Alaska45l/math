@@ -55,10 +55,26 @@
 
 @font-face {
   font-family: 'Math fallback';
-  src: local('DejaVu Math TeX Gyre'), local('STIX Two Math'), local('Cambria Math'), local('Latin Modern Math');
-  size-adjust: 105%;
-  ascent-override: 90%;
-  descent-override: 25%;
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("../fonts/math-subset.woff2") format("woff2"),
+       local('STIX Two Math'),
+       local('DejaVu Math TeX Gyre'),
+       local('Cambria Math'),
+       local('Latin Modern Math');
+  size-adjust: 95%;
+}
+
+@font-face {
+  font-family: 'Math fallback';
+  font-style: italic;
+  font-weight: 100 900;
+  src: url("../fonts/math-subset.woff2") format("woff2"),
+       local('STIX Two Math'),
+       local('DejaVu Math TeX Gyre'),
+       local('Cambria Math'),
+       local('Latin Modern Math');
+  size-adjust: 95%;
 }
 
 :root {

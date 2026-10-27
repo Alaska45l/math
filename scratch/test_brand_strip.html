@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tira de Brand - 22 Leyes Fundamentales (Opción A)</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    body {
+      padding: 24px;
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-note);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .strip-subtitle {
+      text-align: center;
+      margin-bottom: 24px;
+      opacity: 0.8;
+      font-size: 16px;
+    }
+    .strip-table {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .strip-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px dashed rgba(240, 245, 240, 0.15);
+      gap: 16px;
+    }
+    .strip-idx {
+      font-family: var(--font-hand);
+      font-size: 16px;
+      opacity: 0.6;
+      width: 24px;
+      flex-shrink: 0;
+    }
+    .strip-meta {
+      width: 180px;
+      flex-shrink: 0;
+    }
+    .strip-name {
+      font-family: var(--font-hand);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+    .strip-field {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    .strip-brand-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 8px 14px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Brand — 22 Leyes Fundamentales (Opción A: <code>--font-math</code>)</h1>
+  <p class="strip-subtitle">STIX Two Math via math-subset.woff2 · Representación matemática homogénea</p>
+  <div class="strip-table" id="strip-container"></div>
+
+  <script type="module">
+    import { FUNDAMENTAL_LAWS } from '../js/core/nav.js';
+    const container = document.getElementById('strip-container');
+    FUNDAMENTAL_LAWS.forEach((law, idx) => {
+      const row = document.createElement('div');
+      row.className = 'strip-row';
+      row.innerHTML = `
+        <div class="strip-idx">${idx + 1}</div>
+        <div class="strip-meta">
+          <div class="strip-name">${law.name}</div>
+          <div class="strip-field">${law.field}</div>
+        </div>
+        <div class="strip-brand-container">
+          <a class="site-nav__brand" href="#" style="margin: 0; pointer-events: none;">${law.html}</a>
+        </div>
+      `;
+      container.appendChild(row);
+    });
+  </script>
+</body>
+</html>
