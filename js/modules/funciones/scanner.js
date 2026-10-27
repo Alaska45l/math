@@ -296,7 +296,11 @@ export function initScanner(container) {
     caseVerdict: byId('sc-case-verdict', container),
   };
 
-  const plane = createPlane(el.svg, { width: 600, height: 380, xMin: X_MIN, xMax: X_MAX, yMin: Y_MIN, yMax: Y_MAX });
+  const plane = createPlane(el.svg, {
+    width: 600, height: 380, xMin: X_MIN, xMax: X_MAX, yMin: Y_MIN, yMax: Y_MAX,
+    xStep: 2, yStep: 2,
+    xTickPos: (t, { sx, xAxisY }) => (t === -2 ? { x: sx(-2) - 8, y: xAxisY + 22, anchor: 'end' } : null),
+  });
 
   /* ---------- Actualización del estado ---------- */
   function setX(raw) {
@@ -309,7 +313,7 @@ export function initScanner(container) {
   /* ---------- Render ---------- */
   function shadowX(sh) {
     const y = plane.xAxisY, x1 = plane.sx(sh.a), x2 = plane.sx(sh.b);
-    const out = [s('line', { x1, y1: y, x2, y2: y, class: 'fn-shadow-x' })];
+    const out = [s('line', { x1, y1: y, x2, y2: y, class: 'fn-shadow-x fn-shadow-x--pos' })];
     [[x1, sh.ea], [x2, sh.eb]].forEach(([x, e]) => {
       if (e !== 'inf') out.push(s('circle', { cx: x, cy: y, r: 4.5, class: e === 'open' ? 'plot-dot--open' : 'plot-dot' }));
     });
@@ -322,7 +326,7 @@ export function initScanner(container) {
       if (e !== 'inf') {
         out.push(s('circle', {
           cx: x, cy: y, r: 4.5,
-          fill: e === 'open' ? 'var(--card)' : 'var(--green)', stroke: 'var(--green)', 'stroke-width': 2,
+          fill: e === 'open' ? 'var(--card)' : 'var(--ink)', stroke: 'var(--ink)', 'stroke-width': 2,
         }));
       }
     });
@@ -411,7 +415,7 @@ export function initScanner(container) {
       else c.xShadows.forEach((sh) => plane.layers.shade.append(...shadowX(sh)));
     }
     if (state.showIm) {
-      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.yAxisX, cy: plane.sy(0.8 * n), r: 5, fill: 'var(--green)' })));
+      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.yAxisX, cy: plane.sy(0.8 * n), r: 5, fill: 'var(--ink)' })));
       else c.yShadows.forEach((sh) => plane.layers.shade.append(...shadowY(sh)));
     }
 
@@ -419,8 +423,11 @@ export function initScanner(container) {
 
     const laser = res.pts.length === 1 ? 'var(--green)' : res.pts.length > 1 ? 'var(--pink)' : 'var(--yellow)';
     const lx = plane.sx(state.x);
-    plane.layers.marks.append(s('line', { x1: lx, y1: plane.sy(Y_MIN), x2: lx, y2: plane.sy(Y_MAX), class: 'fn-laser', stroke: laser }));
-    plane.layers.labels.append(s('text', { x: lx, y: plane.box.y + 16, class: 'plot-label', 'text-anchor': 'middle' }, `x = ${fmt(state.x)}`));
+    plane.layers.marks.append(
+      s('line', { x1: lx, y1: plane.sy(Y_MAX), x2: lx, y2: plane.xAxisY - 2, class: 'fn-laser', stroke: laser }),
+      s('line', { x1: lx, y1: plane.xAxisY + 38, x2: lx, y2: plane.sy(Y_MIN), class: 'fn-laser', stroke: laser }),
+    );
+    plane.layers.labels.append(s('text', { x: lx + 8, y: plane.box.y + 14, class: 'plot-label', 'text-anchor': 'start' }, `x = ${fmt(state.x)}`));
 
     res.pts.forEach((y) => {
       if (y < Y_MIN || y > Y_MAX) return;

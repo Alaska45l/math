@@ -165,14 +165,26 @@
 }
 
 .fn-shadow-x {
-  stroke: var(--blue);
   stroke-width: 6;
   stroke-linecap: round;
   opacity: 0.85;
 }
 
+.fn-shadow-x--pos {
+  stroke: var(--blue);
+}
+
+.fn-shadow-x--neg {
+  stroke: var(--ink);
+  stroke-dasharray: 5 4;
+}
+
+.fn-shadow-x--pink {
+  stroke: var(--pink);
+}
+
 .fn-shadow-y {
-  stroke: var(--green);
+  stroke: var(--ink);
   stroke-width: 6;
   stroke-linecap: round;
   opacity: 0.85;
@@ -190,12 +202,12 @@
 }
 
 .fn-triangle-dx {
-  stroke: var(--green);
+  stroke: var(--ink);
   stroke-width: 2.5;
 }
 
 .fn-triangle-dy {
-  stroke: var(--yellow);
+  stroke: var(--ink);
   stroke-width: 2.5;
 }
 

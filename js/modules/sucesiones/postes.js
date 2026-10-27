@@ -68,6 +68,12 @@ export function initPostes(root) {
 
     // Render del SVG
     const svg = $('#seq-track');
+    const isMobileTrack = window.innerWidth <= 600;
+    const step = isMobileTrack ? 52 : 92;
+    const startX = isMobileTrack ? 24 : 75;
+    const vbWidth = isMobileTrack ? 360 : 700;
+    svg.setAttribute('viewBox', `0 0 ${vbWidth} 195`);
+
     let svgHtml = `
       <defs>
         <marker id="seq-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
@@ -78,24 +84,28 @@ export function initPostes(root) {
 
     // Arcos de saltos
     for (let i = 0; i < 6; i++) {
-      const x = 75 + i * 92;
+      const x = startX + i * step;
       const isTravelled = i < hops;
       const stepLabel = k === 'geo' ? `× ${fmt(c)}` : `${c >= 0 ? '+' : ''} ${fmt(c)}`;
+      const arcOffset = isMobileTrack ? 18 : 22;
+      const arcSpan = step - 2 * arcOffset;
+      const mid = x + step / 2;
       svgHtml += `
-        <path class="seq-arc ${isTravelled ? 'is-travelled' : ''}" d="M${x + 12} 88 Q${x + 46} 28 ${x + 80} 88"/>
-        <text class="seq-arc-label ${isTravelled ? 'is-travelled' : ''}" x="${x + 46}" y="42">${stepLabel}</text>
+        <path class="seq-arc ${isTravelled ? 'is-travelled' : ''}" d="M${x + arcOffset} 88 Q${mid} 28 ${x + arcOffset + arcSpan} 88"/>
+        <text class="seq-arc-label ${isTravelled ? 'is-travelled' : ''}" x="${mid}" y="22">${stepLabel}</text>
       `;
     }
 
     // Postes
     vals.forEach((v, i) => {
-      const x = 75 + i * 92;
+      const x = startX + i * step;
       const idx = start + i;
       const isActive = i === hops;
+      const r = isMobileTrack ? (isActive ? 16 : 13) : (isActive ? 20 : 17);
       svgHtml += `
         <g class="seq-point ${isActive ? 'is-active' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="Poste ${idx}, valor ${fmt(v, 2)}">
           <title>Hacé clic para seleccionar n = ${idx}</title>
-          <circle class="seq-post ${isActive ? 'is-active' : ''}" cx="${x}" cy="92" r="${isActive ? 20 : 17}"/>
+          <circle class="seq-post ${isActive ? 'is-active' : ''}" cx="${x}" cy="92" r="${r}"/>
           <text class="seq-index" x="${x}" y="136">n = ${idx}</text>
           <text class="seq-post-val" x="${x}" y="97">${fmt(v, 2)}</text>
         </g>
@@ -103,6 +113,11 @@ export function initPostes(root) {
     });
 
     svg.innerHTML = svgHtml;
+
+    const activeEl = svg.querySelector('.seq-point.is-active');
+    if (activeEl && typeof activeEl.scrollIntoView === 'function') {
+      activeEl.scrollIntoView({ inline: 'center', block: 'nearest' });
+    }
 
     // Listeners de clic y teclado en los postes del SVG
     svg.querySelectorAll('[data-i]').forEach(el => {
@@ -166,7 +181,7 @@ export function initPostes(root) {
             <div class="seq-compare-row seq-compare-row--good">
               <div class="seq-compare-header">
                 <strong>Fórmula correcta:</strong> <code>64 · (1/4)ⁿ⁻¹</code>
-                <span class="seq-good">✓ Coincide exactamente</span>
+                <span class="seq-good"><svg class="chalk-icon chalk-icon--check" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5 6.5-8"/></svg> Coincide exactamente</span>
               </div>
               <div class="seq-compare-values">
                 <span>n=1: <strong>64</strong></span> · 

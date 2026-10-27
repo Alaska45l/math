@@ -101,21 +101,39 @@ export function createPlane(svg, cfg) {
     s('clipPath', { id: clipId }, s('rect', { x: P.l, y: P.t, width: pw, height: ph })),
     s('marker', {
       id: `${clipId}-arrow`, viewBox: '0 0 10 10', refX: 8, refY: 5,
-      markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse',
-    }, s('path', { d: 'M0 0L10 5L0 10z', class: 'plot-arrowhead' })),
+      markerWidth: 8, markerHeight: 8, orient: 'auto-start-reverse',
+    }, s('path', { d: 'M 1.5 1.5 L 8.5 5 L 1.5 8.5', class: 'plot-arrowhead' })),
+    s('filter', {
+      id: `${clipId}-chalk`, x: '-5%', y: '-5%', width: '110%', height: '110%',
+      filterUnits: 'userSpaceOnUse',
+    },
+      s('feTurbulence', {
+        id: `${clipId}-turb`, type: 'fractalNoise',
+        baseFrequency: '0.9', numOctaves: '2', result: 'noise',
+      }),
+      s('feDisplacementMap', {
+        in: 'SourceGraphic', in2: 'noise', scale: '1.4',
+        xChannelSelector: 'R', yChannelSelector: 'G',
+      })
+    ),
   );
 
   const layers = {};
-  const order = ['bg', 'grid', 'shade', 'axes', 'under', 'curve', 'over', 'marks', 'labels'];
+  const order = ['bg', 'grid', 'shade', 'axes', 'axisLabels', 'under', 'curve', 'over', 'marks', 'labels'];
   const root = [];
   order.forEach((name) => {
     const clipped = ['bg', 'shade', 'under', 'curve', 'over'].includes(name);
-    layers[name] = s('g', { class: `plot-layer plot-layer--${name}`, 'clip-path': clipped ? `url(#${clipId})` : null });
+    const filtered = ['axes', 'curve'].includes(name);
+    layers[name] = s('g', {
+      class: `plot-layer plot-layer--${name}`,
+      'clip-path': clipped ? `url(#${clipId})` : null,
+      filter: filtered ? `url(#${clipId}-chalk)` : null,
+    });
     root.push(layers[name]);
   });
   mount(svg, defs, ...root);
 
-  /* ---------- Escala dinámica de fuentes SVG (>= 14px efectivos) ---------- */
+  /* ---------- Escala dinámica de fuentes SVG y compensación de grano ---------- */
   function updateSvgFontScale() {
     const clientW = svg.clientWidth || svg.getBoundingClientRect().width;
     if (!clientW || !W) return;
@@ -125,6 +143,12 @@ export function createPlane(svg, cfg) {
     const kalamSize = Math.max(12, Math.round((12 / scale) * 10) / 10);
     svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
     svg.style.setProperty('--svg-scale-kalam', `${kalamSize}px`);
+
+    const turb = svg.querySelector(`#${clipId}-turb`);
+    if (turb) {
+      const baseFreq = (0.9 * (W / clientW)).toFixed(4);
+      turb.setAttribute('baseFrequency', baseFreq);
+    }
   }
   updateSvgFontScale();
   if (typeof ResizeObserver !== 'undefined') {
@@ -151,28 +175,49 @@ export function createPlane(svg, cfg) {
       grid.append(s('line', { x1: P.l, y1: sy(t), x2: P.l + pw, y2: sy(t), class: 'plot-grid' })));
   }
   const axes = layers.axes;
+  const axisLabels = layers.axisLabels;
   axes.append(
     s('line', { x1: P.l, y1: xAxisY, x2: P.l + pw + 8, y2: xAxisY, class: 'plot-axis', 'marker-end': `url(#${clipId}-arrow)` }),
     s('line', { x1: yAxisX, y1: P.t + ph, x2: yAxisX, y2: P.t - 8, class: 'plot-axis', 'marker-end': `url(#${clipId}-arrow)` }),
+  );
+  axisLabels.append(
     s('text', { x: P.l + pw + 6, y: xAxisY - 8, class: 'plot-axis-label', 'text-anchor': 'end' }, c.xLabel),
     s('text', { x: yAxisX + 8, y: P.t + 4, class: 'plot-axis-label' }, c.yLabel),
   );
+  const isMobileScreen = typeof window !== 'undefined' ? (window.innerWidth <= 600) : false;
+  const helpers = { sx, sy, xAxisY, yAxisX };
   ticks(c.xMin, c.xMax, c.xStep).forEach((t) => {
     if (Math.abs(t) < 1e-9 && c.xMin < 0) return;
     axes.append(
       s('line', { x1: sx(t), y1: xAxisY - 3, x2: sx(t), y2: xAxisY + 3, class: 'plot-axis' }),
-      s('text', { x: sx(t), y: xAxisY + 16, class: 'plot-tick', 'text-anchor': 'middle' }, c.xFmt(t)),
+    );
+    if (isMobileScreen && (c.xMax - c.xMin) >= 7 && c.xStep === 1 && Math.abs(t % 2) > 0.01) return;
+    const txt = c.xFmt(t);
+    if (!txt) return;
+    const pos = (typeof c.xTickPos === 'function' && c.xTickPos(t, helpers)) || { x: sx(t), y: xAxisY + 26, anchor: 'middle' };
+    axisLabels.append(
+      s('text', { x: pos.x, y: pos.y, class: 'plot-tick', 'text-anchor': pos.anchor }, txt),
     );
   });
   ticks(c.yMin, c.yMax, c.yStep).forEach((t) => {
     if (Math.abs(t) < 1e-9 && c.yMin < 0) return;
     axes.append(
       s('line', { x1: yAxisX - 3, y1: sy(t), x2: yAxisX + 3, y2: sy(t), class: 'plot-axis' }),
-      s('text', { x: yAxisX - 6, y: sy(t) + 4, class: 'plot-tick', 'text-anchor': 'end' }, c.yFmt(t)),
+    );
+    if (isMobileScreen && (c.yMax - c.yMin) >= 7 && c.yStep === 1 && Math.abs(t % 2) > 0.01) return;
+    const txt = c.yFmt(t);
+    if (!txt) return;
+    const pos = (typeof c.yTickPos === 'function' && c.yTickPos(t, helpers)) || { x: yAxisX - 8, y: sy(t) + 4, anchor: 'end' };
+    axisLabels.append(
+      s('text', { x: pos.x, y: pos.y, class: 'plot-tick', 'text-anchor': pos.anchor }, txt),
     );
   });
   if (c.xMin < 0 && c.yMin < 0) {
-    axes.append(s('text', { x: yAxisX - 6, y: xAxisY + 16, class: 'plot-tick', 'text-anchor': 'end' }, '0'));
+    const originTxt = c.xFmt ? c.xFmt(0) : '0';
+    if (originTxt) {
+      const pos = (typeof c.originPos === 'function' && c.originPos(helpers)) || c.originPos || { x: yAxisX - 8, y: xAxisY - 6, anchor: 'end' };
+      axisLabels.append(s('text', { x: pos.x, y: pos.y, class: 'plot-tick', 'text-anchor': pos.anchor }, '0'));
+    }
   }
 
   /* ---------- Curvas ---------- */

@@ -253,6 +253,11 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       ),
     ),
   );
+
+  const activeLink = root.querySelector('.site-nav__link[aria-current="page"]');
+  if (activeLink && typeof activeLink.scrollIntoView === 'function') {
+    activeLink.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
 }
 
 /**

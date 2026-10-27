@@ -136,6 +136,8 @@ export function initInversa(container) {
     xStep: 1,
     yStep: 1,
     pad: { l: 44, r: 56, t: 30, b: 30 },
+    xTickPos: (t, { sx, xAxisY }) => (t === -1 ? { x: sx(-1) - 8, y: xAxisY + 26, anchor: 'end' } : null),
+    yTickPos: (t, { yAxisX, sy }) => (t === -1 ? { x: yAxisX - 8, y: sy(-1) - 6, anchor: 'end' } : null),
   });
 
   function setA(rawA) {
@@ -330,19 +332,20 @@ export function initInversa(container) {
     // Manija del punto directo (a, f(a))
     const cxA = plane.sx(a), cyA = plane.sy(fa);
     plane.layers.marks.append(
-      s('circle', { cx: cxA, cy: cyA, r: 13, class: 'fn-handle-ring fn-handle-ring--p1' }),
-      s('circle', { cx: cxA, cy: cyA, r: 7, fill: 'var(--blue)', stroke: 'var(--card)', 'stroke-width': 2 }),
+      s('ellipse', { cx: cxA, cy: cyA, rx: 13.5, ry: 12.5, class: 'fn-handle-ring fn-handle-ring--p1', transform: `rotate(12 ${cxA} ${cyA})` }),
+      s('ellipse', { cx: cxA, cy: cyA, rx: 7.2, ry: 6.8, fill: 'var(--blue)', stroke: 'var(--card)', 'stroke-width': 2, transform: `rotate(12 ${cxA} ${cyA})` }),
       s('circle', { cx: cxA, cy: cyA, r: 22, class: 'fn-handle' }),
     );
 
     // Manija del punto reflejado (f(a), a)
     const cxInv = plane.sx(fa), cyInv = plane.sy(a);
     plane.layers.marks.append(
-      s('circle', { cx: cxInv, cy: cyInv, r: 13, class: 'fn-handle-ring fn-handle-ring--p2' }),
-      s('circle', {
-        cx: cxInv, cy: cyInv, r: 7,
+      s('ellipse', { cx: cxInv, cy: cyInv, rx: 13.5, ry: 12.5, class: 'fn-handle-ring fn-handle-ring--p2', transform: `rotate(-14 ${cxInv} ${cyInv})` }),
+      s('ellipse', {
+        cx: cxInv, cy: cyInv, rx: 7.2, ry: 6.8,
         fill: Math.abs(m) < 1e-4 ? 'var(--pink)' : 'var(--green)',
         stroke: 'var(--card)', 'stroke-width': 2,
+        transform: `rotate(-14 ${cxInv} ${cyInv})`
       }),
       s('circle', { cx: cxInv, cy: cyInv, r: 22, class: 'fn-handle' }),
     );
@@ -350,30 +353,31 @@ export function initInversa(container) {
     // Etiquetas en el gráfico
     plane.layers.labels.append(
       s('text', {
-        x: plane.sx(3.6),
-        y: plane.sy(4.0),
+        x: plane.sx(2.0),
+        y: plane.sy(3.5),
         class: 'plot-label',
         fill: 'var(--muted)',
         'text-anchor': 'middle',
       }, 'Espejo y = x'),
       s('text', {
-        x: plane.sx(-4.2),
-        y: plane.sy(Math.max(-4.5, Math.min(4.5, m * (-4.2) + b))) - 10,
+        x: plane.sx(-4.4),
+        y: plane.sy(Math.max(-4.2, Math.min(4.2, m * (-4.4) + b))) + 22,
         class: 'plot-label',
         fill: 'var(--blue)',
+        'text-anchor': 'start',
       }, 'f(x)'),
       s('text', {
-        x: cxA + (a >= 2 ? -12 : 12),
-        y: cyA + (fa >= 3 ? 18 : -12),
+        x: cxA,
+        y: cyA + 24,
         class: 'plot-label',
-        'text-anchor': a >= 2 ? 'end' : 'start',
+        'text-anchor': 'middle',
         fill: 'var(--blue)',
       }, `P(${fmt(a)}; ${fmt(fa)})`),
       s('text', {
-        x: cxInv + (fa >= 2 ? -12 : 12),
-        y: cyInv + (a >= 3 ? 18 : -12),
+        x: cxInv - 14,
+        y: cyInv + 4,
         class: 'plot-label',
-        'text-anchor': fa >= 2 ? 'end' : 'start',
+        'text-anchor': 'end',
         fill: Math.abs(m) < 1e-4 ? 'var(--pink)' : 'var(--green)',
       }, `P'(${fmt(fa)}; ${fmt(a)})`),
     );
@@ -381,11 +385,11 @@ export function initInversa(container) {
     if (Math.abs(m) < 1e-4) {
       plane.layers.labels.append(
         s('text', {
-          x: plane.sx(b) + 8,
-          y: plane.sy(-4),
+          x: plane.sx(b) - 12,
+          y: plane.sy(3.5),
           class: 'plot-label',
           fill: 'var(--pink)',
-          'text-anchor': 'start',
+          'text-anchor': 'end',
         }, 'Recta x = b (NO es función)'),
       );
     } else {

@@ -3,7 +3,8 @@
  * C₀, C⁺, C⁻, monotonía (↑/↓), extremos locales vs. absolutos,
  * la trampa "negativa pero creciente" y el Candado del Eje X.
  */
-import { h, s, mount, byId, on, setPressed } from '../../core/dom.js';
+import { h, s, mount, byId, on, setPressed, chalkIcon } from '../../core/dom.js';
+import { fmt } from '../../core/math-format.js';
 import { createPlane } from '../../core/plot.js';
 
 /* ------------------------------------------------------------------ */
@@ -135,7 +136,7 @@ export function initRadiografia(container) {
       h('div', { class: 'fn-side' },
         h('div', { id: 'rad-explain', class: 'notice', 'aria-live': 'polite' }),
         h('div', { class: 'notice notice--warn' },
-          h('strong', null, '🔒 Candado del eje X. '),
+          h('strong', null, chalkIcon('lock'), ' Candado del eje X. '),
           'C⁺, C⁻, I↑ e I↓ responden siempre a la misma pregunta: ',
           h('em', null, '¿para qué valores de x pasa esto?'),
           ' Por eso se escriben leyendo el eje X (el "piso"), nunca las alturas del eje Y. Las líneas punteadas te bajan cada borde hasta el piso.',
@@ -168,17 +169,29 @@ export function initRadiografia(container) {
   const lensesBar = byId('rad-lenses', container);
   const quizBox = byId('rad-quiz', container);
 
-  const plane = createPlane(svg, { width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5 });
+  const plane = createPlane(svg, {
+    width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5,
+    xFmt: (t) => ([-3, 0, 4, 5].includes(t) ? '' : fmt(t)),
+    yFmt: (t) => ([-1, 0].includes(t) ? '' : fmt(t)),
+  });
   const curve = (a, b, attrs) => s('path', { d: plane.fnPath(evalWave, a, b, { samples: Math.ceil((b - a) * 60) }), fill: 'none', ...attrs });
   const guide = (x, color) => s('line', {
     x1: plane.sx(x), y1: plane.sy(evalWave(x)), x2: plane.sx(x), y2: plane.xAxisY,
     stroke: color, 'stroke-width': 1.6, 'stroke-dasharray': '4 4',
   });
-  const bar = (a, b, color, offset = 0) => s('line', {
+  const bar = (a, b, mod = 'pos', offset = 0) => s('line', {
     x1: plane.sx(a), y1: plane.xAxisY + offset, x2: plane.sx(b), y2: plane.xAxisY + offset,
-    class: 'fn-shadow-x', stroke: color,
+    class: `fn-shadow-x fn-shadow-x--${mod}`,
   });
-  const dot = (x, y, color, r = 6) => s('circle', { cx: plane.sx(x), cy: plane.sy(y), r, fill: color, stroke: 'var(--card)', 'stroke-width': 1.5 });
+  const dot = (x, y, color, r = 6) => {
+    const rot = ((Math.round((x + 5) * 7) % 7) - 3) * 3;
+    return s('ellipse', {
+      cx: plane.sx(x), cy: plane.sy(y),
+      rx: r * 1.05, ry: r * 0.95,
+      fill: color, stroke: 'var(--card)', 'stroke-width': 1.5,
+      transform: `rotate(${rot} ${plane.sx(x)} ${plane.sy(y)})`
+    });
+  };
   const label = (x, y, text, anchor = 'middle', color = null) => s('text', { x, y, class: 'plot-label', 'text-anchor': anchor, fill: color }, text);
 
   /** Flecha tangente en x, apuntando en el sentido de x creciente. */
@@ -187,7 +200,7 @@ export function initRadiografia(container) {
     const px = plane.sx(x), py = plane.sy(evalWave(x));
     let dx = plane.sx(x + 0.01) - px, dy = plane.sy(evalWave(x) + m * 0.01) - py;
     const len = Math.hypot(dx, dy); dx /= len; dy /= len;
-    const L = 22, color = customColor || (m > 0 ? 'var(--green)' : 'var(--yellow)');
+    const L = 22, color = customColor || (m > 0 ? 'var(--blue)' : 'var(--ink)');
     const ex = px + dx * L, ey = py + dy * L;
     const nx = -dy, ny = dx;
     return s('g', null,
@@ -207,32 +220,37 @@ export function initRadiografia(container) {
       const neg = { stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-dasharray': '5 4' };
       cv.append(curve(X0, -3, pos), curve(-3, 0, neg), curve(0, 4, pos), curve(4, X1, neg));
       under.append(
-        bar(X0, -3, 'var(--blue)'), bar(0, 4, 'var(--blue)'),
-        bar(-3, 0, 'var(--ink)'), bar(4, X1, 'var(--ink)'),
+        bar(X0, -3, 'pos'), bar(0, 4, 'pos'),
+        bar(-3, 0, 'neg'), bar(4, X1, 'neg'),
         guide(X0, 'var(--blue)'), guide(X1, 'var(--ink)'),
       );
       [-3, 0, 4].forEach((r) => {
         marks.append(dot(r, 0, 'var(--yellow)'));
-        labels.append(label(plane.sx(r), plane.xAxisY - 12, `(${r}; 0)`));
+        const isZero = r === 0;
+        const offsetX = isZero ? -14 : 14;
+        const anchor = isZero ? 'end' : 'start';
+        labels.append(label(plane.sx(r) + offsetX, plane.xAxisY - 14, `(${r}; 0)`, anchor));
       });
     } else if (state.lens === 'monotonia') {
+      const pos = { stroke: 'var(--blue)', 'stroke-width': 4 };
+      const neg = { stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-dasharray': '5 4' };
       cv.append(
-        curve(X0, -1.8, { stroke: 'var(--yellow)', 'stroke-width': 3.5 }),
-        curve(-1.8, 2, { stroke: 'var(--green)', 'stroke-width': 4 }),
-        curve(2, X1, { stroke: 'var(--yellow)', 'stroke-width': 3.5 }),
+        curve(X0, -1.8, neg),
+        curve(-1.8, 2, pos),
+        curve(2, X1, neg),
       );
       under.append(
-        bar(-1.8, 2, 'var(--green)'),
-        bar(X0, -1.8, 'var(--yellow)'), bar(2, X1, 'var(--yellow)'),
+        bar(-1.8, 2, 'pos'),
+        bar(X0, -1.8, 'neg'), bar(2, X1, 'neg'),
         guide(-1.8, 'var(--muted)'), guide(2, 'var(--muted)'),
       );
       [-3.5, -2.6, -1, 0.9, 3, 4.5].forEach((x) => marks.append(tangentArrow(x)));
-      labels.append(label(plane.sx(0.1), plane.xAxisY + 30, 'I↑ = (−1,8; 2), leído en el eje X', 'middle', 'var(--green)'));
+      labels.append(label(plane.sx(0.1), plane.xAxisY + 36, 'I↑ = (−1,8; 2), leído en el eje X', 'middle', 'var(--blue)'));
     } else if (state.lens === 'extremos') {
       cv.append(curve(X0, X1, { class: 'plot-curve' }));
       under.append(guide(2, 'var(--muted)'), guide(-1.8, 'var(--muted)'), guide(X1, 'var(--muted)'), guide(X0, 'var(--muted)'));
       marks.append(
-        dot(2, 4, 'var(--green)', 7), dot(-1.8, -3, 'var(--yellow)', 7),
+        dot(2, 4, 'var(--blue)', 7), dot(-1.8, -3, 'var(--yellow)', 7),
         dot(X1, -5, 'var(--yellow)', 7), dot(X0, 2.5, 'var(--blue)', 6),
       );
       labels.append(
@@ -246,7 +264,7 @@ export function initRadiografia(container) {
         curve(X0, X1, { stroke: 'var(--border-strong)', 'stroke-width': 2.5 }),
         curve(-1.8, 0, { stroke: 'var(--pink)', 'stroke-width': 5 }),
       );
-      under.append(bar(-1.8, 0, 'var(--pink)'), guide(-1.8, 'var(--pink)'));
+      under.append(bar(-1.8, 0, 'pink'), guide(-1.8, 'var(--pink)'));
       marks.append(dot(-1.8, -3, 'var(--pink)'), dot(0, 0, 'var(--pink)'), tangentArrow(-0.9, 'var(--pink)'));
       labels.append(label(plane.sx(-0.9), plane.sy(-3.6), 'Abajo del eje, pero subiendo', 'middle', 'var(--pink)'));
     }

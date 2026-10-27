@@ -66,17 +66,29 @@
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
 }
 
 .seq-track {
   width: 100%;
-  min-width: 560px;
+  max-width: 700px;
   min-height: 190px;
   overflow: visible;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
+  background: transparent;
+}
+
+@media (min-width: 601px) {
+  .seq-track-wrap {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+  .seq-track {
+    min-width: 560px;
+  }
 }
 
 .seq-point {
@@ -156,7 +168,7 @@
 .seq-point.is-active .seq-post-val,
 .seq-point.is-active .seq-label,
 .seq-point:has(.seq-post.is-active) .seq-label {
-  fill: #141f18 !important;
+  fill: var(--bg);
   font-weight: 800;
 }
 
@@ -235,9 +247,10 @@
   transition: all .15s ease;
 }
 
-.seq-zoom-btn:hover {
-  color: var(--ink);
-  background: rgba(255, 255, 255, .05);
+@media (hover: hover) {
+  .seq-zoom-btn:hover {
+    color: var(--ink);
+  }
 }
 
 .seq-zoom-btn.is-active {
@@ -257,7 +270,7 @@
 
 /* Valores numéricos en el Radar Geométrico con halo de contraste */
 .seq-chart {
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
+  background: transparent;
 }
 
 .seq-chart text {
@@ -442,7 +455,7 @@
 .seq-verify-table th,
 .seq-verify-table td {
   border: none;
-  border-bottom: 1px dashed rgba(236, 232, 220, 0.2);
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   padding: 6px 10px;
   text-align: center;
 }
@@ -451,17 +464,17 @@
   background: transparent;
   color: var(--muted);
   font-weight: 600;
-  border-bottom: 1.5px solid rgba(236, 232, 220, 0.3);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent);
 }
 
 .seq-cell-good {
-  background: transparent !important;
+  background: transparent;
   color: var(--green);
   font-weight: 700;
 }
 
 .seq-cell-bad {
-  background: transparent !important;
+  background: transparent;
   color: var(--pink);
   font-weight: 700;
 }

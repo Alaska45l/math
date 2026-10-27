@@ -60,6 +60,34 @@ export function s(tag, attrs, ...children) {
   return el;
 }
 
+/** Icono vectorial estilo tiza (lock, check, cross). */
+export function chalkIcon(type, attrs = {}) {
+  const icon = s('svg', {
+    class: `chalk-icon chalk-icon--${type}`,
+    viewBox: '0 0 16 16',
+    width: '16',
+    height: '16',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': '1.8',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'aria-hidden': 'true',
+    ...attrs,
+  });
+  if (type === 'lock') {
+    icon.append(
+      s('rect', { x: 3, y: 7, width: 10, height: 8, rx: 1.5 }),
+      s('path', { d: 'M5.5 7V4.5a2.5 2.5 0 0 1 5 0V7' })
+    );
+  } else if (type === 'check') {
+    icon.append(s('path', { d: 'M3 8.5l3.5 3.5 6.5-8' }));
+  } else if (type === 'cross') {
+    icon.append(s('path', { d: 'M4 4l8 8M12 4l-8 8' }));
+  }
+  return icon;
+}
+
 /** Reemplaza todos los hijos del nodo. */
 export function mount(el, ...children) {
   el.replaceChildren();

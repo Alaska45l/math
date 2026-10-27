@@ -66,18 +66,6 @@
 }
 
 @font-face {
-  font-family: 'Math for Caveat';
-  font-style: italic;
-  font-weight: 100 900;
-  src: url("../fonts/math-subset.woff2") format("woff2"),
-       local('STIX Two Math'),
-       local('DejaVu Math TeX Gyre'),
-       local('Cambria Math'),
-       local('Latin Modern Math');
-  size-adjust: 93%;
-}
-
-@font-face {
   font-family: 'Math for Kalam';
   font-style: normal;
   font-weight: 100 900;
@@ -90,32 +78,8 @@
 }
 
 @font-face {
-  font-family: 'Math for Kalam';
-  font-style: italic;
-  font-weight: 100 900;
-  src: url("../fonts/math-subset.woff2") format("woff2"),
-       local('STIX Two Math'),
-       local('DejaVu Math TeX Gyre'),
-       local('Cambria Math'),
-       local('Latin Modern Math');
-  size-adjust: 114%;
-}
-
-@font-face {
   font-family: 'Math fallback';
   font-style: normal;
-  font-weight: 100 900;
-  src: url("../fonts/math-subset.woff2") format("woff2"),
-       local('STIX Two Math'),
-       local('DejaVu Math TeX Gyre'),
-       local('Cambria Math'),
-       local('Latin Modern Math');
-  size-adjust: 95%;
-}
-
-@font-face {
-  font-family: 'Math fallback';
-  font-style: italic;
   font-weight: 100 900;
   src: url("../fonts/math-subset.woff2") format("woff2"),
        local('STIX Two Math'),
@@ -142,14 +106,14 @@
 
   /* Roles semánticos de tiza en pizarrón (7 tokens puros):
      --bg:     superficie de pizarra verde oscura
-     --ink:    blanco tiza: texto principal, fórmulas, ejes y curvas base
-     --muted:  tiza gastada: guías secundarias, asíntotas mudas, etiquetas sutiles
-     --yellow: "mirá acá": resultados, respuestas, secante/TCP, lámpara encendida
-     --blue:   entradas, manijas interactivas (P₁, P₂), condiciones de entrada, C⁺
+     --ink:    blanco tiza: texto principal, fórmulas, ejes, curvas base, catetos Δx y Δy, C⁻ (trazos), I↓ (trazos)
+     --muted:  tiza gastada: guías secundarias, cuadrículas, asíntotas mudas, etiquetas sutiles
+     --yellow: "mirá acá": resultados, respuestas, secante/TCP, raíces C₀, lámpara encendida
+     --blue:   entradas, manijas interactivas (P₁, P₂), condiciones de entrada, C⁺, I↑
      --pink:   alerta estricta: error, trampa, "NO es función", quiz incorrecto
-     --green:  éxito: correcto, confirmación, variación horizontal dx, intervalo I↑ */
-  --border: rgba(236, 232, 220, .15);
-  --border-strong: rgba(236, 232, 220, .30);
+     --green:  éxito: correcto / acierto / confirmación, neutro multiplicativo, y NADA más */
+  --border: color-mix(in srgb, var(--ink) 15%, transparent);
+  --border-strong: color-mix(in srgb, var(--ink) 30%, transparent);
 
   /* Lámpara (circuito) */
   --lamp-fill: var(--yellow);

@@ -42,7 +42,7 @@ button,
   .tab:hover,
   .fn-quiz-btn:hover,
   .chip:hover {
-    background: transparent !important;
+    background: transparent;
     color: var(--yellow);
   }
 }
@@ -449,7 +449,7 @@ output {
 
 /* ---------- Plano cartesiano (js/core/plot.js) ---------- */
 .plot {
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
+  background: transparent;
   border: none;
   border-radius: 0;
   touch-action: none;
@@ -457,8 +457,10 @@ output {
 }
 
 .plot-grid {
-  stroke: var(--border);
+  stroke: var(--muted);
   stroke-width: 1;
+  stroke-dasharray: 2 4;
+  stroke-opacity: 0.10;
 }
 
 .plot-axis {
@@ -467,13 +469,29 @@ output {
 }
 
 .plot-arrowhead {
-  fill: var(--muted);
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chalk-icon {
+  display: inline-block;
+  vertical-align: -0.18em;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .plot-tick {
   font-size: var(--svg-scale-caveat, 20px);
   fill: var(--muted);
   font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
 }
 
 .plot-axis-label {
@@ -485,11 +503,14 @@ output {
 
 .plot-label {
   font-size: var(--svg-scale-caveat, 20px);
-  fill: var(--ink);
   paint-order: stroke;
   stroke: var(--card);
   stroke-width: 4px;
   stroke-linejoin: round;
+}
+
+.plot-label:not([fill]) {
+  fill: var(--ink);
 }
 
 .plot-label--muted {

@@ -89,6 +89,7 @@ export function initSecante(container) {
       width: 600, height: 380, xMin: c.xMin, xMax: c.xMax, yMin: c.yMin, yMax: c.yMax,
       yStep: c.yStep, xLabel: c.xLabel, yLabel: c.yLabel,
     });
+    plane.layers.curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve' }));
   }
 
   function setPoint(which, x) {
@@ -136,9 +137,13 @@ export function initSecante(container) {
       return;
     }
     const grew = (y2 - y1) * Math.sign(x2 - x1) > 0;
-    el.verdict.className = grew ? 'notice notice--ok' : 'notice';
+    el.verdict.className = 'notice';
     mount(el.verdict,
-      h('strong', null, `${span}, ${c.qty} ${grew ? c.up : c.down} ${fmt(Math.abs(dy))} ${c.yUnit} en ${fmt(Math.abs(dx))} ${c.xUnit}. `),
+      h('strong', null, `${span}, ${c.qty} ${grew ? c.up : c.down} `),
+      h('span', { style: 'color: var(--yellow); font-weight: bold;' }, `${fmt(Math.abs(dy))} ${c.yUnit}`),
+      ' en ',
+      h('span', { style: 'color: var(--yellow); font-weight: bold;' }, `${fmt(Math.abs(dx))} ${c.xUnit}`),
+      '. ',
       `En promedio, es como si hubiera ${grew ? 'subido' : 'bajado'} a un ritmo parejo de ${fmt(Math.abs(tcp))} ${c.rateText}. `,
       grew ? '' : 'El signo negativo de la TCP te avisa justamente eso: la magnitud disminuyó. ',
       'Esa es la pendiente de la secante: la recta que une los dos instantes como si el cambio hubiera sido constante.',
@@ -157,9 +162,8 @@ export function initSecante(container) {
     el.v2.textContent = `${fmt(x2)} ${c.xUnit}`;
     el.rule.textContent = `Modelo: ${c.rule}`;
 
-    plane.clear('under', 'curve', 'marks', 'labels');
-    const { under, curve, marks, labels } = plane.layers;
-    curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve' }));
+    plane.clear('under', 'marks', 'labels');
+    const { under, marks, labels } = plane.layers;
 
     if (Math.abs(dx) > 1e-9) {
       const m = dy / dx, sec = (x) => y1 + m * (x - x1);
@@ -171,24 +175,29 @@ export function initSecante(container) {
       const midY = (c.yMin + c.yMax) / 2, rightSide = x2 >= (c.xMin + c.xMax) / 2;
       labels.append(
         s('text', {
-          x: plane.sx((x1 + x2) / 2), y: plane.sy(y1) + (y1 > midY ? 20 : -10),
-          class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--green)',
+          x: plane.sx(3.2), y: plane.sy(y1) - 12,
+          class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--ink)',
         }, `Δx = ${fmt(dx)} ${c.xUnit}`),
         s('text', {
-          x: plane.sx(x2) + (rightSide ? -8 : 8), y: plane.sy((y1 + y2) / 2) + 4,
-          class: 'plot-label', 'text-anchor': rightSide ? 'end' : 'start', fill: 'var(--yellow)',
+          x: plane.sx(x2) + 14, y: plane.sy(22.2),
+          class: 'plot-label', 'text-anchor': 'start', fill: 'var(--ink)',
         }, `Δy = ${fmt(dy)} ${c.yUnit}`),
       );
     }
 
     [[x1, y1, 'P₁', 'p1', 'var(--blue)'], [x2, y2, 'P₂', 'p2', 'var(--blue)']].forEach(([x, y, name, key, color]) => {
       const cx = plane.sx(x), cy = plane.sy(y);
+      const rot = key === 'p1' ? 12 : -15;
       marks.append(
-        s('circle', { cx, cy, r: 13, class: `fn-handle-ring fn-handle-ring--${key}` }),
-        s('circle', { cx, cy, r: 7, fill: color, stroke: 'var(--card)', 'stroke-width': 2 }),
+        s('ellipse', { cx, cy, rx: 13.5, ry: 12.5, class: `fn-handle-ring fn-handle-ring--${key}`, transform: `rotate(${rot} ${cx} ${cy})` }),
+        s('ellipse', { cx, cy, rx: 7.2, ry: 6.8, fill: color, stroke: 'var(--card)', 'stroke-width': 2, transform: `rotate(${rot} ${cx} ${cy})` }),
         s('circle', { cx, cy, r: 20, class: 'fn-handle' }),
       );
-      labels.append(s('text', { x: cx, y: cy - 18, class: 'plot-label', 'text-anchor': 'middle' }, `${name}(${fmt(x)}; ${fmt(y)})`));
+      const isP1 = key === 'p1';
+      const labelX = isP1 ? cx + 16 : cx - 14;
+      const labelY = isP1 ? cy + 28 : cy - 14;
+      const anchor = isP1 ? 'start' : 'end';
+      labels.append(s('text', { x: labelX, y: labelY, class: 'plot-label', 'text-anchor': anchor }, `${name}(${fmt(x)}; ${fmt(y)})`));
     });
 
     renderMath(c, x1, x2, y1, y2, dx, dy);
