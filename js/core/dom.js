@@ -65,14 +65,15 @@ export function chalkIcon(type, attrs = {}) {
   const icon = s('svg', {
     class: `chalk-icon chalk-icon--${type}`,
     viewBox: '0 0 16 16',
-    width: '16',
-    height: '16',
+    width: '20',
+    height: '20',
     fill: 'none',
     stroke: 'currentColor',
-    'stroke-width': '1.8',
+    'stroke-width': '2',
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
     'aria-hidden': 'true',
+    focusable: 'false',
     ...attrs,
   });
   if (type === 'lock') {

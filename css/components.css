@@ -478,10 +478,19 @@ output {
 
 .chalk-icon {
   display: inline-block;
-  vertical-align: -0.18em;
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.2em;
+  fill: none;
   stroke: currentColor;
+  stroke-width: 2px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.chalk-icon * {
+  vector-effect: non-scaling-stroke;
 }
 
 .plot-tick {

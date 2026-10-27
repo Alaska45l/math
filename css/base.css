@@ -157,11 +157,12 @@ body::before {
   pointer-events: none;
   background-image:
     url("grain-tile.webp"),
+    url("chalkboard-eraser.webp"),
     url("chalkboard-ghosts.svg"),
     radial-gradient(ellipse 120% 90% at 50% 25%, #2e3f36 0%, #26352d 65%, #1f2c25 100%);
-  background-repeat: repeat, repeat, no-repeat;
-  background-size: 256px 256px, 1600px 1200px, cover;
-  background-position: 0 0, center top, center center;
+  background-repeat: repeat, repeat, repeat, no-repeat;
+  background-size: 256px 256px, 1600px 1200px, 1600px 1200px, cover;
+  background-position: 0 0, center top, center top, center center;
 }
 
 h1 {
@@ -216,7 +217,7 @@ a {
   color: var(--blue);
 }
 
-svg {
+svg:not(.chalk-icon) {
   display: block;
   width: 100%;
   height: auto;

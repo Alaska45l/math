@@ -24,21 +24,6 @@
     </style>
   </defs>
 
-  <!-- 6 arcos de borrador reforzados en márgenes (200-450px, angulo <= 6 grados) -->
-  <g>
-    <!-- Margen superior izquierdo -->
-    <path d="M 60 170 Q 220 162 380 176" class="wipe-arc" stroke-width="56" />
-    <!-- Margen superior derecho -->
-    <path d="M 1220 160 Q 1390 168 1550 152" class="wipe-arc" stroke-width="58" />
-    <!-- Margen lateral izquierdo medio -->
-    <path d="M 50 560 Q 210 550 370 572" class="wipe-arc" stroke-width="54" />
-    <!-- Margen lateral derecho medio -->
-    <path d="M 1240 580 Q 1395 588 1550 570" class="wipe-arc" stroke-width="56" />
-    <!-- Margen inferior izquierdo -->
-    <path d="M 70 960 Q 240 950 420 972" class="wipe-arc" stroke-width="56" />
-    <!-- Margen inferior derecho -->
-    <path d="M 1200 970 Q 1370 980 1540 958" class="wipe-arc" stroke-width="58" />
-  </g>
 
   <!-- Fórmulas tenues en márgenes (opacidad <= 0.04) -->
   <g class="ghost-path" mask="url(#ghost-erase-mask)">

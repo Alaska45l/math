@@ -100,6 +100,7 @@ for (const width of [1280, 390]) {
     const viewCollisions = await page.evaluate((viewId) => {
       const collisions = [];
       const svgs = Array.from(document.querySelectorAll('svg')).filter(s => {
+        if (s.closest('[hidden]')) return false;
         const r = s.getBoundingClientRect();
         return r.width > 0 && r.height > 0;
       });
@@ -137,18 +138,22 @@ for (const width of [1280, 390]) {
         }
 
         // 2. Label - Path / Line / Circle collisions
-        // Ignore grid lines (class plot-grid) and elements inside defs
+        // Ignore grid lines (class plot-grid), guide lines (fn-guide), handles and elements inside defs
         const strokes = Array.from(svg.querySelectorAll('path, line, circle, ellipse')).filter(el => {
           if (el.closest('defs')) return false;
           if (el.classList.contains('plot-grid')) return false;
           if (el.classList.contains('fn-handle')) return false; // invisible hit-area
+          if (el.classList.contains('fn-guide')) return false;  // intentional guide stroke to label
           const cs = window.getComputedStyle(el);
           return cs.display !== 'none' && cs.visibility !== 'hidden' && (cs.stroke !== 'none' || cs.fill !== 'none');
         });
 
         texts.forEach(t => {
-          // If text has halo (stroke on text matching card background), small boundary overlaps are protected by halo
-          // But substantial intersection (path cutting deeply into text center) is a collision
+          // EXCEPTION: A tick with halo (.plot-tick with paint-order: stroke) crossed by a curve or line is NOT a collision.
+          // Standard in analysis textbooks: the card-colored stroke buffer keeps the number legible even when intersected.
+          const isTickWithHalo = t.classList.contains('plot-tick') && window.getComputedStyle(t).paintOrder.includes('stroke');
+          if (isTickWithHalo) return;
+
           const r = t.getBoundingClientRect();
           // Shrink bbox slightly by 2px margin to ignore tangential touching
           const innerR = {

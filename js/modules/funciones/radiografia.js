@@ -171,8 +171,8 @@ export function initRadiografia(container) {
 
   const plane = createPlane(svg, {
     width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5,
-    xFmt: (t) => ([-3, 0, 4, 5].includes(t) ? '' : fmt(t)),
-    yFmt: (t) => ([-1, 0].includes(t) ? '' : fmt(t)),
+    xFmt: (t) => fmt(t),
+    yFmt: (t) => fmt(t),
   });
   const curve = (a, b, attrs) => s('path', { d: plane.fnPath(evalWave, a, b, { samples: Math.ceil((b - a) * 60) }), fill: 'none', ...attrs });
   const guide = (x, color) => s('line', {
@@ -226,11 +226,26 @@ export function initRadiografia(container) {
       );
       [-3, 0, 4].forEach((r) => {
         marks.append(dot(r, 0, 'var(--yellow)'));
-        const isZero = r === 0;
-        const offsetX = isZero ? -14 : 14;
-        const anchor = isZero ? 'end' : 'start';
-        labels.append(label(plane.sx(r) + offsetX, plane.xAxisY - 14, `(${r}; 0)`, anchor));
       });
+      const lx = plane.sx(-1.5), ly = plane.sy(2.2);
+      labels.append(label(lx, ly, 'C₀', 'middle', 'var(--yellow)'));
+      under.append(
+        s('path', {
+          class: 'fn-guide',
+          d: `M${lx - 12} ${ly + 8} C ${lx - 40} ${ly + 25}, ${plane.sx(-3) + 15} ${plane.xAxisY - 20}, ${plane.sx(-3)} ${plane.xAxisY - 6}`,
+          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
+        }),
+        s('path', {
+          class: 'fn-guide',
+          d: `M${lx} ${ly + 8} Q ${lx + 10} ${plane.xAxisY - 15}, ${plane.sx(0)} ${plane.xAxisY - 6}`,
+          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
+        }),
+        s('path', {
+          class: 'fn-guide',
+          d: `M${lx + 12} ${ly + 8} C ${lx + 60} ${ly + 10}, ${plane.sx(4) - 30} ${plane.xAxisY - 30}, ${plane.sx(4)} ${plane.xAxisY - 6}`,
+          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
+        })
+      );
     } else if (state.lens === 'monotonia') {
       const pos = { stroke: 'var(--blue)', 'stroke-width': 4 };
       const neg = { stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-dasharray': '5 4' };
