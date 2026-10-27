@@ -99,6 +99,9 @@ export function frac(top, bot, { className = '', label } = {}) {
   );
 }
 
+/** Nombre descriptivo usado por los laboratorios de sucesiones. */
+export const fractionHtml = (top, bot, options) => frac(top, bot, options);
+
 /** Variable en itálica matemática. */
 export const v = (name) => h('var', null, name);
 

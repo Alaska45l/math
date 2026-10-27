@@ -8,6 +8,7 @@ export const PAGES = [
   { id: 'desigualdades', href: 'desigualdades.html', label: 'Desigualdades' },
   { id: 'unidades', href: 'unidades.html', label: 'Unidades' },
   { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
+  { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
 ];
 
 /**
