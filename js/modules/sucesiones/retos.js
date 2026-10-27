@@ -7,7 +7,7 @@ export function initRetos(root) {
     const genCols = genVals.map((v, i) => {
       const match = typeof v === 'number' && Math.abs(v - realVals[i]) < 1e-4;
       const vStr = typeof v === 'number' ? fmt(v, 2) : v;
-      const checkSvg = `<svg class="chalk-icon chalk-icon--check inline-mark" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 8.5 L6 12 L14 3.5"/></svg>`;
+      const checkSvg = `<svg class="chalk-icon chalk-icon--check inline-mark" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 8.5 L6 12 L14 3.5"/></svg><span class="sr-only">correcta</span>`;
       if (match) {
         return `<td class="seq-cell-good">${vStr} ${checkSvg}</td>`;
       } else {

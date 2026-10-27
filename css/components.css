@@ -493,6 +493,18 @@ output {
   vector-effect: non-scaling-stroke;
 }
 
+.chalk-icon--check {
+  color: var(--green);
+}
+
+.chalk-icon--cross {
+  color: var(--pink);
+}
+
+.chalk-icon--lock {
+  color: var(--yellow);
+}
+
 .plot-tick {
   font-size: var(--svg-scale-caveat, 20px);
   fill: var(--muted);

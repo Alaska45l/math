@@ -56,17 +56,31 @@ async function benchmarkDrag(viewUrl, setupFn, dragSelector, testName) {
     window._metrics = {
       frameIntervals: [],
       handlerDurations: [],
-      longAnimationFrames: []
+      longAnimationFrames: [],
+      pointerMoveCount: 0
     };
 
     // Long Animation Frame observer
     try {
       const obs = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
+          const scripts = (entry.scripts || []).map(s => ({
+            invoker: s.invoker,
+            invokerType: s.invokerType,
+            sourceURL: s.sourceURL,
+            sourceFunctionName: s.sourceFunctionName,
+            sourceCharPosition: s.sourceCharPosition,
+            duration: s.duration,
+            forcedStyleAndLayoutDuration: s.forcedStyleAndLayoutDuration,
+            pauseDuration: s.pauseDuration
+          }));
           window._metrics.longAnimationFrames.push({
             duration: entry.duration,
             blockingDuration: entry.blockingDuration,
-            startTime: entry.startTime
+            startTime: entry.startTime,
+            renderStart: entry.renderStart,
+            styleAndLayoutStart: entry.styleAndLayoutStart,
+            scripts
           });
         }
       });
@@ -87,10 +101,10 @@ async function benchmarkDrag(viewUrl, setupFn, dragSelector, testName) {
     }
     requestAnimationFrame(onFrame);
 
-    // Measure pointermove handler execution duration
+    // Measure pointermove handler execution duration and count
     window.addEventListener('pointermove', () => {
+      window._metrics.pointerMoveCount++;
       const start = performance.now();
-      // Wait for synchronous microtasks of the event
       window._metrics.handlerDurations.push(performance.now() - start);
     }, { capture: true, passive: true });
   });
@@ -152,16 +166,24 @@ async function benchmarkDrag(viewUrl, setupFn, dragSelector, testName) {
   console.log(`
 >>> ${testName} <<<`);
   console.log(`  Total Frames Tracked: ${totalFrames}`);
+  console.log(`  Total pointermove Events Dispatched & Handled: ${metrics.pointerMoveCount}`);
   console.log(`  Vsync Intervals: p50 = ${p50.toFixed(2)} ms | p95 = ${p95.toFixed(2)} ms | max = ${max.toFixed(2)} ms`);
   console.log(`  Dropped Frames (>25ms): ${droppedFrames} of ${totalFrames} (${dropRate.toFixed(1)}%)`);
   console.log(`  Long Animation Frames (LoAF >50ms): ${metrics.longAnimationFrames.length}`);
   if (metrics.longAnimationFrames.length > 0) {
     metrics.longAnimationFrames.forEach((f, idx) => {
-      console.log(`    LoAF #${idx+1}: duration=${f.duration.toFixed(1)}ms, blocking=${f.blockingDuration.toFixed(1)}ms`);
+      console.log(`    LoAF #${idx+1}: duration=${f.duration.toFixed(1)}ms, blocking=${f.blockingDuration.toFixed(1)}ms, renderStart=${f.renderStart?.toFixed(1) || 'N/A'}, styleAndLayoutStart=${f.styleAndLayoutStart?.toFixed(1) || 'N/A'}`);
+      if (f.scripts && f.scripts.length > 0) {
+        f.scripts.forEach((s, sIdx) => {
+          console.log(`      Script #${sIdx+1}: invoker='${s.invoker}' (${s.invokerType}), fn='${s.sourceFunctionName}', dur=${s.duration.toFixed(1)}ms, forcedStyleLayout=${s.forcedStyleAndLayoutDuration.toFixed(1)}ms, src=${s.sourceURL ? s.sourceURL.split('/').slice(-2).join('/') : 'inline'}:${s.sourceCharPosition}`);
+        });
+      } else {
+        console.log(`      (No JS script attribution; delay was in browser style/layout/raster pipeline)`);
+      }
     });
   }
 
-  return { testName, totalFrames, p50, p95, max, droppedFrames, dropRate, loafCount: metrics.longAnimationFrames.length };
+  return { testName, totalFrames, p50, p95, max, droppedFrames, dropRate, loafCount: metrics.longAnimationFrames.length, pointerMoveCount: metrics.pointerMoveCount };
 }
 
 // 1. Secante Drag (Point P2)

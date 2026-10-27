@@ -390,6 +390,7 @@ export function initScanner(container) {
             s('line', { x1: '3', y1: '3', x2: '13', y2: '13' }),
             s('line', { x1: '13', y1: '3', x2: '3', y2: '13' }),
           ),
+          h('span', { class: 'sr-only' }, 'incorrecta'),
         ),
       );
     }

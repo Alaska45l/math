@@ -95,6 +95,7 @@ console.log('=== AUDITORIA DE ICONOS Y SVGs (scratch/audit_icon_sizes.mjs) ===')
 
 let totalFailures = 0;
 let iconCountTotal = 0;
+const allChecksList = [];
 
 for (const width of [1280, 390]) {
   console.log(`
@@ -119,6 +120,7 @@ for (const width of [1280, 390]) {
       chalkIcons.forEach((icon, idx) => {
         const cs = window.getComputedStyle(icon);
         const r = icon.getBoundingClientRect();
+        const color = cs.color;
         const info = {
           idx,
           tag: icon.tagName,
@@ -128,7 +130,10 @@ for (const width of [1280, 390]) {
           height: r.height,
           cssWidth: cs.width,
           cssHeight: cs.height,
-          parent: icon.parentElement ? icon.parentElement.tagName.toLowerCase() : 'none'
+          color,
+          parent: icon.parentElement ? icon.parentElement.tagName.toLowerCase() : 'none',
+          srOnly: icon.parentElement ? (icon.parentElement.querySelector('.sr-only')?.textContent || '') : '',
+          ariaHidden: icon.getAttribute('aria-hidden')
         };
         results.icons.push(info);
 
@@ -141,6 +146,42 @@ for (const width of [1280, 390]) {
         }
         if (info.height < 14 || info.height > 32) {
           results.errors.push(`[CHALK-ICON HEIGHT] icon #${idx} (${info.className}) has height ${info.height.toFixed(1)}px (expected 14-32px)`);
+        }
+
+        // Requirement b: Computed semantic color
+        if (icon.classList.contains('chalk-icon--check')) {
+          if (color !== 'rgb(174, 209, 162)') {
+            results.errors.push(`[CHALK-ICON COLOR] icon #${idx} (.chalk-icon--check) color is '${color}' (expected var(--green) rgb(174, 209, 162))`);
+          }
+        } else if (icon.classList.contains('chalk-icon--cross')) {
+          if (color !== 'rgb(227, 161, 161)') {
+            results.errors.push(`[CHALK-ICON COLOR] icon #${idx} (.chalk-icon--cross) color is '${color}' (expected var(--pink) rgb(227, 161, 161))`);
+          }
+        } else if (icon.classList.contains('chalk-icon--lock')) {
+          if (color !== 'rgb(230, 211, 138)') {
+            results.errors.push(`[CHALK-ICON COLOR] icon #${idx} (.chalk-icon--lock) color is '${color}' (expected var(--yellow) rgb(230, 211, 138))`);
+          }
+        }
+
+        // Requirement c: Accessibility / sr-only text
+        if (icon.classList.contains('chalk-icon--check')) {
+          const parent = icon.parentElement;
+          const srOnly = parent ? parent.querySelector('.sr-only') : null;
+          const text = srOnly ? srOnly.textContent.trim().toLowerCase() : '';
+          if (!text.includes('correcta')) {
+            results.errors.push(`[CHALK-ICON A11Y] icon #${idx} (.chalk-icon--check) lacks adjacent .sr-only with 'correcta'`);
+          }
+        } else if (icon.classList.contains('chalk-icon--cross')) {
+          const parent = icon.parentElement;
+          const srOnly = parent ? parent.querySelector('.sr-only') : null;
+          const text = srOnly ? srOnly.textContent.trim().toLowerCase() : '';
+          if (!text.includes('incorrecta')) {
+            results.errors.push(`[CHALK-ICON A11Y] icon #${idx} (.chalk-icon--cross) lacks adjacent .sr-only with 'incorrecta'`);
+          }
+        } else if (icon.classList.contains('chalk-icon--lock')) {
+          if (icon.getAttribute('aria-hidden') !== 'true') {
+            results.errors.push(`[CHALK-ICON A11Y] icon #${idx} (.chalk-icon--lock) is decorative and must be aria-hidden="true"`);
+          }
         }
       });
 
@@ -164,6 +205,17 @@ for (const width of [1280, 390]) {
 
     iconCountTotal += auditResults.icons.length;
 
+    for (const icon of auditResults.icons) {
+      allChecksList.push({
+        width,
+        view: v.id,
+        cls: icon.className.replace('chalk-icon', '').trim(),
+        dims: `${icon.width.toFixed(1)}x${icon.height.toFixed(1)}px`,
+        color: icon.color,
+        a11y: icon.srOnly ? `sr-only: "${icon.srOnly}"` : (icon.ariaHidden ? `aria-hidden="${icon.ariaHidden}"` : 'none')
+      });
+    }
+
     if (auditResults.errors.length > 0) {
       console.log(`  FAIL [${v.id} @ ${width}px] (${auditResults.icons.length} chalk-icons found):`);
       auditResults.errors.forEach(e => console.log(`    ❌ ${e}`));
@@ -178,6 +230,12 @@ for (const width of [1280, 390]) {
 
 console.log(`
 ==========================================`);
+console.log(`DESGLOSE DETALLADO DE LAS ${allChecksList.length} COMPROBACIONES DE ICONOS:`);
+console.log(`------------------------------------------`);
+allChecksList.forEach((c, i) => {
+  console.log(`Check #${(i + 1).toString().padStart(2, '0')}: [${c.width}px - ${c.view}] icon: .${c.cls} | dims: ${c.dims} | color: ${c.color} | ${c.a11y} -> PASS ✅`);
+});
+console.log(`------------------------------------------`);
 console.log(`Total chalk-icon checks across 13 views: ${iconCountTotal}`);
 console.log(`Total failures: ${totalFailures}`);
 console.log(`Status: ${totalFailures === 0 ? 'ALL CHECKS PASSED ✅' : 'FAILED ❌'}`);

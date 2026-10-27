@@ -229,23 +229,6 @@ export function initRadiografia(container) {
       });
       const lx = plane.sx(-1.5), ly = plane.sy(2.2);
       labels.append(label(lx, ly, 'C₀', 'middle', 'var(--yellow)'));
-      under.append(
-        s('path', {
-          class: 'fn-guide',
-          d: `M${lx - 12} ${ly + 8} C ${lx - 40} ${ly + 25}, ${plane.sx(-3) + 15} ${plane.xAxisY - 20}, ${plane.sx(-3)} ${plane.xAxisY - 6}`,
-          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
-        }),
-        s('path', {
-          class: 'fn-guide',
-          d: `M${lx} ${ly + 8} Q ${lx + 10} ${plane.xAxisY - 15}, ${plane.sx(0)} ${plane.xAxisY - 6}`,
-          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
-        }),
-        s('path', {
-          class: 'fn-guide',
-          d: `M${lx + 12} ${ly + 8} C ${lx + 60} ${ly + 10}, ${plane.sx(4) - 30} ${plane.xAxisY - 30}, ${plane.sx(4)} ${plane.xAxisY - 6}`,
-          fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 1.4, 'stroke-dasharray': '3 3', opacity: '0.85'
-        })
-      );
     } else if (state.lens === 'monotonia') {
       const pos = { stroke: 'var(--blue)', 'stroke-width': 4 };
       const neg = { stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-dasharray': '5 4' };

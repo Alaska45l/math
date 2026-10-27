@@ -180,7 +180,7 @@ export function initPostes(root) {
           <div class="seq-compare-grid">
             <div class="seq-compare-row seq-compare-row--good">
               <div class="seq-compare-header">
-                <strong><svg class="chalk-icon chalk-icon--check" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 8.5l3.5 3.5 6.5-8"/></svg> Fórmula correcta:</strong> <code>64 · (1/4)ⁿ⁻¹</code>
+                <strong><svg class="chalk-icon chalk-icon--check" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 8.5l3.5 3.5 6.5-8"/></svg><span class="sr-only">correcta</span> Fórmula correcta:</strong> <code>64 · (1/4)ⁿ⁻¹</code>
                 <span class="small">(coincide exactamente)</span>
               </div>
               <div class="seq-compare-values">
@@ -193,7 +193,7 @@ export function initPostes(root) {
 
             <div class="seq-compare-row seq-compare-row--bad">
               <div class="seq-compare-header">
-                <strong><svg class="chalk-icon chalk-icon--cross" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg> Woo-Jin:</strong> <code>64 · (1/4)ⁿ</code>
+                <strong><svg class="chalk-icon chalk-icon--cross" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg><span class="sr-only">incorrecta</span> Woo-Jin:</strong> <code>64 · (1/4)ⁿ</code>
                 <span class="small pink">(desfasado 1 salto)</span>
               </div>
               <div class="seq-compare-values">
@@ -206,7 +206,7 @@ export function initPostes(root) {
 
             <div class="seq-compare-row seq-compare-row--bad">
               <div class="seq-compare-header">
-                <strong><svg class="chalk-icon chalk-icon--cross" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg> Kiran:</strong> <code>16 · (1/4)ⁿ⁻¹</code>
+                <strong><svg class="chalk-icon chalk-icon--cross" viewBox="0 0 16 16" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg><span class="sr-only">incorrecta</span> Kiran:</strong> <code>16 · (1/4)ⁿ⁻¹</code>
                 <span class="small pink">(base incorrecta)</span>
               </div>
               <div class="seq-compare-values">
