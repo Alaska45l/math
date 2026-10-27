@@ -1,6 +1,57 @@
-/* ==========================================================================
-   base.css — Design tokens, reset, modo claro/oscuro y tipografía
-   ========================================================================== */
+/* ---------- Tipografías de Pizarrón (WOFF2 autoalojadas) ---------- */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/caveat-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/caveat-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/kalam-regular-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/kalam-regular-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/kalam-bold-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Kalam';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/kalam-bold-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
   color-scheme: dark;
@@ -38,11 +89,13 @@
   --lamp-stroke: var(--yellow);
   --lamp-x: var(--bg);
 
-  /* Geometría sobria y académica */
+  /* Geometría y tipografía manuscrita de pizarrón */
   --radius: 3px;
   --radius-lg: 4px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, serif;
+  --font-math: "DejaVu Math TeX Gyre", "Cambria Math", "STIX Two Math", "Latin Modern Math", "DejaVu Serif", Georgia, serif;
+  --font-hand: 'Caveat', var(--font-math), cursive;
+  --font-note: 'Kalam', var(--font-math), cursive;
 }
 
 *,
@@ -64,31 +117,41 @@ body {
   background-position: center top;
   background-attachment: fixed;
   color: var(--ink);
-  font: 16px/1.55 var(--font-sans);
+  font: 16px/1.6 var(--font-note);
   min-height: 100vh;
 }
 
 h1 {
-  font-size: clamp(22px, 4vw, 30px);
-  line-height: 1.2;
-  font-weight: 600;
+  font-family: var(--font-hand);
+  font-size: clamp(34px, 6vw, 52px);
+  line-height: 1.15;
+  font-weight: 700;
   margin: 0 0 8px;
+  letter-spacing: 0.5px;
 }
 
 h2 {
-  font-size: 20px;
-  font-weight: 600;
+  font-family: var(--font-hand);
+  font-size: clamp(26px, 4.5vw, 36px);
+  line-height: 1.2;
+  font-weight: 700;
   margin: 28px 0 8px;
 }
 
 h3 {
-  font-size: 16px;
-  font-weight: 600;
+  font-family: var(--font-hand);
+  font-size: clamp(20px, 3.5vw, 26px);
+  line-height: 1.25;
+  font-weight: 700;
   margin: 18px 0 6px;
 }
 
 p {
-  margin: 0 0 10px;
+  font-family: var(--font-note);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 62ch;
+  margin: 0 0 12px;
 }
 
 a {
@@ -113,7 +176,7 @@ svg text {
 .intro {
   margin: 0 0 22px;
   font-size: 17px;
-  max-width: 68ch;
+  max-width: 62ch;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
@@ -148,6 +211,9 @@ svg text {
 }
 
 .nota {
+  font-family: var(--font-hand);
+  font-size: 18px;
+  line-height: 1.4;
   transform: rotate(-.8deg);
   max-width: 34ch;
 }
@@ -157,8 +223,11 @@ svg text {
 }
 
 .subrayado-ondulado {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e6d38a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom / 100% 4px repeat-x;
+  display: inline;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e6d38a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom left / 16px 4px repeat-x;
   padding-bottom: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .small {
@@ -189,17 +258,17 @@ svg text {
 
 /* Texto SVG: siempre via tokens para que el modo oscuro sea legible */
 .svg-t {
-  font-size: 14px;
+  font-size: 16px;
   fill: var(--ink);
 }
 
 .svg-ts {
-  font-size: 12px;
+  font-size: 16px;
   fill: var(--muted);
 }
 
 .svg-th {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 600;
   fill: var(--ink);
 }

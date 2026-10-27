@@ -146,9 +146,15 @@ export function initRadiografia(container) {
             'Guillermo miró el tramo que sube desde el valle (−1,8; −3) hasta la cima (2; 4) y escribió ',
             h('code', null, 'I↑ = (−3; 4)'), '. Le pusieron mal. ¿Por qué?'),
           h('div', { class: 'fn-quiz-options', id: 'rad-quiz' },
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'brackets' } }, 'A) Porque tenía que usar corchetes: [−3; 4].'),
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'correct' } }, 'B) Porque copió las alturas (y = −3 e y = 4) en vez de los valores de x. Lo correcto es (−1,8; 2).'),
-            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'negative' } }, 'C) Porque entre x = −1,8 y x = 0 la función es negativa, así que ahí no puede crecer.'),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'brackets' } },
+              h('span', { class: 'quiz-opt-tag' }, 'A)'),
+              ' Porque tenía que usar corchetes: [−3; 4].'),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'correct' } },
+              h('span', { class: 'quiz-opt-tag' }, 'B)'),
+              ' Porque copió las alturas (y = −3 e y = 4) en vez de los valores de x. Lo correcto es (−1,8; 2).'),
+            h('button', { type: 'button', class: 'fn-quiz-btn', dataset: { ans: 'negative' } },
+              h('span', { class: 'quiz-opt-tag' }, 'C)'),
+              ' Porque entre x = −1,8 y x = 0 la función es negativa, así que ahí no puede crecer.'),
           ),
           h('p', { id: 'rad-quiz-msg', class: 'status', 'aria-live': 'polite' }),
         ),
@@ -258,19 +264,23 @@ export function initRadiografia(container) {
   });
 
   const FEEDBACK = {
-    correct: ['text-ok', '¡Exacto! −3 y 4 son alturas, valores de y. Un intervalo de crecimiento contesta "¿para qué x sube?", así que hay que bajar al piso: la curva sube desde x = −1,8 hasta x = 2, o sea I↑ = (−1,8; 2).'],
-    brackets: ['text-err', 'No es un tema de corchetes. El problema de fondo es que −3 y 4 ni siquiera son valores de x: son las alturas del valle y de la cima.'],
-    negative: ['text-err', 'Cuidado, esa es justamente la trampa de la Lente 4: estar debajo del eje no impide estar subiendo. La función crece en todo (−1,8; 2).'],
+    correct: ['text-ok', '¡Exacto! ', '−3 y 4 son alturas, valores de y. Un intervalo de crecimiento contesta "¿para qué x sube?", así que hay que bajar al piso: la curva sube desde x = −1,8 hasta x = 2, o sea I↑ = (−1,8; 2).'],
+    brackets: ['text-err', 'No es un tema de corchetes. ', 'El problema de fondo es que −3 y 4 ni siquiera son valores de x: son las alturas del valle y de la cima.'],
+    negative: ['text-err', 'Cuidado, esa es justamente la trampa de la Lente 4: ', 'estar debajo del eje no impide estar subiendo. La función crece en todo (−1,8; 2).'],
   };
   on(quizBox, 'click', 'button[data-ans]', (_e, btn) => {
     const isCorrect = btn.dataset.ans === 'correct';
     quizBox.querySelectorAll('button[data-ans]').forEach((b) => {
-      b.classList.remove('encerrado', 'tachado');
+      b.classList.remove('is-active');
+      const tag = b.querySelector('.quiz-opt-tag');
+      if (tag) tag.classList.remove('encerrado', 'tachado');
     });
-    btn.classList.add(isCorrect ? 'encerrado' : 'tachado');
-    const [cls, text] = FEEDBACK[btn.dataset.ans];
-    quizMsg.className = `status ${cls}`;
-    quizMsg.textContent = text;
+    btn.classList.add('is-active');
+    const tag = btn.querySelector('.quiz-opt-tag');
+    if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
+    const [cls, lead, text] = FEEDBACK[btn.dataset.ans];
+    quizMsg.className = 'status';
+    mount(quizMsg, h('strong', { class: cls }, lead), text);
   });
 
   render();

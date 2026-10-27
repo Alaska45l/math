@@ -24,12 +24,12 @@
   left: 50%;
   top: -6px;
   width: 12px;
-  height: 7px;
+  height: 8px;
   transform: translateX(-50%);
   border: inherit;
   border-bottom: 0;
   border-radius: 5px 5px 0 0;
-  background: inherit;
+  background: var(--bg);
 }
 
 /* Hueco (denominador): muesca abajo */

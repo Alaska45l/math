@@ -203,32 +203,51 @@ output {
 }
 
 .notice--ok {
-  color: var(--green);
+  color: var(--ink);
   background: transparent;
+}
+.notice--ok > strong:first-child,
+.notice--ok .notice-tag {
+  color: var(--green);
 }
 
 .notice--warn {
-  color: var(--yellow);
+  color: var(--ink);
   background: transparent;
+}
+.notice--warn > strong:first-child,
+.notice--warn .notice-tag {
+  color: var(--yellow);
 }
 
 .notice--err {
-  color: var(--pink);
+  color: var(--ink);
   background: transparent;
 }
+.notice--err > strong:first-child,
+.notice--err .notice-tag {
+  color: var(--pink);
+}
 
-.notice--err strong {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e3a1a1' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom / 100% 4px repeat-x;
+.notice--err > strong:first-child {
+  display: inline;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3.5 Q 5 0.5, 10 3.5 T 20 3.5' fill='none' stroke='%23e3a1a1' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") bottom left / 16px 4px repeat-x;
   padding-bottom: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .notice--blue {
-  color: var(--blue);
+  color: var(--ink);
   background: transparent;
+}
+.notice--blue > strong:first-child,
+.notice--blue .notice-tag {
+  color: var(--blue);
 }
 
 .notice strong {
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .status {
@@ -413,7 +432,7 @@ output {
 
 /* ---------- Plano cartesiano (js/core/plot.js) ---------- */
 .plot {
-  background: transparent;
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
   border: none;
   border-radius: 0;
   touch-action: none;
@@ -435,20 +454,20 @@ output {
 }
 
 .plot-tick {
-  font-size: 11px;
+  font-size: 16px;
   fill: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .plot-axis-label {
-  font-size: 14px;
+  font-size: 18px;
   font-style: italic;
   font-family: var(--font-math);
   fill: var(--ink);
 }
 
 .plot-label {
-  font-size: 13px;
+  font-size: 16px;
   fill: var(--ink);
   paint-order: stroke;
   stroke: var(--card);

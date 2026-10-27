@@ -8,11 +8,10 @@ export function initRetos(root) {
       const match = typeof v === 'number' && Math.abs(v - realVals[i]) < 1e-4;
       const vStr = typeof v === 'number' ? fmt(v, 2) : v;
       const checkSvg = `<svg class="inline-mark" viewBox="0 0 16 16" aria-label="correcto"><path d="M2 8.5 L6 12 L14 3.5" fill="none" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      const crossSvg = `<svg class="inline-mark" viewBox="0 0 16 16" aria-label="incorrecto"><path d="M3.5 3.5 L12.5 12.5 M12.5 3.5 L3.5 12.5" fill="none" stroke="var(--pink)" stroke-width="2.4" stroke-linecap="round"/></svg>`;
       if (match) {
         return `<td class="seq-cell-good">${vStr} ${checkSvg}</td>`;
       } else {
-        return `<td class="seq-cell-bad"><span class="tachado seq-verify-bad-val">${vStr}</span> <span class="encerrado">${fmt(realVals[i], 2)}</span> ${crossSvg}</td>`;
+        return `<td class="seq-cell-bad"><span class="tachado seq-verify-bad-val">${vStr}</span> <span class="encerrado">${fmt(realVals[i], 2)}</span></td>`;
       }
     }).join('');
 
@@ -197,11 +196,13 @@ export function initRetos(root) {
           <p>${t.desc}</p>
           <p><strong>${t.question}</strong></p>
           <div class="seq-options">
-            ${t.answers.map((ans, j) => `
+            ${t.answers.map((ans, j) => {
+              const letter = String.fromCharCode(65 + j);
+              return `
               <button type="button" class="btn" data-answer="${j}">
-                ${ans.replace('1/4', '<span class="seq-frac"></span>')}
+                <span class="quiz-opt-tag">${letter})</span> ${ans.replace('1/4', '<span class="seq-frac"></span>')}
               </button>
-            `).join('')}
+            `;}).join('')}
           </div>
           <div class="seq-feedback" aria-live="polite"></div>
         </article>
@@ -253,9 +254,13 @@ export function initRetos(root) {
         const ansIdx = Number(btn.dataset.answer);
         const isCorrect = ansIdx === task.correctIndex;
         card.querySelectorAll('[data-answer]').forEach(b => {
-          b.classList.remove('is-active', 'encerrado', 'tachado');
+          b.classList.remove('is-active');
+          const tag = b.querySelector('.quiz-opt-tag');
+          if (tag) tag.classList.remove('encerrado', 'tachado');
         });
-        btn.classList.add('is-active', isCorrect ? 'encerrado' : 'tachado');
+        btn.classList.add('is-active');
+        const tag = btn.querySelector('.quiz-opt-tag');
+        if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
 
         const { label, vals } = task.evalGen(ansIdx);
         const table = verifyTableHtml(task.realIndices, task.realVals, vals, label);

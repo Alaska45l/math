@@ -343,7 +343,7 @@ export function initScanner(container) {
       mount(el.verdict,
         h('strong', null, '¡Hay dos salidas para la misma entrada! '),
         `En x = ${X}, la gráfica te devuelve dos alturas distintas al mismo tiempo: y = ${fmt(res.pts[0])} e y = ${fmt(res.pts[1])}. `,
-        'Como f(x) no puede valer dos cosas a la vez, esta relación ', h('strong', null, 'NO es función'), '.',
+        'Como f(x) no puede valer dos cosas a la vez, esta relación ', h('span', { class: 'text-err' }, 'NO es función'), '.',
         note);
     } else {
       el.verdict.className = 'notice notice--warn';
@@ -364,8 +364,29 @@ export function initScanner(container) {
       return;
     }
     const isFn = c.isFunction && !state.sawCollision;
-    mount(el.isFn, h('span', { class: isFn ? ['encerrado', 'text-ok'] : ['tachado', 'text-err'] },
-      isFn ? 'Sí, es función' : 'No es función'));
+    if (isFn) {
+      mount(el.isFn, h('span', { class: ['encerrado', 'text-ok'] }, 'Sí, es función'));
+    } else {
+      mount(el.isFn,
+        h('span', { class: 'text-err' },
+          'No es función ',
+          s('svg', {
+            class: 'inline-mark',
+            viewBox: '0 0 16 16',
+            width: '14',
+            height: '14',
+            fill: 'none',
+            stroke: 'currentColor',
+            'stroke-width': '2',
+            'stroke-linecap': 'round',
+            style: 'vertical-align: -2px; display: inline-block;',
+          },
+            s('line', { x1: '3', y1: '3', x2: '13', y2: '13' }),
+            s('line', { x1: '13', y1: '3', x2: '3', y2: '13' }),
+          ),
+        ),
+      );
+    }
     el.caseVerdict.hidden = false;
     el.caseVerdict.textContent = c.verdict;
   }

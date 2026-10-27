@@ -44,7 +44,8 @@
 
 .seq-controls input,
 .seq-controls select {
-  max-width: 240px;
+  width: auto;
+  max-width: 100%;
 }
 
 .seq-range {
@@ -59,6 +60,7 @@
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
 }
 
 .seq-point {
@@ -106,7 +108,7 @@
 .seq-label {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 12.5px;
+  font-size: 16px;
   font-weight: 600;
   font-family: var(--font-sans);
 }
@@ -115,7 +117,7 @@
 .seq-arc-label {
   text-anchor: middle;
   fill: var(--muted);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-sans);
 }
@@ -129,7 +131,7 @@
 .seq-post-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   font-family: var(--font-sans);
 }
@@ -146,7 +148,7 @@
 .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -237,11 +239,15 @@
 }
 
 /* Valores numéricos en el Radar Geométrico con halo de contraste */
+.seq-chart {
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, #26352d 50%, transparent 100%);
+}
+
 .seq-chart .seq-label,
 .seq-chart-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 12.5px;
+  font-size: 16px;
   font-weight: 700;
   font-family: var(--font-sans);
   paint-order: stroke fill;
@@ -253,7 +259,7 @@
 .seq-chart .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
 }
 
@@ -454,7 +460,6 @@
 .seq-feedback {
   min-height: 2em;
   margin-top: 10px;
-  font-weight: 650;
   line-height: 1.5;
 }
 
