@@ -81,7 +81,7 @@ export function initPostes(root) {
       const stepLabel = k === 'geo' ? `× ${fmt(c)}` : `${c >= 0 ? '+' : ''} ${fmt(c)}`;
       svgHtml += `
         <path class="seq-arc ${isTravelled ? 'is-travelled' : ''}" d="M${x + 12} 88 Q${x + 46} 28 ${x + 80} 88"/>
-        <text class="seq-label" x="${x + 46}" y="42" fill="${isTravelled ? 'var(--green)' : 'var(--muted)'}" font-weight="600">${stepLabel}</text>
+        <text class="seq-arc-label ${isTravelled ? 'is-travelled' : ''}" x="${x + 46}" y="42">${stepLabel}</text>
       `;
     }
 
@@ -91,11 +91,11 @@ export function initPostes(root) {
       const idx = start + i;
       const isActive = i === hops;
       svgHtml += `
-        <g class="seq-point" data-i="${i}" tabindex="0" role="button" aria-label="Poste ${idx}, valor ${fmt(v, 2)}">
+        <g class="seq-point ${isActive ? 'is-active' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="Poste ${idx}, valor ${fmt(v, 2)}">
           <title>Hacé clic para seleccionar n = ${idx}</title>
           <circle class="seq-post ${isActive ? 'is-active' : ''}" cx="${x}" cy="92" r="${isActive ? 20 : 17}"/>
           <text class="seq-index" x="${x}" y="136">n = ${idx}</text>
-          <text class="seq-label" x="${x}" y="97" font-weight="${isActive ? '700' : '500'}">${fmt(v, 2)}</text>
+          <text class="seq-post-val" x="${x}" y="97">${fmt(v, 2)}</text>
         </g>
       `;
     });

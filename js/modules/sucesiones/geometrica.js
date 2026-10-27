@@ -108,7 +108,7 @@ export function initGeometrica(root) {
         <g class="seq-point" data-n="${i + 1}" tabindex="0" role="button" aria-label="Término n=${i+1}, valor ${fmt(v, 2)}">
           <circle class="seq-post" cx="${x}" cy="${y}" r="7"/>
           <text class="seq-index" x="${x}" y="298">${i + 1}</text>
-          <text class="seq-label" x="${x}" y="${labelY}" font-weight="600">${fmt(v, 2)}</text>
+          <text class="seq-chart-val" x="${x}" y="${labelY}">${fmt(v, 2)}</text>
         </g>
       `);
     });

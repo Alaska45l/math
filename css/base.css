@@ -10,6 +10,7 @@
   --surface: #19271f;     /* Paneles y cajas secundarias */
   --card: #1e3127;        /* Tarjetas, lienzos interactivos y cajas de fórmulas con fondo sólido */
   --ink: #f2f4ec;         /* Tiza blanca nítida */
+  --text: var(--ink);     /* Alias de texto principal para contraste */
   --muted: #a3b8aa;       /* Tiza blanca atenuada / polvo de tiza */
   --border: rgba(255, 255, 255, .15);
   --border-strong: rgba(255, 255, 255, .30);
@@ -48,6 +49,7 @@
     --surface: #18251d;
     --card: #1c2b22;
     --ink: #f2f4ec;
+    --text: var(--ink);
     --muted: #9eb2a3;
   }
 }
@@ -106,6 +108,10 @@ svg {
   display: block;
   width: 100%;
   height: auto;
+}
+
+svg text {
+  fill: var(--ink);
 }
 
 .intro,

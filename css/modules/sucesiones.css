@@ -102,17 +102,52 @@
   stroke-width: 4;
 }
 
+/* Números y texto general en SVGs */
 .seq-label {
   text-anchor: middle;
-  fill: var(--text);
-  font-size: 12px;
+  fill: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
   font-family: var(--font-sans);
 }
 
-.seq-index {
+/* Etiquetas numéricas de salto sobre los arcos */
+.seq-arc-label {
   text-anchor: middle;
   fill: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+.seq-arc-label.is-travelled {
+  fill: var(--green-line);
+  font-weight: 700;
+}
+
+/* Números dentro de los postes inactivos: blanco tiza nítido sobre fondo oscuro */
+.seq-post-val {
+  text-anchor: middle;
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+/* Cuando el poste está activo (fondo amarillo brillante), el número va en pizarra oscuro para máximo contraste */
+.seq-point.is-active .seq-post-val,
+.seq-point.is-active .seq-label,
+.seq-point:has(.seq-post.is-active) .seq-label {
+  fill: #141f18 !important;
+  font-weight: 800;
+}
+
+/* Índices (n = 1, n = 2...) en celeste claro de alto contraste */
+.seq-index {
+  text-anchor: middle;
+  fill: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* ---------- Elementos Neutros y Salto Cero ---------- */
@@ -200,6 +235,27 @@
   stroke-width: 1.5;
   stroke-dasharray: 4 4;
   opacity: 0.8;
+}
+
+/* Valores numéricos en el Radar Geométrico con halo de contraste */
+.seq-chart .seq-label,
+.seq-chart-val {
+  text-anchor: middle;
+  fill: var(--ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  paint-order: stroke fill;
+  stroke: var(--card);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+
+.seq-chart .seq-index {
+  text-anchor: middle;
+  fill: var(--blue);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* ---------- Muñecas Rusas (Sustitución Regresiva) ---------- */
