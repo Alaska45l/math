@@ -176,12 +176,12 @@ export function initSecante(container) {
         }, `Δx = ${fmt(dx)} ${c.xUnit}`),
         s('text', {
           x: plane.sx(x2) + (rightSide ? -8 : 8), y: plane.sy((y1 + y2) / 2) + 4,
-          class: 'plot-label', 'text-anchor': rightSide ? 'end' : 'start', fill: 'var(--amber)',
+          class: 'plot-label', 'text-anchor': rightSide ? 'end' : 'start', fill: 'var(--yellow)',
         }, `Δy = ${fmt(dy)} ${c.yUnit}`),
       );
     }
 
-    [[x1, y1, 'P₁', 'p1', 'var(--blue-line)'], [x2, y2, 'P₂', 'p2', 'var(--amber-line)']].forEach(([x, y, name, key, color]) => {
+    [[x1, y1, 'P₁', 'p1', 'var(--blue)'], [x2, y2, 'P₂', 'p2', 'var(--blue)']].forEach(([x, y, name, key, color]) => {
       const cx = plane.sx(x), cy = plane.sy(y);
       marks.append(
         s('circle', { cx, cy, r: 13, class: `fn-handle-ring fn-handle-ring--${key}` }),

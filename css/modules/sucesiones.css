@@ -85,26 +85,26 @@
 }
 
 .seq-point:focus-visible .seq-post {
-  stroke: var(--amber);
+  stroke: var(--yellow);
   stroke-width: 4;
 }
 
 .seq-post {
   cursor: pointer;
   fill: var(--card);
-  stroke: var(--blue-line);
+  stroke: var(--blue);
   stroke-width: 3;
   transition: transform .15s ease, fill .15s ease, stroke .15s ease;
 }
 
 .seq-point:hover .seq-post {
-  fill: var(--bluebg);
+  fill: transparent;
   stroke: var(--blue);
 }
 
 .seq-post.is-active {
-  fill: var(--amber-line);
-  stroke: var(--amber);
+  fill: var(--yellow);
+  stroke: var(--yellow);
 }
 
 .seq-arc {
@@ -116,7 +116,7 @@
 }
 
 .seq-arc.is-travelled {
-  stroke: var(--green-line);
+  stroke: var(--green);
   stroke-width: 4;
 }
 
@@ -139,7 +139,7 @@
 }
 
 .seq-arc-label.is-travelled {
-  fill: var(--green-line);
+  fill: var(--green);
   font-weight: 700;
 }
 
@@ -242,14 +242,14 @@
 
 .seq-zoom-btn.is-active {
   background: var(--card);
-  border-color: var(--blue-line);
+  border-color: var(--blue);
   color: var(--blue);
   font-weight: 600;
 }
 
 .seq-bounce-line {
   fill: none;
-  stroke: var(--violet-line);
+  stroke: var(--blue);
   stroke-width: 1.5;
   stroke-dasharray: 4 4;
   opacity: 0.8;
@@ -368,12 +368,49 @@
   border: none;
 }
 
-/* ---------- Tablas y Comprobación en Retos ---------- */
+/* ---------- Tablas y Comprobación en Retos (Refloweado sin scroll) ---------- */
 #seq-compare {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  margin-top: 14px;
+}
+
+.seq-compare-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.seq-compare-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--border-strong);
+  background: transparent;
+}
+
+.seq-compare-row--good {
+  border-left-color: var(--green);
+}
+
+.seq-compare-row--bad {
+  border-left-color: var(--pink);
+}
+
+.seq-compare-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.seq-compare-values {
+  font-size: 14px;
+  color: var(--muted);
+  word-break: break-word;
 }
 
 .seq-table {

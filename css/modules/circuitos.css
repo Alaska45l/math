@@ -42,7 +42,7 @@
 }
 
 .wire-flow {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
   stroke-width: 3;
   stroke-dasharray: 6 6;
   opacity: 0;
@@ -79,7 +79,7 @@
 }
 
 .lever.is-powered {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
 }
 
 .pivot {
@@ -97,7 +97,7 @@
 }
 
 .lamp-rays {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
   stroke-width: 2;
   stroke-linecap: round;
   opacity: 0;
@@ -147,9 +147,9 @@
   stroke-dasharray: 4 3;
 }
 
-.nl--a { --c: var(--teal-line); }
-.nl--b { --c: var(--violet-line); }
-.nl--res { --c: var(--amber-line); }
+.nl--a { --c: var(--blue); }
+.nl--b { --c: var(--blue); stroke-dasharray: 4 3; }
+.nl--res { --c: var(--yellow); }
 
 .nl-seg {
   stroke: var(--c);

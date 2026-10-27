@@ -89,9 +89,11 @@
   display: block;
 }
 
-.fn-quiz-btn:hover {
-  background: transparent;
-  color: var(--yellow);
+@media (hover: hover) {
+  .fn-quiz-btn:hover {
+    background: transparent;
+    color: var(--yellow);
+  }
 }
 
 .fn-pipeline {
@@ -157,15 +159,20 @@
   flex-wrap: nowrap;
 }
 
+.tcp-row .math,
+.tcp-row strong {
+  color: var(--yellow);
+}
+
 .fn-shadow-x {
-  stroke: var(--blue-line);
+  stroke: var(--blue);
   stroke-width: 6;
   stroke-linecap: round;
   opacity: 0.85;
 }
 
 .fn-shadow-y {
-  stroke: var(--green-line);
+  stroke: var(--green);
   stroke-width: 6;
   stroke-linecap: round;
   opacity: 0.85;
@@ -177,18 +184,18 @@
 }
 
 .fn-secant {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
   stroke-width: 2.2;
   stroke-dasharray: 6 4;
 }
 
 .fn-triangle-dx {
-  stroke: var(--green-line);
+  stroke: var(--green);
   stroke-width: 2.5;
 }
 
 .fn-triangle-dy {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
   stroke-width: 2.5;
 }
 
@@ -199,7 +206,7 @@
 }
 
 .fn-normal {
-  stroke: var(--amber-line);
+  stroke: var(--yellow);
   stroke-width: 1.8;
   stroke-dasharray: 4 4;
 }
@@ -233,8 +240,8 @@
   pointer-events: none;
 }
 
-.fn-handle-ring--p1 { color: var(--blue-line); }
-.fn-handle-ring--p2 { color: var(--amber-line); }
+.fn-handle-ring--p1 { color: var(--blue); }
+.fn-handle-ring--p2 { color: var(--blue); }
 
 @keyframes fn-pulse {
   0%, 100% { opacity: .25; }
@@ -300,5 +307,5 @@
 }
 
 .fn-pipeline--inv .fn-pipe-arrow {
-  color: var(--green-line);
+  color: var(--green);
 }

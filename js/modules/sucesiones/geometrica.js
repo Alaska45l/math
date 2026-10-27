@@ -88,7 +88,7 @@ export function initGeometrica(root) {
 
     // Asíntota y = 0 cuando converge
     if (Math.abs(r) < 1) {
-      elements.push(`<line x1="40" y1="${zeroY}" x2="600" y2="${zeroY}" stroke="var(--amber-line)" stroke-dasharray="6 4" stroke-width="2"/>`);
+      elements.push(`<line x1="40" y1="${zeroY}" x2="600" y2="${zeroY}" stroke="var(--yellow)" stroke-dasharray="6 4" stroke-width="2"/>`);
     }
 
     // Guía visual quebrada punteada para el zig-zag cuando r < 0
@@ -105,7 +105,7 @@ export function initGeometrica(root) {
         const val = a * (r ** (n - 1));
         return `${i === 0 ? 'M' : 'L'}${X(n)} ${Y(val)}`;
       }).join(' ');
-      elements.push(`<path d="${pts}" fill="none" stroke="var(--green-line)" stroke-width="2.5"/>`);
+      elements.push(`<path d="${pts}" fill="none" stroke="var(--green)" stroke-width="2.5"/>`);
     }
 
     // Términos discretos (postes y puntos)
@@ -115,7 +115,7 @@ export function initGeometrica(root) {
       const isNeg = v < 0;
       const labelY = isAlternating ? (isNeg ? y + 16 : y - 10) : (y < 40 ? y + 18 : y - 10);
 
-      elements.push(`<line x1="${x}" y1="${zeroY}" x2="${x}" y2="${y}" stroke="var(--blue-line)" stroke-dasharray="2 2" stroke-width="1.2"/>`);
+      elements.push(`<line x1="${x}" y1="${zeroY}" x2="${x}" y2="${y}" stroke="var(--blue)" stroke-dasharray="2 2" stroke-width="1.2"/>`);
       elements.push(`
         <g class="seq-point" data-n="${i + 1}" tabindex="0" role="button" aria-label="Término n=${i+1}, valor ${fmt(v, 2)}">
           <circle class="seq-post" cx="${x}" cy="${y}" r="7"/>
@@ -129,8 +129,8 @@ export function initGeometrica(root) {
 
     // Leyenda inferior
     $('#geo-legend').innerHTML = isAlternating
-      ? `<p class="small muted" style="margin-top:8px">Línea punteada violeta: guía visual del rebote secuencial P₁ → P₂ → P₃ (no es una función continua; la sucesión solo existe en los puntos enteros).</p>`
-      : (r === 0.25 ? `<p class="small muted" style="margin-top:8px">Línea de trazos ámbar en y = 0: asíntota horizontal (límite al infinito).</p>` : '');
+      ? `<p class="small muted" style="margin-top:8px">Línea punteada azul: guía visual del rebote secuencial P₁ → P₂ → P₃ (no es una función continua; la sucesión solo existe en los puntos enteros).</p>`
+      : (r === 0.25 ? `<p class="small muted" style="margin-top:8px">Línea de trazos amarilla en y = 0: asíntota horizontal (límite al infinito).</p>` : '');
 
     // Interacción al hacer clic en los puntos
     svg.querySelectorAll('[data-n]').forEach(p => {

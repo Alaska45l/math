@@ -162,34 +162,46 @@ export function initPostes(root) {
         <div class="seq-card">
           <h3>Trampa de Woo-Jin y Kiran · ¿Quién tiene razón?</h3>
           <p>Sucesión pedida: <strong>64, 16, 4, 1</strong> comenzando en <i>n = 1</i> con razón <i>r = 1/4</i>.</p>
-          <table class="seq-table">
-            <thead>
-              <tr>
-                <th>Índice n</th>
-                <th>Sucesión real</th>
-                <th>Fórmula correcta: 64 · (1/4)ⁿ⁻¹</th>
-                <th>Woo-Jin: 64 · (1/4)ⁿ</th>
-                <th>Kiran: 16 · (1/4)ⁿ⁻¹</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${[1, 2, 3, 4].map(i => {
-                const real = [64, 16, 4, 1][i - 1];
-                const good = 64 * (0.25 ** (i - 1));
-                const woo = 64 * (0.25 ** i);
-                const kir = 16 * (0.25 ** (i - 1));
-                return `
-                  <tr>
-                    <td><b>n = ${i}</b></td>
-                    <td><strong>${real}</strong></td>
-                    <td class="seq-good"><strong>${good}</strong> ✓</td>
-                    <td class="${woo === real ? 'seq-good' : 'seq-bad'}">${woo === real ? woo + ' ✓' : '<span class="tachado">' + woo + '</span> <span class="small pink">(desfasado 1 salto)</span>'}</td>
-                    <td class="${kir === real ? 'seq-good' : 'seq-bad'}">${kir === real ? kir + ' ✓' : '<span class="tachado">' + kir + '</span> <span class="small pink">(base incorrecta)</span>'}</td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
+          <div class="seq-compare-grid">
+            <div class="seq-compare-row seq-compare-row--good">
+              <div class="seq-compare-header">
+                <strong>Fórmula correcta:</strong> <code>64 · (1/4)ⁿ⁻¹</code>
+                <span class="seq-good">✓ Coincide exactamente</span>
+              </div>
+              <div class="seq-compare-values">
+                <span>n=1: <strong>64</strong></span> · 
+                <span>n=2: <strong>16</strong></span> · 
+                <span>n=3: <strong>4</strong></span> · 
+                <span>n=4: <strong>1</strong></span>
+              </div>
+            </div>
+
+            <div class="seq-compare-row seq-compare-row--bad">
+              <div class="seq-compare-header">
+                <strong>Woo-Jin:</strong> <code>64 · (1/4)ⁿ</code>
+                <span class="small pink">(desfasado 1 salto)</span>
+              </div>
+              <div class="seq-compare-values">
+                <span>n=1: <span class="tachado">16</span></span> · 
+                <span>n=2: <span class="tachado">4</span></span> · 
+                <span>n=3: <span class="tachado">1</span></span> · 
+                <span>n=4: <span class="tachado">0,25</span></span>
+              </div>
+            </div>
+
+            <div class="seq-compare-row seq-compare-row--bad">
+              <div class="seq-compare-header">
+                <strong>Kiran:</strong> <code>16 · (1/4)ⁿ⁻¹</code>
+                <span class="small pink">(base incorrecta)</span>
+              </div>
+              <div class="seq-compare-values">
+                <span>n=1: <span class="tachado">16</span></span> · 
+                <span>n=2: <span class="tachado">4</span></span> · 
+                <span>n=3: <span class="tachado">1</span></span> · 
+                <span>n=4: <span class="tachado">0,25</span></span>
+              </div>
+            </div>
+          </div>
           <p style="margin-top:10px"><b>Lección de examen:</b> Al evaluar en <i>n = 1</i>, Woo-Jin da <code>64 · (1/4)¹ = 16</code> (da el segundo término en el primer casillero). Kiran calcula <code>16 · (1/4)⁰ = 16</code> (la potencia da el neutro 1, pero su base era 16 en vez de 64). ¡Ninguno de los dos escribió la fórmula correcta!</p>
         </div>
       `;

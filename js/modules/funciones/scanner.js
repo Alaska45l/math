@@ -91,7 +91,7 @@ const CASES = [
       return { pts: [r, -r] };
     },
     draw(plane) {
-      const st = { fill: 'none', stroke: 'var(--red-line)', 'stroke-width': 3, 'stroke-linecap': 'round' };
+      const st = { fill: 'none', stroke: 'var(--pink)', 'stroke-width': 3, 'stroke-linecap': 'round' };
       plane.layers.curve.append(
         s('path', { d: plane.fnPath((x) => Math.sqrt(x + 2), -2, X_MAX, { samples: 200 }), ...st }),
         s('path', { d: plane.fnPath((x) => -Math.sqrt(x + 2), -2, X_MAX, { samples: 200 }), ...st }),
@@ -124,7 +124,7 @@ const CASES = [
       const ry = Math.abs(plane.sy(1) - plane.sy(0));
       plane.layers.curve.append(s('ellipse', {
         cx: plane.sx(2), cy: plane.sy(2), rx: r, ry,
-        fill: 'none', stroke: 'var(--red-line)', 'stroke-width': 3,
+        fill: 'none', stroke: 'var(--pink)', 'stroke-width': 3,
       }));
     },
   },
@@ -182,7 +182,7 @@ const CASES = [
       plane.layers.under.append(
         s('line', {
           x1: plane.sx(2), y1: plane.sy(Y_MIN), x2: plane.sx(2), y2: plane.sy(Y_MAX),
-          stroke: 'var(--amber-line)', 'stroke-width': 1.8, 'stroke-dasharray': '5 4',
+          stroke: 'var(--yellow)', 'stroke-width': 1.8, 'stroke-dasharray': '5 4',
         }),
         s('line', {
           x1: plane.sx(X_MIN), y1: plane.sy(1), x2: plane.sx(X_MAX), y2: plane.sy(1),
@@ -322,7 +322,7 @@ export function initScanner(container) {
       if (e !== 'inf') {
         out.push(s('circle', {
           cx: x, cy: y, r: 4.5,
-          fill: e === 'open' ? 'var(--card)' : 'var(--green-line)', stroke: 'var(--green-line)', 'stroke-width': 2,
+          fill: e === 'open' ? 'var(--card)' : 'var(--green)', stroke: 'var(--green)', 'stroke-width': 2,
         }));
       }
     });
@@ -407,17 +407,17 @@ export function initScanner(container) {
     plane.clear('shade', 'under', 'curve', 'marks', 'labels');
 
     if (state.showDom) {
-      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.sx(n), cy: plane.xAxisY, r: 5, fill: 'var(--blue-line)' })));
+      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.sx(n), cy: plane.xAxisY, r: 5, fill: 'var(--blue)' })));
       else c.xShadows.forEach((sh) => plane.layers.shade.append(...shadowX(sh)));
     }
     if (state.showIm) {
-      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.yAxisX, cy: plane.sy(0.8 * n), r: 5, fill: 'var(--green-line)' })));
+      if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.yAxisX, cy: plane.sy(0.8 * n), r: 5, fill: 'var(--green)' })));
       else c.yShadows.forEach((sh) => plane.layers.shade.append(...shadowY(sh)));
     }
 
     c.draw(plane);
 
-    const laser = res.pts.length === 1 ? 'var(--green-line)' : res.pts.length > 1 ? 'var(--red-line)' : 'var(--amber-line)';
+    const laser = res.pts.length === 1 ? 'var(--green)' : res.pts.length > 1 ? 'var(--pink)' : 'var(--yellow)';
     const lx = plane.sx(state.x);
     plane.layers.marks.append(s('line', { x1: lx, y1: plane.sy(Y_MIN), x2: lx, y2: plane.sy(Y_MAX), class: 'fn-laser', stroke: laser }));
     plane.layers.labels.append(s('text', { x: lx, y: plane.box.y + 16, class: 'plot-label', 'text-anchor': 'middle' }, `x = ${fmt(state.x)}`));
@@ -430,7 +430,7 @@ export function initScanner(container) {
       );
     });
     if (res.holeY !== undefined) {
-      plane.layers.marks.append(s('circle', { cx: lx, cy: plane.sy(res.holeY), r: 8, fill: 'none', stroke: 'var(--amber-line)', 'stroke-width': 2 }));
+      plane.layers.marks.append(s('circle', { cx: lx, cy: plane.sy(res.holeY), r: 8, fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 2 }));
     }
 
     renderVerdict(c, res);

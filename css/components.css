@@ -32,9 +32,19 @@ button,
   background: transparent;
 }
 
-button:hover:not(:disabled),
-.button:hover:not(:disabled) {
-  background: var(--surface);
+@media (hover: hover) {
+  button:hover:not(:disabled):not(.tab):not(.fn-quiz-btn):not(.chip),
+  .button:hover:not(:disabled):not(.tab):not(.fn-quiz-btn):not(.chip) {
+    color: var(--yellow);
+    background: transparent;
+  }
+
+  .tab:hover,
+  .fn-quiz-btn:hover,
+  .chip:hover {
+    background: transparent !important;
+    color: var(--yellow);
+  }
 }
 
 button:active:not(:disabled),
@@ -65,29 +75,29 @@ input[type="range"] {
   padding: 0;
   border: 0;
   background: transparent;
-  accent-color: var(--blue-line);
+  accent-color: var(--blue);
   flex: 1;
   min-width: 120px;
 }
 
 output {
   font-variant-numeric: tabular-nums;
-  color: var(--amber);
+  color: var(--blue);
   font-weight: 700;
 }
 
 /* Botón conmutable (aria-pressed) */
 .toggle[aria-pressed="true"],
 .btn--on {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
-  border-color: var(--blue-line);
+  border-color: var(--blue);
 }
 
 .btn--primary {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
-  border-color: var(--blue-line);
+  border-color: var(--blue);
   font-weight: 400;
 }
 
@@ -265,7 +275,7 @@ output {
 
 .form-error {
   font-size: 13px;
-  color: var(--red);
+  color: var(--pink);
   min-height: 20px;
   margin: 4px 0 0;
 }
@@ -417,14 +427,14 @@ output {
   border: none;
   padding: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px;
+  gap: 4px 8px;
 }
 
 .stat__label {
   font-size: 15px;
   color: var(--muted);
-  white-space: nowrap;
 }
 
 .stat__label::after {
@@ -433,9 +443,8 @@ output {
 }
 
 .stat__value {
-  font-size: 26px;
+  font-size: clamp(20px, 4.5vw, 26px);
   font-weight: 700;
-  white-space: nowrap;
 }
 
 /* ---------- Plano cartesiano (js/core/plot.js) ---------- */
@@ -489,20 +498,20 @@ output {
 
 .plot-curve {
   fill: none;
-  stroke: var(--blue-line);
+  stroke: var(--blue);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .plot-dot {
-  fill: var(--blue-line);
+  fill: var(--blue);
   stroke: var(--card);
   stroke-width: 1.5;
 }
 
 .plot-dot--open {
   fill: var(--card);
-  stroke: var(--blue-line);
+  stroke: var(--blue);
   stroke-width: 2.5;
 }

@@ -299,7 +299,7 @@ export function initInversa(container) {
 
     // Recta f(x) = mx + b
     plane.layers.curve.append(
-      s('path', { d: plane.linePathMB(m, b), fill: 'none', stroke: 'var(--blue-line)', 'stroke-width': 3 }),
+      s('path', { d: plane.linePathMB(m, b), fill: 'none', stroke: 'var(--blue)', 'stroke-width': 3 }),
     );
 
     // Recta inversa f⁻¹(x)
@@ -307,14 +307,14 @@ export function initInversa(container) {
       plane.layers.curve.append(
         s('line', {
           x1: plane.sx(b), y1: plane.sy(-5), x2: plane.sx(b), y2: plane.sy(5),
-          stroke: 'var(--red-line)', 'stroke-width': 3, 'stroke-dasharray': '5 4',
+          stroke: 'var(--pink)', 'stroke-width': 3, 'stroke-dasharray': '5 4',
         }),
       );
     } else {
       const invM = 1 / m;
       const invB = -b / m;
       plane.layers.curve.append(
-        s('path', { d: plane.linePathMB(invM, invB), fill: 'none', stroke: 'var(--green-line)', 'stroke-width': 3 }),
+        s('path', { d: plane.linePathMB(invM, invB), fill: 'none', stroke: 'var(--green)', 'stroke-width': 3 }),
       );
     }
 
@@ -331,7 +331,7 @@ export function initInversa(container) {
     const cxA = plane.sx(a), cyA = plane.sy(fa);
     plane.layers.marks.append(
       s('circle', { cx: cxA, cy: cyA, r: 13, class: 'fn-handle-ring fn-handle-ring--p1' }),
-      s('circle', { cx: cxA, cy: cyA, r: 7, fill: 'var(--blue-line)', stroke: 'var(--card)', 'stroke-width': 2 }),
+      s('circle', { cx: cxA, cy: cyA, r: 7, fill: 'var(--blue)', stroke: 'var(--card)', 'stroke-width': 2 }),
       s('circle', { cx: cxA, cy: cyA, r: 22, class: 'fn-handle' }),
     );
 
@@ -341,7 +341,7 @@ export function initInversa(container) {
       s('circle', { cx: cxInv, cy: cyInv, r: 13, class: 'fn-handle-ring fn-handle-ring--p2' }),
       s('circle', {
         cx: cxInv, cy: cyInv, r: 7,
-        fill: Math.abs(m) < 1e-4 ? 'var(--red-line)' : 'var(--green-line)',
+        fill: Math.abs(m) < 1e-4 ? 'var(--pink)' : 'var(--green)',
         stroke: 'var(--card)', 'stroke-width': 2,
       }),
       s('circle', { cx: cxInv, cy: cyInv, r: 22, class: 'fn-handle' }),
@@ -374,7 +374,7 @@ export function initInversa(container) {
         y: cyInv + (a >= 3 ? 18 : -12),
         class: 'plot-label',
         'text-anchor': fa >= 2 ? 'end' : 'start',
-        fill: Math.abs(m) < 1e-4 ? 'var(--red)' : 'var(--green)',
+        fill: Math.abs(m) < 1e-4 ? 'var(--pink)' : 'var(--green)',
       }, `P'(${fmt(fa)}; ${fmt(a)})`),
     );
 
@@ -384,7 +384,7 @@ export function initInversa(container) {
           x: plane.sx(b) + 8,
           y: plane.sy(-4),
           class: 'plot-label',
-          fill: 'var(--red)',
+          fill: 'var(--pink)',
           'text-anchor': 'start',
         }, 'Recta x = b (NO es función)'),
       );

@@ -64,7 +64,7 @@ export const FUNDAMENTAL_LAWS = [
   {
     icon: 'S',
     formula: 'S = k_B ln Ω',
-    html: 'S = k<sub>B</sub> ln Ω',
+    html: 'S = k<sub>B</sub> <span class="op-name">ln</span> Ω',
     ariaLabel: 'S igual a constante de Boltzmann por logaritmo de microestados',
     name: 'Boltzmann',
     field: 'Termodinámica Estadística',
@@ -172,7 +172,7 @@ export const FUNDAMENTAL_LAWS = [
   {
     icon: 'f\'',
     formula: 'f\'(x) = lim_(h→0) Δf/h',
-    html: 'f\'(x) = lim<sub>h→0</sub> Δf/h',
+    html: 'f\'(x) = <span class="op-name">lim</span><sub>h→0</sub> Δf/h',
     ariaLabel: 'Derivada instantánea como límite del cociente incremental',
     name: 'Derivada Instantánea',
     field: 'Cálculo Diferencial',
