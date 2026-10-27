@@ -69,16 +69,18 @@ const VIEWS = [
   {
     id: 'funciones_scanner_normal',
     name: '4. Funciones: Escáner (caso 1)',
-    url: '/funciones.html#panel-scan',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-scanner');
       await page.waitForSelector('#sc-case');
     }
   },
   {
     id: 'funciones_scanner_colision',
     name: '5. Funciones: Escáner colisión (No es función)',
-    url: '/funciones.html#panel-scan',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-scanner');
       await page.waitForSelector('#sc-case');
       await page.selectOption('#sc-case', '2'); // Círculo
       await page.fill('#sc-x', '2');
@@ -89,16 +91,18 @@ const VIEWS = [
   {
     id: 'funciones_radiografia_init',
     name: '6. Funciones: Radiografía (inicial)',
-    url: '/funciones.html#panel-radio',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-radiografia');
       await page.waitForSelector('#rad-quiz');
     }
   },
   {
     id: 'funciones_radiografia_answered',
     name: '7. Funciones: Radiografía quiz respondido',
-    url: '/funciones.html#panel-radio',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-radiografia');
       await page.waitForSelector('.fn-quiz-btn[data-ans="correct"]');
       await page.click('.fn-quiz-btn[data-ans="correct"]');
       await page.waitForTimeout(100);
@@ -107,16 +111,18 @@ const VIEWS = [
   {
     id: 'funciones_secante',
     name: '8. Funciones: Secante y TCP (2 filas)',
-    url: '/funciones.html#panel-sec',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-secante');
       await page.waitForSelector('.fn-formula-box');
     }
   },
   {
     id: 'funciones_inversa',
     name: '9. Funciones: Inversa trampa m = 0',
-    url: '/funciones.html#panel-inv',
+    url: '/funciones.html',
     setup: async (page) => {
+      await page.click('#tab-inversa');
       await page.waitForSelector('#inv-zero-m');
       await page.click('#inv-zero-m');
       await page.waitForTimeout(100);
@@ -125,34 +131,38 @@ const VIEWS = [
   {
     id: 'sucesiones_postes',
     name: '10. Sucesiones: Postes en riel',
-    url: '/sucesiones.html#panel-postes',
+    url: '/sucesiones.html',
     setup: async (page) => {
+      await page.click('#tab-postes');
       await page.waitForSelector('#seq-track');
     }
   },
   {
     id: 'sucesiones_traductor',
     name: '11. Sucesiones: Traductor',
-    url: '/sucesiones.html#panel-traductor',
+    url: '/sucesiones.html',
     setup: async (page) => {
+      await page.click('#tab-traductor');
       await page.waitForSelector('#panel-traductor');
     }
   },
   {
     id: 'sucesiones_geom',
     name: '12. Sucesiones: Radar geométrica',
-    url: '/sucesiones.html#panel-geom',
+    url: '/sucesiones.html',
     setup: async (page) => {
-      await page.waitForSelector('#panel-geom');
+      await page.click('#tab-geometrica');
+      await page.waitForSelector('#panel-geometrica');
     }
   },
   {
     id: 'sucesiones_retos',
     name: '13. Sucesiones: Retos con respuesta',
-    url: '/sucesiones.html#panel-retos',
+    url: '/sucesiones.html',
     setup: async (page) => {
-      await page.waitForSelector('#seq-quiz-opts button');
-      await page.click('#seq-quiz-opts button');
+      await page.click('#tab-retos');
+      await page.waitForSelector('button[data-answer]');
+      await page.click('button[data-answer]');
       await page.waitForTimeout(100);
     }
   }
@@ -217,7 +227,7 @@ async function main() {
 
     overflowResults.push({ view: v.name, ...overflow });
 
-    // 2. Audit font families
+    // 2. Audit font families on visible text elements
     const fontAudit = await page.evaluate(() => {
       const counts = {};
       const violations = [];
@@ -304,7 +314,7 @@ async function main() {
 
     svgFontResults.push({ view: v.name, ...svgAudit });
 
-    console.log(`✓ ${v.name}: scrollW=${overflow.scrollWidth}px (clientW=${overflow.clientWidth}px), SVG texts=${svgAudit.total}, minSVGFont=${svgAudit.minEffective}px`);
+    console.log(`✓ ${v.name}: scrollW=${overflow.scrollWidth}px (clientW=${overflow.clientWidth}px), SVG texts=${svgAudit.total}, minSVGFont=${svgAudit.minEffective !== null ? svgAudit.minEffective + 'px' : 'N/A'}`);
   }
 
   console.log('\n--- FONT FAMILY AUDIT TOTALS ---');
@@ -359,7 +369,9 @@ async function main() {
   await dpr3Context.close();
 
   // B. Riel with temporary red outline on eraser patch
-  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html#panel-postes`, { waitUntil: 'networkidle' });
+  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html`, { waitUntil: 'networkidle' });
+  await page.click('#tab-postes');
+  await page.waitForTimeout(100);
   await page.evaluate(() => {
     const el = document.querySelector('.seq-track');
     if (el) el.style.outline = '3px dashed #f87171';
@@ -367,7 +379,6 @@ async function main() {
   const track = page.locator('.seq-track');
   await track.screenshot({ path: 'screenshots/fase2/riel_eraser_patch_red_outline.png' });
   console.log('Saved screenshots/fase2/riel_eraser_patch_red_outline.png');
-  // Revert
   await page.evaluate(() => {
     const el = document.querySelector('.seq-track');
     if (el) el.style.outline = '';
@@ -396,10 +407,13 @@ async function main() {
   console.log('\n--- CAPTURING VIEWS FOR MONTAGES ---');
   
   // Montage 1: postes + radar + circuito + unidades(cm³)
-  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html#panel-postes`, { waitUntil: 'networkidle' });
+  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html`, { waitUntil: 'networkidle' });
+  await page.click('#tab-postes');
+  await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_postes.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html#panel-geom`, { waitUntil: 'networkidle' });
+  await page.click('#tab-geometrica');
+  await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_radar.png' });
 
   await page.goto(`http://127.0.0.1:${PORT}/desigualdades.html`, { waitUntil: 'networkidle' });
@@ -411,20 +425,27 @@ async function main() {
   await page.screenshot({ path: 'screenshots/fase2/v_unidades.png' });
 
   // Montage 2: retos + traductor + inversa + radiografía
-  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html#panel-retos`, { waitUntil: 'networkidle' });
-  await page.click('#seq-quiz-opts button');
+  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html`, { waitUntil: 'networkidle' });
+  await page.click('#tab-retos');
+  await page.waitForTimeout(100);
+  await page.waitForSelector('button[data-answer]');
+  await page.click('button[data-answer]');
   await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_retos.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/sucesiones.html#panel-traductor`, { waitUntil: 'networkidle' });
+  await page.click('#tab-traductor');
+  await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_traductor.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/funciones.html#panel-inv`, { waitUntil: 'networkidle' });
+  await page.goto(`http://127.0.0.1:${PORT}/funciones.html`, { waitUntil: 'networkidle' });
+  await page.click('#tab-inversa');
+  await page.waitForTimeout(100);
   await page.click('#inv-zero-m');
   await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_inversa.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/funciones.html#panel-radio`, { waitUntil: 'networkidle' });
+  await page.click('#tab-radiografia');
+  await page.waitForTimeout(100);
   await page.click('.fn-quiz-btn[data-ans="correct"]');
   await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_radiografia.png' });
@@ -433,17 +454,22 @@ async function main() {
   await page.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: 'networkidle' });
   await page.screenshot({ path: 'screenshots/fase2/v_index.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/funciones.html#panel-scan`, { waitUntil: 'networkidle' });
+  await page.goto(`http://127.0.0.1:${PORT}/funciones.html`, { waitUntil: 'networkidle' });
+  await page.click('#tab-scanner');
+  await page.waitForTimeout(100);
   await page.selectOption('#sc-case', '2');
   await page.fill('#sc-x', '2');
   await page.dispatchEvent('#sc-x', 'input');
   await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_scanner.png' });
 
-  await page.goto(`http://127.0.0.1:${PORT}/funciones.html#panel-sec`, { waitUntil: 'networkidle' });
+  await page.click('#tab-secante');
+  await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_secante.png' });
 
   await page.goto(`http://127.0.0.1:${PORT}/desigualdades.html`, { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await page.waitForTimeout(150);
   await page.screenshot({ path: 'screenshots/fase2/v_desigualdades.png' });
 
   console.log('All montage view screenshots captured!');

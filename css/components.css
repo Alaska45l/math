@@ -17,6 +17,13 @@ input[type="text"] {
   border-radius: var(--radius);
   min-height: 36px;
   padding: 6px 12px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+select {
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 button,
