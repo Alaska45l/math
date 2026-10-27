@@ -41,7 +41,7 @@
   display: grid;
   gap: 5px;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem;
   min-width: 0;
   max-width: 100%;
 }
@@ -136,7 +136,7 @@
 .seq-label {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   font-family: var(--font-hand);
 }
@@ -145,7 +145,7 @@
 .seq-arc-label {
   text-anchor: middle;
   fill: var(--muted);
-  font-size: 17px;
+  font-size: var(--svg-scale-caveat, 1.125rem);
   font-weight: 600;
   font-family: var(--font-hand);
 }
@@ -159,7 +159,7 @@
 .seq-post-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 18px;
+  font-size: var(--svg-scale-caveat, 1.125rem);
   font-weight: 600;
   font-family: var(--font-hand);
 }
@@ -176,7 +176,7 @@
 .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 18px;
+  font-size: var(--svg-scale-caveat, 1.125rem);
   font-weight: 600;
   font-family: var(--font-hand);
 }
@@ -187,21 +187,21 @@
   padding: 0;
   background: transparent;
   border: none;
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
 .seq-neutral-box h4 {
   margin: 0 0 6px;
   color: var(--yellow);
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 .seq-neutral-badge {
   display: inline-block;
   padding: 0;
   border-radius: 0;
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: 700;
   margin-right: 6px;
 }
@@ -236,7 +236,7 @@
 }
 
 .seq-zoom-btn {
-  font-size: 13px;
+  font-size: 1rem;
   padding: 8px 12px;
   min-height: 44px;
   min-width: 44px;
@@ -323,14 +323,14 @@
 }
 
 .seq-chart text {
-  font-size: 21px;
+  font-size: 1.3125rem;
 }
 
 .seq-chart .seq-label,
 .seq-chart-val {
   text-anchor: middle;
   fill: var(--ink);
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-weight: 700;
   font-family: var(--font-hand);
   paint-order: stroke fill;
@@ -342,7 +342,7 @@
 .seq-chart .seq-index {
   text-anchor: middle;
   fill: var(--blue);
-  font-size: 21px;
+  font-size: 1.3125rem;
   font-weight: 600;
   font-family: var(--font-hand);
 }
@@ -376,7 +376,7 @@
   padding: 4px 0 4px 12px;
   border-left: 2px solid var(--blue);
   background: transparent;
-  font-size: 16px;
+  font-size: 1rem;
   border-radius: 0;
 }
 
@@ -392,7 +392,7 @@
   border-radius: 0;
   color: var(--green);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 /* ---------- Puente con Función Lineal ---------- */
@@ -407,7 +407,7 @@
 .seq-linear-bridge h4 {
   margin: 0 0 6px;
   color: var(--yellow);
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 /* ---------- Alerta de Paréntesis ---------- */
@@ -417,7 +417,7 @@
   background: transparent;
   border: none;
   border-radius: 0;
-  font-size: 13.5px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -464,12 +464,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 1rem;
   color: var(--ink);
 }
 
 .seq-compare-values {
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--ink);
   word-break: break-word;
 }
@@ -478,7 +478,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
-  font-size: 13.5px;
+  font-size: 1rem;
 }
 
 .seq-table td,
@@ -497,7 +497,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 .seq-verify-table th,
@@ -537,7 +537,7 @@
   padding: 0;
   border-radius: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -581,7 +581,7 @@
   border: none;
   border-radius: 0;
   margin-top: 12px;
-  font-size: 13.5px;
+  font-size: 1rem;
 }
 
 .seq-feedback {

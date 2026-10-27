@@ -24,8 +24,8 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-const PORT = 8196;
-await new Promise(r => server.listen(PORT, r));
+await new Promise(r => server.listen(0, r));
+const PORT = server.address().port;
 
 const browser = await chromium.launch({ executablePath: '/usr/bin/chromium' });
 
@@ -84,11 +84,11 @@ const VIEWS = [
   }}
 ];
 
-console.log('=== SVG COLLISION CATALOG AUDIT (390px and 1280px) ===');
+console.log('=== SVG COLLISION CATALOG AUDIT (2560px, 1920px, 1280px, 390px) ===');
 
 const allCollisions = [];
 
-for (const width of [1280, 390]) {
+for (const width of [2560, 1920, 1280, 390]) {
   console.log(`\n--- Viewport: ${width}px ---`);
   for (const v of VIEWS) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });

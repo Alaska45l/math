@@ -25,8 +25,8 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-const PORT = 8208;
-await new Promise(r => server.listen(PORT, r));
+await new Promise(r => server.listen(0, r));
+const PORT = server.address().port;
 
 const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
 

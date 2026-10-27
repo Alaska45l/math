@@ -31,15 +31,16 @@ const VIEWS = [
   { name: '13. Retos', url: '/sucesiones.html', setup: async (page) => { await page.click('#tab-retos'); await page.click('button[data-answer]'); } },
 ];
 
-server.listen(8147, async () => {
+server.listen(0, async () => {
+  const port = server.address().port;
   const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
   
-  for (const w of [390, 360]) {
+  for (const w of [2560, 1920, 1280, 820, 390, 360]) {
     console.log(`\n=== CHECKING AT VIEWPORT ${w}px ===`);
-    const page = await browser.newPage({ viewport: { width: w, height: 844 } });
+    const page = await browser.newPage({ viewport: { width: w, height: 900 } });
     
     for (const v of VIEWS) {
-      await page.goto(`http://127.0.0.1:8147${v.url}`, { waitUntil: 'networkidle' });
+      await page.goto(`http://127.0.0.1:${port}${v.url}`, { waitUntil: 'networkidle' });
       await v.setup(page);
       await page.waitForTimeout(80);
       
@@ -61,7 +62,7 @@ server.listen(8147, async () => {
             const s = window.getComputedStyle(el);
             if (s.display === 'none' || s.visibility === 'hidden') return false;
             // Allow children of overflow-x: auto to extend inside their container
-            if (el.closest('.seq-track-wrap')) return false;
+            if (el.closest('.seq-track-wrap') || el.closest('.site-nav__list')) return false;
             const r = el.getBoundingClientRect();
             return r.right > viewWidth + 1;
           })

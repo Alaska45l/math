@@ -25,8 +25,8 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-const PORT = 8197;
-await new Promise(r => server.listen(PORT, r));
+await new Promise(r => server.listen(0, r));
+const PORT = server.address().port;
 
 const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
 
@@ -97,9 +97,8 @@ let totalFailures = 0;
 let iconCountTotal = 0;
 const allChecksList = [];
 
-for (const width of [1280, 390]) {
-  console.log(`
---- Viewport: ${width}px ---`);
+for (const width of [2560, 1920, 1280, 390]) {
+  console.log(`\n--- Viewport: ${width}px ---`);
   for (const v of VIEWS) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });
     await page.goto(v.url, { waitUntil: 'networkidle' });

@@ -139,8 +139,12 @@ export function createPlane(svg, cfg) {
     if (!clientW || !W) return;
     const scale = clientW / W;
     if (scale <= 0) return;
-    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
-    const kalamSize = Math.max(12, Math.round((12 / scale) * 10) / 10);
+    const isDesktop = typeof window !== 'undefined' ? (window.innerWidth >= 820) : false;
+    const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
+    const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
+    const targetKalam = isDesktop ? (1.0 * rootPx) : 12;
+    const caveatSize = Math.max(14, Math.round((targetCaveat / scale) * 10) / 10);
+    const kalamSize = Math.max(12, Math.round((targetKalam / scale) * 10) / 10);
     svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
     svg.style.setProperty('--svg-scale-kalam', `${kalamSize}px`);
 
@@ -212,7 +216,7 @@ export function createPlane(svg, cfg) {
   if (c.xMin < 0 && c.yMin < 0) {
     const originTxt = c.xFmt ? c.xFmt(0) : '0';
     if (originTxt) {
-      const pos = (typeof c.originPos === 'function' && c.originPos(helpers)) || c.originPos || { x: yAxisX - 8, y: xAxisY - 6, anchor: 'end' };
+      const pos = (typeof c.originPos === 'function' && c.originPos(helpers)) || c.originPos || { x: yAxisX + 6, y: xAxisY + 16, anchor: 'start' };
       axisLabels.append(s('text', { x: pos.x, y: pos.y, class: 'plot-tick', 'text-anchor': pos.anchor }, '0'));
     }
   }

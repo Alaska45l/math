@@ -41,7 +41,10 @@ export function initGeometrica(root) {
     if (!clientW) return;
     const scale = clientW / 620;
     if (scale <= 0) return;
-    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
+    const isDesktop = typeof window !== 'undefined' ? (window.innerWidth >= 820) : false;
+    const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
+    const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
+    const caveatSize = Math.max(14, Math.round((targetCaveat / scale) * 10) / 10);
     geoSvg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
   }
   updateGeoScale();
@@ -84,7 +87,7 @@ export function initGeometrica(root) {
     elements.push(`<line x1="40" y1="${zeroY}" x2="600" y2="${zeroY}" stroke="currentColor" stroke-width="1.5"/>`);
     elements.push(`<line x1="40" y1="20" x2="40" y2="285" stroke="currentColor" stroke-width="1.5"/>`);
     elements.push(`<text x="592" y="${zeroY - 8}" class="seq-index" font-weight="bold">n</text>`);
-    elements.push(`<text x="45" y="32" class="seq-index" text-anchor="start">y</text>`);
+    elements.push(`<text x="50" y="32" class="seq-index" text-anchor="start">y</text>`);
 
     // Asíntota y = 0 cuando converge
     if (Math.abs(r) < 1) {
@@ -118,7 +121,7 @@ export function initGeometrica(root) {
       elements.push(`<line x1="${x}" y1="${zeroY}" x2="${x}" y2="${y}" stroke="var(--blue)" stroke-dasharray="2 2" stroke-width="1.2"/>`);
       elements.push(`
         <g class="seq-point" data-n="${i + 1}" tabindex="0" role="button" aria-label="Término n=${i+1}, valor ${fmt(v, 2)}">
-          <rect class="seq-point-hit" x="${x - 40}" y="${Math.min(y, labelY) - 20}" width="80" height="80" fill="transparent"/>
+          <rect class="seq-point-hit" x="${x - 45}" y="${Math.min(y, labelY) - 20}" width="90" height="90" fill="transparent"/>
           <circle class="seq-post" cx="${x}" cy="${y}" r="7"/>
           <text class="seq-index" x="${x}" y="298">${i + 1}</text>
           <text class="seq-chart-val" x="${x}" y="${labelY}">${fmt(v, 2)}</text>

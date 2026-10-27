@@ -105,7 +105,7 @@ export function initPostes(root) {
       svgHtml += `
         <g class="seq-point ${isActive ? 'is-active' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="Poste ${idx}, valor ${fmt(v, 2)}">
           <title>Hacé clic para seleccionar n = ${idx}</title>
-          <rect class="seq-point-hit" x="${x - 24}" y="65" width="48" height="80" fill="transparent"/>
+          <rect class="seq-point-hit" x="${x - 28}" y="65" width="56" height="80" fill="transparent"/>
           <circle class="seq-post ${isActive ? 'is-active' : ''}" cx="${x}" cy="92" r="${r}"/>
           <text class="seq-index" x="${x}" y="136">n = ${idx}</text>
           <text class="seq-post-val" x="${x}" y="97">${fmt(v, 2)}</text>
@@ -114,6 +114,23 @@ export function initPostes(root) {
     });
 
     svg.innerHTML = svgHtml;
+
+    function updateTrackScale() {
+      const clientW = svg.clientWidth || svg.getBoundingClientRect().width;
+      if (!clientW) return;
+      const scale = clientW / vbWidth;
+      if (scale <= 0) return;
+      const isDesktop = typeof window !== 'undefined' ? (window.innerWidth >= 820) : false;
+      const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
+      const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
+      const caveatSize = Math.max(14, Math.round((targetCaveat / scale) * 10) / 10);
+      svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
+    }
+    updateTrackScale();
+    if (typeof ResizeObserver !== 'undefined' && !svg._roBound) {
+      svg._roBound = true;
+      new ResizeObserver(updateTrackScale).observe(svg);
+    }
 
     const activeEl = svg.querySelector('.seq-point.is-active');
     if (activeEl && typeof activeEl.scrollIntoView === 'function') {

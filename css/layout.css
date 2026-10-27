@@ -25,7 +25,7 @@
 /* ---------- Brand del nav: Leyes fundamentales y símbolos ---------- */
 .site-nav__brand {
   font-family: var(--font-math);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   font-style: italic;
   letter-spacing: 0.4px;
@@ -85,7 +85,7 @@
   padding: 0 10px;
   color: var(--muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 1rem;
   border-bottom: 2px solid transparent;
   transition: color .15s, border-color .15s;
   box-sizing: border-box;
@@ -127,13 +127,17 @@
   .site-nav__brand {
     margin-right: 0;
     max-width: 140px;
-    font-size: 14px;
+    font-size: 0.875rem;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     flex: none;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .site-nav__link {
+    font-size: 0.875rem;
   }
 
   .site-nav__list {
@@ -162,17 +166,18 @@
 
 /* ---------- Contenedores ---------- */
 .page {
-  max-width: 900px;
+  max-width: 56.25rem;
+  width: calc(100% - 2rem);
   margin: 0 auto;
-  padding: 28px 16px 56px;
+  padding: 1.75rem 1rem 3.5rem;
 }
 
 .page--narrow {
-  max-width: 700px;
+  max-width: 43.75rem;
 }
 
 .page--wide {
-  max-width: 1080px;
+  max-width: 67.5rem;
 }
 
 .row {
@@ -230,7 +235,7 @@
 }
 
 .panel__label {
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--muted);
   margin: 0 0 6px;
 }
@@ -252,7 +257,7 @@
 
 .tab {
   font: inherit;
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--muted);
   background: transparent;
   border: 0;
@@ -310,7 +315,7 @@
   margin-right: 6px;
   background: transparent;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -357,7 +362,7 @@
 
 .hub-card__tag {
   align-self: flex-start;
-  font-size: 11px;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -369,13 +374,13 @@
 }
 
 .hub-card__title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 650;
   margin: 0;
 }
 
 .hub-card__text {
-  font-size: 14px;
+  font-size: 1rem;
   color: var(--muted);
   margin: 0;
 }
@@ -383,6 +388,6 @@
 .hub-card__list {
   margin: 4px 0 0;
   padding-left: 18px;
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--muted);
 }

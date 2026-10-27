@@ -61,7 +61,10 @@ function bindSvgScale(svg, viewBoxW = 680) {
     if (!clientW) return;
     const scale = clientW / viewBoxW;
     if (scale <= 0) return;
-    const caveatSize = Math.max(14, Math.round((14 / scale) * 10) / 10);
+    const isDesktop = typeof window !== 'undefined' ? (window.innerWidth >= 820) : false;
+    const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
+    const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
+    const caveatSize = Math.max(14, Math.round((targetCaveat / scale) * 10) / 10);
     svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
   }
   update();

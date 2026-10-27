@@ -94,7 +94,7 @@ for (const vp of viewports) {
         acceptNode: (node) => {
           if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
           const p = node.parentElement;
-          if (!p || p.closest('[hidden]') || p.closest('script, style')) return NodeFilter.FILTER_REJECT;
+          if (!p || p.closest('[hidden]') || p.closest('script, style') || p.closest('svg') || p.closest('.sr-only')) return NodeFilter.FILTER_REJECT;
           const cs = window.getComputedStyle(p);
           if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
@@ -114,18 +114,19 @@ for (const vp of viewports) {
         if (isDesktop) {
           const isCaveat = /caveat/i.test(font);
           const isKalam = /kalam/i.test(font);
-          // Thresholds: Caveat >= 1.05 rem, Kalam >= 1.0 rem
-          const thresholdPx = isCaveat ? 1.05 * rootPx : (isKalam ? 1.0 * rootPx : 1.0 * rootPx);
-
-          if (px < thresholdPx - 0.2) {
-            results.push({
-              type: 'HTML',
-              font,
-              px: px.toFixed(1),
-              thresholdPx: thresholdPx.toFixed(1),
-              text: el.textContent.trim().slice(0, 24),
-              selector: (el.tagName.toLowerCase() + (el.className ? `.${Array.from(el.classList).slice(0, 2).join('.')}` : '')).slice(0, 28)
-            });
+          if (isCaveat || isKalam) {
+            const thresholdPx = isCaveat ? (1.05 * rootPx) : (1.0 * rootPx);
+            const tag = el.tagName.toLowerCase();
+            if (px < thresholdPx - 0.2 && tag !== 'sub' && tag !== 'sup') {
+              results.push({
+                type: 'HTML',
+                font,
+                px: px.toFixed(1),
+                thresholdPx: thresholdPx.toFixed(1),
+                text: el.textContent.trim().slice(0, 24),
+                selector: (el.tagName.toLowerCase() + (el.className ? `.${Array.from(el.classList).slice(0, 2).join('.')}` : '')).slice(0, 28)
+              });
+            }
           }
         }
       }

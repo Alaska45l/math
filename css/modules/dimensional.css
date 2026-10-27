@@ -52,7 +52,7 @@
 }
 
 .token sup {
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 
 /* Neutro multiplicativo */
@@ -69,7 +69,7 @@
 }
 
 .one__brace {
-  font-size: 22px;
+  font-size: 1.375rem;
   line-height: 1;
 }
 
@@ -93,7 +93,7 @@
 }
 
 .dim-legend .token {
-  font-size: 15px;
+  font-size: 1rem;
 }
 
 .dim-power {
@@ -130,7 +130,7 @@
 
 .dim-group small {
   color: var(--muted);
-  font-size: 15px;
+  font-size: 1rem;
   max-width: 180px;
 }
 

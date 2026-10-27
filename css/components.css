@@ -27,7 +27,7 @@ button,
 input[type="number"],
 input[type="text"] {
   font: inherit;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 400;
   color: var(--ink);
   background-color: transparent;
@@ -72,7 +72,7 @@ select {
   -moz-appearance: none;
   appearance: none;
   font: inherit;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 400;
   color: var(--ink);
   background-color: transparent;
@@ -397,7 +397,7 @@ output {
 /* Chips (presets): min-height 44px */
 .chip {
   min-height: 44px;
-  font-size: 15px;
+  font-size: 1rem;
   padding: 8px 12px;
   border-radius: var(--radius);
   display: inline-flex;
@@ -425,21 +425,21 @@ output {
 }
 
 .field__label {
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--muted);
   min-width: 90px;
 }
 
 .field__out {
   font-variant-numeric: tabular-nums;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   min-width: 56px;
   text-align: right;
 }
 
 .label-sm {
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--muted);
 }
 
@@ -448,7 +448,7 @@ output {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 1rem;
   font-weight: 600;
   padding: 0;
   border-radius: 0;
@@ -489,7 +489,7 @@ output {
 }
 
 .badge--sm {
-  font-size: 13px;
+  font-size: 1rem;
   padding: 0;
   border-radius: 0;
 }
@@ -574,7 +574,7 @@ output {
 }
 
 .form-error {
-  font-size: 13px;
+  font-size: 1rem;
   color: var(--pink);
   min-height: 20px;
   margin: 4px 0 0;
@@ -619,11 +619,11 @@ output {
   align-items: center;
   gap: 6px;
   font-family: var(--font-hand);
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .eq--lg {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 
 .eq .op {
@@ -645,7 +645,7 @@ output {
 .unit {
   font-family: var(--font-hand);
   font-style: normal;
-  font-size: .88em;
+  font-size: 1.0625rem;
   color: var(--muted);
 }
 
@@ -665,7 +665,7 @@ output {
 }
 
 .expr > .op {
-  font-size: 22px;
+  font-size: 1.375rem;
   color: var(--muted);
 }
 
@@ -733,7 +733,7 @@ output {
 }
 
 .stat__label {
-  font-size: 15px;
+  font-size: 1rem;
   color: var(--muted);
 }
 
