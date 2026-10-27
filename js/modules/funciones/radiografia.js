@@ -282,11 +282,12 @@ export function initRadiografia(container) {
   on(quizBox, 'click', 'button[data-ans]', (_e, btn) => {
     const isCorrect = btn.dataset.ans === 'correct';
     quizBox.querySelectorAll('button[data-ans]').forEach((b) => {
-      b.classList.remove('is-active');
+      b.classList.remove('is-active', 'is-correct', 'is-incorrect');
       const tag = b.querySelector('.quiz-opt-tag');
       if (tag) tag.classList.remove('encerrado', 'tachado');
     });
     btn.classList.add('is-active');
+    btn.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
     const tag = btn.querySelector('.quiz-opt-tag');
     if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
     const [cls, lead, text] = FEEDBACK[btn.dataset.ans];

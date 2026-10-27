@@ -77,23 +77,44 @@
 
 .fn-quiz-btn {
   text-align: left;
-  height: auto;
-  min-height: 0;
-  padding: 6px 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 10px;
   line-height: 1.4;
   border-radius: 0;
   border: none;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
-  display: block;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  box-sizing: border-box;
+  transition: color 0.15s;
 }
 
 @media (hover: hover) {
   .fn-quiz-btn:hover {
     background: transparent;
     color: var(--yellow);
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
+}
+
+.fn-quiz-btn.is-incorrect {
+  color: var(--pink);
+}
+
+.fn-quiz-btn.is-correct {
+  color: #ffffff;
+}
+
+.quiz-opt-tag {
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 6px;
+  flex: none;
 }
 
 .fn-pipeline {
@@ -282,9 +303,9 @@
 }
 
 .fn-reveal {
-  min-height: auto;
+  min-height: 44px;
   font-size: 16px;
-  padding: 2px 10px;
+  padding: 6px 14px;
   border-radius: var(--radius);
 }
 

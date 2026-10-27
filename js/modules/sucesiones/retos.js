@@ -254,11 +254,12 @@ export function initRetos(root) {
         const ansIdx = Number(btn.dataset.answer);
         const isCorrect = ansIdx === task.correctIndex;
         card.querySelectorAll('[data-answer]').forEach(b => {
-          b.classList.remove('is-active');
+          b.classList.remove('is-active', 'is-correct', 'is-incorrect');
           const tag = b.querySelector('.quiz-opt-tag');
           if (tag) tag.classList.remove('encerrado', 'tachado');
         });
         btn.classList.add('is-active');
+        btn.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
         const tag = btn.querySelector('.quiz-opt-tag');
         if (tag) tag.classList.add(isCorrect ? 'encerrado' : 'tachado');
 

@@ -105,6 +105,7 @@ export function initPostes(root) {
       svgHtml += `
         <g class="seq-point ${isActive ? 'is-active' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="Poste ${idx}, valor ${fmt(v, 2)}">
           <title>Hacé clic para seleccionar n = ${idx}</title>
+          <rect class="seq-point-hit" x="${x - 24}" y="65" width="48" height="80" fill="transparent"/>
           <circle class="seq-post ${isActive ? 'is-active' : ''}" cx="${x}" cy="92" r="${r}"/>
           <text class="seq-index" x="${x}" y="136">n = ${idx}</text>
           <text class="seq-post-val" x="${x}" y="97">${fmt(v, 2)}</text>

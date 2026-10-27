@@ -118,6 +118,7 @@ export function initGeometrica(root) {
       elements.push(`<line x1="${x}" y1="${zeroY}" x2="${x}" y2="${y}" stroke="var(--blue)" stroke-dasharray="2 2" stroke-width="1.2"/>`);
       elements.push(`
         <g class="seq-point" data-n="${i + 1}" tabindex="0" role="button" aria-label="Término n=${i+1}, valor ${fmt(v, 2)}">
+          <rect class="seq-point-hit" x="${x - 40}" y="${Math.min(y, labelY) - 20}" width="80" height="80" fill="transparent"/>
           <circle class="seq-post" cx="${x}" cy="${y}" r="7"/>
           <text class="seq-index" x="${x}" y="298">${i + 1}</text>
           <text class="seq-chart-val" x="${x}" y="${labelY}">${fmt(v, 2)}</text>
