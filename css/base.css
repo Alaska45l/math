@@ -3,69 +3,52 @@
    ========================================================================== */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* Superficies y texto */
-  --bg: #faf9f5;
-  --surface: #f1efe8;
-  --card: #ffffff;
-  --ink: #1f1e1d;
-  --muted: #5f5e5a;
-  --border: rgba(0, 0, 0, .14);
-  --border-strong: rgba(0, 0, 0, .3);
+  /* Superficies de pizarrón escolar / universitario de exactas */
+  --bg: #141f18;          /* Pizarrón verde pizarra oscuro */
+  --surface: #19271f;     /* Paneles y cajas secundarias */
+  --card: #1e3127;        /* Tarjetas, lienzos interactivos y cajas de fórmulas con fondo sólido */
+  --ink: #f2f4ec;         /* Tiza blanca nítida */
+  --muted: #a3b8aa;       /* Tiza blanca atenuada / polvo de tiza */
+  --border: rgba(255, 255, 255, .15);
+  --border-strong: rgba(255, 255, 255, .30);
 
-  /* Semántica */
-  --blue: #185fa5;      /* objetivo / identidad */
-  --bluebg: #e6f1fb;
-  --blue-line: #378add; /* trazos SVG */
-  --green: #27500a;     /* acierto / neutro / unicidad válida */
-  --greenbg: #eaf3de;
-  --green-line: #639922;
-  --amber: #633806;     /* corriente / advertencia / pendiente */
-  --amberbg: #faeeda;
-  --amber-line: #ef9f27;
-  --red: #791f1f;       /* error / colisión / violación de dominio */
-  --redbg: #fcebeb;
-  --red-line: #e24b4a;
-  --violet-line: #7f77dd;
-  --teal-line: #1d9e75;
+  /* Tizas de colores (Chalk colors con alto contraste) */
+  --blue: #93c5fd;        /* Tiza celeste */
+  --bluebg: #113450;
+  --blue-line: #60a5fa;
+  --green: #86efac;       /* Tiza verde menta */
+  --greenbg: #133b21;
+  --green-line: #4ade80;
+  --amber: #fde047;       /* Tiza amarilla */
+  --amberbg: #40320a;
+  --amber-line: #facc15;
+  --red: #fca5a5;         /* Tiza rosa/roja */
+  --redbg: #401616;
+  --red-line: #f87171;
+  --violet-line: #c084fc; /* Tiza lila */
+  --teal-line: #2dd4bf;   /* Tiza turquesa */
 
   /* Lámpara (circuito) */
-  --lamp-fill: #fac775;
-  --lamp-stroke: #ba7517;
-  --lamp-x: #854f0b;
+  --lamp-fill: #fef08a;
+  --lamp-stroke: #ca8a04;
+  --lamp-x: #854d0e;
 
-  /* Geometría */
-  --radius: 10px;
-  --radius-lg: 14px;
+  /* Geometría sobria y académica (sin bordes redondeados excesivos) */
+  --radius: 3px;
+  --radius-lg: 4px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", Georgia, serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1f1e1d;
-    --surface: #2c2c2a;
-    --card: #262624;
-    --ink: #f1efe8;
-    --muted: #b4b2a9;
-    --border: rgba(255, 255, 255, .16);
-    --border-strong: rgba(255, 255, 255, .32);
-
-    --blue: #b5d4f4;
-    --bluebg: #0c447c;
-    --blue-line: #6aa9ec;
-    --green: #c0dd97;
-    --greenbg: #27500a;
-    --green-line: #8cc152;
-    --amber: #fac775;
-    --amberbg: #633806;
-    --amber-line: #f0a83a;
-    --red: #f7c1c1;
-    --redbg: #791f1f;
-    --red-line: #f07070;
-    --violet-line: #a59ff0;
-    --teal-line: #3cc497;
+    --bg: #141e17;
+    --surface: #18251d;
+    --card: #1c2b22;
+    --ink: #f2f4ec;
+    --muted: #9eb2a3;
   }
 }
 
@@ -81,9 +64,15 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: url("chalkboard-ghosts.svg");
+  background-repeat: repeat;
+  background-size: 1100px 825px;
+  background-position: center top;
+  background-attachment: fixed;
   color: var(--ink);
   font: 16px/1.55 var(--font-sans);
+  min-height: 100vh;
 }
 
 h1 {
@@ -126,6 +115,9 @@ svg {
 
 .intro {
   margin: 0 0 22px;
+  font-size: 17px;
+  max-width: 68ch;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .small {

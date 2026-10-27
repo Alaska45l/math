@@ -82,7 +82,7 @@ input[type="range"] {
   min-height: auto;
   font-size: 13px;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius);
 }
 
 /* Campo slider: <label> + range + <output> */
@@ -152,7 +152,7 @@ input[type="range"] {
 .badge--sm {
   font-size: 12px;
   padding: 1px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 
 .text-ok {
@@ -310,7 +310,7 @@ input[type="range"] {
   display: inline-block;
   padding: 3px 9px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius);
   font-weight: 600;
   line-height: 1.25;
   transition: transform .25s, opacity .25s;

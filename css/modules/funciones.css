@@ -245,7 +245,7 @@
   min-height: auto;
   font-size: 12px;
   padding: 2px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius);
 }
 
 /* ---------- Tubería con valores vivos ---------- */
@@ -264,7 +264,7 @@
 
 .fn-pipe-op {
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 13px;
   font-weight: 600;
   background: var(--amberbg);

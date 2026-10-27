@@ -22,17 +22,29 @@
   gap: 6px 16px;
 }
 
+/* ---------- Brand del nav: Leyes fundamentales y símbolos ---------- */
 .site-nav__brand {
-  font-weight: 650;
+  font-family: var(--font-math);
+  font-size: 16px;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.4px;
   color: var(--ink);
   text-decoration: none;
   margin-right: auto;
+  opacity: .92;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+
+.site-nav__brand:hover {
+  opacity: 1;
 }
 
 .site-nav__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 18px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -40,27 +52,27 @@
 
 .site-nav__link {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
+  padding: 8px 0;
   color: var(--muted);
   text-decoration: none;
   font-size: 14px;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
 }
 
 .site-nav__link:hover {
-  background: var(--surface);
   color: var(--ink);
 }
 
 .site-nav__link[aria-current="page"] {
-  background: var(--bluebg);
-  color: var(--blue);
+  color: var(--ink);
   font-weight: 600;
+  border-bottom: 2px solid var(--blue-line);
 }
 
 .site-nav__link:focus-visible {
   outline: 2px solid var(--blue);
-  outline-offset: 2px;
+  outline-offset: 4px;
 }
 
 /* ---------- Contenedores ---------- */
@@ -121,8 +133,9 @@
 
 .panel {
   padding: 14px 16px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--surface);
+  border: 1px solid var(--border);
   margin: 0 0 12px;
 }
 
@@ -147,7 +160,7 @@
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 18px;
   border-bottom: 1px solid var(--border);
   margin: 0 0 20px;
 }
@@ -158,43 +171,42 @@
   color: var(--muted);
   background: transparent;
   border: 0;
-  border-bottom: 3px solid transparent;
-  border-radius: var(--radius) var(--radius) 0 0;
-  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  padding: 8px 0;
   cursor: pointer;
   margin-bottom: -1px;
+  border-radius: 0;
+  transition: color .15s, border-color .15s;
 }
 
 .tab:hover {
   color: var(--ink);
-  background: var(--surface);
+  background: transparent;
 }
 
 .tab[aria-selected="true"] {
-  color: var(--blue);
+  color: var(--ink);
   border-bottom-color: var(--blue-line);
   font-weight: 600;
+  background: transparent;
 }
 
 .tab:focus-visible {
   outline: 2px solid var(--blue);
-  outline-offset: -2px;
+  outline-offset: 4px;
 }
 
 .tab__num {
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
+  display: inline;
   margin-right: 6px;
-  border-radius: 50%;
-  font-size: 11px;
-  background: var(--surface);
+  background: transparent;
   color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .tab[aria-selected="true"] .tab__num {
-  background: var(--bluebg);
+  background: transparent;
   color: var(--blue);
 }
 
@@ -214,16 +226,15 @@
   flex-direction: column;
   gap: 8px;
   padding: 20px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--card);
   border: 1px solid var(--border);
   color: var(--ink);
   text-decoration: none;
-  transition: transform .15s, border-color .15s;
+  transition: border-color .15s;
 }
 
 .hub-card:hover {
-  transform: translateY(-2px);
   border-color: var(--blue-line);
 }
 
@@ -234,16 +245,14 @@
 
 .hub-card__tag {
   align-self: flex-start;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--bluebg);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   color: var(--blue);
 }
 
 .hub-card__tag--new {
-  background: var(--greenbg);
   color: var(--green);
 }
 

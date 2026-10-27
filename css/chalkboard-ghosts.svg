@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-label="Textura de pizarrón con fórmulas matemáticas medio borradas">
+  <defs>
+    <!-- Grano fino de tiza/pizarra -->
+    <filter id="chalk-dust-grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch" result="noise" />
+      <feColorMatrix type="matrix" values="1 0 0 0 1  0 1 0 0 1  0 0 1 0 1  0 0 0 0.035 0" />
+    </filter>
+
+    <!-- Máscara de borrador: las zonas negras desvanecen las fórmulas sin pintar formas oscuras -->
+    <mask id="ghost-erase-mask">
+      <rect width="100%" height="100%" fill="white" />
+      <!-- Pasadas de borrador que cortan tramos de fórmulas limpiamente -->
+      <path d="M 90 75 Q 160 72 240 76" stroke="black" stroke-width="32" stroke-linecap="round" opacity="0.95" />
+      <path d="M 490 195 Q 580 193 670 196" stroke="black" stroke-width="34" stroke-linecap="round" opacity="0.9" />
+      <path d="M 120 305 Q 185 307 250 304" stroke="black" stroke-width="32" stroke-linecap="round" opacity="0.95" />
+      <path d="M 520 445 Q 600 447 685 444" stroke="black" stroke-width="34" stroke-linecap="round" opacity="0.9" />
+      <path d="M 180 555 Q 260 558 350 554" stroke="black" stroke-width="32" stroke-linecap="round" opacity="0.92" />
+      <path d="M 440 685 Q 530 682 620 686" stroke="black" stroke-width="32" stroke-linecap="round" opacity="0.95" />
+      <path d="M 850 798 Q 930 801 1020 797" stroke="black" stroke-width="34" stroke-linecap="round" opacity="0.9" />
+      <!-- Desvanecimientos suaves en franjas horizontales tpicas de borrado en pizarrn -->
+      <path d="M 0 200 Q 400 180 800 220 T 1200 190" stroke="black" stroke-width="45" stroke-linecap="round" opacity="0.45" />
+      <path d="M 0 570 Q 500 540 1000 580" stroke="black" stroke-width="50" stroke-linecap="round" opacity="0.4" />
+    </mask>
+  </defs>
+
+  <style>
+    .ghost-eq {
+      font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", Georgia, serif;
+      font-style: italic;
+      letter-spacing: 0.8px;
+      fill: rgba(240, 245, 240, 0.038);
+      user-select: none;
+      pointer-events: none;
+    }
+    .ghost-sm { font-size: 18px; }
+    .ghost-md { font-size: 21px; }
+    .ghost-lg { font-size: 24px; }
+    .ghost-draw {
+      fill: none;
+      stroke: rgba(240, 245, 240, 0.032);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .wipe-streak {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.013);
+      stroke-linecap: round;
+    }
+  </style>
+
+  <!-- Grano de polvo sobre toda la superficie -->
+  <rect width="100%" height="100%" filter="url(#chalk-dust-grain)" />
+
+  <!-- Huellas suaves de borrado con tiza blanca difusa (residuo seco de borrador) -->
+  <g>
+    <path d="M 0 140 Q 300 110 650 150 T 1200 130" class="wipe-streak" stroke-width="80" />
+    <path d="M 0 380 Q 400 420 800 360 T 1200 400" class="wipe-streak" stroke-width="95" />
+    <path d="M 0 680 Q 350 630 750 690 T 1200 660" class="wipe-streak" stroke-width="90" />
+    <path d="M 120 0 Q 360 450 600 900" class="wipe-streak" stroke-width="70" />
+    <path d="M 720 0 Q 890 400 1080 900" class="wipe-streak" stroke-width="75" />
+  </g>
+
+  <!-- Fórmulas matemáticas medio borradas (enmascaradas) -->
+  <g class="ghost-eq" mask="url(#ghost-erase-mask)">
+    <!-- Fila 1 -->
+    <text x="60" y="80" class="ghost-md">∇ × E = −∂B/∂t</text>
+    <text x="440" y="75" class="ghost-lg">E = mc²</text>
+    <text x="760" y="80" class="ghost-md">iℏ ∂ψ/∂t = Ĥψ</text>
+    <text x="1020" y="75" class="ghost-sm">∇ · B = 0</text>
+
+    <!-- Diagrama: Triángulo y Pitágoras -->
+    <g transform="translate(280, 70)">
+      <polygon points="0,50 60,50 60,10" class="ghost-draw" />
+      <text x="15" y="66" class="ghost-sm">a² + b² = c²</text>
+    </g>
+
+    <!-- Fila 2 -->
+    <text x="80" y="190" class="ghost-sm">∮ B · dℓ = μ₀ I</text>
+    <text x="400" y="200" class="ghost-lg">e^(iπ) + 1 = 0</text>
+    <text x="780" y="195" class="ghost-md">∫_−∞^∞ e^(−x²) dx = √π</text>
+
+    <!-- Fila 3 -->
+    <text x="60" y="310" class="ghost-md">Δx · Δp ≥ ℏ/2</text>
+    <text x="420" y="320" class="ghost-sm">G_μν + Λg_μν = κT_μν</text>
+    <text x="820" y="315" class="ghost-md">S = k_B ln Ω</text>
+
+    <!-- Diagrama: Parábola en mini-ejes -->
+    <g transform="translate(220, 390)">
+      <line x1="-50" y1="0" x2="60" y2="0" class="ghost-draw" />
+      <line x1="0" y1="45" x2="0" y2="-50" class="ghost-draw" />
+      <path d="M -40 -35 Q 0 35 40 -35" class="ghost-draw" />
+      <circle cx="15" cy="5" r="2.5" fill="rgba(240,245,240,0.04)" />
+    </g>
+
+    <!-- Fila 4 -->
+    <text x="60" y="440" class="ghost-sm">dU = T dS − P dV</text>
+    <text x="460" y="450" class="ghost-lg">∑ 1/n² = π²/6</text>
+    <text x="860" y="440" class="ghost-sm">ℒ = T − V</text>
+
+    <!-- Fila 5 -->
+    <text x="100" y="560" class="ghost-md">lim_(x→0) sin(x)/x = 1</text>
+    <text x="500" y="570" class="ghost-md">f'(x) = lim Δf/h</text>
+    <text x="840" y="560" class="ghost-sm">λ = h / p</text>
+
+    <!-- Fila 6 -->
+    <text x="70" y="680" class="ghost-sm">PV = nRT</text>
+    <text x="380" y="690" class="ghost-lg">∮_∂Σ ω = ∫_Σ dω</text>
+    <text x="820" y="685" class="ghost-md">ℵ₀ &lt; 2^(ℵ₀)</text>
+
+    <!-- Diagrama: Campana normal -->
+    <g transform="translate(680, 760)">
+      <line x1="-70" y1="0" x2="80" y2="0" class="ghost-draw" />
+      <path d="M -65 0 Q -20 -35 0 -35 Q 20 -35 65 0" class="ghost-draw" />
+    </g>
+
+    <!-- Fila 7 -->
+    <text x="90" y="800" class="ghost-md">⟨ ∇ · ∂ · ∫ · ∮ · ∑ · ∏ · ℏ ⟩</text>
+    <text x="460" y="810" class="ghost-sm">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ</text>
+    <text x="840" y="805" class="ghost-sm">{ ∀x, ∃! y : y = f(x) }</text>
+  </g>
+</svg>
