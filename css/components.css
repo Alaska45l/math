@@ -20,9 +20,9 @@
   --chalk-border-active: var(--chalk-border-1-pressed);
 }
 
-button,
-.button,
-.btn,
+button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:not(.seq-check__opt-btn),
 .fn-reveal,
 input[type="number"],
 input[type="text"] {
@@ -46,25 +46,34 @@ input[type="text"] {
 }
 
 /* Asignación de 3 variantes de bordes dibujados a mano */
-button:nth-of-type(3n+1),
-.button:nth-of-type(3n+1),
-.btn:nth-of-type(3n+1),
+button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:nth-of-type(3n+1):not(.seq-check__opt-btn),
 select:nth-of-type(3n+1) {
   border-image: var(--chalk-border-1);
 }
 
-button:nth-of-type(3n+2),
-.button:nth-of-type(3n+2),
-.btn:nth-of-type(3n+2),
+button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:nth-of-type(3n+2):not(.seq-check__opt-btn),
 select:nth-of-type(3n+2) {
   border-image: var(--chalk-border-2);
 }
 
-button:nth-of-type(3n),
-.button:nth-of-type(3n),
-.btn:nth-of-type(3n),
+button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:nth-of-type(3n):not(.seq-check__opt-btn),
 select:nth-of-type(3n) {
   border-image: var(--chalk-border-3);
+}
+
+/* Pestañas y opciones de quiz/retos sin caja en reposo */
+.tab,
+.fn-quiz-btn,
+.seq-check__opt-btn,
+button[data-answer] {
+  border: 0;
+  border-image: none;
 }
 
 /* Select nativo con flecha de tiza */
@@ -99,25 +108,25 @@ select optgroup {
 }
 
 @media (hover: hover) {
-  button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .btn:hover:nth-of-type(3n+1):not(:disabled),
+  button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .btn:hover:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn),
   select:hover:nth-of-type(3n+1) {
     color: var(--yellow);
     border-image: var(--chalk-border-1-hover);
   }
 
-  button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .btn:hover:nth-of-type(3n+2):not(:disabled),
+  button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .btn:hover:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn),
   select:hover:nth-of-type(3n+2) {
     color: var(--yellow);
     border-image: var(--chalk-border-2-hover);
   }
 
-  button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
-  .btn:hover:nth-of-type(3n):not(:disabled),
+  button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+  .btn:hover:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn),
   select:hover:nth-of-type(3n) {
     color: var(--yellow);
     border-image: var(--chalk-border-3-hover);
@@ -168,27 +177,27 @@ button[aria-pressed="true"]:nth-of-type(3n),
 }
 
 /* Estado :active momentáneo */
-button:active:not(:disabled):not(.tab):not(.fn-quiz-btn),
-.button:active:not(:disabled):not(.tab):not(.fn-quiz-btn),
-.btn:active:not(:disabled),
+button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:active:not(:disabled):not(.seq-check__opt-btn),
 .fn-reveal:active {
   color: var(--yellow);
 }
 
-button:active:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn),
-.btn:active:nth-of-type(3n+1):not(:disabled) {
+button:active:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:active:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn) {
   border-image: var(--chalk-border-1-pressed);
   transform: rotate(-0.6deg) scale(0.98);
 }
 
-button:active:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn),
-.btn:active:nth-of-type(3n+2):not(:disabled) {
+button:active:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:active:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn) {
   border-image: var(--chalk-border-2-pressed);
   transform: rotate(0.6deg) scale(0.98);
 }
 
-button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
-.btn:active:nth-of-type(3n):not(:disabled) {
+button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
+.btn:active:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn) {
   border-image: var(--chalk-border-3-pressed);
   transform: rotate(-0.4deg) scale(0.98);
 }

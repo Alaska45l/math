@@ -267,14 +267,8 @@ export function renderChalkSill() {
   if (document.querySelector('.chalk-sill')) return;
   const sill = h('footer', { class: 'chalk-sill', 'aria-hidden': 'true' },
     h('div', { class: 'chalk-sill__rail' },
-      s('svg', { class: 'chalk-sill__svg', viewBox: '0 0 70 24', width: '70', height: '24' },
-        s('ellipse', { cx: '36', cy: '20', rx: '28', ry: '3', fill: 'rgba(0,0,0,0.4)' }),
-        s('path', { d: 'M12 14 L54 12 L56 18 L14 20 Z', fill: '#ece8dc', opacity: '0.95' }),
-        s('path', { d: 'M12 14 L14 20 C11 20, 9 17, 12 14 Z', fill: '#dfdac8' }),
-        s('circle', { cx: '58', cy: '18', r: '1.5', fill: '#ece8dc', opacity: '0.6' }),
-        s('circle', { cx: '62', cy: '19', r: '1', fill: '#ece8dc', opacity: '0.5' }),
-        s('circle', { cx: '9', cy: '20', r: '1.2', fill: '#ece8dc', opacity: '0.5' }),
-        s('circle', { cx: '6', cy: '19', r: '0.8', fill: '#ece8dc', opacity: '0.4' })
+      s('svg', { class: 'chalk-sill__chalk', viewBox: '0 0 32 9', width: '32', height: '9', 'aria-hidden': 'true' },
+        s('path', { d: 'M2 7 L30 5 L31 8 L2 9 Z', fill: '#ece8dc', opacity: '0.95' })
       )
     )
   );

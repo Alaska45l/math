@@ -316,7 +316,7 @@ p.intro,
   color: var(--muted);
   background: transparent;
   border: 0;
-  border-bottom: none;
+  border-image: none;
   min-height: 44px;
   padding: 8px 12px;
   cursor: pointer;
@@ -343,7 +343,8 @@ p.intro,
   color: var(--ink);
   font-weight: 600;
   background: transparent;
-  border-bottom: none;
+  border: 0;
+  border-image: none;
 }
 
 .tab[aria-selected="true"]::after,
@@ -501,41 +502,28 @@ p.intro,
 @media (min-width: 820px) {
   .chalk-sill {
     display: block;
-    position: relative;
     width: 100%;
     max-width: 67.5rem;
-    margin: 48px auto 0;
+    margin: auto auto 0;
     padding: 0 1rem;
     box-sizing: border-box;
+    pointer-events: none;
   }
 
   .chalk-sill__rail {
-    height: 12px;
-    background: linear-gradient(to bottom, #4a4338, #302b24 60%, #201c18);
-    border-top: 2px solid #6b6050;
-    border-radius: 2px 2px 0 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(236, 232, 220, 0.15);
-    position: relative;
+    height: 6px;
+    background: #6b6050;
+    border-radius: 2px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 4rem;
   }
 
-  .chalk-sill__rail::before {
-    content: "";
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    top: -3px;
-    height: 3px;
-    background: radial-gradient(ellipse at center, rgba(236, 232, 220, 0.35) 0%, transparent 70%);
+  .chalk-sill__chalk {
+    width: 2rem;
+    height: 0.55rem;
     pointer-events: none;
-  }
-
-  .chalk-sill__svg {
-    position: absolute;
-    right: 60px;
-    bottom: 8px;
-    width: 70px;
-    height: 24px;
-    overflow: visible;
-    pointer-events: none;
+    margin-bottom: 2px;
   }
 }

@@ -99,6 +99,7 @@ export function initInversa(container) {
       h('div', { class: 'fn-canvas-card' },
         s('svg', {
           id: 'inv-svg',
+          class: 'plot',
           viewBox: '0 0 500 460',
           role: 'img',
           'aria-label': 'Plano cartesiano con la recta f, su simétrica f⁻¹ y el espejo y = x; arrastrá el punto o su reflejo',

@@ -590,7 +590,8 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             const isSelectedOpt = qState.value === optIdx;
             const btn = h('button', {
               type: 'button',
-              class: ['btn', 'seq-check__opt-btn', isSelectedOpt ? 'is-selected' : '', isResolved && optIdx === q.expected ? 'is-correct' : ''],
+              class: ['seq-check__opt-btn', isSelectedOpt ? 'is-selected' : '', isResolved && optIdx === q.expected ? 'is-correct' : ''],
+              dataset: { answer: optIdx },
               disabled: isResolved,
             },
               h('strong', { class: 'seq-check__opt-tag' }, `${letter}) `),

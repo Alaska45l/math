@@ -74,7 +74,7 @@ const LENSES = [
         h('li', null, h('strong', null, 'Positividad: C⁺ = [−4; −3) ∪ (0; 4). '), 'Los x para los que la curva queda arriba del eje (f(x) > 0).'),
         h('li', null, h('strong', null, 'Negatividad: C⁻ = (−3; 0) ∪ (4; 5]. '), 'Los x para los que la curva queda abajo (f(x) < 0).'),
       ),
-      h('p', { class: 'muted small' }, 'Fijate que las tres respuestas son conjuntos de valores de x: las franjas de colores sobre el eje horizontal.'),
+      h('p', { class: 'muted small rad-explain-note' }, 'Fijate que las tres respuestas son conjuntos de valores de x: las franjas de colores sobre el eje horizontal.'),
     ],
   },
   {
@@ -131,7 +131,8 @@ export function initRadiografia(container) {
     ),
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
-        s('svg', { id: 'rad-svg', viewBox: '0 0 620 390', role: 'img', 'aria-label': 'Gráfica para analizar signo, crecimiento y extremos' }),
+        s('svg', { id: 'rad-svg', class: 'plot', viewBox: '0 0 620 390', role: 'img', 'aria-label': 'Gráfica para analizar signo, crecimiento y extremos' }),
+        h('div', { id: 'rad-sticky-note', class: 'rad-sticky-note' }),
       ),
       h('div', { class: 'fn-side' },
         h('div', { id: 'rad-explain', class: 'notice', 'aria-live': 'polite' }),
@@ -217,6 +218,22 @@ export function initRadiografia(container) {
     mount(explain, h('strong', null, lens.title), ...lens.body);
     plane.clear('shade', 'under', 'curve', 'marks', 'labels');
     const { shade, under, curve: cv, marks, labels } = plane.layers;
+
+    const stickyNote = byId('rad-sticky-note', container);
+    if (stickyNote) {
+      if (state.lens === 'signos') {
+        mount(stickyNote,
+          s('svg', { class: 'rad-arrow-svg', viewBox: '0 0 240 70', width: '240', height: '70', 'aria-hidden': 'true' },
+            s('path', { d: 'M120 62 Q 135 32, 120 8 M 112 18 L 120 8 L 128 18', fill: 'none', stroke: 'var(--yellow)', 'stroke-width': '2.4', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })
+          ),
+          h('p', { class: 'rad-sticky-note__text' },
+            'Fijate que las tres respuestas son conjuntos de valores de x: las franjas de colores sobre el eje horizontal.'
+          )
+        );
+      } else {
+        mount(stickyNote);
+      }
+    }
 
     if (state.lens === 'signos') {
       const pos = { stroke: 'var(--blue)', 'stroke-width': 3.5 };

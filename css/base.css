@@ -153,6 +153,8 @@ body {
   color: var(--ink);
   font: 1rem/1.6 var(--font-note);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -222,6 +224,22 @@ input {
 
 a {
   color: var(--blue);
+}
+
+svg {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.plot,
+.seq-track,
+.seq-chart,
+#circuit,
+#number-line {
+  display: block;
+  width: 100%;
 }
 
 svg text:not([fill]) {

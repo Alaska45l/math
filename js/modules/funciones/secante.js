@@ -63,7 +63,7 @@ export function initSecante(container) {
     ),
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
-        s('svg', { id: 'sec-svg', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Curva con recta secante y triángulo de incrementos; arrastrá P₁ o P₂' }),
+        s('svg', { id: 'sec-svg', class: 'plot', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Curva con recta secante y triángulo de incrementos; arrastrá P₁ o P₂' }),
         h('p', { class: 'fn-hint' }, 'Tip: agarrá P₁ o P₂ y arrastralos sobre el gráfico. Se mueve el que esté más cerca de tu dedo o del mouse.'),
       ),
       h('div', { class: 'fn-side' },

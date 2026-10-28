@@ -610,22 +610,44 @@
   gap: 10px;
 }
 
-.seq-check__opt-btn {
+.seq-check__opt-btn,
+button[data-answer] {
   text-align: left;
   justify-content: flex-start;
-  padding: 10px 14px;
+  padding: 8px 12px;
   font-size: 0.95rem;
   width: 100%;
+  border: 0;
+  border-image: none;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  box-sizing: border-box;
 }
 
-.seq-check__opt-btn.is-correct {
-  border-color: var(--green);
+.seq-check__opt-btn:hover,
+button[data-answer]:hover {
+  border: 0;
+  border-image: none;
+  color: var(--yellow);
+}
+
+.seq-check__opt-btn.is-selected,
+.seq-check__opt-btn.is-correct,
+button[data-answer].is-selected,
+button[data-answer].is-correct {
+  border: 0;
+  border-image: none;
+}
+
+.seq-check__opt-btn.is-correct .seq-check__opt-tag {
   color: var(--green);
 }
 
-.seq-check__opt-tag {
+.seq-check__opt-btn.is-selected .seq-check__opt-tag {
   color: var(--yellow);
-  margin-right: 6px;
 }
 
 .seq-check__match-list {

@@ -255,7 +255,7 @@ export function initScanner(container) {
     ),
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
-        s('svg', { id: 'sc-svg', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Plano cartesiano con el láser vertical; tocá o arrastrá para moverlo' }),
+        s('svg', { id: 'sc-svg', class: 'plot', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Plano cartesiano con el láser vertical; tocá o arrastrá para moverlo' }),
         h('p', { class: 'fn-hint' }, 'Tip: tocá o arrastrá sobre el gráfico para mover el láser. Cerca de los puntos clave se "imanta".'),
       ),
       h('div', { class: 'fn-side' },
