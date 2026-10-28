@@ -285,6 +285,42 @@
   fill: var(--blue);
 }
 
+.seq-ribbon__input {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px dashed var(--yellow);
+  background: var(--bg);
+  color: var(--yellow);
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.seq-ribbon__input:focus {
+  border-color: var(--blue);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--blue) 15%, var(--bg));
+}
+
+.seq-ribbon__input.is-correct {
+  border: 2px solid var(--green) !important;
+  color: var(--green) !important;
+  background: color-mix(in srgb, var(--green) 18%, var(--bg)) !important;
+}
+
+.seq-ribbon__input.is-error {
+  border: 2px solid var(--pink) !important;
+  color: var(--pink) !important;
+  background: color-mix(in srgb, var(--pink) 18%, var(--bg)) !important;
+}
+
+
 /* ---------- Fórmula Anotada (annotatedFormula) ---------- */
 .seq-annotated {
   margin: 16px 0;

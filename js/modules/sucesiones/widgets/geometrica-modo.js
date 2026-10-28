@@ -1,109 +1,223 @@
 /**
  * widgets/geometrica-modo.js — Widget interactivo para la Sección 8:
  * El espejo multiplicativo (Aritmética vs Geométrica).
- * Muestra el puente conceptual de dividir por b a multiplicar por 1/b,
- * el neutro multiplicativo ·1 en n = 1, y la acumulación de potencias.
+ * Cubre:
+ * 1. De dividir por b a multiplicar por la fracción 1/b.
+ * 2. Equivalencia algebraica estándar (k · r^(n-1)) vs simplificada (c0 · r^n).
+ * 3. Diccionario interactivo lado a lado (Modo Suma +d ⇄ Modo Multiplicación ×r).
  */
 
 import { h, mount } from '../../../core/dom.js';
 import { fmt, fractionHtml } from '../../../core/math-format.js';
 import { createRibbon } from '../components.js';
 
-const EXAMPLES = [
+const MODES = [
   {
-    id: 'khan54',
-    label: '54, 18, 6, 2… (Dividir por 3 es × 1/3)',
+    id: 'div3',
+    label: '54, 18, 6, 2… (÷3 es × 1/3)',
     k: 54,
     r: 1 / 3,
-    rStr: '1/3',
+    rNum: 1,
+    rDen: 3,
     terms: [54, 18, 6, 2],
-    desc: 'En cada salto dividís entre 3, lo cual se escribe algebraicamente como multiplicar por la fracción 1/3.',
+    desc: 'En cada salto dividís entre 3. En álgebra esto se escribe como multiplicar por la fracción recíproca 1/3.',
     stdFormula: '54 · (1/3)^(n − 1)',
+    simpFormula: '162 · (1/3)^n',
   },
   {
-    id: 'khanHalf',
-    label: '1/2, 2, 8, 32… (Razón r = 4)',
+    id: 'div2',
+    label: '40, 20, 10, 5… (÷2 es × 1/2)',
+    k: 40,
+    r: 0.5,
+    rNum: 1,
+    rDen: 2,
+    terms: [40, 20, 10, 5],
+    desc: 'En cada salto dividís entre 2. Algebraicamente multiplicás por la fracción 1/2.',
+    stdFormula: '40 · (1/2)^(n − 1)',
+    simpFormula: '80 · (1/2)^n',
+  },
+  {
+    id: 'equiv4',
+    label: '1/2, 2, 8, 32… (Equivalencia 1/2·4ⁿ⁻¹ = 1/8·4ⁿ)',
     k: 0.5,
+    kNum: 1,
+    kDen: 2,
     r: 4,
-    rStr: '4',
+    rNum: 4,
+    rDen: 1,
     terms: [0.5, 2, 8, 32],
-    desc: 'En cada salto multiplicás por 4. Al inicio tenés 0 saltos: 1/2 · 4⁰ = 1/2 · 1 = 1/2.',
-    stdFormula: '1/2 · 4^(n − 1) = 1/8 · 4^n',
+    desc: 'Desglose algebraico: 4^(n − 1) = 4^n / 4 = 1/4 · 4^n. Al multiplicar por el primer término 1/2: (1/2 · 1/4) · 4^n = 1/8 · 4^n.',
+    stdFormula: '1/2 · 4^(n − 1)',
+    simpFormula: '1/8 · 4^n',
+  },
+  {
+    id: 'dictionary',
+    label: 'Diccionario: Modo Suma +d ⇄ Modo Multiplicación ×r',
+    isDictionary: true,
   },
 ];
 
 export function initGeometricaModoWidget(container) {
-  let exampleIdx = 0;
+  let modeIdx = 0;
 
   function render() {
-    const ex = EXAMPLES[exampleIdx];
+    const activeMode = MODES[modeIdx];
 
     const controls = h('div', { class: 'seq-controls' },
-      EXAMPLES.map((item, idx) =>
+      MODES.map((item, idx) =>
         h('button', {
           type: 'button',
-          class: ['chip', idx === exampleIdx ? 'is-active' : ''],
-          on: { click: () => { exampleIdx = idx; render(); } },
+          class: ['chip', idx === modeIdx ? 'is-active' : ''],
+          on: { click: () => { modeIdx = idx; render(); } },
         }, item.label)
       )
     );
 
-    const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
-    createRibbon(ribbonSlot, {
-      terms: ex.terms,
-      startIndex: 1,
-      hop: { op: '×', value: ex.rStr },
-      travelled: 3,
-    });
+    let mainContent;
 
-    // Tabla de desglose de factores y neutro multiplicativo (gemela a la de sumas)
-    const breakdownRows = [
-      { n: 1, factors: `${fmt(ex.k)}`, formula: `${fmt(ex.k)} · (${ex.rStr})⁰ = ${fmt(ex.k)} · 1`, jumps: '0 saltos (Neutro multiplicativo · 1)', res: ex.terms[0] },
-      { n: 2, factors: `${fmt(ex.k)} · ${ex.rStr}`, formula: `${fmt(ex.k)} · (${ex.rStr})¹`, jumps: '1 salto', res: ex.terms[1] },
-      { n: 3, factors: `${fmt(ex.k)} · ${ex.rStr} · ${ex.rStr}`, formula: `${fmt(ex.k)} · (${ex.rStr})²`, jumps: '2 saltos', res: ex.terms[2] },
-      { n: 4, factors: `${fmt(ex.k)} · ${ex.rStr} · ${ex.rStr} · ${ex.rStr}`, formula: `${fmt(ex.k)} · (${ex.rStr})³`, jumps: '3 saltos', res: ex.terms[3] },
-      { n: 'n', factors: `${fmt(ex.k)} · (${ex.rStr}) · … (n − 1 factores)`, formula: `${fmt(ex.k)} · (${ex.rStr})^(n − 1)`, jumps: 'n − 1 saltos', res: 'k · r^(n − 1)', isTarget: true },
-    ];
-
-    const table = h('div', { class: 'seq-table-wrap' },
-      h('table', { class: 'seq-table' },
-        h('thead', null,
-          h('tr', null,
-            h('th', null, 'Poste (n)'),
-            h('th', null, 'Multiplicación repetida'),
-            h('th', null, 'Potencia k · r^(n − 1)'),
-            h('th', null, 'Explicación del salto'),
-            h('th', null, 'Término a(n)')
-          )
-        ),
-        h('tbody', null,
-          breakdownRows.map((r) =>
-            h('tr', { class: r.isTarget ? 'is-active' : '' },
-              h('td', null, String(r.n)),
-              h('td', null, r.factors),
-              h('td', null, r.formula),
-              h('td', null, r.jumps),
-              h('td', null, h('strong', null, typeof r.res === 'number' ? fmt(r.res) : r.res))
+    if (activeMode.isDictionary) {
+      // Diccionario Interactivo
+      mainContent = h('div', { class: 'seq-block seq-block--try' },
+        h('strong', { class: 'seq-block__label' }, 'El Gran Espejo: Comparativa Lado a Lado'),
+        h('div', { class: 'seq-table-wrap' },
+          h('table', { class: 'seq-table' },
+            h('thead', null,
+              h('tr', null,
+                h('th', null, 'Concepto'),
+                h('th', null, 'Sucesión Aritmética (Modo Suma)'),
+                h('th', null, 'Sucesión Geométrica (Modo Multiplicación)')
+              )
+            ),
+            h('tbody', null,
+              h('tr', null,
+                h('td', null, h('strong', null, 'Paso de avance')),
+                h('td', null, 'Suma constante: ', h('code', null, '+ d')),
+                h('td', null, 'Multiplicación constante: ', h('code', null, '× r'), ' (÷b es × 1/b)')
+              ),
+              h('tr', null,
+                h('td', null, h('strong', null, 'En n = 1 (0 saltos)')),
+                h('td', null, 'Neutro aditivo: suma ', h('strong', null, '+0'), ' saltos (a(1) + 0·d)'),
+                h('td', null, 'Neutro multiplicativo: multiplica por ', h('strong', { style: 'color: var(--green);' }, '· 1'), ' (r⁰ = 1, a(1)·1)')
+              ),
+              h('tr', null,
+                h('td', null, h('strong', null, 'Acumulación en n')),
+                h('td', null, 'Suma repetida (multiplicación): ', h('code', null, '(n − 1) · d')),
+                h('td', null, 'Multiplicación repetida (potencia): ', h('code', null, 'r^(n − 1)'))
+              ),
+              h('tr', null,
+                h('td', null, h('strong', null, 'Fórmula estándar')),
+                h('td', null, h('code', null, 'a(n) = k + d(n − 1)')),
+                h('td', null, h('code', null, 'a(n) = k · r^(n − 1)'))
+              ),
+              h('tr', null,
+                h('td', null, h('strong', null, 'Fórmula simplificada')),
+                h('td', null, h('code', null, 'a(n) = c₀ + d·n'), ' (con c₀ = k − d)'),
+                h('td', null, h('code', null, 'a(n) = c₀ · rⁿ'), ' (con c₀ = k / r)')
+              )
             )
           )
         )
-      )
-    );
+      );
+    } else {
+      // Cinta SVG
+      const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
+      createRibbon(ribbonSlot, {
+        terms: activeMode.terms,
+        startIndex: 1,
+        hop: {
+          op: '×',
+          value: activeMode.rDen > 1 ? `${activeMode.rNum}/${activeMode.rDen}` : activeMode.r,
+        },
+        travelled: activeMode.terms.length - 1,
+      });
 
-    const bridgeCard = h('div', { class: 'notice notice--ok' },
-      h('strong', null, 'El diccionario de traducción Aritmética ⇄ Geométrica:'),
-      h('ul', { style: 'margin: 6px 0; padding-left: 20px;' },
-        h('li', null, 'En aritmética sumamos d repetidamente ⟹ multiplicación ', h('code', null, 'd · (n − 1)'), '.'),
-        h('li', null, 'En geométrica multiplicamos por r repetidamente ⟹ potencia ', h('code', null, 'r^(n − 1)'), '.'),
-        h('li', null, 'En n = 1 diste 0 saltos: sumarle 0 no cambia nada (neutro aditivo +0); multiplicar por r⁰ = 1 no cambia nada (neutro multiplicativo ·1).')
-      )
-    );
+      // Filas de desglose
+      const breakdownRows = activeMode.terms.map((val, i) => {
+        const n = i + 1;
+        const jumps = n - 1;
+        let multRep = '';
+        let potCalc = '';
+
+        const rFracHtml = activeMode.rDen > 1
+          ? `(${activeMode.rNum}/${activeMode.rDen})`
+          : `${activeMode.r}`;
+
+        if (n === 1) {
+          multRep = `${fmt(activeMode.k)}`;
+          potCalc = `${fmt(activeMode.k)} · ${rFracHtml}⁰ = ${fmt(activeMode.k)} · 1`;
+        } else {
+          multRep = `${fmt(activeMode.k)}` + ` · ${rFracHtml}`.repeat(jumps);
+          potCalc = `${fmt(activeMode.k)} · ${rFracHtml}^${jumps}`;
+        }
+
+        return h('tr', null,
+          h('td', null, `n = ${n}`),
+          h('td', null, multRep),
+          h('td', null, potCalc),
+          h('td', null, jumps === 0 ? h('span', { style: 'color: var(--green); font-weight: bold;' }, '0 saltos (Neutro multiplicativo · 1)') : `${jumps} saltos de × r`),
+          h('td', null, h('strong', null, typeof val === 'number' ? fmt(val) : val))
+        );
+      });
+
+      // Fila general n
+      const rRepText = activeMode.rDen > 1 ? `(${activeMode.rNum}/${activeMode.rDen})` : `${activeMode.r}`;
+      breakdownRows.push(
+        h('tr', { class: 'is-active' },
+          h('td', null, 'n (general)'),
+          h('td', null, `${fmt(activeMode.k)} · ${rRepText} · … (n − 1 veces)`),
+          h('td', null, h('strong', { style: 'color: var(--yellow);' }, `${fmt(activeMode.k)} · ${rRepText}^(n − 1)`)),
+          h('td', null, 'n − 1 saltos acumulados'),
+          h('td', null, h('strong', { style: 'color: var(--yellow);' }, 'a(n) = k · rⁿ⁻¹'))
+        )
+      );
+
+      const table = h('div', { class: 'seq-table-wrap' },
+        h('table', { class: 'seq-table' },
+          h('thead', null,
+            h('tr', null,
+              h('th', null, 'Poste (n)'),
+              h('th', null, 'Multiplicación repetida'),
+              h('th', null, 'Potencia k · r^(n − 1)'),
+              h('th', null, 'Explicación del salto'),
+              h('th', null, 'Término a(n)')
+            )
+          ),
+          h('tbody', null, ...breakdownRows)
+        )
+      );
+
+      // Tarjeta de puente conceptual y equivalencia
+      let cardEl;
+      if (activeMode.id === 'equiv4') {
+        cardEl = h('div', { class: 'notice notice--ok' },
+          h('strong', null, 'Equivalencia paso a paso: Forma estándar vs. simplificada:'),
+          h('div', { class: 'eq', style: 'margin: 8px 0; font-size: 1.15rem;' },
+            'a(n) = ', fractionHtml('1', '2'), ' · 4ⁿ⁻¹ = ',
+            fractionHtml('1', '2'), ' · ', fractionHtml('4ⁿ', '4'), ' = (',
+            fractionHtml('1', '2'), ' · ', fractionHtml('1', '4'), ') · 4ⁿ = ',
+            h('strong', { style: 'color: var(--yellow);' }, fractionHtml('1', '8')), ' · 4ⁿ'
+          ),
+          h('p', { class: 'small' },
+            'En forma estándar ves directamente k = 1/2 y r = 4. En forma simplificada 1/8 · 4ⁿ los números están compactados, pero ambas fórmulas generan exactamente los mismos términos 1/2, 2, 8, 32…'
+          )
+        );
+      } else {
+        cardEl = h('div', { class: 'notice notice--ok' },
+          h('strong', null, 'Puente conceptual: De dividir entre b a multiplicar por 1/b:'),
+          h('p', { style: 'margin: 6px 0;' }, activeMode.desc),
+          h('p', { class: 'small muted' },
+            `Fórmula estándar obtenida: `, h('code', null, activeMode.stdFormula),
+            `. En n = 1 tenés r⁰ = 1, conservando intacto el punto de partida k = ${fmt(activeMode.k)}.`
+          )
+        );
+      }
+
+      mainContent = h('div', null, ribbonSlot, table, cardEl);
+    }
 
     mount(container,
       controls,
-      ribbonSlot,
-      table,
-      bridgeCard
+      mainContent
     );
   }
 

@@ -586,17 +586,14 @@ const CHECKS_DATA = {
 };
 
 /* ---------- Inicialización de Fórmulas Anotadas ---------- */
-const an1 = document.getElementById('annotated-sec-1');
-if (an1) annotatedFormula(an1, { type: 'explicit', seqName: 'a', k: 3, step: 2, kind: 'ari' });
-
-const an4 = document.getElementById('annotated-sec-4');
+const an4 = document.getElementById('annotated-sec-4') || document.querySelector('[data-annotated="sec-4"]');
 if (an4) annotatedFormula(an4, { type: 'recursive', seqName: 'a', k: 3, step: 2, kind: 'ari' });
 
-const an5a = document.getElementById('annotated-sec-5a');
-if (an5a) annotatedFormula(an5a, { type: 'explicit', seqName: 'a', k: 5, step: 3, kind: 'ari' });
+const an5a = document.getElementById('annotated-sec-5a') || document.querySelector('[data-annotated="sec-5a"]');
+if (an5a) annotatedFormula(an5a, { type: 'explicit', seqName: 'a', k: 3, step: 2, kind: 'ari' });
 
-const an8 = document.getElementById('annotated-sec-8');
-if (an8) annotatedFormula(an8, { type: 'explicit', seqName: 'a', k: 54, step: 1 / 3, kind: 'geo' });
+const an8 = document.getElementById('annotated-sec-8') || document.querySelector('[data-annotated="sec-8"]');
+if (an8) annotatedFormula(an8, { type: 'explicit', seqName: 'a', k: 54, step: 1 / 3, stepStr: '1/3', kind: 'geo' });
 
 /* ---------- Montaje de Widgets ---------- */
 

@@ -10,6 +10,7 @@ import {
   explicitSimplified,
   fromExplicit,
   expandRecursive,
+  diagnose,
 } from '../../js/modules/sucesiones/logic.js';
 import { parse } from '../../js/modules/sucesiones/expr.js';
 
@@ -154,4 +155,35 @@ test('logic: expandRecursive con GENERAL_RULES', () => {
   const r4 = expandRecursive({ id: 'fibonacci', anchors: [1] }, 6);
   assert.equal(r4.ok, false);
   assert.equal(r4.error.code, 'missing_anchors');
+});
+
+test('logic: diagnose contrato estricto de los 7 identificadores', () => {
+  // 1. neg_pow_precedence
+  const d1 = diagnose(parse('8 * -5^(n-1)').ast, { kind: 'geo', k: 8, step: -5 });
+  assert.strictEqual(d1[0]?.id, 'neg_pow_precedence');
+
+  // 2. exponent_n
+  const d2 = diagnose(parse('64 * (1/4)^n').ast, { kind: 'geo', k: 64, step: 0.25 });
+  assert.strictEqual(d2[0]?.id, 'exponent_n');
+
+  // 3. off_by_one
+  const d3 = diagnose(parse('2 + 6n').ast, { kind: 'ari', k: 2, step: 6 });
+  assert.strictEqual(d3[0]?.id, 'off_by_one');
+
+  // 4. wrong_anchor_a2
+  const d4 = diagnose(parse('16 * (1/4)^(n-1)').ast, { kind: 'geo', k: 64, step: 0.25 });
+  assert.strictEqual(d4[0]?.id, 'wrong_anchor_a2');
+
+  // 5. sign_of_step
+  const d5 = diagnose(parse('5 - 12(n-1)').ast, { kind: 'ari', k: 5, step: 12 });
+  assert.strictEqual(d5[0]?.id, 'sign_of_step');
+
+  // 6. swapped_k_step
+  const d6 = diagnose(parse('12 + 5(n-1)').ast, { kind: 'ari', k: 5, step: 12 });
+  assert.strictEqual(d6[0]?.id, 'swapped_k_step');
+
+  // 7. not_standard_but_equivalent
+  const d7 = diagnose(parse('-9 + 4n').ast, { kind: 'ari', k: -5, step: 4 }, { requireStandard: true });
+  assert.strictEqual(d7[0]?.id, 'not_standard_but_equivalent');
+  assert.strictEqual(d7[0]?.severity, 'warn');
 });

@@ -8,6 +8,7 @@
 import { h, mount } from '../../../core/dom.js';
 import { fmt, fractionHtml, MINUS } from '../../../core/math-format.js';
 import { isTerm, stepFromTwo } from '../logic.js';
+import { createRibbon } from '../components.js';
 
 export function initAlRevesWidget(container) {
   let submode = 'filter'; // 'filter' | 'bridge'
@@ -103,6 +104,43 @@ export function initAlRevesWidget(container) {
         )
       );
 
+      // Visualización en cinta (vecindario del target)
+      const ribbonSlot = h('div', { class: 'seq-ribbon-wrap', style: 'margin: 12px 0;' });
+      let voidNotice = null;
+
+      if (result.n > 0 && Number.isFinite(result.n)) {
+        if (result.isTerm) {
+          const center = result.n;
+          const startN = Math.max(1, center - 2);
+          const hoodTerms = [0, 1, 2, 3, 4].map((idx) => fK + fStep * (startN + idx - 1));
+          createRibbon(ribbonSlot, {
+            terms: hoodTerms,
+            startIndex: startN,
+            selected: center - startN,
+            hop: { op: fStep >= 0 ? '+' : '-', value: Math.abs(fStep) },
+            travelled: hoodTerms.length - 1,
+          });
+        } else {
+          const floorN = Math.floor(result.n);
+          if (floorN >= 1) {
+            const startN = Math.max(1, floorN - 1);
+            const hoodTerms = [0, 1, 2, 3].map((idx) => fK + fStep * (startN + idx - 1));
+            createRibbon(ribbonSlot, {
+              terms: hoodTerms,
+              startIndex: startN,
+              hop: { op: fStep >= 0 ? '+' : '-', value: Math.abs(fStep) },
+              travelled: hoodTerms.length - 1,
+            });
+            voidNotice = h('div', { class: 'notice notice--warn', style: 'margin-top: 6px;' },
+              h('strong', null, `Ubicación en la cinta: `),
+              h('span', null,
+                `El valor objetivo ${fmt(fTarget)} cae en n = ${fmt(result.n, 1)}, exactamente en el vacío entre el poste a(${floorN}) = ${fmt(fK + fStep * (floorN - 1))} y el poste a(${floorN + 1}) = ${fmt(fK + fStep * floorN)}.`
+              )
+            );
+          }
+        }
+      }
+
       // Veredicto
       const verdict = h('div', { class: ['notice', result.isTerm ? 'notice--ok' : 'notice--err'] },
         h('strong', null, result.isTerm ? '✓ Sí pertenece a la sucesión:' : '✗ NO pertenece a la sucesión:'),
@@ -113,7 +151,7 @@ export function initAlRevesWidget(container) {
         )
       );
 
-      contentArea = h('div', null, presets, inputs, stepsView, verdict);
+      contentArea = h('div', null, presets, inputs, stepsView, verdict, ribbonSlot, voidNotice);
     } else {
       // Sub-modo 2: Puente
       const jumps = bN2 - bN1;
