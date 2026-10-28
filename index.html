@@ -19,50 +19,94 @@
     <p class="intro">Simuladores para desarmar la máquina y ver los engranajes: cada idea se construye desde sus
       definiciones, sin recetas mágicas. Elegí un laboratorio.</p>
 
-    <div class="hub-grid">
-      <a class="hub-card" href="desigualdades.html">
-        <span class="hub-card__tag">Lógica y conjuntos</span>
-        <h2 class="hub-card__title">Desigualdades compuestas como circuito</h2>
-        <p class="hub-card__text">Cada desigualdad es un interruptor: en serie forman un AND (intersección), en
-          paralelo un OR (unión).</p>
-        <ul class="hub-card__list">
-          <li>Recta numérica con extremos abiertos y cerrados</li>
-          <li>Retos de conjuntos solución y De Morgan</li>
-        </ul>
+    <div class="hub-index">
+      <!-- 1. Desigualdades -->
+      <a class="hub-entry" href="desigualdades.html">
+        <svg class="hub-entry__doodle hub-doodle--circ" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Garabato de interruptor y recta numérica">
+          <!-- Interruptor circuito -->
+          <path d="M6 20 L22 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="22" cy="20" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M24 18 L38 8" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="42" cy="20" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M45 20 L58 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Recta numérica con intervalo -->
+          <path d="M6 46 L58 46" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M54 42 L58 46 L54 50" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"/>
+          <!-- Tramo pintado [a, b) -->
+          <path d="M18 46 L44 46" stroke="var(--yellow)" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="18" cy="46" r="4" fill="var(--yellow)" stroke="var(--yellow)" stroke-width="1.5"/>
+          <circle cx="44" cy="46" r="4" fill="var(--bg)" stroke="var(--yellow)" stroke-width="2"/>
+        </svg>
+        <div class="hub-entry__body">
+          <h2 class="hub-entry__title">Desigualdades compuestas</h2>
+          <p class="hub-entry__desc">Interruptores en serie (AND · ∧) y en paralelo (OR · ∨) sobre la recta numérica.</p>
+        </div>
       </a>
 
-      <a class="hub-card" href="unidades.html">
-        <span class="hub-card__tag">Análisis dimensional</span>
-        <h2 class="hub-card__title">Unidades y neutro multiplicativo</h2>
-        <p class="hub-card__text">Convertí unidades multiplicando por fracciones que valen 1: cada pin encastra con
-          su hueco y forma el neutro multiplicativo.</p>
-        <ul class="hub-card__list">
-          <li>Factores unitarios orientables</li>
-          <li>Autopsia de unidades al cubo</li>
-        </ul>
+      <!-- 2. Unidades -->
+      <a class="hub-entry" href="unidades.html">
+        <svg class="hub-entry__doodle hub-doodle--dim" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Garabato de encastre dimensional y neutro multiplicativo">
+          <!-- Pin puzzle -->
+          <path d="M8 26 L22 26 L22 18 C22 14, 30 14, 30 18 L30 26 L44 26 L44 38 L8 38 Z" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Vinculum fraccionario -->
+          <path d="M4 42 L60 42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Socket puzzle abajo -->
+          <path d="M12 46 L24 46 L24 53 C24 57, 32 57, 32 53 L32 46 L52 46" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/>
+          <!-- Texto 1 neutro -->
+          <text x="50" y="24" font-family="Caveat, cursive" font-size="22" font-weight="bold" fill="var(--green)">· 1</text>
+        </svg>
+        <div class="hub-entry__body">
+          <h2 class="hub-entry__title">Unidades y neutro multiplicativo</h2>
+          <p class="hub-entry__desc">Conversión dimensional encastrando pines y huecos mediante factores que valen 1.</p>
+        </div>
       </a>
 
-      <a class="hub-card" href="funciones.html">
-        <span class="hub-card__tag hub-card__tag--new">Unidad 8 · Nuevo</span>
-        <h2 class="hub-card__title">Laboratorio de Funciones</h2>
-        <p class="hub-card__text">Cuatro micro-simuladores para leer, analizar e invertir funciones con rigor.</p>
-        <ul class="hub-card__list">
-          <li>Escáner de unicidad, dominio e imagen</li>
-          <li>Radiografía cartesiana: C₀, C⁺, C⁻, monotonía y extremos</li>
-          <li>Puente secante: tasa de cambio promedio con unidades</li>
-          <li>Máquina inversa y espejo <span class="math">y = x</span></li>
-        </ul>
+      <!-- 3. Funciones -->
+      <a class="hub-entry" href="funciones.html">
+        <svg class="hub-entry__doodle hub-doodle--fn" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Garabato de plano cartesiano con función y láser">
+          <!-- Ejes cartesianos -->
+          <path d="M12 6 L12 56 M8 50 L58 50" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 6 L9 11 M12 6 L15 11" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M58 50 L53 47 M58 50 L53 53" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Curva suave f(x) -->
+          <path d="M14 44 Q 28 48, 38 30 T 56 12" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Láser vertical escáner -->
+          <path d="M38 8 L38 52" stroke="var(--yellow)" stroke-width="1.8" stroke-dasharray="3 3" stroke-linecap="round"/>
+          <circle cx="38" cy="30" r="3.5" fill="var(--yellow)" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        <div class="hub-entry__body">
+          <h2 class="hub-entry__title">Laboratorio de Funciones</h2>
+          <p class="hub-entry__desc">Escáner de unicidad, radiografía en X, tasa de cambio promedio y máquina inversa.</p>
+        </div>
       </a>
 
-      <a class="hub-card" href="sucesiones.html">
-        <span class="hub-card__tag hub-card__tag--new">Nuevo · Unidad 9 y Puente a Análisis I</span>
-        <h2 class="hub-card__title">Laboratorio de Sucesiones</h2>
-        <p class="hub-card__text">Pensá cada sucesión como una función de dominio entero: el índice elige un término y el dominio puede empezar en ℕ o en ℕ₀.</p>
-        <ul class="hub-card__list">
-          <li>Postes y saltos: por qué aparece el exponente (n − 1)</li>
-          <li>Conversión entre fórmulas recursivas y explícitas</li>
-          <li>Razones negativas, interés compuesto y convergencia</li>
-        </ul>
+      <!-- 4. Sucesiones -->
+      <a class="hub-entry hub-entry--new" href="sucesiones.html">
+        <svg class="hub-entry__doodle hub-doodle--seq" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Garabato de postes y saltos discretos">
+          <!-- Riel de base -->
+          <path d="M6 52 L58 52" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Postes y puntos discretos a(n) -->
+          <path d="M14 52 L14 40 M26 52 L26 32 M38 52 L38 22 M50 52 L50 10" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <circle cx="14" cy="40" r="3.5" fill="var(--yellow)"/>
+          <circle cx="26" cy="32" r="3.5" fill="var(--yellow)"/>
+          <circle cx="38" cy="22" r="3.5" fill="var(--yellow)"/>
+          <circle cx="50" cy="10" r="3.5" fill="var(--yellow)"/>
+          <!-- Saltos curvos entre postes -->
+          <path d="M14 36 Q 20 25, 26 28" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M26 28 Q 32 15, 38 18" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <div class="hub-entry__body">
+          <div class="hub-entry__title-wrap">
+            <h2 class="hub-entry__title">Laboratorio de Sucesiones</h2>
+            <div class="hub-badge-new" aria-label="Laboratorio nuevo">
+              <span class="hub-badge-text">¡nuevo!</span>
+              <svg class="hub-badge-arrow" viewBox="0 0 28 16" width="28" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12 Q 12 16, 24 6 M 18 4 L 24 6 L 22 12"/>
+              </svg>
+            </div>
+          </div>
+          <p class="hub-entry__desc">Funciones de dominio discreto: postes, saltos, equivalencias y puente a Análisis.</p>
+        </div>
       </a>
     </div>
   </main>

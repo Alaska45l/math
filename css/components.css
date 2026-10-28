@@ -437,10 +437,18 @@ output {
   margin: 0 0 10px;
 }
 
+.field-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .field__label {
   font-size: 1rem;
   color: var(--muted);
   min-width: 90px;
+  white-space: nowrap;
 }
 
 .field__out {
@@ -748,10 +756,11 @@ output {
 .stat__label {
   font-size: 1rem;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .stat__label::after {
-  content: " → ";
+  content: ": ";
   color: var(--muted);
 }
 

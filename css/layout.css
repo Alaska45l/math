@@ -9,7 +9,7 @@
   z-index: 10;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
 }
 
 .site-nav__inner {
@@ -191,8 +191,16 @@
 
 @media (max-width: 820px) {
   .page {
+    width: 100%;
+    max-width: 100%;
     padding: 1.25rem 1rem 2.5rem;
   }
+}
+
+.intro,
+p.intro,
+.page-header p {
+  max-width: 36rem;
 }
 
 .page--narrow {
@@ -274,8 +282,32 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  border-bottom: 1px solid var(--border);
-  margin: 0 0 20px;
+  border-bottom: none;
+  margin: 0 0 16px;
+  position: relative;
+}
+
+@media (max-width: 820px) {
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 16px;
+    gap: 12px;
+    margin: 0 0 20px;
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 }
 
 .tab {
@@ -352,65 +384,158 @@
   outline: none;
 }
 
-/* ---------- Hub ---------- */
-.hub-grid {
+/* ---------- Hub (Índice Manuscrito de Pizarra) ---------- */
+.hub-index {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  margin-top: 36px;
 }
 
-.hub-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  border-radius: var(--radius);
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  text-decoration: none;
-  transition: border-color .15s;
-}
-
-@media (hover: hover) {
-  .hub-card:hover {
-    border-color: var(--blue);
+@media (min-width: 900px) {
+  .hub-index {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 48px;
   }
 }
 
-.hub-card:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 3px;
+.hub-entry {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 16px 20px;
+  align-items: start;
+  text-decoration: none;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: transform 0.15s, opacity 0.15s;
 }
 
-.hub-card__tag {
-  align-self: flex-start;
-  font-size: 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--blue);
+@media (hover: hover) {
+  .hub-entry:hover {
+    transform: translateY(-2px);
+  }
+  .hub-entry:hover .hub-entry__title {
+    color: var(--yellow);
+  }
 }
 
-.hub-card__tag--new {
-  color: var(--green);
+.hub-entry:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 4px;
 }
 
-.hub-card__title {
+.hub-entry__doodle {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  color: var(--ink);
+  overflow: visible;
+  transition: transform 0.2s;
+}
+
+.hub-entry:hover .hub-entry__doodle {
+  transform: rotate(-3deg) scale(1.05);
+}
+
+.hub-entry__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hub-entry__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hub-entry__title {
+  font-family: var(--font-hand);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+  transition: color 0.15s;
+}
+
+.hub-entry__desc {
+  font-family: var(--font-note);
   font-size: 1.125rem;
-  font-weight: 650;
-  margin: 0;
-}
-
-.hub-card__text {
-  font-size: 1rem;
+  line-height: 1.5;
   color: var(--muted);
   margin: 0;
 }
 
-.hub-card__list {
-  margin: 4px 0 0;
-  padding-left: 18px;
-  font-size: 1rem;
-  color: var(--muted);
+.hub-badge-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--yellow);
+  transform: rotate(-3deg);
+}
+
+.hub-badge-text {
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hub-badge-arrow {
+  width: 28px;
+  height: 16px;
+  overflow: visible;
+}
+
+/* ---------- Repisa de Pizarra (Sill / Tray) ---------- */
+.chalk-sill {
+  display: none;
+}
+
+@media (min-width: 820px) {
+  .chalk-sill {
+    display: block;
+    position: relative;
+    width: 100%;
+    max-width: 67.5rem;
+    margin: 48px auto 0;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .chalk-sill__rail {
+    height: 12px;
+    background: linear-gradient(to bottom, #4a4338, #302b24 60%, #201c18);
+    border-top: 2px solid #6b6050;
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(236, 232, 220, 0.15);
+    position: relative;
+  }
+
+  .chalk-sill__rail::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    top: -3px;
+    height: 3px;
+    background: radial-gradient(ellipse at center, rgba(236, 232, 220, 0.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .chalk-sill__svg {
+    position: absolute;
+    right: 60px;
+    bottom: 8px;
+    width: 70px;
+    height: 24px;
+    overflow: visible;
+    pointer-events: none;
+  }
 }

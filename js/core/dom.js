@@ -62,8 +62,11 @@ export function s(tag, attrs, ...children) {
 
 /** Icono vectorial estilo tiza (lock, check, cross). */
 export function chalkIcon(type, attrs = {}) {
+  const { class: customClass, ...restAttrs } = attrs;
+  const fullClass = customClass
+    ? `chalk-icon chalk-icon--${type} ${customClass}`
+    : `chalk-icon chalk-icon--${type}`;
   const icon = s('svg', {
-    class: `chalk-icon chalk-icon--${type}`,
     viewBox: '0 0 16 16',
     width: '20',
     height: '20',
@@ -74,7 +77,8 @@ export function chalkIcon(type, attrs = {}) {
     'stroke-linejoin': 'round',
     'aria-hidden': 'true',
     focusable: 'false',
-    ...attrs,
+    ...restAttrs,
+    class: fullClass,
   });
   if (type === 'lock') {
     icon.append(

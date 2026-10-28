@@ -123,7 +123,7 @@ export function initRadiografia(container) {
   const state = { lens: 'signos' };
 
   mount(container,
-    h('div', { class: 'panel' },
+    h('div', { class: 'panel fn-lens-panel' },
       h('span', { class: 'label-sm' }, 'Elegí una lente de rayos X para mirar la misma curva, con Dom(f) = [−4; 5]:'),
       h('div', { class: 'fn-lens-bar', id: 'rad-lenses' },
         LENSES.map((l) => h('button', { type: 'button', class: 'toggle', dataset: { lens: l.id }, 'aria-pressed': l.id === state.lens ? 'true' : 'false' }, l.label)),

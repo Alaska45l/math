@@ -11,28 +11,29 @@
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 28px;
   align-items: start;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px 64px;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0 0;
+  padding: 0 0 48px;
 }
 
 @media (max-width: 900px) {
   .seq-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
-    padding: 0 12px 48px;
+    margin: 1rem 0 0;
+    padding: 0 0 32px;
   }
 }
 
 .seq-sidebar {
   position: sticky;
-  top: 16px;
-  max-height: calc(100vh - 32px);
+  top: 4.5rem;
+  max-height: calc(100vh - 5.5rem);
   overflow-y: auto;
-  padding: 14px;
-  background-color: var(--card);
-  border: 2px solid transparent;
-  border-image: var(--chalk-border-1);
+  padding: 0;
+  background-color: transparent;
+  border: none;
   box-sizing: border-box;
 }
 
@@ -57,14 +58,15 @@
   gap: 10px;
   margin-bottom: 14px;
   padding-bottom: 10px;
-  border-bottom: 1px dashed var(--border);
+  border-bottom: none;
 }
 
 .seq-progress-bar {
   flex: 1;
-  height: 8px;
-  background-color: var(--surface);
-  border: 1px solid var(--border-strong);
+  height: 6px;
+  background-color: rgba(236, 232, 220, 0.12);
+  border: none;
+  border-radius: 3px;
   overflow: hidden;
 }
 
@@ -105,20 +107,19 @@
   color: var(--ink);
   text-decoration: none;
   font-size: 1rem;
-  border: 1px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  border: none;
+  transition: color 0.15s;
 }
 
 .seq-sidebar__link:hover,
 .seq-sidebar__link:focus-visible {
   color: var(--yellow);
-  border-color: var(--border-strong);
 }
 
 .seq-sidebar__link.is-active {
   color: var(--yellow);
   font-weight: 700;
-  border-left: 3px solid var(--yellow);
+  border: none;
 }
 
 .seq-sidebar__status {
@@ -163,11 +164,11 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  padding: 10px 16px;
+  padding: 8px 0;
   margin-bottom: 24px;
-  background-color: var(--card);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 .seq-blackboard-toolbar__info {
@@ -180,13 +181,12 @@
 }
 
 .seq-blackboard-toolbar__badge {
-  font-size: 0.85rem;
-  font-family: var(--font-sans);
-  background-color: color-mix(in srgb, var(--yellow) 15%, transparent);
+  font-size: 0.95rem;
+  font-family: var(--font-hand);
+  background-color: transparent;
   color: var(--yellow);
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: 1px solid var(--border-strong);
+  padding: 0;
+  border: none;
 }
 
 .seq-blackboard-toolbar__actions {
@@ -196,13 +196,11 @@
 }
 
 .seq-section {
-  background-color: var(--bg);
-  border: 3px solid transparent;
-  border-image: var(--chalk-border-1);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  padding: 32px 36px;
-  margin-bottom: 40px;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 12px 0 32px;
+  margin-bottom: 32px;
   position: relative;
   box-sizing: border-box;
   scroll-margin-top: 24px;
@@ -264,10 +262,15 @@
 }
 
 .seq-block--caution {
-  background-color: color-mix(in srgb, var(--pink) 8%, transparent);
-  border: 1px solid var(--pink);
-  padding: 16px 18px;
+  background-color: transparent;
+  border: none;
+  padding: 8px 0;
   margin: 24px 0;
+  transform: rotate(-1deg);
+}
+
+.seq-block--caution:nth-of-type(even) {
+  transform: rotate(1deg);
 }
 
 .seq-block--caution .seq-block__label {
@@ -282,22 +285,13 @@
   gap: 16px;
   flex-wrap: wrap;
   margin-top: 40px;
-  padding-top: 20px;
-  border-top: 2px solid var(--border-strong);
+  padding-top: 16px;
+  border-top: none;
   position: relative;
 }
 
 .seq-chalk-tray::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 24px;
-  width: 28px;
-  height: 4px;
-  background: var(--ink);
-  border-radius: 2px;
-  box-shadow: 36px 0 0 -1px var(--yellow), 64px 0 0 -1px var(--muted);
-  opacity: 0.8;
+  display: none;
 }
 
 .seq-chalk-tray__btn {
@@ -412,7 +406,15 @@
   padding: 0;
   box-sizing: border-box;
   outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
   transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.seq-ribbon__input::-webkit-outer-spin-button,
+.seq-ribbon__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .seq-ribbon__input:focus {
@@ -437,8 +439,8 @@
 /* ---------- Fórmula Anotada (annotatedFormula) ---------- */
 .seq-annotated {
   margin: 16px 0;
-  padding: 14px;
-  border: 1px dashed var(--border-strong);
+  padding: 8px 0;
+  border: none;
 }
 
 .seq-annotated__formula {
@@ -477,19 +479,27 @@
 }
 
 .seq-annotated__note-box {
-  min-height: 48px;
+  min-height: 44px;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
-  background-color: color-mix(in srgb, var(--ink) 5%, transparent);
-  border-left: 3px solid var(--yellow);
+  padding: 4px 0;
+  background-color: transparent;
+  border: none;
 }
 
 .seq-annotated__note {
   margin: 0;
   font-family: var(--font-hand);
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   color: var(--yellow);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transform: rotate(-1deg);
+}
+
+.seq-annotated__note:nth-of-type(even) {
+  transform: rotate(1deg);
 }
 
 .seq-annotated__brace-box {
@@ -550,6 +560,9 @@
 }
 
 .seq-check__check-icon {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
   color: var(--green);
 }
 
@@ -712,14 +725,13 @@
 }
 
 .seq-detective__row {
-  padding: 10px 14px;
-  border: 1px dashed var(--border);
+  padding: 8px 0;
+  border: none;
   transition: border-color 0.2s, background-color 0.2s;
 }
 
 .seq-detective__row.is-constant {
-  border-color: var(--yellow);
-  background-color: color-mix(in srgb, var(--yellow) 6%, transparent);
+  background-color: transparent;
 }
 
 .seq-detective__header {
@@ -736,15 +748,15 @@
 }
 
 .seq-detective__cell {
-  padding: 4px 8px;
-  border: 1px solid var(--border);
+  padding: 4px 6px;
+  border: none;
   font-family: var(--font-hand);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
 .seq-detective__cell.is-highlight {
-  border-color: var(--yellow);
   color: var(--yellow);
+  font-weight: bold;
 }
 
 .seq-detective__sub {

@@ -23,8 +23,10 @@
     <div class="panel row">
       <label for="problem">Problema</label>
       <select id="problem"></select>
-      <label for="value">Valor</label>
-      <input id="value" type="number" min="0" step="any" class="dim-value">
+      <div class="field-inline">
+        <label for="value">Valor</label>
+        <input id="value" type="number" min="0" step="any" class="dim-value">
+      </div>
       <div class="btn-group" role="group" aria-label="Predicción">
         <button type="button" id="predict-up" class="toggle" aria-pressed="false">Creo que crece</button>
         <button type="button" id="predict-down" class="toggle" aria-pressed="false">Creo que se achica</button>
