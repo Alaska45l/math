@@ -693,8 +693,8 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       if (q.solution && !isResolved) {
         const btnSol = h('button', {
           type: 'button',
-          class: 'chip chip--ghost',
-        }, '¡Estoy atorado! Mostrame la solución');
+          class: ['chip', qState.showSolution ? 'chip--active' : 'chip--ghost'],
+        }, qState.showSolution ? 'Ocultar solución' : '¡Estoy atorado! Mostrame la solución');
 
         btnSol.addEventListener('click', () => {
           qState.showSolution = !qState.showSolution;
@@ -703,9 +703,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         toolsRow.append(btnSol);
       }
 
-      // Despliegue de pistas
-      const hintsDisplay = h('div', { class: 'seq-check__hints-box' });
+      // Despliegue de pistas (sólo si el usuario las solicitó)
+      let hintsDisplay = null;
       if (qState.hintIndex > 0 && q.hints) {
+        hintsDisplay = h('div', { class: 'seq-check__hints-box' });
         for (let hIdx = 0; hIdx < qState.hintIndex; hIdx++) {
           hintsDisplay.append(
             h('div', { class: 'seq-check__hint-item small' },
@@ -716,9 +717,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         }
       }
 
-      // Despliegue de solución
-      const solutionDisplay = h('div', { class: 'seq-check__solution-box' });
+      // Despliegue de solución (sólo si el usuario la solicitó explícitamente)
+      let solutionDisplay = null;
       if (qState.showSolution && q.solution) {
+        solutionDisplay = h('div', { class: 'seq-check__solution-box' });
         const solContent = h('div', { class: 'seq-check__solution small' },
           h('strong', null, 'Resolución paso a paso:'),
           h('div', null)
@@ -731,14 +733,18 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         solutionDisplay.append(solContent);
       }
 
-      return h('article', { class: ['seq-check__card', isResolved ? 'is-resolved' : ''] },
+      const cardChildren = [
         header,
         promptEl,
         inputSlot,
-        feedbackEl,
-        toolsRow,
+        qState.feedback ? feedbackEl : null,
+        toolsRow.childNodes.length > 0 ? toolsRow : null,
         hintsDisplay,
-        solutionDisplay
+        solutionDisplay,
+      ].filter(Boolean);
+
+      return h('article', { class: ['seq-check__card', isResolved ? 'is-resolved' : ''] },
+        ...cardChildren
       );
     });
 

@@ -165,9 +165,14 @@ export function createPlane(svg, cfg) {
   const yAxisX = sx(Math.min(Math.max(0, c.xMin), c.xMax));
 
   function ticks(min, max, step) {
+    if (!Number.isFinite(min) || !Number.isFinite(max) || !Number.isFinite(step) || step <= 0) return [];
+    let effStep = step;
+    if ((max - min) / effStep > 40) {
+      effStep = Math.max(1e-6, (max - min) / 8);
+    }
     const out = [];
-    const start = Math.ceil(min / step) * step;
-    for (let t = start; t <= max + 1e-9; t += step) out.push(Number(t.toFixed(6)));
+    const start = Math.ceil(min / effStep) * effStep;
+    for (let t = start; t <= max + 1e-9 && out.length < 50; t += effStep) out.push(Number(t.toFixed(6)));
     return out;
   }
 

@@ -6,6 +6,7 @@
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
+import { calcSafeAxis } from '../scale.js';
 
 export function initCompararWidget(container) {
   let initialDeposit = 70;
@@ -28,27 +29,45 @@ export function initCompararWidget(container) {
         'Depósito inicial f(1): $',
         h('input', {
           type: 'number',
+          min: 1,
+          max: 10000,
           class: 'seq-check__input-sm',
           value: initialDeposit,
-          on: { change: (e) => { initialDeposit = parseFloat(e.target.value) || 70; render(); } },
+          on: { change: (e) => {
+            const p = parseFloat(e.target.value);
+            initialDeposit = Number.isFinite(p) ? Math.max(1, Math.min(10000, p)) : 70;
+            render();
+          } },
         })
       ),
       h('label', { class: 'field__label' },
         'Ahorro fijo anual (+d): $',
         h('input', {
           type: 'number',
+          min: 0,
+          max: 5000,
           class: 'seq-check__input-sm',
           value: fixedAdd,
-          on: { change: (e) => { fixedAdd = parseFloat(e.target.value) || 10; render(); } },
+          on: { change: (e) => {
+            const p = parseFloat(e.target.value);
+            fixedAdd = Number.isFinite(p) ? Math.max(0, Math.min(5000, p)) : 10;
+            render();
+          } },
         })
       ),
       h('label', { class: 'field__label' },
         'Interés compuesto anual (+%): ',
         h('input', {
           type: 'number',
+          min: 1,
+          max: 50,
           class: 'seq-check__input-sm',
           value: interestPct,
-          on: { change: (e) => { interestPct = parseFloat(e.target.value) || 10; render(); } },
+          on: { change: (e) => {
+            const p = parseFloat(e.target.value);
+            interestPct = Number.isFinite(p) ? Math.max(1, Math.min(50, p)) : 10;
+            render();
+          } },
         }),
         '%'
       ),
@@ -58,9 +77,13 @@ export function initCompararWidget(container) {
           type: 'number',
           class: 'seq-check__input-sm',
           min: 3,
-          max: 20,
+          max: 15,
           value: yearsCount,
-          on: { change: (e) => { yearsCount = Math.max(3, parseInt(e.target.value, 10) || 8); render(); } },
+          on: { change: (e) => {
+            const p = parseInt(e.target.value, 10);
+            yearsCount = Number.isFinite(p) ? Math.max(3, Math.min(15, p)) : 8;
+            render();
+          } },
         })
       )
     );
@@ -125,16 +148,19 @@ export function initCompararWidget(container) {
       explanation
     );
 
-    // Render del plano
+    // Render del plano con escala adaptativa monetaria segura
     const maxVal = Math.max(data[data.length - 1].ari, data[data.length - 1].geo);
+    const axis = calcSafeAxis({ minVal: 0, maxVal, targetTicks: 6, forceZero: true, currency: true });
     const plane = createPlane(svgEl, {
       width: 540,
       height: 320,
       xMin: 0,
       xMax: yearsCount + 1,
-      yMin: 0,
-      yMax: Math.ceil(maxVal * 1.15),
+      yMin: axis.yMin,
+      yMax: axis.yMax,
       xStep: 1,
+      yStep: axis.yStep,
+      yFmt: axis.yFmt,
       xLabel: 'Año (n)',
       yLabel: 'Saldo ($)',
     });
