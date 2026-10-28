@@ -28,7 +28,7 @@
         <div class="seq-sidebar__chapter">
           <span class="seq-sidebar__chapter-title">Capítulo 1 · El Lenguaje</span>
           <a class="seq-sidebar__link" href="#sec-1" data-sec="sec-1"><span>1. ¿Qué es una sucesión?</span> <span class="seq-sidebar__status"></span></a>
-          <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2"><span>2. Tipos de patrones</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2"><span>2. Aritmética y diferencia común</span> <span class="seq-sidebar__status"></span></a>
           <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3"><span>3. Función y Dominio ℕ</span> <span class="seq-sidebar__status"></span></a>
         </div>
 
@@ -79,7 +79,6 @@
         <div class="seq-block seq-block--look">
           <span class="seq-block__label">Cómo se ve</span>
           <p>Imaginá una fila de postes numerados: <code>3, 5, 7…</code>. Cada número es un <strong>término</strong>. El primer término es <code>3</code>, el segundo es <code>5</code> y el tercero es <code>7</code>. Los puntos suspensivos <code>…</code> significan que la lista continúa indefinidamente.</p>
-          <div class="seq-annotated" id="annotated-sec-1"></div>
         </div>
 
         <div class="seq-block seq-block--try">
@@ -103,27 +102,30 @@
       <section id="sec-2" class="seq-section" aria-labelledby="title-sec-2">
         <header class="seq-section__header">
           <span class="seq-section__tag">Capítulo 1 · Sección 2</span>
-          <h2 id="title-sec-2" class="seq-section__title">Aritmética, geométrica o ninguna</h2>
+          <h2 id="title-sec-2" class="seq-section__title">¿Qué es una sucesión aritmética? La diferencia común</h2>
         </header>
 
         <div class="seq-block seq-block--phrase">
           <span class="seq-block__label">En una frase</span>
-          <p class="seq-phrase-text">Si sumás o restás siempre el mismo número, es aritmética; si multiplicás siempre por el mismo número, es geométrica; si el salto cambia, no es ninguna de las dos.</p>
+          <p class="seq-phrase-text">En una sucesión aritmética, la diferencia entre términos consecutivos es siempre el mismo número constante, llamado diferencia común (d).</p>
         </div>
 
         <div class="seq-block seq-block--look">
           <span class="seq-block__label">Cómo se ve</span>
-          <p>En una <strong>sucesión aritmética</strong>, la resta entre cualquier término y el anterior da un valor constante llamado <strong>diferencia común (d)</strong>:</p>
+          <p>Cuando el patrón de avance involucra <strong>sumar o restar una cantidad fija</strong> a cada término para obtener el siguiente, la lista se llama <strong>sucesión aritmética</strong>.</p>
+          <p>La <strong>diferencia común (d)</strong> es la resta entre cualquier término y el término inmediatamente anterior:</p>
+          <div class="eq" style="font-size: 1.3rem; margin: 10px 0;">d = a(n) − a(n − 1)</div>
           <ul>
-            <li><code>3, 5, 7, 9…</code> tiene diferencia constante <span class="eq">+2</span> (creciente).</li>
-            <li><code>21, 16, 11, 6…</code> tiene diferencia constante <span class="eq">−5</span> (decreciente: al restar un valor constante positivo, sumás un número negativo).</li>
+            <li><code>3, 5, 7, 9…</code> es aritmética con diferencia constante <span class="eq">d = +2</span> (creciente: cada término es mayor que el anterior).</li>
+            <li><code>21, 16, 11, 6…</code> es aritmética con diferencia constante <span class="eq">d = −5</span> (decreciente: al sumar un número negativo, los términos disminuyen).</li>
+            <li><code>−2, −5, −8, −11…</code> es aritmética con diferencia constante <span class="eq">d = −3</span> (decreciente).</li>
           </ul>
-          <p>En cambio, <code>1, 2, 4, 8…</code> <em>no</em> es aritmética porque sus diferencias son <span class="eq">+1, +2, +4</span>. Pero si dividís cada término por el anterior, el cociente es constante (<span class="eq">× 2</span>): es una <strong>sucesión geométrica</strong> con <strong>razón común (r = 2)</strong>.</p>
+          <p><strong>El contraejemplo clave:</strong> la sucesión <code>1, 2, 4, 8…</code> <em>no</em> es aritmética, porque sus diferencias consecutivas son <span class="eq">+1, +2, +4</span> (no son constantes). En cambio, su cociente entre términos consecutivos sí es constante (<span class="eq">× 2</span>), lo que anticipa a las <strong>sucesiones geométricas</strong> con <strong>razón común (r = 2)</strong>.</p>
         </div>
 
         <div class="seq-block seq-block--try">
           <span class="seq-block__label">Probalo</span>
-          <p>Explorá los casos en el Detective de Patrones para ver cuándo las diferencias se vuelven constantes y cuándo lo hacen los cocientes:</p>
+          <p>Bajo la cinta de postes del Detective de Patrones, analizá en simultáneo la fila de diferencias y la fila de cocientes para ver cuál de las dos se vuelve constante:</p>
           <div data-widget="detective"></div>
         </div>
 
@@ -368,7 +370,25 @@
 
         <div class="seq-block seq-block--look">
           <span class="seq-block__label">Cómo se ve</span>
+          <p>La fórmula explícita estándar de una sucesión geométrica tiene la forma:</p>
           <div id="annotated-sec-8"></div>
+
+          <h3 style="margin-top: 18px;">Puente 1: De «dividir entre b» a «multiplicar por la fracción 1/b»</h3>
+          <p>En el álgebra de sucesiones <strong>nunca usamos el signo de división directa</strong> en la razón. Dividir repetidamente entre un número equivale a multiplicar por su recíproco fraccionario:</p>
+          <ul>
+            <li>En <code>40, 20, 10, 5…</code> dividir entre 2 equivale a multiplicar por <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span>: <span class="eq">a(n) = 40 · (<span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span>)<sup>n − 1</sup></span>.</li>
+            <li>En <code>54, 18, 6, 2…</code> dividir entre 3 equivale a multiplicar por <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">3</span></span>: <span class="eq">a(n) = 54 · (<span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">3</span></span>)<sup>n − 1</sup></span>.</li>
+          </ul>
+
+          <h3 style="margin-top: 18px;">Puente 2: Equivalencia algebraica en geométricas</h3>
+          <p>En el caso de Khan Academy <code>1/2, 2, 8, 32…</code> (primer término <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span> y razón <span class="eq">r = 4</span>):</p>
+          <div class="eq" style="font-size: 1.25rem; margin: 10px 0;">
+            a(n) = <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span> · 4<sup>n − 1</sup>
+            = <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span> · <span class="fr"><span class="top">4ⁿ</span><span class="bar"></span><span class="bot">4</span></span>
+            = (<span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">2</span></span> · <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">4</span></span>) · 4ⁿ
+            = <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">8</span></span> · 4ⁿ
+          </div>
+          <p class="small muted">Ambas formas son matemáticamente idénticas: la forma estándar <span class="eq">1/2 · 4ⁿ⁻¹</span> hace visible el primer término y la razón; la simplificada <span class="eq">1/8 · 4ⁿ</span> compacta los coeficientes numéricos.</p>
         </div>
 
         <div class="seq-block seq-block--try">
@@ -391,18 +411,45 @@
       <section id="sec-9" class="seq-section" aria-labelledby="title-sec-9">
         <header class="seq-section__header">
           <span class="seq-section__tag">Capítulo 3 · Sección 9</span>
-          <h2 id="title-sec-9" class="seq-section__title">El radar de la razón r: signos y paréntesis</h2>
+          <h2 id="title-sec-9" class="seq-section__title">El radar de la razón r: signos negativos y la trampa de los paréntesis</h2>
         </header>
 
         <div class="seq-block seq-block--phrase">
           <span class="seq-block__label">En una frase</span>
-          <p class="seq-phrase-text">Una razón negativa hace que los términos alternen de signo (+, −, +, −) y exige obligatoriamente paréntesis en la base para no violar la jerarquía de operaciones.</p>
+          <p class="seq-phrase-text">Una razón negativa hace que los términos alternen de signo (+, −, +, −) y exige obligatoriamente paréntesis en la base para no violar la jerarquía de potencias.</p>
         </div>
 
         <div class="seq-block seq-block--look">
           <span class="seq-block__label">Cómo se ve</span>
-          <p><span class="eq">8 · (−5)<sup>n − 1</sup></span> da <code>8, −40, 200, −1000…</code>.</p>
-          <p>Sin paréntesis, <span class="eq">8 · −5<sup>n − 1</sup></span> deja el menos afuera de la potencia y da todos negativos: <code>−8, −40, −200, −1000…</code>.</p>
+          <p>El valor de la <strong>razón común (r)</strong> define cuatro comportamientos cualitativos totalmente diferentes:</p>
+          <ul>
+            <li><strong>r &gt; 1</strong> (ej. r = 2): Crecimiento exponencial veloz hacia +∞.</li>
+            <li><strong>0 &lt; r &lt; 1</strong> (ej. r = 1/4 = 0,25): Decaimiento hacia 0; los términos se achican sin cambiar de signo.</li>
+            <li><strong>−1 &lt; r &lt; 0</strong> (ej. r = −0,5): ¡Alternancia de signos amortiguada! Rebota entre positivo y negativo acercándose a 0.</li>
+            <li><strong>r &lt; −1</strong> (ej. r = −5): ¡Alternancia de signos divergente! Rebota entre positivo y negativo con saltos gigantescos hacia ±∞.</li>
+          </ul>
+
+          <h3 style="margin-top: 18px;">Trampa Crítica 1: Paréntesis obligatorios en bases negativas</h3>
+          <p>En el caso de Khan Academy <span class="eq">a(n) = 8 · (−5)<sup>n − 1</sup></span>:</p>
+          <div class="seq-table-wrap">
+            <table class="seq-table">
+              <thead>
+                <tr><th>Posición</th><th>Con paréntesis: 8 · (−5)ⁿ⁻¹</th><th>Sin paréntesis: 8 · −5ⁿ⁻¹ (¡Error!)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>n = 1</td><td>8 · (−5)⁰ = 8 · 1 = <strong>+8</strong></td><td>8 · −(5⁰) = 8 · (−1) = <strong class="text-err">−8</strong></td></tr>
+                <tr><td>n = 2</td><td>8 · (−5)¹ = 8 · (−5) = <strong>−40</strong></td><td>8 · −(5¹) = 8 · (−5) = <strong class="text-err">−40</strong></td></tr>
+                <tr><td>n = 3</td><td>8 · (−5)² = 8 · 25 = <strong>+200</strong></td><td>8 · −(5²) = 8 · (−25) = <strong class="text-err">−200</strong></td></tr>
+                <tr><td>n = 4</td><td>8 · (−5)³ = 8 · (−125) = <strong>−1000</strong></td><td>8 · −(5³) = 8 · (−125) = <strong class="text-err">−1000</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small muted">Sin paréntesis, la potencia tiene mayor jerarquía que el signo menos: <span class="eq">−5ⁿ⁻¹</span> significa <span class="eq">−(5ⁿ⁻¹)</span>, dejando todos los términos negativos y arruinando la alternancia.</p>
+
+          <h3 style="margin-top: 18px;">Trampa Crítica 2: Por qué con r &lt; 0 no existe curva continua real</h3>
+          <p>Si intentás graficar una función exponencial continua <span class="eq">f(x) = 8 · (−5)<sup>x − 1</sup></span> y evaluar en un punto decimal intermedio como <span class="eq">x = 1,5</span>, tendrías:</p>
+          <div class="eq" style="font-size: 1.25rem; margin: 10px 0;">(−5)<sup>1,5 − 1</sup> = (−5)<sup>0,5</sup> = (−5)<sup>1/2</sup> = √(−5) ∉ ℝ</div>
+          <p>¡La raíz cuadrada de un número negativo no existe en los números reales! Por eso, cuando <span class="eq">r &lt; 0</span>, la sucesión <strong>solo existe como puntos discretos aislados</strong>; no existe ninguna curva continua real que los conecte.</p>
         </div>
 
         <div class="seq-block seq-block--try">
@@ -412,7 +459,7 @@
 
         <div class="seq-block seq-block--caution">
           <span class="seq-block__label">Cuidado con</span>
-          <p>Si la razón es negativa, <strong>no existe ninguna curva continua en los números reales</strong> que una los puntos, porque a mitad de camino tendrías que calcular raíces pares de números negativos.</p>
+          <p>Al escribir fórmulas en el teclado, nunca omitas los paréntesis: escribí siempre <code>8 * (-5)^(n - 1)</code>. Escribir <code>8 * -5^(n - 1)</code> será marcado inmediatamente como error de jerarquía por el evaluador.</p>
         </div>
 
         <div class="seq-block seq-block--check">

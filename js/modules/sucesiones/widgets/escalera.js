@@ -229,7 +229,10 @@ export function initEscaleraWidget(container) {
       } else {
         resultView = h('div', { class: 'notice notice--err' },
           h('strong', null, 'Error conceptual de recursión: '),
-          h('span', null, res.error.message)
+          h('p', { style: 'margin: 4px 0;' }, res.error.message),
+          h('p', { class: 'small', style: 'margin: 4px 0;' },
+            'Para calcular a(3) = a(2) + a(1) necesitás conocer obligatoriamente los dos escalones previos. Sin a(2), ¡el sistema se queda sin combustible y la regla no puede dar el siguiente paso!'
+          )
         );
       }
 

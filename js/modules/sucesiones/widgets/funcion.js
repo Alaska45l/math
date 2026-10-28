@@ -174,11 +174,43 @@ export function initFuncionWidget(container) {
         x2: cursorX,
         y2: plane.sy(p.yMax),
         stroke: isIntegerN ? 'var(--yellow)' : 'var(--pink)',
-        'stroke-width': '1.5',
+        'stroke-width': '2',
         'stroke-dasharray': isIntegerN ? 'none' : '4 3',
-        opacity: '0.8',
+        opacity: '0.85',
       })
     );
+
+    if (!isIntegerN) {
+      const midY = plane.sy(p.fn(cursorN));
+      plane.layers.marks.append(
+        s('circle', {
+          cx: cursorX,
+          cy: midY,
+          r: 8,
+          fill: 'var(--pink)',
+          stroke: 'var(--ink)',
+          'stroke-width': '2',
+        }),
+        s('text', {
+          x: cursorX,
+          y: midY + 4,
+          fill: 'var(--ink)',
+          'font-family': 'var(--font-hand)',
+          'font-size': '12px',
+          'font-weight': 'bold',
+          'text-anchor': 'middle',
+        }, '✕'),
+        s('text', {
+          x: cursorX,
+          y: midY - 14,
+          fill: 'var(--pink)',
+          'font-family': 'var(--font-hand)',
+          'font-size': '13px',
+          'font-weight': 'bold',
+          'text-anchor': 'middle',
+        }, `n = ${fmt(cursorN, 1)} ∉ ℕ (Vacío)`)
+      );
+    }
 
     // Eventos de arrastre/clic en el plano
     bindSvgDrag(svgEl, plane, ({ x }) => {

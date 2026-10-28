@@ -157,13 +157,28 @@ export function createRibbon(root, props = {}) {
     postGroup.append(circle);
 
     if (isEditable) {
-      const textVal = s('text', {
-        x,
-        y: postY + 5,
-        class: 'seq-ribbon__val seq-ribbon__val--editable',
-        'text-anchor': 'middle',
-      }, termVal !== undefined && termVal !== '' ? String(termVal) : '?');
-      postGroup.append(textVal);
+      const fo = s('foreignObject', {
+        x: x - 20,
+        y: postY - 20,
+        width: 40,
+        height: 40,
+      });
+      const inputEl = h('input', {
+        type: 'number',
+        step: 'any',
+        class: [
+          'seq-ribbon__input',
+          props.validities?.[i] === 'ok' ? 'is-correct' : props.validities?.[i] === 'err' ? 'is-error' : '',
+        ],
+        value: termVal !== undefined && termVal !== '?' && termVal !== '' ? termVal : '',
+        placeholder: '¿?',
+        'aria-label': `${posLabel}: ingresar valor con el teclado`,
+      });
+      inputEl.addEventListener('input', (e) => {
+        onEditTerm?.(i, e.target.value, inputEl);
+      });
+      fo.append(inputEl);
+      postGroup.append(fo);
     } else {
       const textVal = s('text', {
         x,
@@ -229,9 +244,14 @@ export function annotatedFormula(root, config = {}) {
     seqName = 'a',
     k = 3,
     step = 2,
+    kStr = null,
+    stepStr = null,
     op: oper = '+',
     kind = 'ari',
   } = config;
+
+  const kDisplay = kStr || fmt(k);
+  const stepDisplay = stepStr || (kind === 'geo' && Math.abs(step - 1 / 3) < 1e-4 ? '1/3' : fmt(step));
 
   const noteArea = h('div', { class: 'seq-annotated__note-box', 'aria-live': 'polite' },
     h('p', { class: 'seq-annotated__hint-text muted small' }, 'Tocá o pasá el mouse sobre cada elemento de la fórmula para ver su rol:')
@@ -266,10 +286,10 @@ export function annotatedFormula(root, config = {}) {
 
   if (type === 'explicit') {
     if (kind === 'ari') {
-      const kToken = makeToken(fmt(k), `← Primer término a(1): el poste donde arranca la sucesión (${fmt(k)}).`, 'Primer término');
+      const kToken = makeToken(kDisplay, `← Primer término ${seqName}(1): el poste donde arranca la sucesión (${kDisplay}).`, 'Primer término');
       const dSign = step >= 0 ? '+' : MINUS;
-      const dVal = fmt(Math.abs(step));
-      const dToken = makeToken(`${dSign} ${dVal}`, `← Diferencia común d: cantidad fija que sumamos en cada paso (${fmt(step)}).`, 'Diferencia común');
+      const dVal = stepStr || fmt(Math.abs(step));
+      const dToken = makeToken(`${dSign} ${dVal}`, `← Diferencia común d: cantidad fija que sumamos en cada paso (${stepDisplay}).`, 'Diferencia común');
       const jumpsToken = makeToken('(n − 1)', '← Cantidad de saltos: para llegar al poste n desde el poste 1 hacés exactamente n − 1 saltos.', 'Cantidad de saltos');
 
       tokensContainer = h('div', { class: 'seq-annotated__formula' },
@@ -281,9 +301,9 @@ export function annotatedFormula(root, config = {}) {
         jumpsToken
       );
     } else {
-      const kToken = makeToken(fmt(k), `← Primer término a(1): el ancla inicial de la sucesión (${fmt(k)}).`, 'Primer término');
-      const rStr = step < 0 ? `(${fmt(step)})` : fmt(step);
-      const rToken = makeToken(rStr, `← Razón común r: factor por el que multiplicás en cada paso (${fmt(step)}).`, 'Razón común');
+      const kToken = makeToken(kDisplay, `← Primer término ${seqName}(1): el ancla inicial de la sucesión (${kDisplay}).`, 'Primer término');
+      const rStr = step < 0 ? `(${stepDisplay})` : stepDisplay;
+      const rToken = makeToken(rStr, `← Razón común r: factor por el que multiplicás en cada paso (${stepDisplay}).`, 'Razón común');
       const jumpsToken = makeToken('^(n − 1)', '← Potencia n − 1: acumulación multiplicativa de n − 1 saltos desde el inicio.', 'Exponente de saltos');
 
       tokensContainer = h('div', { class: 'seq-annotated__formula' },
@@ -296,12 +316,12 @@ export function annotatedFormula(root, config = {}) {
     }
   } else {
     // Recursiva con llave
-    const anchorToken = makeToken(`${seqName}(1) = ${fmt(k)}`, `← Ancla de inicio: el primer término es obligatoriamente ${fmt(k)}.`, 'Ancla de inicio');
+    const anchorToken = makeToken(`${seqName}(1) = ${kDisplay}`, `← Ancla de inicio: el primer término es obligatoriamente ${kDisplay}.`, 'Ancla de inicio');
     const prevToken = makeToken(`${seqName}(n − 1)`, '← Término anterior: el valor del escalón inmediatamente previo.', 'Término anterior');
-    const stepStr = kind === 'ari'
-      ? (step >= 0 ? `+ ${fmt(step)}` : `${MINUS} ${fmt(Math.abs(step))}`)
-      : `· ${step < 0 ? `(${fmt(step)})` : fmt(step)}`;
-    const stepToken = makeToken(stepStr, `← Regla de recurrencia: cómo subir de un escalón al siguiente.`, 'Regla de paso');
+    const stepSign = kind === 'ari'
+      ? (step >= 0 ? `+ ${stepDisplay}` : `${MINUS} ${stepDisplay}`)
+      : `· ${step < 0 ? `(${stepDisplay})` : stepDisplay}`;
+    const stepToken = makeToken(stepSign, `← Regla de recurrencia: cómo avanzar de un escalón al siguiente (${stepDisplay}).`, 'Regla de paso');
 
     tokensContainer = h('div', { class: 'seq-annotated__brace-box' },
       h('div', { class: 'seq-annotated__brace', 'aria-hidden': 'true' }, '{'),
