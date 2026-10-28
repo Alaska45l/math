@@ -107,38 +107,51 @@ const interactionResults = await client.eval(`(async () => {
 
   const report = {};
 
-  // 1. Verificar throttling de playSliderTick
-  let tickCount = 0;
-  const originalSliderTick = sound.playSliderTick;
-  const start = performance.now();
+  const ctx = sound.getAudioContext();
+  report.hasAudioContext = Boolean(ctx);
+
+  // Instrumentar AudioContext para contar nodos reales creados
+  let oscCount = 0;
+  let bufCount = 0;
+  const origCreateOsc = ctx.createOscillator.bind(ctx);
+  const origCreateBuf = ctx.createBufferSource.bind(ctx);
+  ctx.createOscillator = () => { oscCount++; return origCreateOsc(); };
+  ctx.createBufferSource = () => { bufCount++; return origCreateBuf(); };
+
+  // 1. Verificar throttling REAL de playSliderTick
+  // Esperar a que pase cualquier ventana de throttle previa
+  await new Promise((r) => setTimeout(r, 50));
+  const oscBeforeThrottle = oscCount;
   for (let i = 0; i < 10; i++) {
     sound.playSliderTick(1);
   }
-  report.sliderTicksImmediately = 1; // Primer tick pasa, los siguientes en <32ms throttled
+  // En un bucle sincrónico de 10 ticks, sólo el primero debe dispararse (1 osc), los otros 9 throttled
+  report.sliderTicksInSyncLoop = oscCount - oscBeforeThrottle;
+  report.sliderThrottlingWorks = (oscCount - oscBeforeThrottle === 1);
 
-  // 2. Verificar que cuando está silenciado, no genera nodos de audio
+  // 2. Verificar que cuando está silenciado, NO genera ningún nodo de audio
   sound.setSoundEnabled(false);
-  const audioCtxBefore = sound.getAudioContext();
-  let createdNodesWhileMuted = 0;
+  const oscBeforeMute = oscCount;
+  const bufBeforeMute = bufCount;
   sound.playSliderTick(1);
   sound.playVoiceBlip('a', 'feliz');
   sound.playPoseEmote('enojada');
   sound.playSuccess('normal');
   sound.playError(2);
   sound.playClick();
-  report.soundDisabledWorks = !sound.isSoundEnabled();
+  sound.playPageTurn();
+  const nodesCreatedWhileMuted = (oscCount - oscBeforeMute) + (bufCount - bufBeforeMute);
+  report.nodesCreatedWhileMuted = nodesCreatedWhileMuted;
+  report.soundDisabledWorks = (nodesCreatedWhileMuted === 0 && !sound.isSoundEnabled());
 
   // Restaurar sonido
   sound.setSoundEnabled(true);
   report.soundEnabledRestored = sound.isSoundEnabled();
 
-  // 3. AudioContext lazy con limitador
-  const ctx = sound.getAudioContext();
-  report.hasAudioContext = Boolean(ctx);
-
-  // 4. Probar playSuccess, playError, playClick, playPoseEmote sin errores
+  // 3. Probar playSuccess, playError, playClick, playPoseEmote sin errores
   let audioErrors = 0;
   try {
+    await new Promise((r) => setTimeout(r, 50));
     sound.playSliderTick(1.2);
     sound.playClick();
     sound.playPageTurn();
@@ -158,7 +171,7 @@ const interactionResults = await client.eval(`(async () => {
   }
   report.audioCallsPassed = audioErrors === 0;
 
-  // 5. Probar Visual Novel typewriter con voz
+  // 4. Probar Visual Novel typewriter con voz
   let vnError = null;
   try {
     vn.react({

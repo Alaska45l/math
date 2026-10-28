@@ -73,16 +73,30 @@ export function toggleSound() {
  */
 function setupUserGestureUnlock() {
   if (userGestureUnlocked || typeof window === 'undefined') return;
-  userGestureUnlocked = true;
 
   const unlock = () => {
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
+    if (userGestureUnlocked) return;
+    const ctx = getAudioContext();
+    if (ctx) {
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(() => {
+          userGestureUnlocked = true;
+          window.removeEventListener('pointerdown', unlock, { capture: true });
+          window.removeEventListener('keydown', unlock, { capture: true });
+          window.removeEventListener('touchstart', unlock, { capture: true });
+        }).catch(() => {});
+      } else if (ctx.state === 'running') {
+        userGestureUnlocked = true;
+        window.removeEventListener('pointerdown', unlock, { capture: true });
+        window.removeEventListener('keydown', unlock, { capture: true });
+        window.removeEventListener('touchstart', unlock, { capture: true });
+      }
     }
   };
 
   window.addEventListener('pointerdown', unlock, { capture: true, passive: true });
   window.addEventListener('keydown', unlock, { capture: true, passive: true });
+  window.addEventListener('touchstart', unlock, { capture: true, passive: true });
 }
 
 if (typeof window !== 'undefined') {
@@ -228,7 +242,8 @@ export function playSliderTick(velocity = 1) {
   osc.frequency.exponentialRampToValueAtTime(52, now + 0.022);
 
   const peakOsc = Math.min(0.18, 0.08 + v * 0.03);
-  oscGain.gain.setValueAtTime(peakOsc, now);
+  oscGain.gain.setValueAtTime(0.0001, now);
+  oscGain.gain.linearRampToValueAtTime(peakOsc, now + 0.003);
   oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
 
   osc.connect(oscGain);
@@ -251,6 +266,7 @@ const FORMANT_MAP = {
   í: 420,
   ó: 520,
   ú: 360,
+  ü: 360,
 };
 
 /**
@@ -264,7 +280,7 @@ export function playVoiceBlip(char, pose = 'base') {
   if (!char || typeof char !== 'string') return;
 
   // Ignorar espacios, saltos de línea y signos de puntuación mudos
-  if (/[\s\.,!?;:—\-–'"()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) return;
+  if (/[\s\.,!?;:—\-–'"«»`()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) return;
 
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -384,6 +400,8 @@ export function playPoseEmote(pose) {
     if (!noiseBuf) return;
     const src = ctx.createBufferSource();
     src.buffer = noiseBuf;
+    const maxOffset = Math.max(0, noiseBuf.duration - 0.28);
+    const startOffset = Math.random() * maxOffset;
 
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
@@ -400,7 +418,7 @@ export function playPoseEmote(pose) {
     bp.connect(gain);
     gain.connect(master);
 
-    src.start(now);
+    src.start(now, startOffset, 0.27);
     src.stop(now + 0.27);
   } else if (pose === 'orgullosa') {
     // Doble tono corto ascendente ("Hm-hm~" en cuarta justa suave: 260 Hz → 345 Hz)
@@ -475,35 +493,36 @@ export function playPoseEmote(pose) {
  * Onda sine + segundo armónico suave a -14dB (amplitud ~0.20), ataque 8ms y caída exponencial.
  */
 function playMarimbaVoice(ctx, master, freq, startTime, duration = 0.320, vol = 0.15) {
+  const t = Math.max(ctx.currentTime, startTime);
   const osc1 = ctx.createOscillator();
   const osc2 = ctx.createOscillator();
   osc1.type = 'sine';
   osc2.type = 'sine';
 
-  osc1.frequency.setValueAtTime(freq, startTime);
-  osc2.frequency.setValueAtTime(freq * 2, startTime); // Segundo armónico
+  osc1.frequency.setValueAtTime(freq, t);
+  osc2.frequency.setValueAtTime(freq * 2, t); // Segundo armónico
 
   const gain1 = ctx.createGain();
   const gain2 = ctx.createGain();
-  gain1.gain.setValueAtTime(1.0, startTime);
-  gain2.gain.setValueAtTime(0.20, startTime); // -14dB relativo
+  gain1.gain.setValueAtTime(1.0, t);
+  gain2.gain.setValueAtTime(0.20, t); // -14dB relativo
 
   osc1.connect(gain1);
   osc2.connect(gain2);
 
   const envGain = ctx.createGain();
-  envGain.gain.setValueAtTime(0.0001, startTime);
-  envGain.gain.linearRampToValueAtTime(vol, startTime + 0.008); // Ataque redondeado 8ms
-  envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); // Decaimiento cálido
+  envGain.gain.setValueAtTime(0.0001, t);
+  envGain.gain.linearRampToValueAtTime(vol, t + 0.008); // Ataque redondeado 8ms
+  envGain.gain.exponentialRampToValueAtTime(0.0001, t + duration); // Decaimiento cálido
 
   gain1.connect(envGain);
   gain2.connect(envGain);
   envGain.connect(master);
 
-  osc1.start(startTime);
-  osc2.start(startTime);
-  osc1.stop(startTime + duration + 0.01);
-  osc2.stop(startTime + duration + 0.01);
+  osc1.start(t);
+  osc2.start(t);
+  osc1.stop(t + duration + 0.01);
+  osc2.stop(t + duration + 0.01);
 }
 
 /**
@@ -565,7 +584,7 @@ export function playError(streak = 1) {
   }
 
   notes.forEach(({ f, t, d }) => {
-    const start = now + t;
+    const start = Math.max(ctx.currentTime, now + t);
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'triangle';
@@ -608,6 +627,9 @@ export function playClick() {
   if (noiseBuf) {
     const src = ctx.createBufferSource();
     src.buffer = noiseBuf;
+    const maxOffset = Math.max(0, noiseBuf.duration - 0.025);
+    const startOffset = Math.random() * maxOffset;
+
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
     bp.frequency.setValueAtTime(850, now);
@@ -622,7 +644,7 @@ export function playClick() {
     bp.connect(gain);
     gain.connect(master);
 
-    src.start(now);
+    src.start(now, startOffset, 0.015);
     src.stop(now + 0.015);
   }
 }
@@ -643,6 +665,9 @@ export function playPageTurn() {
   if (noiseBuf) {
     const src = ctx.createBufferSource();
     src.buffer = noiseBuf;
+    const maxOffset = Math.max(0, noiseBuf.duration - 0.085);
+    const startOffset = Math.random() * maxOffset;
+
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
     bp.frequency.setValueAtTime(650, now);
@@ -658,7 +683,7 @@ export function playPageTurn() {
     bp.connect(gain);
     gain.connect(master);
 
-    src.start(now);
+    src.start(now, startOffset, 0.075);
     src.stop(now + 0.075);
   }
 }
@@ -693,6 +718,7 @@ export function initGlobalSoundUI() {
     let state = sliderState.get(target);
     let velocity = 1;
     if (state) {
+      if (val === state.val) return; // No mover si no cambió el valor
       const dt = Math.max(1, now - state.time);
       const dNorm = Math.abs(val - state.val) / range;
       velocity = Math.min(3.0, Math.max(0.4, (dNorm / dt) * 900));
@@ -708,7 +734,7 @@ export function initGlobalSoundUI() {
     if (!target || typeof target.closest !== 'function') return;
 
     const match = target.closest(
-      '.btn, .toggle, .vn-trigger, .tab-btn, .seq-ribbon__post, [role="tab"], .chip, .seq-check__opt-btn'
+      'button:not(.site-nav__sound-btn), .btn, .toggle, .vn-trigger, .tab-btn, .seq-ribbon__post, [role="tab"], .chip, .seq-check__opt-btn, .fn-reveal, .fn-quiz-btn, .dim-tool__btn'
     );
     if (match && !match.classList.contains('site-nav__sound-btn') && !match.disabled) {
       playClick();

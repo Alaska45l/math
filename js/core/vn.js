@@ -317,7 +317,7 @@ class VisualNovelController {
         this.typingCharIndex++;
         currentItem.node.nodeValue = currentItem.fullText.slice(0, this.typingCharIndex);
 
-        if (char && !/[\s\.,!?;:—\-–'"()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) {
+        if (char && !/[\s\.,!?;:—\-–'"«»`()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) {
           this.voiceCharCount = (this.voiceCharCount || 0) + 1;
           if (this.voiceCharCount % 2 === 1) {
             playVoiceBlip(char, this.currentPose || 'base');
@@ -364,8 +364,11 @@ class VisualNovelController {
     const tag = line.tag || DEFAULT_TAGS[pose] || 'Alaska';
     const html = line.html || '';
 
-    if (this.currentPose !== pose) {
-      this.currentPose = pose;
+    const shouldEmote = this.isFirstLineOfScript || (this.currentPose !== pose);
+    this.isFirstLineOfScript = false;
+    this.currentPose = pose;
+
+    if (shouldEmote) {
       playPoseEmote(pose);
     }
 
@@ -415,6 +418,7 @@ class VisualNovelController {
     this.currentScript = lines;
     this.currentIndex = 0;
     this.onFinishCallback = onFinish || null;
+    this.isFirstLineOfScript = true;
 
     this.isOpen = true;
     this.isMinimized = false;
@@ -477,6 +481,7 @@ class VisualNovelController {
     this.isTyping = false;
     this.isOpen = false;
     this.isMinimized = false;
+    this.isFirstLineOfScript = false;
     this.currentPose = null;
 
     if (this.hudEl) {

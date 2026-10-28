@@ -52,10 +52,12 @@ export function bindSvgDrag(svg, planeOrGetter, onMove) {
       const curX = e.clientX || 0;
       const curY = e.clientY || 0;
       const dist = Math.hypot(curX - lastClientX, curY - lastClientY);
-      const vel = Math.min(2.5, Math.max(0.5, dist / 6));
-      lastClientX = curX;
-      lastClientY = curY;
-      playSliderTick(vel);
+      if (dist >= 1) {
+        const vel = Math.min(2.5, Math.max(0.5, dist / 6));
+        lastClientX = curX;
+        lastClientY = curY;
+        playSliderTick(vel);
+      }
       emit(e, 'move');
     }
   };
