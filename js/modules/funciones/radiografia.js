@@ -286,6 +286,11 @@ export function initRadiografia(container) {
       marks.append(dot(-1.8, -3, 'var(--pink)'), dot(0, 0, 'var(--pink)'), tangentArrow(-0.9, 'var(--pink)'));
       labels.append(label(plane.sx(-0.9), plane.sy(-3.6), 'Abajo del eje, pero subiendo', 'middle', 'var(--pink)'));
     }
+
+    cv.querySelectorAll('path').forEach((p) => {
+      p.setAttribute('pathLength', '1');
+      p.classList.add('curve-anim');
+    });
   }
 
   on(lensesBar, 'click', 'button[data-lens]', (_e, btn) => {

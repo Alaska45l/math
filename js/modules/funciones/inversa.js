@@ -139,6 +139,37 @@ export function initInversa(container) {
     pad: { l: 44, r: 56, t: 30, b: 30 },
   });
 
+  let lastM = null, lastB = null;
+  function updateInversaCurves(animate = false) {
+    lastM = state.m;
+    lastB = state.b;
+    plane.clear('curve');
+    const { m, b } = state;
+    const p1 = s('path', { d: plane.linePathMB(m, b), fill: 'none', stroke: 'var(--blue)', 'stroke-width': 3 });
+    if (animate) {
+      p1.setAttribute('pathLength', '1');
+      p1.classList.add('curve-anim');
+    }
+    plane.layers.curve.append(p1);
+
+    if (Math.abs(m) < 1e-4) {
+      const p2 = s('line', {
+        x1: plane.sx(b), y1: plane.sy(-5), x2: plane.sx(b), y2: plane.sy(5),
+        stroke: 'var(--pink)', 'stroke-width': 3, 'stroke-dasharray': '5 4',
+      });
+      plane.layers.curve.append(p2);
+    } else {
+      const invM = 1 / m;
+      const invB = -b / m;
+      const p2 = s('path', { d: plane.linePathMB(invM, invB), fill: 'none', stroke: 'var(--green)', 'stroke-width': 3 });
+      if (animate) {
+        p2.setAttribute('pathLength', '1');
+        p2.classList.add('curve-anim');
+      }
+      plane.layers.curve.append(p2);
+    }
+  }
+
   function setA(rawA) {
     const clamped = Math.max(-4, Math.min(4, rawA));
     const snapped = snapTo(round1(clamped), [-4, -3, -2, -1, 0, 1, 2, 3, 4], 0.12);
@@ -293,30 +324,13 @@ export function initInversa(container) {
     }
 
     // 3. Plano cartesiano
-    plane.clear('under', 'curve', 'marks', 'labels');
+    plane.clear('under', 'marks', 'labels');
 
     // Espejo y = x
     plane.layers.under.append(s('path', { d: plane.linePathMB(1, 0), class: 'fn-mirror' }));
 
-    // Recta f(x) = mx + b
-    plane.layers.curve.append(
-      s('path', { d: plane.linePathMB(m, b), fill: 'none', stroke: 'var(--blue)', 'stroke-width': 3 }),
-    );
-
-    // Recta inversa f⁻¹(x)
-    if (Math.abs(m) < 1e-4) {
-      plane.layers.curve.append(
-        s('line', {
-          x1: plane.sx(b), y1: plane.sy(-5), x2: plane.sx(b), y2: plane.sy(5),
-          stroke: 'var(--pink)', 'stroke-width': 3, 'stroke-dasharray': '5 4',
-        }),
-      );
-    } else {
-      const invM = 1 / m;
-      const invB = -b / m;
-      plane.layers.curve.append(
-        s('path', { d: plane.linePathMB(invM, invB), fill: 'none', stroke: 'var(--green)', 'stroke-width': 3 }),
-      );
+    if (lastM !== m || lastB !== b) {
+      updateInversaCurves(false);
     }
 
     // Segmento perpendicular entre (a, f(a)) y (f(a), a)
@@ -427,6 +441,7 @@ export function initInversa(container) {
   on(el.btnZeroM, 'click', () => {
     state.m = 0;
     el.rngM.value = '0';
+    updateInversaCurves(true);
     render();
   });
 
@@ -439,6 +454,7 @@ export function initInversa(container) {
     el.rngM.value = String(state.m);
     el.rngB.value = String(state.b);
     el.rngA.value = String(state.a);
+    updateInversaCurves(true);
     render();
   });
 
@@ -471,5 +487,6 @@ export function initInversa(container) {
   el.rngM.value = String(state.m);
   el.rngB.value = String(state.b);
   el.rngA.value = String(state.a);
+  updateInversaCurves(true);
   render();
 }

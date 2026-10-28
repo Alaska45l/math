@@ -37,15 +37,17 @@
 /* ---------- Circuito SVG ---------- */
 .wire-base {
   stroke: var(--border-strong);
-  stroke-width: 3;
+  stroke-width: 3.5;
   stroke-linecap: round;
+  fill: none;
 }
 
 .wire-flow {
   stroke: var(--yellow);
-  stroke-width: 3;
+  stroke-width: 3.5;
   stroke-dasharray: 6 6;
   opacity: 0;
+  fill: none;
   transition: opacity .2s;
 }
 
@@ -67,8 +69,9 @@
 
 .lever {
   stroke: var(--muted);
-  stroke-width: 3;
+  stroke-width: 3.5;
   stroke-linecap: round;
+  fill: none;
   transform-box: fill-box;
   transform-origin: left center;
   transition: transform .25s, stroke .2s;
@@ -98,17 +101,17 @@
 
 .lamp-rays {
   stroke: var(--yellow);
-  stroke-width: 2;
+  stroke-width: 2.5;
   stroke-linecap: round;
   opacity: 0;
   transition: opacity .2s;
 }
 
 .lamp-bulb {
-  fill: none;
+  fill: none !important;
   stroke: var(--border-strong);
   stroke-width: 2;
-  transition: fill .2s;
+  transition: stroke .2s;
 }
 
 .lamp-x {
@@ -122,12 +125,14 @@
 }
 
 .lamp.is-lit .lamp-bulb {
-  fill: var(--lamp-fill);
-  stroke: var(--lamp-stroke);
+  fill: none !important;
+  stroke: var(--yellow);
+  stroke-width: 3;
 }
 
 .lamp.is-lit .lamp-x {
-  stroke: var(--lamp-x);
+  stroke: var(--yellow);
+  stroke-width: 3;
 }
 
 /* ---------- Recta numérica ---------- */

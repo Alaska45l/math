@@ -399,6 +399,20 @@ export function initScanner(container) {
     el.caseVerdict.textContent = c.verdict;
   }
 
+  let drawnCase = -1;
+  function renderCurve(animate = false) {
+    drawnCase = state.caseIdx;
+    plane.clear('under', 'curve');
+    const c = CASES[state.caseIdx];
+    c.draw(plane);
+    if (animate) {
+      plane.layers.curve.querySelectorAll('path, ellipse').forEach((el) => {
+        el.setAttribute('pathLength', '1');
+        el.classList.add('curve-anim');
+      });
+    }
+  }
+
   function render() {
     const c = CASES[state.caseIdx];
     const res = c.evalAt(state.x);
@@ -412,7 +426,7 @@ export function initScanner(container) {
     setPressed(el.dom, state.showDom);
     setPressed(el.im, state.showIm);
 
-    plane.clear('shade', 'under', 'curve', 'marks', 'labels');
+    plane.clear('shade', 'marks', 'labels');
 
     if (state.showDom) {
       if (c.discrete) c.discrete.forEach((n) => plane.layers.shade.append(s('circle', { cx: plane.sx(n), cy: plane.xAxisY, r: 5, fill: 'var(--blue)' })));
@@ -423,7 +437,9 @@ export function initScanner(container) {
       else c.yShadows.forEach((sh) => plane.layers.shade.append(...shadowY(sh)));
     }
 
-    c.draw(plane);
+    if (drawnCase !== state.caseIdx) {
+      renderCurve(false);
+    }
 
     const laser = res.pts.length === 1 ? 'var(--green)' : res.pts.length > 1 ? 'var(--pink)' : 'var(--yellow)';
     const lx = plane.sx(state.x);
@@ -454,6 +470,7 @@ export function initScanner(container) {
     state.caseIdx = Number(e.target.value);
     state.revealed = false;
     state.sawCollision = false;
+    renderCurve(true);
     setX(state.x);
   });
   on(el.rng, 'input', (e) => setX(Number(e.target.value)));
@@ -462,5 +479,6 @@ export function initScanner(container) {
   on(el.isFn, 'click', '#sc-reveal', () => { state.revealed = true; render(); });
   bindSvgDrag(el.svg, plane, ({ x }) => setX(x));
 
+  renderCurve(true);
   render();
 }

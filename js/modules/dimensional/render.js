@@ -2,7 +2,7 @@
  * dimensional/render.js — Vista del laboratorio de unidades.
  * Toda razón entre unidades se muestra con fracción horizontal (.fr).
  */
-import { h, mount } from '../../core/dom.js';
+import { h, s, mount } from '../../core/dom.js';
 import { fmt, frac } from '../../core/math-format.js';
 import { FACTORS, PROBLEMS, CUBE_PROBLEM } from './logic.js';
 
@@ -12,14 +12,43 @@ const join = (nodes) => nodes.flatMap((n, i) => (i ? [dot(), n] : [n]));
 const sup = (e) => (e > 1 ? h('sup', null, String(e)) : null);
 const numNode = (n) => (n === null || n === undefined ? null : h('span', { class: 'num' }, F6(n)));
 
-/** Ficha con forma de pin (numerador) o hueco (denominador). */
-export const token = (u, side, status, extra = null) =>
-  h('span', { class: ['token', side === 'n' ? 'token--pin' : 'token--socket', `token--${status}`] }, u, extra);
+/** Ficha con silueta SVG de pin (numerador) o hueco (denominador) con knob incluido y fondo transparente. */
+export const token = (u, side, status, extra = null) => {
+  const isPin = side === 'n';
+  const isSocket = side === 'd';
+  const shape = s('svg', {
+    class: 'token__shape',
+    viewBox: '0 0 100 60',
+    preserveAspectRatio: 'none',
+    'aria-hidden': 'true',
+  },
+    s('path', {
+      d: isPin
+        ? 'M 12 16 L 36 16 C 36 6, 64 6, 64 16 L 88 16 C 96 16, 100 20, 100 28 L 100 48 C 100 56, 96 60, 88 60 L 12 60 C 4 60, 0 56, 0 48 L 0 28 C 0 20, 4 16, 12 16 Z'
+        : isSocket
+        ? 'M 12 0 L 88 0 C 96 0, 100 4, 100 12 L 100 32 C 100 40, 96 44, 88 44 L 64 44 C 64 34, 36 34, 36 44 L 12 44 C 4 44, 0 40, 0 32 L 0 12 C 0 4, 4 0, 12 0 Z'
+        : 'M 10 2 L 90 2 C 96 2, 98 4, 98 10 L 98 50 C 98 56, 96 58, 90 58 L 10 58 C 4 58, 2 56, 2 50 L 2 10 C 2 4, 4 2, 10 2 Z',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '1.5',
+      'vector-effect': 'non-scaling-stroke',
+    })
+  );
 
-/** Neutro multiplicativo formado por una pareja u/u. */
-const neutralOne = (u, fresh) =>
+  return h('span', { class: ['token', isPin ? 'token--pin' : 'token--socket', `token--${status}`] },
+    shape,
+    h('span', { class: 'token__text' }, u, extra)
+  );
+};
+
+/** Neutro multiplicativo: pareja pin/socket tachada con diagonal 1.5px y 1 manuscrito en --green. */
+const neutralOne = (u, fresh, side = 'd') =>
   h('span', { class: ['one', fresh && 'is-fresh'], title: `${u} sobre ${u} = 1` },
-    h('span', { class: 'one__brace', 'aria-hidden': 'true' }, '⌢'), '1');
+    h('span', { class: ['one__token', 'tachado--green'] },
+      token(u, side, 'neutral')
+    ),
+    h('span', { class: 'one__num', 'aria-hidden': 'true' }, '1')
+  );
 
 /** Mapa de unidades → nodo (fracción de dos pisos si hay denominador). */
 export function unitNode(m, status = null) {
@@ -33,7 +62,7 @@ export function unitNode(m, status = null) {
 }
 
 function termNode(t) {
-  const item = (x) => (x.pair !== undefined ? neutralOne(x.u, x.fresh) : token(x.u, x.side, x.status));
+  const item = (x) => (x.pair !== undefined ? neutralOne(x.u, x.fresh, x.side) : token(x.u, x.side, x.status));
   const top = [numNode(t.nv), ...join(t.n.map(item))];
   if (!t.d.length) return h('span', { class: 'fr' }, h('span', { class: 'top' }, top));
   return frac(top, [numNode(t.dv), ...join(t.d.map(item))]);
@@ -127,7 +156,7 @@ export function renderPowerNote(root, state, c) {
   root.hidden = state.p !== CUBE_PROBLEM;
   if (root.hidden) return;
   const applied = Math.min(c.cubeApplied, 3);
-  const slots = [0, 1, 2].map((i) => (i < applied ? h('span', { class: 'one' }, '1') : token('cm', 'd', 'pending')));
+  const slots = [0, 1, 2].map((i) => (i < applied ? neutralOne('cm', false, 'd') : token('cm', 'd', 'pending')));
   mount(root,
     h('strong', null, 'Autopsia de cm³'),
     h('p', null, 'El denominador es ', h('strong', null, 'cm · cm · cm'), ', no una sola ficha. Neutralizaste ',

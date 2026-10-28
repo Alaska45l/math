@@ -10,17 +10,38 @@ const condText = (c) => `x ${c.op} ${fmt(c.v)}`;
 
 /* ---------------- Circuito ---------------- */
 
-function wire(refs, id, x1, y1, x2, y2) {
-  const flow = s('line', { x1, y1, x2, y2, class: 'wire-flow' });
-  refs.wires[id] = flow;
-  return [s('line', { x1, y1, x2, y2, class: 'wire-base' }), flow];
+function wirePath(x1, y1, x2, y2) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  if (Math.abs(y1 - y2) < 1) {
+    const dy = (Math.round(x1 + x2) % 2 === 0 ? 1 : -1) * 1.5;
+    return `M ${x1} ${y1} Q ${mx} ${y1 + dy}, ${x2} ${y2}`;
+  } else if (Math.abs(x1 - x2) < 1) {
+    const dx = (Math.round(y1 + y2) % 2 === 0 ? 1 : -1) * 1.5;
+    return `M ${x1} ${y1} Q ${x1 + dx} ${my}, ${x2} ${y2}`;
+  }
+  return `M ${x1} ${y1} L ${x2} ${y2}`;
 }
 
-function switchNode(refs, id, x1, x2, y) {
+function wire(refs, id, x1, y1, x2, y2) {
+  const d = wirePath(x1, y1, x2, y2);
+  const flow = s('path', { d, class: 'wire-flow' });
+  refs.wires[id] = flow;
+  return [s('path', { d, class: 'wire-base' }), flow];
+}
+
+function switchNode(refs, id, x1, x2, y, isOrMode = false, isTop = false) {
   const m = (x1 + x2) / 2;
-  const blade = s('line', { x1, y1: y, x2, y2: y, class: 'lever' });
-  const label = s('text', { class: 'svg-th', x: m, y: y - 72, 'text-anchor': 'middle' });
-  const state = s('text', { class: 'svg-ts', x: m, y: y + 32, 'text-anchor': 'middle' });
+  const len = x2 - x1;
+  const blade = s('path', {
+    d: `M ${x1} ${y} Q ${x1 + len * 0.5} ${y - 1.5}, ${x2} ${y}`,
+    class: 'lever',
+  });
+  // Etiqueta de condición <= 24px sobre la llave
+  const label = s('text', { class: 'svg-th', x: m, y: y - 18, 'text-anchor': 'middle' });
+  // "V · conduce": fuera del loop en modo OR (arriba para A con holgura anticolisión, abajo para B)
+  const stateY = isOrMode ? (isTop ? y - 64 : y + 32) : y + 28;
+  const state = s('text', { class: 'svg-ts', x: m, y: stateY, 'text-anchor': 'middle' });
   refs.sw[id] = { blade, label, state };
   return [
     blade,
@@ -39,11 +60,13 @@ const junction = (x, y) => s('circle', { cx: x, cy: y, r: 4, class: 'junction' }
 
 function lamp(refs, cx, y) {
   const rays = s('g', { class: 'lamp-rays' });
+  const rayLengths = [11, 7, 13, 6, 12, 8, 14, 7];
   for (let i = 0; i < 8; i++) {
     const a = (i * Math.PI) / 4 + Math.PI / 8, c = Math.cos(a), sn = Math.sin(a);
+    const r1 = 26, r2 = r1 + rayLengths[i];
     rays.append(s('line', {
-      x1: (cx + 27 * c).toFixed(1), y1: (y + 27 * sn).toFixed(1),
-      x2: (cx + 35 * c).toFixed(1), y2: (y + 35 * sn).toFixed(1),
+      x1: (cx + r1 * c).toFixed(1), y1: (y + r1 * sn).toFixed(1),
+      x2: (cx + r2 * c).toFixed(1), y2: (y + r2 * sn).toFixed(1),
     }));
   }
   const bulb = s('circle', { cx, cy: y, r: 20, class: 'lamp-bulb' });
@@ -97,7 +120,7 @@ export function buildCircuit(svg, mode) {
       wire(refs, 'vTR', 440, t, 440, m), wire(refs, 'vBR', 440, b, 440, m),
       wire(refs, 'p1', 440, m, 505, m), wire(refs, 'p2', 545, m, 635, m),
       junction(140, m), junction(440, m),
-      switchNode(refs, 'A', 200, 380, t), switchNode(refs, 'B', 200, 380, b),
+      switchNode(refs, 'A', 200, 380, t, true, true), switchNode(refs, 'B', 200, 380, b, true, false),
       lamp(refs, 525, m), terminal(50, m, 'entrada'), terminal(640, m, 'salida'));
   }
   return refs;

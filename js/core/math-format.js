@@ -2,7 +2,7 @@
  * math-format.js — Formateo numérico (Intl es-AR), protección de signos,
  * intervalos/conjuntos y el componente de fracción horizontal `.fr`.
  */
-import { h } from './dom.js';
+import { h, s } from './dom.js';
 
 export const MINUS = '\u2212'; // signo menos tipográfico (−)
 export const INF = Infinity;
@@ -90,11 +90,26 @@ export function formatSet(set, digits = 2) {
  * <span class="bot">…</span></span>. top/bot aceptan string, Node o arrays.
  */
 export function frac(top, bot, { className = '', label } = {}) {
+  const barSvg = s('svg', {
+    class: 'fr__bar-svg',
+    viewBox: '0 0 100 4',
+    preserveAspectRatio: 'none',
+    'aria-hidden': 'true',
+  },
+    s('path', {
+      d: 'M 0 2 Q 50 3.5, 100 2',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'vector-effect': 'non-scaling-stroke',
+    })
+  );
+
   return h(
     'span',
     { class: ['fr', className], role: label ? 'math' : null, 'aria-label': label || null },
     h('span', { class: 'top' }, top),
-    h('span', { class: 'bar', 'aria-hidden': 'true' }),
+    h('span', { class: 'bar', 'aria-hidden': 'true' }, barSvg),
     h('span', { class: 'bot' }, bot),
   );
 }

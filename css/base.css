@@ -357,6 +357,22 @@ svg text:not([fill]) {
   fill: var(--ink);
 }
 
+/* Curvas matemáticas animadas: trazado progresivo (600ms ease-out) */
+@keyframes curve-draw-write {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.curve-anim {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: curve-draw-write 600ms ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -364,5 +380,10 @@ svg text:not([fill]) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .curve-anim {
+    animation: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
   }
 }

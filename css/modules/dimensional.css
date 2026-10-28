@@ -15,62 +15,59 @@
 
 /* Pin (numerador): saliente arriba */
 .token--pin {
-  border-radius: 7px 7px 5px 5px;
-}
-
-.token--pin::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -6px;
-  width: 12px;
-  height: 8px;
-  transform: translateX(-50%);
-  border: inherit;
-  border-bottom: 0;
-  border-radius: 5px 5px 0 0;
-  background: var(--bg);
+  padding-top: 9px;
+  padding-bottom: 3px;
 }
 
 /* Hueco (denominador): muesca abajo */
 .token--socket {
-  border-radius: 5px 5px 7px 7px;
-}
-
-.token--socket::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -1px;
-  width: 13px;
-  height: 6px;
-  transform: translateX(-50%);
-  border: 1px solid var(--bg);
-  border-top: 0;
-  border-radius: 0 0 6px 6px;
-  background: var(--bg);
+  padding-top: 3px;
+  padding-bottom: 9px;
 }
 
 .token sup {
   font-size: 0.6875rem;
 }
 
-/* Neutro multiplicativo */
+/* Neutro multiplicativo: pareja tachada con diagonal 1.5px y 1 manuscrito en --green */
 .one {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  color: var(--green);
-  font-weight: 700;
   background: transparent;
-  border: 1px solid var(--green);
-  border-radius: var(--radius);
-  padding: 1px 7px;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  vertical-align: middle;
 }
 
-.one__brace {
-  font-size: 1.375rem;
+.one__token {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.one__num {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--green);
   line-height: 1;
+  margin-left: 2px;
+}
+
+.tachado--green {
+  position: relative;
+  display: inline-flex;
+}
+
+.tachado--green::after {
+  content: "";
+  position: absolute;
+  inset: -3px -2px;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cline x1='4' y1='96' x2='96' y2='4' stroke='%23aed1a2' stroke-width='1.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  z-index: 2;
 }
 
 @keyframes dim-collapse {
@@ -151,11 +148,6 @@
 
 .dim-tool__btn {
   padding: 8px 10px;
-}
-
-.dim-tool__btn .token--socket::after {
-  border-color: var(--bg);
-  background: var(--bg);
 }
 
 .dim-actions {

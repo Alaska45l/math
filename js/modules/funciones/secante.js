@@ -89,7 +89,7 @@ export function initSecante(container) {
       width: 600, height: 380, xMin: c.xMin, xMax: c.xMax, yMin: c.yMin, yMax: c.yMax,
       yStep: c.yStep, xLabel: c.xLabel, yLabel: c.yLabel,
     });
-    plane.layers.curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve' }));
+    plane.layers.curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve curve-anim', pathLength: '1' }));
   }
 
   function setPoint(which, x) {
