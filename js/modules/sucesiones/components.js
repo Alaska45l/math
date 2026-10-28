@@ -64,6 +64,9 @@ export function createRibbon(root, props = {}) {
   const svg = s('svg', {
     class: 'seq-ribbon-svg',
     viewBox: `0 0 ${W} ${H}`,
+    width: W,
+    height: H,
+    style: `min-width: ${W}px; width: ${W}px; height: ${H}px;`,
     role: 'img',
     'aria-label': `Cinta de ${N} términos y saltos de la sucesión`,
   });
@@ -151,17 +154,17 @@ export function createRibbon(root, props = {}) {
     const circle = s('circle', {
       cx: x,
       cy: postY,
-      r: 22,
+      r: 24,
       class: 'seq-ribbon__circle',
     });
     postGroup.append(circle);
 
     if (isEditable) {
       const fo = s('foreignObject', {
-        x: x - 20,
-        y: postY - 20,
-        width: 40,
-        height: 40,
+        x: x - 24,
+        y: postY - 24,
+        width: 48,
+        height: 48,
       });
       const inputEl = h('input', {
         type: 'number',

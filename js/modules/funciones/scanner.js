@@ -299,7 +299,7 @@ export function initScanner(container) {
   const plane = createPlane(el.svg, {
     width: 600, height: 380, xMin: X_MIN, xMax: X_MAX, yMin: Y_MIN, yMax: Y_MAX,
     xStep: 1, yStep: 1,
-    xFmt: (t) => (Math.abs(t) > 4 ? '' : fmt(t)),
+    xFmt: (t) => (Math.abs(t) > 5 ? '' : fmt(t)),
     yFmt: (t) => (Math.abs(t) > 4 ? '' : fmt(t)),
   });
 

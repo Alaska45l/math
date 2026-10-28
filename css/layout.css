@@ -124,16 +124,17 @@
     gap: 0;
     padding: 0 10px;
     box-sizing: border-box;
-    height: 75px;
-    min-height: 75px;
+    height: 88px;
+    min-height: 88px;
+    max-height: 100px;
   }
 
   .site-nav__brand {
     margin-right: 0;
-    max-width: none;
+    max-width: 100%;
     font-size: 0.9375rem;
-    height: 36px;
-    min-height: 36px;
+    height: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -142,6 +143,7 @@
     overflow-y: hidden;
     text-overflow: clip;
     white-space: nowrap;
+    box-sizing: border-box;
   }
 
   .site-nav__brand::-webkit-scrollbar {
@@ -149,6 +151,8 @@
   }
 
   .site-nav__list {
+    width: 100%;
+    max-width: 100%;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -156,7 +160,9 @@
     min-width: 0;
     gap: 8px;
     padding: 0 4px;
-    height: 39px;
+    height: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
     mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
   }
@@ -164,7 +170,7 @@
   .site-nav__link {
     font-size: 0.875rem;
     white-space: nowrap;
-    min-height: 38px;
+    min-height: 44px;
     min-width: 44px;
     display: inline-flex;
     align-items: center;

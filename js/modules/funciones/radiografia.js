@@ -79,7 +79,7 @@ const LENSES = [
   },
   {
     id: 'monotonia',
-    label: 'Lente 2: Crecimiento (↑) y decrecimiento (↓)',
+    label: 'Lente 2: Crecimiento\u00A0(↑) y decrecimiento\u00A0(↓)',
     title: '¿Sube o baja mientras avanzás hacia la derecha?',
     body: [
       h('p', null, 'Ahora no importa a qué altura está la curva, sino ', h('strong', null, 'hacia dónde va'), '. Imaginá que la recorrés de izquierda a derecha: las flechas te muestran la dirección en cada tramo.'),

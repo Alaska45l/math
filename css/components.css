@@ -4,17 +4,17 @@
 
 /* ---------- Controles de formulario (Estética de Tiza) ---------- */
 
-/* SVG Border-Image de tiza dibujada a mano */
+/* SVG Border-Image de tiza dibujada a mano (24x24, slice 6 == border-image-width 6px sin reescalado) */
 :root {
-  --chalk-border-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-3: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-1-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-2-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-3-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-1-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203%207%20Q%2018%206.2%2033.5%206.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.2%203%20Q%2029.8%2018%2029.1%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2029.2%20Q%2018%2029.8%203%2028.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.8%2033.5%20Q%206.2%2018%207.1%203%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-2-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%202.5%206.6%20Q%2018%207.3%2033.5%207.1%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2028.8%202.5%20Q%2028.2%2018%2028.9%2033.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2033.5%2028.7%20Q%2018%2028.2%202.5%2029.3%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%207.2%2033.5%20Q%207.8%2018%206.7%202.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
-  --chalk-border-3-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2036%2036%27%20width%3D%2736%27%20height%3D%2736%27%3E%3Cpath%20d%3D%27M%203.2%207.2%20Q%2018%206.5%2034%206.6%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2029.4%203.2%20Q%2028.7%2018%2029.5%2034%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%2034%2029.5%20Q%2018%2028.9%203.2%2028.6%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M%206.5%2034%20Q%207.3%2018%206.9%203.2%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E") 10 round;
+  --chalk-border-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.2%20Q%2012%201.8%2022.5%203.0%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2022.2%2012%2020.8%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2022.5%2020.8%20Q%2012%2022.2%201.5%2021.0%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%201.8%2012%203.2%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%202.7%20Q%207%203.5%2013%202.6%20T%2022.5%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2021.3%201.5%20Q%2020.5%207%2021.4%2013%20T%2020.7%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.3%20Q%2017%2020.5%2011%2021.4%20T%201.5%2020.7%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%202.7%2022.5%20Q%203.5%2017%202.6%2011%20T%203.3%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-3: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.0%20Q%2012%203.8%2022.5%202.8%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2020.2%2012%2021.2%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.0%20Q%2012%2020.2%201.5%2021.2%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%203.8%2012%202.8%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23ece8dc%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.92%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-1-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.2%20Q%2012%201.8%2022.5%203.0%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2022.2%2012%2020.8%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2020.8%20Q%2012%2022.2%201.5%2021.0%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%201.8%2012%203.2%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-2-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%202.7%20Q%207%203.5%2013%202.6%20T%2022.5%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.3%201.5%20Q%2020.5%207%2021.4%2013%20T%2020.7%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.3%20Q%2017%2020.5%2011%2021.4%20T%201.5%2020.7%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%202.7%2022.5%20Q%203.5%2017%202.6%2011%20T%203.3%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-3-hover: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.0%20Q%2012%203.8%2022.5%202.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2020.2%2012%2021.2%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.0%20Q%2012%2020.2%201.5%2021.2%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%203.8%2012%202.8%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 6px stretch;
+  --chalk-border-1-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.2%20Q%2012%201.8%2022.5%203.0%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2022.2%2012%2020.8%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2020.8%20Q%2012%2022.2%201.5%2021.0%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%201.8%2012%203.2%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 7px stretch;
+  --chalk-border-2-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%202.7%20Q%207%203.5%2013%202.6%20T%2022.5%203.3%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.3%201.5%20Q%2020.5%207%2021.4%2013%20T%2020.7%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.3%20Q%2017%2020.5%2011%2021.4%20T%201.5%2020.7%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%202.7%2022.5%20Q%203.5%2017%202.6%2011%20T%203.3%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 7px stretch;
+  --chalk-border-3-pressed: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20width%3D%2724%27%20height%3D%2724%27%3E%3Cpath%20d%3D%27M%201.5%203.0%20Q%2012%203.8%2022.5%202.8%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2021.0%201.5%20Q%2020.2%2012%2021.2%2022.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%2022.5%2021.0%20Q%2012%2020.2%201.5%2021.2%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3Cpath%20d%3D%27M%203.0%2022.5%20Q%203.8%2012%202.8%201.5%27%20fill%3D%27none%27%20stroke%3D%27%23e6d38a%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-opacity%3D%270.95%27/%3E%3C/svg%3E") 6 / 7px stretch;
   --chalk-border-rest: var(--chalk-border-1);
   --chalk-border-hover: var(--chalk-border-1-hover);
   --chalk-border-active: var(--chalk-border-1-pressed);
@@ -31,15 +31,16 @@ input[type="text"] {
   font-weight: 400;
   color: var(--ink);
   background-color: transparent;
-  border: 2px solid transparent;
+  border: 6px solid transparent;
   border-image: var(--chalk-border-1);
   min-height: 44px;
-  padding: 8px 14px;
+  padding: 4px 10px;
   max-width: 100%;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-wrap: balance;
   cursor: pointer;
   transition: color 0.15s, transform 0.1s;
 }
@@ -76,17 +77,17 @@ select {
   font-weight: 400;
   color: var(--ink);
   background-color: transparent;
-  border: 2px solid transparent;
+  border: 6px solid transparent;
   border-image: var(--chalk-border-1);
   min-height: 44px;
-  padding: 8px 34px 8px 12px;
+  padding: 4px 30px 4px 8px;
   max-width: 100%;
   box-sizing: border-box;
   cursor: pointer;
   text-overflow: ellipsis;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12'%3E%3Cpath d='M2.5 4.5 L6 8 L9.5 4.5' fill='none' stroke='%23ece8dc' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
+  background-position: right 10px center;
   background-size: 12px 12px;
   transition: color 0.15s;
 }
@@ -140,6 +141,14 @@ button[aria-pressed="true"],
   color: var(--yellow);
 }
 
+button[aria-pressed="true"],
+.button[aria-pressed="true"],
+.btn[aria-pressed="true"] {
+  border-width: 7px;
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
 button[aria-pressed="true"]:nth-of-type(3n+1),
 .btn[aria-pressed="true"]:nth-of-type(3n+1) {
   border-image: var(--chalk-border-1-pressed);
@@ -184,7 +193,8 @@ button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn),
   transform: rotate(-0.4deg) scale(0.98);
 }
 
-select:active {
+select:active,
+select.is-active {
   border-image: var(--chalk-border-1-pressed);
   color: var(--yellow);
 }
@@ -242,7 +252,7 @@ input[type="checkbox"] {
   min-height: 28px;
   margin: 0;
   background-color: transparent;
-  border: 2px solid transparent;
+  border: 6px solid transparent;
   border-image: var(--chalk-border-1);
   border-radius: var(--radius);
   cursor: pointer;

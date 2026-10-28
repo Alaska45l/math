@@ -141,8 +141,8 @@ export function createPlane(svg, cfg) {
     if (scale <= 0) return;
     const isDesktop = typeof window !== 'undefined' ? window.matchMedia('(min-width: 821px)').matches : false;
     const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
-    const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
-    const targetKalam = isDesktop ? (1.0 * rootPx) : 12;
+    const targetCaveat = isDesktop ? (1.1 * rootPx) : (0.875 * rootPx);
+    const targetKalam = isDesktop ? (1.0 * rootPx) : (0.75 * rootPx);
     const caveatSize = Math.max(14, Math.round((targetCaveat / scale) * 10) / 10);
     const kalamSize = Math.max(12, Math.round((targetKalam / scale) * 10) / 10);
     svg.style.setProperty('--svg-scale-caveat', `${caveatSize}px`);
