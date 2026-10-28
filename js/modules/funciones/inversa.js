@@ -136,8 +136,6 @@ export function initInversa(container) {
     xStep: 1,
     yStep: 1,
     pad: { l: 44, r: 56, t: 30, b: 30 },
-    xTickPos: (t, { sx, xAxisY }) => (t === -1 ? { x: sx(-1) - 8, y: xAxisY + 26, anchor: 'end' } : null),
-    yTickPos: (t, { yAxisX, sy }) => (t === -1 ? { x: yAxisX - 8, y: sy(-1) - 6, anchor: 'end' } : null),
   });
 
   function setA(rawA) {

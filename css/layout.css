@@ -13,13 +13,15 @@
 }
 
 .site-nav__inner {
-  max-width: 960px;
+  max-width: 67.5rem;
+  width: calc(100% - 2rem);
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 8px 1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 16px;
+  box-sizing: border-box;
 }
 
 /* ---------- Brand del nav: Leyes fundamentales y símbolos ---------- */
@@ -114,47 +116,55 @@
   }
 
   .site-nav__inner {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
     padding: 0 10px;
     box-sizing: border-box;
-    height: 48px;
+    height: 75px;
+    min-height: 75px;
   }
 
   .site-nav__brand {
     margin-right: 0;
-    max-width: 140px;
-    font-size: 0.875rem;
-    min-height: 44px;
-    display: inline-flex;
+    max-width: none;
+    font-size: 0.9375rem;
+    height: 36px;
+    min-height: 36px;
+    display: flex;
     align-items: center;
+    justify-content: flex-start;
     flex: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
   }
 
-  .site-nav__link {
-    font-size: 0.875rem;
+  .site-nav__brand::-webkit-scrollbar {
+    display: none;
   }
 
   .site-nav__list {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    flex: 1;
+    flex: none;
     min-width: 0;
     gap: 8px;
     padding: 0 4px;
-    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent 100%);
+    height: 39px;
+    mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
   }
 
   .site-nav__link {
+    font-size: 0.875rem;
     white-space: nowrap;
-    min-height: 44px;
+    min-height: 38px;
     min-width: 44px;
     display: inline-flex;
     align-items: center;

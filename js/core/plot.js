@@ -139,7 +139,7 @@ export function createPlane(svg, cfg) {
     if (!clientW || !W) return;
     const scale = clientW / W;
     if (scale <= 0) return;
-    const isDesktop = typeof window !== 'undefined' ? (window.innerWidth >= 820) : false;
+    const isDesktop = typeof window !== 'undefined' ? window.matchMedia('(min-width: 821px)').matches : false;
     const rootPx = typeof window !== 'undefined' ? (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) : 16;
     const targetCaveat = isDesktop ? (1.1 * rootPx) : 14;
     const targetKalam = isDesktop ? (1.0 * rootPx) : 12;

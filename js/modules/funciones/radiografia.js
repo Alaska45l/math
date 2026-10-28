@@ -192,7 +192,10 @@ export function initRadiografia(container) {
       transform: `rotate(${rot} ${plane.sx(x)} ${plane.sy(y)})`
     });
   };
-  const label = (x, y, text, anchor = 'middle', color = null) => s('text', { x, y, class: 'plot-label', 'text-anchor': anchor, fill: color }, text);
+  const label = (x, y, text, anchor = 'middle', color = null, id = null) => s('text', {
+    x, y, id, class: `plot-label${color === 'var(--yellow)' ? ' plot-label--yellow' : ''}`,
+    'text-anchor': anchor, fill: color,
+  }, text);
 
   /** Flecha tangente en x, apuntando en el sentido de x creciente. */
   function tangentArrow(x, customColor = null) {
@@ -228,7 +231,7 @@ export function initRadiografia(container) {
         marks.append(dot(r, 0, 'var(--yellow)'));
       });
       const lx = plane.sx(-1.6), ly = plane.sy(0.7);
-      labels.append(label(lx, ly, 'C₀', 'middle', 'var(--yellow)'));
+      labels.append(label(lx, ly, 'C₀', 'middle', 'var(--yellow)', 'rad-c0'));
     } else if (state.lens === 'monotonia') {
       const pos = { stroke: 'var(--blue)', 'stroke-width': 4 };
       const neg = { stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-dasharray': '5 4' };

@@ -153,8 +153,7 @@
   padding: 8px 10px;
 }
 
-.dim-tool__btn .token--socket::after,
-.dim-tool__btn:hover .token--socket::after {
+.dim-tool__btn .token--socket::after {
   border-color: var(--bg);
   background: var(--bg);
 }
