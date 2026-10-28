@@ -6,6 +6,7 @@
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
+import { calcSafeAxis } from '../scale.js';
 
 const PRESETS = [
   { label: 'Caso Khan: 64, 16, 4, 1, 1/4… (r = 1/4)', k: 64, r: 0.25, title: 'Convergencia rápida a 0' },
@@ -114,20 +115,22 @@ export function initLimiteWidget(container) {
       limitNotice
     );
 
-    // Render del plano
+    // Render del plano con escala adaptativa segura
     const allVals = data.map((d) => d.val);
     const minVal = Math.min(...allVals, 0);
     const maxValPl = Math.max(...allVals, 0);
-    const ySpan = Math.max(1, maxValPl - minVal);
+    const axis = calcSafeAxis({ minVal, maxVal: maxValPl, targetTicks: 6, forceZero: true });
 
     const plane = createPlane(svgEl, {
       width: 540,
       height: 300,
       xMin: 0,
       xMax: maxN + 1,
-      yMin: Math.floor(minVal - ySpan * 0.1),
-      yMax: Math.ceil(maxValPl + ySpan * 0.1),
+      yMin: axis.yMin,
+      yMax: axis.yMax,
       xStep: Math.ceil(maxN / 8),
+      yStep: axis.yStep,
+      yFmt: axis.yFmt,
       xLabel: 'n → ∞',
       yLabel: 'a(n)',
     });

@@ -6,6 +6,7 @@
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt, MINUS } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
+import { calcSafeAxis } from '../scale.js';
 
 const PRESETS = [
   { id: 'decay_pos', label: '64 · (1/4)ⁿ⁻¹ (Amortiguada a 0)', k: 64, r: 0.25, title: '0 < r < 1: Decaimiento positivo' },
@@ -52,11 +53,14 @@ export function initRazonWidget(container) {
         'Primer término k: ',
         h('input', {
           type: 'number',
+          min: -500,
+          max: 500,
           class: 'seq-check__input-sm',
           value: kVal,
           on: {
             change: (e) => {
-              kVal = parseFloat(e.target.value) || 1;
+              const parsed = parseFloat(e.target.value);
+              kVal = Number.isFinite(parsed) ? Math.max(-500, Math.min(500, parsed)) : 1;
               render();
             },
           },
@@ -224,22 +228,22 @@ export function initRazonWidget(container) {
       liveParenComparator
     );
 
-    // Configuración y dibujo del plano
+    // Configuración y dibujo del plano con escala adaptativa segura
     const allVals = terms.map((t) => t.withParen);
     const minVal = Math.min(...allVals, 0);
     const maxVal = Math.max(...allVals, 0);
-    const ySpan = Math.max(10, maxVal - minVal);
-    const yMin = Math.floor(minVal - ySpan * 0.15);
-    const yMax = Math.ceil(maxVal + ySpan * 0.15);
+    const axis = calcSafeAxis({ minVal, maxVal, targetTicks: 6, forceZero: true });
 
     const plane = createPlane(svgEl, {
       width: 540,
       height: 320,
       xMin: 0,
       xMax: 5,
-      yMin,
-      yMax,
+      yMin: axis.yMin,
+      yMax: axis.yMax,
       xStep: 1,
+      yStep: axis.yStep,
+      yFmt: axis.yFmt,
       xLabel: 'n (índice entero ∈ ℕ)',
       yLabel: 'a(n)',
     });

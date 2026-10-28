@@ -129,45 +129,115 @@
   font-weight: bold;
 }
 
-/* ---------- Contenido Principal y Secciones ---------- */
+/* ---------- Modo Pizarrón y Pizarra Escolar ---------- */
 .seq-content {
   min-width: 0;
   max-width: 100%;
 }
 
+.seq-content.mode-blackboard .seq-section:not(.is-active) {
+  display: none !important;
+}
+
+.seq-content.mode-blackboard .seq-section.is-active {
+  display: block;
+  animation: chalkFadeIn 0.22s ease-out;
+}
+
+@keyframes chalkFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.seq-blackboard-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  background-color: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.seq-blackboard-toolbar__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+  color: var(--yellow);
+}
+
+.seq-blackboard-toolbar__badge {
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  background-color: color-mix(in srgb, var(--yellow) 15%, transparent);
+  color: var(--yellow);
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+}
+
+.seq-blackboard-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .seq-section {
-  margin-bottom: 48px;
-  padding-bottom: 32px;
-  border-bottom: 1px dashed var(--border-strong);
+  background-color: var(--bg);
+  border: 3px solid transparent;
+  border-image: var(--chalk-border-1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  padding: 32px 36px;
+  margin-bottom: 40px;
+  position: relative;
+  box-sizing: border-box;
   scroll-margin-top: 24px;
 }
 
-.seq-section:last-of-type {
-  border-bottom: none;
+@media (max-width: 768px) {
+  .seq-section {
+    padding: 20px 14px;
+    margin-bottom: 24px;
+  }
 }
 
 .seq-section__header {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-strong);
 }
 
 .seq-section__tag {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  font-family: var(--font-hand);
 }
 
 .seq-section__title {
   font-family: var(--font-hand);
-  font-size: clamp(1.75rem, 4vw, 2.35rem);
-  line-height: 1.2;
-  margin: 4px 0 12px;
+  font-size: clamp(1.85rem, 4vw, 2.45rem);
+  line-height: 1.25;
+  margin: 6px 0 8px;
   color: var(--ink);
 }
 
-/* Plantilla Invariante de 5 Bloques */
+/* Plantilla Invariante de 5 Bloques (con aire y espaciado amplio) */
 .seq-block {
-  margin: 18px 0;
+  margin: 28px 0;
 }
 
 .seq-block__label {
@@ -175,31 +245,73 @@
   align-items: center;
   gap: 6px;
   font-family: var(--font-hand);
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--yellow);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .seq-block--phrase .seq-phrase-text {
-  font-size: 1.15rem;
-  line-height: 1.5;
+  font-size: 1.25rem;
+  line-height: 1.6;
   color: var(--ink);
   font-style: italic;
   border-left: 3px solid var(--yellow);
-  padding-left: 12px;
+  padding-left: 16px;
   margin: 0;
 }
 
 .seq-block--caution {
   background-color: color-mix(in srgb, var(--pink) 8%, transparent);
   border: 1px solid var(--pink);
-  padding: 14px;
-  margin: 20px 0;
+  padding: 16px 18px;
+  margin: 24px 0;
 }
 
 .seq-block--caution .seq-block__label {
   color: var(--pink);
+}
+
+/* Bandeja de Tizas Escolar Inferior */
+.seq-chalk-tray {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border-strong);
+  position: relative;
+}
+
+.seq-chalk-tray::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 24px;
+  width: 28px;
+  height: 4px;
+  background: var(--ink);
+  border-radius: 2px;
+  box-shadow: 36px 0 0 -1px var(--yellow), 64px 0 0 -1px var(--muted);
+  opacity: 0.8;
+}
+
+.seq-chalk-tray__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+}
+
+.seq-chalk-tray__info {
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  color: var(--muted);
+  text-align: center;
+  flex: 1;
 }
 
 /* ---------- Cinta SVG (createRibbon) ---------- */
@@ -541,7 +653,8 @@
   border-left: 2px solid var(--yellow);
 }
 
-.seq-check__solution-box {
+.seq-check__solution-box,
+.seq-steps-box {
   margin-top: 12px;
   padding: 12px;
   background-color: color-mix(in srgb, var(--blue) 8%, transparent);
@@ -550,6 +663,16 @@
 
 .seq-check__all-done {
   margin-top: 12px;
+}
+
+/* Ocultamiento estricto de cajas auxiliares sin contenido (evita rectángulos azules vacíos) */
+.seq-check__solution-box:empty,
+.seq-check__hints-box:empty,
+.seq-check__feedback:empty,
+.seq-check__tools:empty,
+.seq-annotated__note-box:empty,
+.seq-widget-feedback:empty {
+  display: none !important;
 }
 
 /* ---------- Widgets Específicos ---------- */
@@ -715,6 +838,8 @@
 
   .site-nav,
   .seq-sidebar,
+  .seq-blackboard-toolbar,
+  .seq-chalk-tray,
   .seq-controls,
   .btn,
   .btn-print,
@@ -742,9 +867,13 @@
     padding: 0 !important;
   }
 
+  .seq-content.mode-blackboard .seq-section,
   .seq-section {
+    display: block !important;
     page-break-inside: avoid;
+    border: none !important;
     border-bottom: 1px solid #cccccc !important;
+    box-shadow: none !important;
     padding: 16px 0 !important;
   }
 

@@ -68,6 +68,9 @@ function initScrollSpy() {
   const sections = links.map((l) => document.getElementById(l.dataset.sec)).filter(Boolean);
 
   const observer = new IntersectionObserver((entries) => {
+    // Si el modo pizarrón está activo, la selección es explícita y no por scroll
+    if (document.querySelector('.seq-content.mode-blackboard')) return;
+
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const id = entry.target.id;
@@ -650,6 +653,191 @@ Object.entries(CHECKS_DATA).forEach(([secId, questions]) => {
   }
 });
 
-// Inicializar sidebar y scroll spy
+/* ---------- Arquitectura de Pizarrón Escolar (Modo Pizarrón) ---------- */
+
+export const LESSON_SECTIONS = [
+  { id: 'sec-1', chapter: 'Capítulo 1', title: '¿Qué es una sucesión?', short: '1. ¿Qué es una sucesión?' },
+  { id: 'sec-2', chapter: 'Capítulo 1', title: 'Aritmética y diferencia común', short: '2. Aritmética y dif. común' },
+  { id: 'sec-3', chapter: 'Capítulo 1', title: 'Función y Dominio ℕ', short: '3. Dominio discreto ℕ' },
+  { id: 'sec-4', chapter: 'Capítulo 2', title: 'La escalera recursiva', short: '4. Escalera recursiva' },
+  { id: 'sec-5a', chapter: 'Capítulo 2', title: 'El teletransportador explícito', short: '5A. Teletransportador' },
+  { id: 'sec-5b', chapter: 'Capítulo 2', title: 'Despejes y puentes', short: '5B. Despejes y puentes' },
+  { id: 'sec-6', chapter: 'Capítulo 2', title: 'Fórmulas equivalentes', short: '6. Fórmulas equivalentes' },
+  { id: 'sec-7', chapter: 'Capítulo 2', title: 'La Piedra de Rosetta', short: '7. Piedra de Rosetta' },
+  { id: 'sec-8', chapter: 'Capítulo 3', title: 'El espejo multiplicativo', short: '8. Espejo multiplicativo' },
+  { id: 'sec-9', chapter: 'Capítulo 3', title: 'Radar de la razón r', short: '9. Radar de la razón r' },
+  { id: 'sec-10', chapter: 'Capítulo 3', title: 'Modelado: Ahorro vs Interés', short: '10. Ahorro vs Interés' },
+  { id: 'sec-11', chapter: 'Capítulo 3', title: 'Hacia el infinito (Límite)', short: '11. Límite al infinito' },
+  { id: 'sec-retos', chapter: 'Capítulo 4', title: 'Entrenador de semillas y Trampas', short: 'Entrenador y Trampas' },
+  { id: 'sec-repaso', chapter: 'Capítulo 4', title: 'Hoja de Repaso Imprimible', short: 'Hoja de Repaso' },
+];
+
+export function initBlackboardController() {
+  const contentEl = document.querySelector('.seq-content');
+  if (!contentEl) return;
+
+  let isBlackboardMode = true;
+  let currentSectionId = 'sec-1';
+
+  // Toolbar superior de pizarrón
+  const badgeEl = h('span', { class: 'seq-blackboard-toolbar__badge', id: 'seq-board-badge' }, 'Pizarrón 1 de 14');
+  const titleEl = h('strong', { id: 'seq-board-title' }, '¿Qué es una sucesión?');
+  const modeBtn = h('button', {
+    type: 'button',
+    class: 'chip',
+    id: 'seq-mode-toggle',
+    title: 'Alternar entre ver un pizarrón enfocado a la vez o toda la lección continua',
+  }, 'Pizarrón por lección (activo)');
+
+  modeBtn.addEventListener('click', () => {
+    isBlackboardMode = !isBlackboardMode;
+    contentEl.classList.toggle('mode-blackboard', isBlackboardMode);
+    modeBtn.textContent = isBlackboardMode
+      ? 'Pizarrón por lección (activo)'
+      : 'Pizarra continua (ver todo)';
+    modeBtn.classList.toggle('chip--ghost', !isBlackboardMode);
+
+    if (isBlackboardMode) {
+      setActiveBoard(currentSectionId, { scroll: true, updateHash: true });
+    } else {
+      const activeEl = document.getElementById(currentSectionId);
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  });
+
+  const toolbarEl = h('div', { class: 'seq-blackboard-toolbar', id: 'seq-board-toolbar' },
+    h('div', { class: 'seq-blackboard-toolbar__info' }, badgeEl, titleEl),
+    h('div', { class: 'seq-blackboard-toolbar__actions' }, modeBtn)
+  );
+
+  contentEl.prepend(toolbarEl);
+  contentEl.classList.add('mode-blackboard');
+
+  function setActiveBoard(secId, { scroll = true, updateHash = true } = {}) {
+    const secInfo = LESSON_SECTIONS.find((s) => s.id === secId);
+    if (!secInfo) return;
+    currentSectionId = secId;
+
+    // Conmutación de visibilidad en secciones
+    LESSON_SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) el.classList.toggle('is-active', s.id === secId);
+    });
+
+    // Sincronización de enlaces de la barra lateral
+    qsa('.seq-sidebar__link[data-sec]').forEach((link) => {
+      link.classList.toggle('is-active', link.dataset.sec === secId);
+    });
+
+    // Actualización de títulos en barra superior
+    const idx = LESSON_SECTIONS.findIndex((s) => s.id === secId);
+    badgeEl.textContent = `Pizarrón ${idx + 1} de ${LESSON_SECTIONS.length}`;
+    titleEl.textContent = `${secInfo.chapter} · ${secInfo.title}`;
+
+    if (updateHash && window.location.hash !== `#${secId}`) {
+      history.replaceState(null, '', `#${secId}`);
+    }
+
+    if (scroll) {
+      const targetEl = document.getElementById(secId);
+      if (targetEl) {
+        const yOffset = -24;
+        const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
+    }
+  }
+
+  // Bandeja de tizas inferior en cada sección
+  LESSON_SECTIONS.forEach((secInfo, idx) => {
+    const secEl = document.getElementById(secInfo.id);
+    if (!secEl) return;
+
+    const prevInfo = idx > 0 ? LESSON_SECTIONS[idx - 1] : null;
+    const nextInfo = idx < LESSON_SECTIONS.length - 1 ? LESSON_SECTIONS[idx + 1] : null;
+
+    const btnPrev = prevInfo
+      ? h('button', {
+          type: 'button',
+          class: 'chip seq-chalk-tray__btn',
+          on: { click: () => setActiveBoard(prevInfo.id) },
+        }, `← ${prevInfo.short}`)
+      : h('span', { class: 'muted small' }, 'Primer pizarrón');
+
+    const infoText = h('span', { class: 'seq-chalk-tray__info' },
+      `Pizarrón ${idx + 1} de ${LESSON_SECTIONS.length} · ${secInfo.chapter}`
+    );
+
+    const btnNext = nextInfo
+      ? h('button', {
+          type: 'button',
+          class: 'btn seq-chalk-tray__btn',
+          on: { click: () => setActiveBoard(nextInfo.id) },
+        }, `${nextInfo.short} →`)
+      : h('button', {
+          type: 'button',
+          class: 'btn seq-chalk-tray__btn',
+          on: { click: () => setActiveBoard(LESSON_SECTIONS[0].id) },
+        }, 'Volver al Inicio ↑');
+
+    const trayEl = h('div', { class: 'seq-chalk-tray' },
+      btnPrev,
+      infoText,
+      btnNext
+    );
+
+    secEl.append(trayEl);
+  });
+
+  // Interceptar clics en los enlaces de la barra lateral
+  qsa('.seq-sidebar__link[data-sec]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const secId = link.dataset.sec;
+      if (secId && isBlackboardMode) {
+        e.preventDefault();
+        setActiveBoard(secId, { scroll: true, updateHash: true });
+      }
+    });
+  });
+
+  // Escuchar cambios de hash (Back/Forward del navegador)
+  window.addEventListener('hashchange', () => {
+    const hashId = window.location.hash.slice(1);
+    if (hashId && LESSON_SECTIONS.some((s) => s.id === hashId)) {
+      setActiveBoard(hashId, { scroll: true, updateHash: false });
+    }
+  });
+
+  // Navegación accesible por teclado (Flechas izquierda / derecha)
+  window.addEventListener('keydown', (e) => {
+    if (!isBlackboardMode) return;
+    const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+      const idx = LESSON_SECTIONS.findIndex((s) => s.id === currentSectionId);
+      if (idx < LESSON_SECTIONS.length - 1) {
+        e.preventDefault();
+        setActiveBoard(LESSON_SECTIONS[idx + 1].id, { scroll: true, updateHash: true });
+      }
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      const idx = LESSON_SECTIONS.findIndex((s) => s.id === currentSectionId);
+      if (idx > 0) {
+        e.preventDefault();
+        setActiveBoard(LESSON_SECTIONS[idx - 1].id, { scroll: true, updateHash: true });
+      }
+    }
+  });
+
+  // Activación inicial respetando hash o arrancando en sec-1
+  const initialHash = window.location.hash.slice(1);
+  const startSec = LESSON_SECTIONS.some((s) => s.id === initialHash) ? initialHash : 'sec-1';
+  setActiveBoard(startSec, { scroll: false, updateHash: false });
+}
+
+// Inicializar sidebar, controlador de pizarrón y scroll spy
 updateSidebarProgress();
 initScrollSpy();
+initBlackboardController();

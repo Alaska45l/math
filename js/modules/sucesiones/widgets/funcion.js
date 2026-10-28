@@ -105,7 +105,7 @@ export function initFuncionWidget(container) {
       layoutGrid
     );
 
-    // Configuración del plano
+    const yStep = (p.yMax - p.yMin) > 20 ? 5 : (p.yMax - p.yMin) > 10 ? 2 : 1;
     const plane = createPlane(svgEl, {
       width: 540,
       height: 320,
@@ -114,6 +114,7 @@ export function initFuncionWidget(container) {
       yMin: p.yMin,
       yMax: p.yMax,
       xStep: 1,
+      yStep,
       xLabel: 'n (índice entero ∈ ℕ)',
       yLabel: 'a(n)',
     });

@@ -1,1 +1,16 @@
-/screenshots
+# Capturas y evidencias visuales de testing
+/screenshots/
+/evidence/
+
+# Scripts de prueba exploratorios, temporales y scratch
+/scratch/
+
+# Reportes y artefactos de navegadores y suites de pruebas (Playwright/Node)
+/test-results/
+/playwright-report/
+/.nyc_output/
+/coverage/
+
+# Dependencias locales y temporales
+/node_modules/
+*.log

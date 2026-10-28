@@ -92,7 +92,7 @@ export function initAlRevesWidget(container) {
       );
 
       // Despeje algebraico paso a paso
-      const stepsView = h('div', { class: 'seq-check__solution-box' },
+      const stepsView = h('div', { class: 'seq-steps-box' },
         h('strong', null, 'Despeje algebraico por propiedad uniforme:'),
         h('ol', { style: 'margin: 8px 0; padding-left: 20px;' },
           result.steps.map((st) =>
