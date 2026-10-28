@@ -179,7 +179,7 @@ export function initEscaleraWidget(container) {
                   if (!enableSecondAnchor) {
                     react({
                       pose: 'colapso',
-                      tag: '💧 ¿Y el combustible?',
+                      tag: '¿Y el combustible?',
                       html: '¿¡Desactivaste la segunda ancla!? La regla de Fibonacci suma los <strong>dos</strong> escalones previos: <span class="eq">a(n − 1) + a(n − 2)</span>. Sin <span class="eq">a(2)</span>, la máquina queda ciega y no sabe cómo arrancar.',
                     });
                   }

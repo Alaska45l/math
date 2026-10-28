@@ -96,7 +96,7 @@ export function initRazonWidget(container) {
               if (tryContinuous && rVal < 0) {
                 react({
                   pose: 'colapso',
-                  tag: '💧 Raíz prohibida en ℝ',
+                  tag: 'Raíz prohibida en ℝ',
                   html: `¡Alerta de cortocircuito! Con razón negativa (<span class="eq">r = ${fmt(rVal)}</span>), en <span class="eq">n = 1,5</span> necesitarías calcular <span class="eq">(${fmt(rVal)})<sup>0,5</sup> = √(${fmt(rVal)}) ∉ ℝ</span>. ¡No existe ninguna curva continua real que conecte los puntos alternantes!`,
                 });
               }

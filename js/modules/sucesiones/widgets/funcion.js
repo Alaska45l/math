@@ -224,7 +224,7 @@ export function initFuncionWidget(container) {
       if (isDecimal && cursorN !== prevN) {
         react({
           pose: 'enojada',
-          tag: '💢 Dominio discreto',
+          tag: 'Dominio discreto',
           html: `¡En ℕ no existen términos con coma! Caíste en el vacío de <span class="eq">n = ${fmt(cursorN, 1)} ∉ ℕ</span>. Las sucesiones son funciones de dominio estrictamente entero.`,
         });
       }

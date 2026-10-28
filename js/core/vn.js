@@ -13,12 +13,27 @@ export const VN_POSES = {
   feliz: 'assets/vn/feliz.webp',
 };
 
+export const ALASKA_TITLES = [
+  'Loca de la ciencia',
+  'Mulita científica',
+  'Fanática del rigor',
+  'Nerd de guardia',
+  'Domadora de sucesiones',
+  'Terror de los límites',
+  'Cazadora de desfasajes',
+  'Calculadora humana',
+  'Adicta a las demostraciones',
+  'Detective discreta',
+  'Veterana del CBC',
+  'Pizarrón andante',
+];
+
 const DEFAULT_TAGS = {
-  base: '👓 Modo Teoría',
-  orgullosa: '😏 Te lo advertí',
-  colapso: '💧 Colapso mental',
-  enojada: '💢 ¡Frená la mano!',
-  feliz: '😊 ¡Bien ahí!',
+  base: 'Modo Teoría',
+  orgullosa: 'Te lo advertí',
+  colapso: 'Colapso mental',
+  enojada: '¡Frená la mano!',
+  feliz: '¡Bien ahí!',
 };
 
 // Precarga inmediata de los 5 sprites
@@ -39,11 +54,13 @@ class VisualNovelController {
     this.fabEl = null;
     this.spriteEl = null;
     this.spriteWrapEl = null;
+    this.roleEl = null;
     this.tagEl = null;
     this.textEl = null;
     this.counterEl = null;
     this.btnNext = null;
 
+    this.titleIndex = 0;
     this.currentScript = [];
     this.currentIndex = 0;
     this.onFinishCallback = null;
@@ -71,17 +88,30 @@ class VisualNovelController {
   initDOM() {
     if (this.hudEl || typeof document === 'undefined') return;
 
-    // Botón flotante minimizado [ 👓 Alaska ]
+    // Botón flotante minimizado [ Alaska ]
     this.fabEl = h('button', {
       type: 'button',
       class: 'vn-fab',
       'aria-label': 'Abrir diálogo de Alaska',
-      title: 'Consultar a Alaska (Tutora de Exactas)',
+      title: 'Consultar a Alaska (Loca de la ciencia)',
       on: {
         click: () => this.restore(),
       },
     },
-      h('span', { class: 'vn-fab__icon' }, '👓'),
+      h('svg', {
+        class: 'vn-fab__icon',
+        viewBox: '0 0 24 24',
+        width: '16',
+        height: '16',
+        fill: 'none',
+        stroke: 'currentColor',
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        'aria-hidden': 'true',
+      },
+        h('path', { d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' })
+      ),
       h('span', { class: 'vn-fab__label' }, 'Alaska')
     );
 
@@ -89,16 +119,17 @@ class VisualNovelController {
     this.spriteEl = h('img', {
       class: 'vn-sprite',
       src: VN_POSES.base,
-      alt: 'Alaska, tutora científica de Exactas',
+      alt: 'Alaska, loca de la ciencia',
     });
 
     this.spriteWrapEl = h('div', { class: 'vn-sprite-wrap' }, this.spriteEl);
 
-    // Placa de nombre y estado emocional
+    // Placa de nombre y rol cambiante
     this.tagEl = h('span', { class: 'vn-tag' }, DEFAULT_TAGS.base);
+    this.roleEl = h('span', { class: 'vn-role' }, ALASKA_TITLES[0]);
     const nameplateEl = h('div', { class: 'vn-nameplate' },
       h('strong', { class: 'vn-name' }, 'Alaska'),
-      h('span', { class: 'vn-role' }, 'Tutora de Exactas'),
+      this.roleEl,
       this.tagEl
     );
 
@@ -320,8 +351,15 @@ class VisualNovelController {
     if (!line) return;
 
     const pose = line.pose || 'base';
-    const tag = line.tag || DEFAULT_TAGS[pose] || '👓 Alaska';
+    const tag = line.tag || DEFAULT_TAGS[pose] || 'Alaska';
     const html = line.html || '';
+
+    // Actualizar título dinámico que va rotando ("Loca de la ciencia", "Mulita científica", etc.)
+    const titleText = line.role || line.title || ALASKA_TITLES[this.titleIndex % ALASKA_TITLES.length];
+    this.titleIndex++;
+    if (this.roleEl) {
+      this.roleEl.textContent = titleText;
+    }
 
     // Actualizar sprite y animaciones
     if (this.spriteEl) {

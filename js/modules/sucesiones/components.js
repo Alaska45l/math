@@ -378,14 +378,14 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         if (diagId === 'not_standard_but_equivalent') {
           react({
             pose: 'orgullosa',
-            tag: '😏 Te lo advertí',
+            tag: 'Te lo advertí',
             html: '¡Ojo que está bien! Escribiste la forma simplificada equivalente. Genera exactamente los mismos términos, aunque acordate que ahí <span class="eq">k</span> no se ve a simple vista.',
           });
         } else {
           const correctPhrases = [
-            { pose: 'orgullosa', tag: '😏 ¡Impecable!', html: '¡Clavadísimo a la primera! Ni tuviste que contar con los dedos.' },
-            { pose: 'orgullosa', tag: '😏 ¡Impecable!', html: 'Je, impecable. Así se lee una estructura sin caer en recetas de memoria.' },
-            { pose: 'feliz', tag: '😊 ¡Bien ahí!', html: '¡Exacto! Mirá qué limpio sale cuando respetás los <span class="eq">(n − 1)</span> saltos.' },
+            { pose: 'orgullosa', tag: '¡Impecable!', html: '¡Clavadísimo a la primera! Ni tuviste que contar con los dedos.' },
+            { pose: 'orgullosa', tag: '¡Impecable!', html: 'Je, impecable. Así se lee una estructura sin caer en recetas de memoria.' },
+            { pose: 'feliz', tag: '¡Bien ahí!', html: '¡Exacto! Mirá qué limpio sale cuando respetás los <span class="eq">(n − 1)</span> saltos.' },
           ];
           const pick = correctPhrases[Math.floor(Math.random() * correctPhrases.length)];
           react(pick);
@@ -393,7 +393,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       } else {
         react({
           pose: 'feliz',
-          tag: '😊 ¡Bien ahí!',
+          tag: '¡Bien ahí!',
           html: '¡Ahora sí! B-bueno, costó un par de chispazos pero corregiste el desfasaje. ¡Sigamos!',
         });
       }
@@ -404,63 +404,63 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           if (diagId === 'neg_pow_precedence') {
             react({
               pose: 'colapso',
-              tag: '💧 Jerarquía rota',
+              tag: 'Jerarquía rota',
               html: '¡Cuidado con la jerarquía! Escribiste la base negativa sin paréntesis y la potencia no está agarrando al signo menos.',
             });
           } else if (diagId === 'exponent_n') {
             react({
               pose: 'base',
-              tag: '👓 Exponente adelantado',
+              tag: 'Exponente adelantado',
               html: 'Te mandaste la gran Woo-Jin: pusiste exponente <span class="eq">n</span> en vez de <span class="eq">(n − 1)</span>. En <span class="eq">n = 1</span> ya estás multiplicando una vez de más.',
             });
           } else if (diagId === 'off_by_one') {
             react({
               pose: 'base',
-              tag: '👓 Desfasaje de poste',
+              tag: 'Desfasaje de poste',
               html: 'Estás desfasado un poste: en el primer término (<span class="eq">n = 1</span>) todavía hiciste 0 saltos, así que el paso multiplica a <span class="eq">(n − 1)</span>, no a <span class="eq">n</span>.',
             });
           } else if (diagId === 'wrong_anchor_a2') {
             react({
               pose: 'colapso',
-              tag: '💧 Ancla corrida',
+              tag: 'Ancla corrida',
               html: '¡Hiciste la gran Kiran! Armaste bien los <span class="eq">(n − 1)</span> saltos, pero pusiste el segundo término como punto de partida en vez de <span class="eq">a(1)</span>.',
             });
           } else if (diagId === 'sign_of_step') {
             react({
               pose: 'base',
-              tag: '👓 Ojo al signo',
+              tag: 'Ojo al signo',
               html: 'Miraste bien el tamaño del salto, pero le pifiaste al signo: fijate si la sucesión está subiendo o bajando.',
             });
           } else if (diagId === 'swapped_k_step') {
             react({
               pose: 'colapso',
-              tag: '💧 Cables cruzados',
+              tag: 'Cables cruzados',
               html: '¡Me diste vuelta los cables! Pusiste la diferencia común donde iba el primer término <span class="eq">k</span> y viceversa.',
             });
           } else {
             react({
               pose: 'base',
-              tag: '👓 Revisá el planteo',
+              tag: 'Revisá el planteo',
               html: 'Revisá la fórmula: compará lo que genera para <span class="eq">n = 1</span> y <span class="eq">n = 2</span> con los términos de la lista.',
             });
           }
         } else {
           react({
             pose: 'base',
-            tag: '👓 Primer intento',
+            tag: 'Primer intento',
             html: 'Mmm, no coincide. Mirá bien los datos del problema o revisá las cuentas antes de volver a intentar.',
           });
         }
       } else if (qState.failCount === 2) {
         react({
           pose: 'enojada',
-          tag: '💢 ¡Frená la mano!',
+          tag: '¡Frená la mano!',
           html: '¿¡Me estás tirando números al azar para ver si embocás!? ¡No estamos en una verdulería! Mirá la cinta de saltos o tocá el botón de Pista antes de seguir adivinando.',
         });
       } else {
         react({
           pose: 'enojada',
-          tag: '💢 ¡Colapso nervioso!',
+          tag: '¡Colapso nervioso!',
           html: '¡Me vas a hacer dar un colapso nervioso! Evaluá con <span class="eq">n = 1</span> en lo que escribiste y fijate que ni siquiera te da el primer término de la lista.',
         });
       }
@@ -810,7 +810,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             render();
             react({
               pose: 'base',
-              tag: '👓 Pista desbloqueada',
+              tag: 'Pista desbloqueada',
               html: `Acá tenés una pista: <em>${hintText}</em>`,
             });
           }
@@ -830,7 +830,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           if (qState.showSolution) {
             react({
               pose: 'colapso',
-              tag: '💧 Suspiro...',
+              tag: 'Suspiro...',
               html: 'Suspiro... está bien, no sufras más. Guardá la goma de borrar y mirá cómo se desarma paso por paso:',
             });
           }
