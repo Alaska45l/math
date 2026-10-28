@@ -224,12 +224,6 @@ a {
   color: var(--blue);
 }
 
-svg:not(.chalk-icon) {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 svg text:not([fill]) {
   fill: var(--ink);
 }
