@@ -28,7 +28,7 @@ import { initLimiteWidget } from './widgets/limite.js';
 // Capítulo 4: Entrenador y Trampas
 import { initRetosModule } from './retos.js';
 
-// Sistema Visual Novel (Modo Tutora Alaska)
+// Sistema Visual Novel (Modo Alaska)
 import { playScript } from '../../core/vn.js';
 import { VN_SCRIPTS } from './vn-scripts.js';
 

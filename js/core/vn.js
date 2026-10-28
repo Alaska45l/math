@@ -1,5 +1,5 @@
 /**
- * vn.js — Motor Visual Novel interactivo ("Modo Tutora Alaska")
+ * vn.js — Motor Visual Novel interactivo ("Modo Alaska")
  * Reutilizable, sin dependencias externas, accesible y con estética de pizarra de tiza.
  */
 
@@ -26,6 +26,9 @@ export const ALASKA_TITLES = [
   'Detective discreta',
   'Veterana del CBC',
   'Pizarrón andante',
+  'Doctora en café y teoremas',
+  'Francotiradora de trampas',
+  'Pesadilla de la intuición floja',
 ];
 
 const DEFAULT_TAGS = {
@@ -364,6 +367,11 @@ class VisualNovelController {
     // Actualizar sprite y animaciones
     if (this.spriteEl) {
       this.spriteEl.src = VN_POSES[pose] || VN_POSES.base;
+      this.spriteEl.alt = `Alaska (${titleText})`;
+    }
+
+    if (this.fabEl) {
+      this.fabEl.title = `Consultar a Alaska (${titleText})`;
     }
 
     if (this.spriteWrapEl) {
