@@ -8,6 +8,7 @@
 import { h, s, mount, on, chalkIcon } from '../../core/dom.js';
 import { fmt, fractionHtml, MINUS } from '../../core/math-format.js';
 import { react } from '../../core/vn.js';
+import { playSuccess, playError } from '../../core/sound.js';
 import { parse, equivalent, toDisplay, isStandardForm } from './expr.js';
 import { diagnose, approxEq } from './logic.js';
 
@@ -374,6 +375,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
   function triggerVnReaction(q, qState, isOk, diagId = null) {
     if (isOk) {
+      playSuccess('normal');
       if ((qState.failCount || 0) === 0) {
         if (diagId === 'not_standard_but_equivalent') {
           react({
@@ -399,6 +401,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       }
     } else {
       qState.failCount = (qState.failCount || 0) + 1;
+      playError(qState.failCount);
       if (qState.failCount === 1) {
         if (q.type === 'expr') {
           if (diagId === 'neg_pow_precedence') {
@@ -470,6 +473,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
   function checkCompletion() {
     const allOk = state.answers.every((a) => a.ok);
     if (allOk) {
+      if (!state.allCompletedReported) {
+        state.allCompletedReported = true;
+        setTimeout(() => playSuccess('section'), 320);
+      }
       saveSectionProgress(sectionId);
       onComplete?.(sectionId);
     }

@@ -1301,3 +1301,50 @@ svg text[fill="var(--yellow)"] {
   }
 }
 
+/* ---------- Botón de sonido compacto en la barra de navegación ---------- */
+button.site-nav__sound-btn,
+.site-nav__sound-btn {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  border: 4px solid transparent;
+  border-image: var(--chalk-border-1);
+  padding: 3px 8px;
+  min-height: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: color 0.15s, opacity 0.15s;
+}
+
+button.site-nav__sound-btn:hover,
+.site-nav__sound-btn:hover {
+  color: var(--ink);
+  border-image: var(--chalk-border-1-hover);
+}
+
+button.site-nav__sound-btn[aria-pressed="true"],
+.site-nav__sound-btn[aria-pressed="true"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+button.site-nav__sound-btn[aria-pressed="false"],
+.site-nav__sound-btn[aria-pressed="false"] {
+  color: var(--muted);
+  opacity: 0.72;
+}
+
+button.site-nav__sound-btn:focus-visible,
+.site-nav__sound-btn:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+

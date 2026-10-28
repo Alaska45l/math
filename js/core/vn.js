@@ -4,6 +4,7 @@
  */
 
 import { h, mount } from './dom.js';
+import { playVoiceBlip, playPoseEmote } from './sound.js';
 
 export const VN_POSES = {
   base: 'assets/vn/base.webp',
@@ -298,6 +299,7 @@ class VisualNovelController {
 
     this.typingNodeIndex = 0;
     this.typingCharIndex = 0;
+    this.voiceCharCount = 0;
     this.updateControlsState();
 
     const tick = () => {
@@ -311,8 +313,17 @@ class VisualNovelController {
       const currentItem = this.currentTextNodes[this.typingNodeIndex];
       if (this.typingCharIndex < currentItem.fullText.length) {
         // Revelar 1 carácter
+        const char = currentItem.fullText[this.typingCharIndex];
         this.typingCharIndex++;
         currentItem.node.nodeValue = currentItem.fullText.slice(0, this.typingCharIndex);
+
+        if (char && !/[\s\.,!?;:—\-–'"()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) {
+          this.voiceCharCount = (this.voiceCharCount || 0) + 1;
+          if (this.voiceCharCount % 2 === 1) {
+            playVoiceBlip(char, this.currentPose || 'base');
+          }
+        }
+
         this.typewriterTimer = setTimeout(tick, 18);
       } else {
         // Pasar al siguiente nodo de texto
@@ -352,6 +363,11 @@ class VisualNovelController {
     const pose = line.pose || 'base';
     const tag = line.tag || DEFAULT_TAGS[pose] || 'Alaska';
     const html = line.html || '';
+
+    if (this.currentPose !== pose) {
+      this.currentPose = pose;
+      playPoseEmote(pose);
+    }
 
     // Actualizar sprite y animaciones
     if (this.spriteEl) {
@@ -461,6 +477,7 @@ class VisualNovelController {
     this.isTyping = false;
     this.isOpen = false;
     this.isMinimized = false;
+    this.currentPose = null;
 
     if (this.hudEl) {
       this.hudEl.classList.remove('is-visible', 'is-minimized');

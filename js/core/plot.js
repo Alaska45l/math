@@ -4,6 +4,7 @@
  */
 import { s, mount, svgPoint } from './dom.js';
 import { fmt } from './math-format.js';
+import { playSliderTick } from './sound.js';
 
 let uid = 0;
 
@@ -22,6 +23,8 @@ let uid = 0;
 export function bindSvgDrag(svg, planeOrGetter, onMove) {
   const getPlane = typeof planeOrGetter === 'function' ? planeOrGetter : () => planeOrGetter;
   let dragging = false;
+  let lastClientX = 0;
+  let lastClientY = 0;
 
   const emit = (event, phase) => {
     const plane = getPlane();
@@ -36,12 +39,26 @@ export function bindSvgDrag(svg, planeOrGetter, onMove) {
   const down = (e) => {
     if (e.button !== undefined && e.button !== 0) return;
     dragging = true;
+    lastClientX = e.clientX || 0;
+    lastClientY = e.clientY || 0;
     try { svg.setPointerCapture?.(e.pointerId); } catch (_) {}
     svg.classList.add('is-dragging');
     e.preventDefault();
+    playSliderTick(1);
     emit(e, 'start');
   };
-  const move = (e) => { if (dragging) emit(e, 'move'); };
+  const move = (e) => {
+    if (dragging) {
+      const curX = e.clientX || 0;
+      const curY = e.clientY || 0;
+      const dist = Math.hypot(curX - lastClientX, curY - lastClientY);
+      const vel = Math.min(2.5, Math.max(0.5, dist / 6));
+      lastClientX = curX;
+      lastClientY = curY;
+      playSliderTick(vel);
+      emit(e, 'move');
+    }
+  };
   const up = (e) => {
     if (!dragging) return;
     dragging = false;

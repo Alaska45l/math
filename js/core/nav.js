@@ -2,6 +2,7 @@
  * nav.js — Barra de navegación global y gestor de pestañas accesible.
  */
 import { h, s, mount, qsa, on } from './dom.js';
+import { isSoundEnabled, toggleSound, playClick, initGlobalSoundUI } from './sound.js';
 
 export const PAGES = [
   { id: 'inicio', href: 'index.html', label: 'Inicio' },
@@ -238,10 +239,31 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   });
   brandLink.innerHTML = law.html;
 
+  const soundEnabled = isSoundEnabled();
+  const soundBtn = h('button', {
+    type: 'button',
+    class: 'site-nav__sound-btn',
+    'aria-pressed': soundEnabled ? 'true' : 'false',
+    title: soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos',
+  }, soundEnabled ? '🔊 Sonido' : '🔇 Silencio');
+
+  soundBtn.addEventListener('click', () => {
+    const next = toggleSound();
+    soundBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
+    soundBtn.textContent = next ? '🔊 Sonido' : '🔇 Silencio';
+    soundBtn.title = next ? 'Silenciar sonidos' : 'Activar sonidos';
+    if (next) playClick();
+  });
+
+  const navHeader = h('div', { class: 'site-nav__header' },
+    brandLink,
+    soundBtn,
+  );
+
   mount(
     root,
     h('nav', { class: 'site-nav__inner', 'aria-label': 'Laboratorios' },
-      brandLink,
+      navHeader,
       h('ul', { class: 'site-nav__list' },
         PAGES.map((p) => h('li', null,
           h('a', {
@@ -260,6 +282,7 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   }
 
   renderChalkSill();
+  initGlobalSoundUI();
 }
 
 /** Renderiza la repisa inferior de pizarra con un trozo de tiza SVG (solo visible >= 820px). */

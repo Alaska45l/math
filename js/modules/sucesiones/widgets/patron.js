@@ -5,6 +5,7 @@
 
 import { h, mount } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
+import { playSuccess, playError } from '../../../core/sound.js';
 import { createRibbon } from '../components.js';
 
 const PRESETS = [
@@ -18,6 +19,10 @@ export function initPatronWidget(container) {
   let presetIdx = 0;
   let userInputs = ['', ''];
   let feedback = null;
+  let stateReportedOk = false;
+  let prevOk1 = false;
+  let prevOk2 = false;
+  let failCount = 0;
 
   function render() {
     const p = PRESETS[presetIdx];
@@ -37,6 +42,10 @@ export function initPatronWidget(container) {
 
     if (ok1 && ok2) {
       feedback = { ok: true, text: `¡Exacto! Siguiendo el ${p.label} completaste ${fmt(p.next[0])} y ${fmt(p.next[1])}.` };
+      if (!stateReportedOk) {
+        stateReportedOk = true;
+        playSuccess('normal');
+      }
     } else if (ok1 && !ok2 && userInputs[1] !== '') {
       feedback = { ok: false, text: `El 4.º término (${fmt(p.next[0])}) es correcto. Ahora completá el 5.º término.` };
     } else if (err1) {
@@ -53,6 +62,10 @@ export function initPatronWidget(container) {
           presetIdx = idx;
           userInputs = ['', ''];
           feedback = null;
+          stateReportedOk = false;
+          prevOk1 = false;
+          prevOk2 = false;
+          failCount = 0;
           render();
         });
         return btn;
@@ -71,6 +84,14 @@ export function initPatronWidget(container) {
         const inputSlotIdx = termIdx - p.terms.length;
         if (inputSlotIdx >= 0 && inputSlotIdx < 2) {
           userInputs[inputSlotIdx] = val;
+          const num = parseFloat(val);
+          const ok = !Number.isNaN(num) && Math.abs(num - p.next[inputSlotIdx]) < 1e-4;
+          if (ok) {
+            playSuccess('normal');
+          } else if (val !== '') {
+            failCount++;
+            playError(failCount);
+          }
           render();
         }
       },
@@ -90,6 +111,21 @@ export function initPatronWidget(container) {
               userInputs[0] = e.target.value;
               render();
             },
+            change: (e) => {
+              userInputs[0] = e.target.value;
+              const val = parseFloat(userInputs[0]);
+              const isMatch = !Number.isNaN(val) && Math.abs(val - p.next[0]) < 1e-4;
+              if (isMatch) {
+                if (!prevOk1) {
+                  prevOk1 = true;
+                  playSuccess('normal');
+                }
+              } else if (userInputs[0] !== '') {
+                failCount++;
+                playError(failCount);
+              }
+              render();
+            },
           },
         })
       ),
@@ -104,6 +140,21 @@ export function initPatronWidget(container) {
           on: {
             input: (e) => {
               userInputs[1] = e.target.value;
+              render();
+            },
+            change: (e) => {
+              userInputs[1] = e.target.value;
+              const val = parseFloat(userInputs[1]);
+              const isMatch = !Number.isNaN(val) && Math.abs(val - p.next[1]) < 1e-4;
+              if (isMatch) {
+                if (!prevOk2) {
+                  prevOk2 = true;
+                  playSuccess('normal');
+                }
+              } else if (userInputs[1] !== '') {
+                failCount++;
+                playError(failCount);
+              }
               render();
             },
           },
