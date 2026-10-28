@@ -455,7 +455,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         react({
           pose: 'enojada',
           tag: '¡Frená la mano!',
-          html: '¿¡Me estás tirando números al azar para ver si embocás!? ¡No estamos en una verdulería! Mirá la cinta de saltos o tocá el botón de Pista antes de seguir adivinando.',
+          html: '¿¡Me estás tirando números al azar para ver si embocás!? ¡No estamos en tu casa como para andar tirando cualquier fruta! N-no es que me preocupe si aprobás o no, ¿eh?, pero me da una bronca bárbara verte adivinar. ¡Mirá la cinta de saltos o tocá el botón de Pista antes de seguir disparando a ciegas!',
         });
       } else {
         react({

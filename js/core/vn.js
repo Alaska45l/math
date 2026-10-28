@@ -57,13 +57,11 @@ class VisualNovelController {
     this.fabEl = null;
     this.spriteEl = null;
     this.spriteWrapEl = null;
-    this.roleEl = null;
     this.tagEl = null;
     this.textEl = null;
     this.counterEl = null;
     this.btnNext = null;
 
-    this.titleIndex = 0;
     this.currentScript = [];
     this.currentIndex = 0;
     this.onFinishCallback = null;
@@ -96,7 +94,7 @@ class VisualNovelController {
       type: 'button',
       class: 'vn-fab',
       'aria-label': 'Abrir diálogo de Alaska',
-      title: 'Consultar a Alaska (Loca de la ciencia)',
+      title: 'Consultar a Alaska',
       on: {
         click: () => this.restore(),
       },
@@ -122,17 +120,15 @@ class VisualNovelController {
     this.spriteEl = h('img', {
       class: 'vn-sprite',
       src: VN_POSES.base,
-      alt: 'Alaska, loca de la ciencia',
+      alt: 'Alaska',
     });
 
     this.spriteWrapEl = h('div', { class: 'vn-sprite-wrap' }, this.spriteEl);
 
-    // Placa de nombre y rol cambiante
+    // Placa de nombre y etiqueta de contexto
     this.tagEl = h('span', { class: 'vn-tag' }, DEFAULT_TAGS.base);
-    this.roleEl = h('span', { class: 'vn-role' }, ALASKA_TITLES[0]);
     const nameplateEl = h('div', { class: 'vn-nameplate' },
       h('strong', { class: 'vn-name' }, 'Alaska'),
-      this.roleEl,
       this.tagEl
     );
 
@@ -357,21 +353,14 @@ class VisualNovelController {
     const tag = line.tag || DEFAULT_TAGS[pose] || 'Alaska';
     const html = line.html || '';
 
-    // Actualizar título dinámico que va rotando ("Loca de la ciencia", "Mulita científica", etc.)
-    const titleText = line.role || line.title || ALASKA_TITLES[this.titleIndex % ALASKA_TITLES.length];
-    this.titleIndex++;
-    if (this.roleEl) {
-      this.roleEl.textContent = titleText;
-    }
-
     // Actualizar sprite y animaciones
     if (this.spriteEl) {
       this.spriteEl.src = VN_POSES[pose] || VN_POSES.base;
-      this.spriteEl.alt = `Alaska (${titleText})`;
+      this.spriteEl.alt = 'Alaska';
     }
 
     if (this.fabEl) {
-      this.fabEl.title = `Consultar a Alaska (${titleText})`;
+      this.fabEl.title = 'Consultar a Alaska';
     }
 
     if (this.spriteWrapEl) {

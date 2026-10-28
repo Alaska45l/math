@@ -1091,17 +1091,6 @@ svg text[fill="var(--yellow)"] {
   letter-spacing: 0.5px;
 }
 
-.vn-role {
-  font-size: 0.86rem;
-  color: var(--muted);
-  line-height: 1.2;
-  font-style: italic;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: 4px;
-  padding: 2px 7px;
-}
-
 .vn-tag {
   background: rgba(230, 211, 138, 0.12);
   border: 1px solid rgba(230, 211, 138, 0.32);
