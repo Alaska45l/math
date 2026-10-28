@@ -1317,11 +1317,17 @@ button.site-nav__sound-btn,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   cursor: pointer;
   white-space: nowrap;
   box-sizing: border-box;
   transition: color 0.15s, opacity 0.15s;
+}
+
+.site-nav__sound-icon {
+  flex-shrink: 0;
+  display: inline-block;
+  pointer-events: none;
 }
 
 button.site-nav__sound-btn:hover,

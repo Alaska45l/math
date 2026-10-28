@@ -217,10 +217,40 @@ export const FUNDAMENTAL_LAWS = [
   },
 ];
 
-/**
- * Renderiza la barra superior dentro de <header data-site-nav="idActual">
- * con el brand de leyes fundamentales/símbolos y navegación accesible.
- */
+function createSoundBtnContent(enabled) {
+  const icon = s('svg', {
+    class: 'site-nav__sound-icon',
+    viewBox: '0 0 24 24',
+    width: '14',
+    height: '14',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    'aria-hidden': 'true',
+  },
+    s('polygon', { points: '11 5 6 9 2 9 2 15 6 15 11 19 11 5', fill: 'currentColor' }),
+    enabled
+      ? [
+          s('path', { d: 'M15.54 8.46a5 5 0 0 1 0 7.07' }),
+          s('path', { d: 'M19.07 4.93a10 10 0 0 1 0 14.14' }),
+        ]
+      : [
+          s('line', { x1: '23', y1: '9', x2: '17', y2: '15' }),
+          s('line', { x1: '17', y1: '9', x2: '23', y2: '15' }),
+        ]
+  );
+  const label = h('span', { class: 'site-nav__sound-label' }, enabled ? 'Sonido' : 'Silencio');
+  return [icon, label];
+}
+
+function updateSoundBtn(btn, enabled) {
+  btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+  btn.title = enabled ? 'Silenciar sonidos' : 'Activar sonidos';
+  btn.replaceChildren(...createSoundBtnContent(enabled));
+}
+
 export function renderNav(root = document.querySelector('[data-site-nav]')) {
   if (!root) return;
   const current = root.dataset.siteNav;
@@ -245,13 +275,11 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
     class: 'site-nav__sound-btn',
     'aria-pressed': soundEnabled ? 'true' : 'false',
     title: soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos',
-  }, soundEnabled ? '🔊 Sonido' : '🔇 Silencio');
+  }, ...createSoundBtnContent(soundEnabled));
 
   soundBtn.addEventListener('click', () => {
     const next = toggleSound();
-    soundBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
-    soundBtn.textContent = next ? '🔊 Sonido' : '🔇 Silencio';
-    soundBtn.title = next ? 'Silenciar sonidos' : 'Activar sonidos';
+    updateSoundBtn(soundBtn, next);
     if (next) playClick();
   });
 
