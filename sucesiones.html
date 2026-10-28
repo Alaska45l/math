@@ -1,5 +1,570 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Laboratorio de Sucesiones · Unidad 9</title><link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/layout.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/modules/sucesiones.css"><script type="module" src="js/modules/sucesiones/index.js"></script></head>
-<body data-page="sucesiones"><header data-site-nav="sucesiones"></header><main class="page page--wide"><h1>Laboratorio de Sucesiones</h1><p class="intro">Cuatro estaciones para entender las sucesiones como funciones de dominio discreto, pasar de la escalera recursiva al cálculo directo y asomarse a la idea de límite.</p>
-<div class="tabs" role="tablist" aria-label="Módulos del Laboratorio de Sucesiones"><button class="tab" role="tab" id="tab-postes" aria-controls="panel-postes" aria-selected="true"><span class="tab__num">1</span>Postes y saltos</button><button class="tab" role="tab" id="tab-traductor" aria-controls="panel-traductor" aria-selected="false" tabindex="-1"><span class="tab__num">2</span>Recursiva y explícita</button><button class="tab" role="tab" id="tab-geometrica" aria-controls="panel-geometrica" aria-selected="false" tabindex="-1"><span class="tab__num">3</span>Radar geométrico</button><button class="tab" role="tab" id="tab-retos" aria-controls="panel-retos" aria-selected="false" tabindex="-1"><span class="tab__num">4</span>Banco de retos</button></div>
-<section id="panel-postes" class="tabpanel" role="tabpanel" aria-labelledby="tab-postes"></section><section id="panel-traductor" class="tabpanel" role="tabpanel" aria-labelledby="tab-traductor" hidden></section><section id="panel-geometrica" class="tabpanel" role="tabpanel" aria-labelledby="tab-geometrica" hidden></section><section id="panel-retos" class="tabpanel" role="tabpanel" aria-labelledby="tab-retos" hidden></section></main></body></html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laboratorio de Sucesiones · De la intuición a la fórmula</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules/sucesiones.css">
+  <script type="module" src="js/modules/sucesiones/index.js"></script>
+</head>
+<body data-page="sucesiones">
+  <header data-site-nav="sucesiones"></header>
+
+  <main class="seq-layout">
+    <!-- Índice Lateral Fijo -->
+    <aside class="seq-sidebar" aria-label="Índice de la lección">
+      <h2 class="seq-sidebar__title">Sucesiones</h2>
+      <div class="seq-sidebar__progress">
+        <span class="small" id="seq-progress-text">Progreso: 0/11</span>
+        <div class="seq-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="11" aria-valuenow="0">
+          <div class="seq-progress-fill" id="seq-progress-fill"></div>
+        </div>
+      </div>
+
+      <nav class="seq-sidebar__nav">
+        <div class="seq-sidebar__chapter">
+          <span class="seq-sidebar__chapter-title">Capítulo 1 · El Lenguaje</span>
+          <a class="seq-sidebar__link" href="#sec-1" data-sec="sec-1"><span>1. ¿Qué es una sucesión?</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2"><span>2. Tipos de patrones</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3"><span>3. Función y Dominio ℕ</span> <span class="seq-sidebar__status"></span></a>
+        </div>
+
+        <div class="seq-sidebar__chapter">
+          <span class="seq-sidebar__chapter-title">Capítulo 2 · Aritméticas</span>
+          <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4"><span>4. La escalera recursiva</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-5a" data-sec="sec-5a"><span>5A. El teletransportador</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-5b" data-sec="sec-5b"><span>5B. Despejes y puentes</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6"><span>6. Fórmulas equivalentes</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-7" data-sec="sec-7"><span>7. La Piedra de Rosetta</span> <span class="seq-sidebar__status"></span></a>
+        </div>
+
+        <div class="seq-sidebar__chapter">
+          <span class="seq-sidebar__chapter-title">Capítulo 3 · Geométricas</span>
+          <a class="seq-sidebar__link" href="#sec-8" data-sec="sec-8"><span>8. El espejo multiplicativo</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-9" data-sec="sec-9"><span>9. Radar de la razón r</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-10" data-sec="sec-10"><span>10. Modelado: Ahorro vs Interés</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-11" data-sec="sec-11"><span>11. Hacia el infinito (Límite)</span> <span class="seq-sidebar__status"></span></a>
+        </div>
+
+        <div class="seq-sidebar__chapter">
+          <span class="seq-sidebar__chapter-title">Capítulo 4 · Práctica</span>
+          <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos"><span>Entrenador y Trampas</span> <span class="seq-sidebar__status"></span></a>
+          <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso"><span>Hoja de Repaso</span></a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Contenido de la Lección Lineal -->
+    <div class="seq-content">
+
+      <!-- ============================================================
+           CAPÍTULO 1 · EL LENGUAJE DE LOS PATRONES
+           ============================================================ -->
+
+      <!-- Sección 1 -->
+      <section id="sec-1" class="seq-section" aria-labelledby="title-sec-1">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 1 · Sección 1</span>
+          <h1 id="title-sec-1" class="seq-section__title">¿Qué es una sucesión?</h1>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Una sucesión es una lista ordenada de números que sigue una regla o patrón, donde cada número ocupa una posición fija llamada término.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Imaginá una fila de postes numerados: <code>3, 5, 7…</code>. Cada número es un <strong>término</strong>. El primer término es <code>3</code>, el segundo es <code>5</code> y el tercero es <code>7</code>. Los puntos suspensivos <code>…</code> significan que la lista continúa indefinidamente.</p>
+          <div class="seq-annotated" id="annotated-sec-1"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <p>Elegí un patrón de avance y completá los postes que faltan escribiendo el número correspondiente:</p>
+          <div data-widget="patron"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>No confundas la <strong>posición</strong> de un término con el <strong>valor</strong> de ese término. En la sucesión <code>3, 5, 7…</code>, en la posición 1 está el valor 3, en la posición 2 está el valor 5. El número de término siempre es un conteo ordinal (1.º, 2.º, 3.º…).</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-1"></div>
+        </div>
+      </section>
+
+      <!-- Sección 2 -->
+      <section id="sec-2" class="seq-section" aria-labelledby="title-sec-2">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 1 · Sección 2</span>
+          <h2 id="title-sec-2" class="seq-section__title">Aritmética, geométrica o ninguna</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Si sumás o restás siempre el mismo número, es aritmética; si multiplicás siempre por el mismo número, es geométrica; si el salto cambia, no es ninguna de las dos.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En una <strong>sucesión aritmética</strong>, la resta entre cualquier término y el anterior da un valor constante llamado <strong>diferencia común (d)</strong>:</p>
+          <ul>
+            <li><code>3, 5, 7, 9…</code> tiene diferencia constante <span class="eq">+2</span> (creciente).</li>
+            <li><code>21, 16, 11, 6…</code> tiene diferencia constante <span class="eq">−5</span> (decreciente: al restar un valor constante positivo, sumás un número negativo).</li>
+          </ul>
+          <p>En cambio, <code>1, 2, 4, 8…</code> <em>no</em> es aritmética porque sus diferencias son <span class="eq">+1, +2, +4</span>. Pero si dividís cada término por el anterior, el cociente es constante (<span class="eq">× 2</span>): es una <strong>sucesión geométrica</strong> con <strong>razón común (r = 2)</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <p>Explorá los casos en el Detective de Patrones para ver cuándo las diferencias se vuelven constantes y cuándo lo hacen los cocientes:</p>
+          <div data-widget="detective"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Cuando una sucesión aritmética decrece, la diferencia común <strong>es negativa</strong>. En <code>21, 16, 11, 6…</code> no digas «la diferencia es 5»: la diferencia es exactamente <code>d = −5</code>, porque <code>16 − 21 = −5</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-2"></div>
+        </div>
+      </section>
+
+      <!-- Sección 3 -->
+      <section id="sec-3" class="seq-section" aria-labelledby="title-sec-3">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 1 · Sección 3</span>
+          <h2 id="title-sec-3" class="seq-section__title">Una sucesión es una función</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Una sucesión es una función matemática donde la entrada n solo puede ser un número entero positivo: su gráfica no es una línea continua, sino puntos aislados.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En álgebra convencional escribimos <span class="eq">f(x)</span>. En sucesiones preferimos escribir <span class="eq">a(n)</span> (o la notación de subíndice <span class="eq">a<sub>n</sub></span>). Usamos <span class="eq">a(n)</span> porque resalta que la sucesión es una función: a cada número de término natural <span class="eq">n ∈ ℕ = {1, 2, 3…}</span> le corresponde una única salida <span class="eq">a(n)</span>.</p>
+          <p><strong>El dominio son exclusivamente los enteros positivos:</strong> no existe el término «menos cinco» ni el término «0,4» de una sucesión.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <p>Arrastrá el cursor sobre el gráfico. Observá qué ocurre en los valores enteros y qué aviso aparece cuando intentás evaluar en valores decimales:</p>
+          <div data-widget="funcion"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>No confundas <span class="eq">a(n − 1)</span> con <span class="eq">a(n) − 1</span>:</p>
+          <ul>
+            <li><span class="eq">a(n − 1)</span> es el <strong>término anterior</strong> (un escalón antes en la lista).</li>
+            <li><span class="eq">a(n) − 1</span> es restarle 1 al valor numérico del término actual.</li>
+          </ul>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-3"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 2 · SUCESIONES ARITMÉTICAS
+           ============================================================ -->
+
+      <!-- Sección 4 -->
+      <section id="sec-4" class="seq-section" aria-labelledby="title-sec-4">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 2 · Sección 4</span>
+          <h2 id="title-sec-4" class="seq-section__title">Fórmulas recursivas: «la escalera»</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">La fórmula recursiva te dice dónde arrancar (el primer escalón) y cuánto sumarle al escalón anterior para subir al siguiente.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <div id="annotated-sec-4"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="escalera"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Para llegar al término 100 subiendo por la escalera recursiva, ¡necesitás calcular previamente los 99 términos anteriores! Por eso las fórmulas recursivas son ideales para entender el paso a paso, pero lentas para llegar lejos.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-4"></div>
+        </div>
+      </section>
+
+      <!-- Sección 5A -->
+      <section id="sec-5a" class="seq-section" aria-labelledby="title-sec-5a">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 2 · Sección 5A</span>
+          <h2 id="title-sec-5a" class="seq-section__title">Fórmulas explícitas: «el teletransportador»</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">La fórmula explícita calcula directamente cualquier término a(n) en un solo renglón sumando al primer término n − 1 saltos iguales.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <div id="annotated-sec-5a"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="teletransportador"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>¿Por qué multiplicamos por <code>(n − 1)</code> y no por <code>n</code>? Porque en el 1.er término ya estás en la salida: <strong>diste 0 saltos</strong>. Si tenés <code>n</code> postes, la cantidad de espacios o saltos entre ellos siempre es <code>n − 1</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-5a"></div>
+        </div>
+      </section>
+
+      <!-- Sección 5B -->
+      <section id="sec-5b" class="seq-section" aria-labelledby="title-sec-5b">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 2 · Sección 5B</span>
+          <h2 id="title-sec-5b" class="seq-section__title">Usar el teletransportador al revés</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Despejando n podés saber en qué poste cae un número dado o reconstruir la diferencia común a partir de dos términos lejanos.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Para averiguar si un valor pertenece a la sucesión, planteás la ecuación y despejás <code>n</code> mediante propiedad uniforme. Si <code>n</code> resulta ser un entero positivo, pertenece; si da con coma, cae en el vacío entre postes.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="al-reves"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Al calcular la diferencia común entre dos postes lejanos como <span class="eq">a(1) = 5</span> y <span class="eq">a(10) = 59</span>, dividí por la cantidad de <strong>saltos</strong> (<span class="eq">10 − 1 = 9</span>), no por 10:</p>
+          <p class="eq">d = <span class="fr"><span class="top">a(10) − a(1)</span><span class="bar"></span><span class="bot">10 − 1</span></span> = <span class="fr"><span class="top">54</span><span class="bar"></span><span class="bot">9</span></span> = 6</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-5b"></div>
+        </div>
+      </section>
+
+      <!-- Sección 6 -->
+      <section id="sec-6" class="seq-section" aria-labelledby="title-sec-6">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 2 · Sección 6</span>
+          <h2 id="title-sec-6" class="seq-section__title">Fórmulas equivalentes y el error típico</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Una misma sucesión puede escribirse de formas equivalentes; pero solo la fórmula estándar te muestra el primer término a simple vista.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Para <code>2, 8, 14…</code> (<span class="eq">k = 2</span>, <span class="eq">d = 6</span>):</p>
+          <p>Fórmula estándar: <span class="eq">2 + 6(n − 1)</span>.</p>
+          <p>Al quitar paréntesis: <span class="eq">2 + 6n − 6 = −4 + 6n</span>.</p>
+          <p>¡Ambas fórmulas generan exactamente los mismos números!</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="equivalentes"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con la trampa mortal</span>
+          <p>Escribir <span class="eq">2 + 6n</span> <strong>NO</strong> da la sucesión <code>2, 8, 14…</code>: en <span class="eq">n = 1</span> da <span class="eq">2 + 6 = 8</span>, empezando un salto corrida. Si querés hallar el primer término en una fórmula que no sea estándar, estás obligado a evaluar en <span class="eq">n = 1</span>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-6"></div>
+        </div>
+      </section>
+
+      <!-- Sección 7 -->
+      <section id="sec-7" class="seq-section" aria-labelledby="title-sec-7">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 2 · Sección 7</span>
+          <h2 id="title-sec-7" class="seq-section__title">Convertir entre recursiva y explícita</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">La Piedra de Rosetta de las sucesiones: cómo traducir entre la cinta, la tabla, la llave recursiva y las fórmulas explícitas.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Si la fórmula explícita está simplificada (como <span class="eq">a(n) = 1 + 4n</span>), hallás <span class="eq">a(1) = 5</span> y <span class="eq">a(2) = 9</span>. La diferencia es <span class="eq">9 − 5 = 4</span>, obteniendo inmediatamente la recursiva.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="rosetta"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>En fórmulas simplificadas como <span class="eq">a(n) = 23 − 6n</span>, el número <code>23</code> <strong>no</strong> es el primer término: es el valor imaginario en <span class="eq">n = 0</span>. El primer término real es <span class="eq">a(1) = 23 − 6(1) = 17</span>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-7"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 3 · EL ESPEJO GEOMÉTRICO Y MODELADO
+           ============================================================ -->
+
+      <!-- Sección 8 -->
+      <section id="sec-8" class="seq-section" aria-labelledby="title-sec-8">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 3 · Sección 8</span>
+          <h2 id="title-sec-8" class="seq-section__title">Sucesiones geométricas: el espejo multiplicativo</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">En las geométricas la suma repetida (+d) se transforma en multiplicación repetida (×r), y el neutro aditivo 0 se convierte en el neutro multiplicativo 1.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <div id="annotated-sec-8"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="geometrica-modo"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>En las fórmulas geométricas <strong>nunca escribimos el signo de dividir</strong>: dividir por 3 en cada salto es exactamente igual a multiplicar por la fracción <span class="fr"><span class="top">1</span><span class="bar"></span><span class="bot">3</span></span>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-8"></div>
+        </div>
+      </section>
+
+      <!-- Sección 9 -->
+      <section id="sec-9" class="seq-section" aria-labelledby="title-sec-9">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 3 · Sección 9</span>
+          <h2 id="title-sec-9" class="seq-section__title">El radar de la razón r: signos y paréntesis</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Una razón negativa hace que los términos alternen de signo (+, −, +, −) y exige obligatoriamente paréntesis en la base para no violar la jerarquía de operaciones.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p><span class="eq">8 · (−5)<sup>n − 1</sup></span> da <code>8, −40, 200, −1000…</code>.</p>
+          <p>Sin paréntesis, <span class="eq">8 · −5<sup>n − 1</sup></span> deja el menos afuera de la potencia y da todos negativos: <code>−8, −40, −200, −1000…</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="razon"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Si la razón es negativa, <strong>no existe ninguna curva continua en los números reales</strong> que una los puntos, porque a mitad de camino tendrías que calcular raíces pares de números negativos.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-9"></div>
+        </div>
+      </section>
+
+      <!-- Sección 10 -->
+      <section id="sec-10" class="seq-section" aria-labelledby="title-sec-10">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 3 · Sección 10</span>
+          <h2 id="title-sec-10" class="seq-section__title">Modelado: Ahorro fijo vs. Interés compuesto</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Sumar un monto fijo cada año es una sucesión aritmética; sumar un porcentaje sobre el saldo acumulado es una sucesión geométrica.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En el problema de Caden: guardar $70 y ganar el 10% anual significa conservar el 100% de lo que tenías más el 10%: <span class="eq">1 + 0,10 = 1,10</span>. La razón común es <span class="eq">r = 1,1</span>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="comparar"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Multiplicar por <code>0,10</code> te da solo el <em>interés ganado</em>, ¡pero le destruye el 90% del dinero a Caden! Para modelar el saldo total, siempre multiplicás por <code>(1 + i) = 1,10</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-10"></div>
+        </div>
+      </section>
+
+      <!-- Sección 11 -->
+      <section id="sec-11" class="seq-section" aria-labelledby="title-sec-11">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 3 · Sección 11</span>
+          <h2 id="title-sec-11" class="seq-section__title">Puente a Análisis I: ¿A dónde va cuando n → ∞?</h2>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Si la razón común está estrictamente entre −1 y 1 (|r| &lt; 1), los términos se achican indefinidamente acercándose a cero: la sucesión converge.</p>
+        </div>
+
+        <div class="seq-block seq-block--look">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En <code>64, 16, 4, 1, 1/4, 1/16…</code> cada término es un cuarto del anterior. A medida que <span class="eq">n</span> crece hacia infinito, los puntos se aplastan contra el eje horizontal sin tocarlo jamás: <span class="eq">lim<sub>n→∞</sub> a(n) = 0</span>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="limite"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>No digas que el término en el infinito «es cero». Cada término individual para cualquier <code>n</code> finito es un número positivo estrictamente mayor a 0; el límite describe la tendencia matemática hacia donde apuntan.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-11"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 4 · ENTRENADOR Y TRAMPAS CLÁSICAS
+           ============================================================ -->
+      <section id="sec-retos" class="seq-section" aria-labelledby="title-sec-retos">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Capítulo 4</span>
+          <h2 id="title-sec-retos" class="seq-section__title">Entrenador y Trampas Clásicas de Examen</h2>
+        </header>
+        <p>Practicá con ejercicios generados a partir de semillas deterministas y ponete a prueba con las 5 trampas conceptuales más comunes de los exámenes de Khan Academy.</p>
+        <div data-widget="retos"></div>
+      </section>
+
+      <!-- ============================================================
+           HOJA DE REPASO IMPRIMIBLE
+           ============================================================ -->
+      <section id="sec-repaso" class="seq-section" aria-labelledby="title-sec-repaso">
+        <header class="seq-section__header">
+          <span class="seq-section__tag">Resumen de Unidad</span>
+          <h2 id="title-sec-repaso" class="seq-section__title">Hoja de Repaso: Aritmética vs. Geométrica</h2>
+        </header>
+        <p>Cuadro comparativo para consultar, descargar o imprimir antes de un examen.</p>
+
+        <div class="seq-table-wrap">
+          <table class="seq-summary-table">
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>Sucesión Aritmética</th>
+                <th>Sucesión Geométrica</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Patrón de avance</strong></td>
+                <td>Suma o resta constante: <code>+ d</code></td>
+                <td>Multiplicación constante: <code>× r</code> (dividir entre b es <code>× 1/b</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Primer término</strong></td>
+                <td><code>a(1) = k</code></td>
+                <td><code>a(1) = k</code></td>
+              </tr>
+              <tr>
+                <td><strong>Paso común</strong></td>
+                <td>Diferencia común <code>d = a(n) − a(n − 1)</code></td>
+                <td>Razón común <code>r = a(n) / a(n − 1)</code></td>
+              </tr>
+              <tr>
+                <td><strong>Fórmula recursiva</strong></td>
+                <td><code>a(1) = k</code><br><code>a(n) = a(n − 1) + d</code></td>
+                <td><code>a(1) = k</code><br><code>a(n) = a(n − 1) · r</code></td>
+              </tr>
+              <tr>
+                <td><strong>Fórmula explícita estándar</strong></td>
+                <td><code>a(n) = k + d(n − 1)</code></td>
+                <td><code>a(n) = k · r^(n − 1)</code></td>
+              </tr>
+              <tr>
+                <td><strong>Neutro en n = 1</strong></td>
+                <td>0 saltos: <code>+ 0 · d</code> (neutro aditivo)</td>
+                <td>0 saltos: <code>· r⁰ = · 1</code> (neutro multiplicativo)</td>
+              </tr>
+              <tr>
+                <td><strong>Fórmula simplificada</strong></td>
+                <td><code>a(n) = c₀ + d·n</code> (donde <code>c₀ = k − d</code>)</td>
+                <td><code>a(n) = c₀ · rⁿ</code> (donde <code>c₀ = k / r</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>Regla de oro de examen</strong></td>
+                <td><code>k + d·n</code> NO es la sucesión (está corrida un paso).</td>
+                <td>Si <code>r &lt; 0</code>, los paréntesis en <code>(−r)^(n − 1)</code> son obligatorios.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>
