@@ -6,14 +6,27 @@
 import { byId, qsa, mount, h } from '../../core/dom.js';
 import { renderNav } from '../../core/nav.js';
 import { createCheckBlock, annotatedFormula, getProgress } from './components.js';
+
+// Widgets Capítulo 1
 import { initPatronWidget } from './widgets/patron.js';
 import { initDetectiveWidget } from './widgets/detective.js';
 import { initFuncionWidget } from './widgets/funcion.js';
+
+// Widgets Capítulo 2
 import { initEscaleraWidget } from './widgets/escalera.js';
 import { initTeletransportadorWidget } from './widgets/teletransportador.js';
 import { initAlRevesWidget } from './widgets/al-reves.js';
 import { initEquivalentesWidget } from './widgets/equivalentes.js';
 import { initRosettaWidget } from './widgets/rosetta.js';
+
+// Widgets Capítulo 3
+import { initGeometricaModoWidget } from './widgets/geometrica-modo.js';
+import { initRazonWidget } from './widgets/razon.js';
+import { initCompararWidget } from './widgets/comparar.js';
+import { initLimiteWidget } from './widgets/limite.js';
+
+// Capítulo 4: Entrenador y Trampas
+import { initRetosModule } from './retos.js';
 
 // Inicializa barra superior global
 renderNav();
@@ -23,7 +36,7 @@ const TOTAL_SECTIONS = 11;
 
 function updateSidebarProgress() {
   const progress = getProgress();
-  const completedKeys = Object.keys(progress).filter((k) => progress[k]);
+  const completedKeys = Object.keys(progress).filter((k) => progress[k] && k.startsWith('sec-'));
   const count = completedKeys.length;
 
   const textEl = byId('seq-progress-text');
@@ -66,7 +79,7 @@ function initScrollSpy() {
   sections.forEach((sec) => observer.observe(sec));
 }
 
-/* ---------- Bancos de Preguntas de Chequeo ---------- */
+/* ---------- Bancos de Preguntas de Chequeo (Khan Academy) ---------- */
 
 const CHECKS_DATA = {
   // CAPÍTULO 1
@@ -410,11 +423,169 @@ const CHECKS_DATA = {
       solution: 'a(1) = 23 − 6 = <strong>17</strong>, y <strong>d = −6</strong>.',
     },
   ],
+
+  // CAPÍTULO 3
+  'sec-8': [
+    {
+      id: 'sec8-q1',
+      type: 'number',
+      prompt: '¿Cuál es el siguiente término en la sucesión geométrica <strong>1/2, 2, 8, [___]</strong>?',
+      expected: 32,
+      hints: [
+        'Fijate cuánto multiplica en cada salto: 2 / (1/2) = 4, y 8 / 2 = 4.',
+        'Calculá 8 × 4.',
+      ],
+      solution: 'La razón común es r = 4. Por lo tanto: 8 × 4 = <strong>32</strong>.',
+    },
+    {
+      id: 'sec8-q2',
+      type: 'pair',
+      prompt: 'Encuentra <strong>k</strong> y <strong>r</strong> en la fórmula recursiva de <strong>1/2, 2, 8…</strong>: <br><code>{ a(1) = k ; a(n) = a(n − 1) · r }</code>.',
+      kLabel: 'k = a(1)',
+      stepLabel: 'r (razón)',
+      kind: 'geo',
+      expected: { k: 0.5, r: 4 },
+      hints: [
+        'El primer término es 1/2 = 0,5.',
+        'La razón es 2 / (1/2) = 4.',
+      ],
+      solution: '<strong>k = 0,5</strong> (o 1/2) y <strong>r = 4</strong>.',
+    },
+    {
+      id: 'sec8-q3',
+      type: 'expr',
+      prompt: 'Escribe una fórmula explícita estándar para <strong>54, 18, 6…</strong>:',
+      expected: {
+        expr: '54 * (1/3)^(n - 1)',
+        kind: 'geo',
+        k: 54,
+        step: 1 / 3,
+      },
+      hints: [
+        'Primer término k = 54.',
+        'Razón común: dividir por 3 es multiplicar por 1/3 (r = 1/3).',
+        'Fórmula estándar: k · r^(n − 1).',
+      ],
+      solution: 'k = 54 y r = 1/3. La fórmula explícita estándar es: <strong>54 · (1/3)^(n − 1)</strong>.',
+    },
+    {
+      id: 'sec8-q4',
+      type: 'expr',
+      prompt: 'Escribe una fórmula explícita para <strong>1/2, 2, 8…</strong>:',
+      expected: {
+        expr: '1/2 * 4^(n - 1)',
+        kind: 'geo',
+        k: 0.5,
+        step: 4,
+      },
+      hints: [
+        'k = 1/2 y r = 4.',
+        'Fórmula: 1/2 · 4^(n − 1) (o equivalente 1/8 · 4^n).',
+      ],
+      solution: 'Fórmula estándar: <strong>1/2 · 4^(n − 1)</strong> (o equivalente 1/8 · 4^n).',
+    },
+  ],
+
+  'sec-9': [
+    {
+      id: 'sec9-q1',
+      type: 'expr',
+      prompt: 'Dada la definición recursiva: <code>{ a(1) = 8 ; a(n) = a(n − 1) · (−5) }</code>, escribe su fórmula explícita estándar:',
+      expected: {
+        expr: '8 * (-5)^(n - 1)',
+        kind: 'geo',
+        k: 8,
+        step: -5,
+        requireStandard: true,
+      },
+      hints: [
+        'Primer término k = 8.',
+        'Razón r = −5.',
+        '¡Recordá poner paréntesis en (−5) para no alterar la jerarquía de potencias!',
+      ],
+      solution: 'Fórmula correcta: <strong>8 · (−5)^(n − 1)</strong>.',
+    },
+    {
+      id: 'sec9-q2',
+      type: 'number',
+      prompt: 'Calcula el valor numérico exacto de <strong>a(4)</strong> para esa misma sucesión:',
+      expected: -1000,
+      hints: [
+        'a(4) = 8 · (−5)^(4 − 1) = 8 · (−5)³.',
+        '(−5)³ = −125.',
+        '8 × (−125) = −1000.',
+      ],
+      solution: 'a(4) = 8 · (−5)³ = 8 · (−125) = <strong>−1000</strong>.',
+    },
+  ],
+
+  'sec-10': [
+    {
+      id: 'sec10-q1',
+      type: 'choice',
+      prompt: 'Caden deposita <strong>$70</strong> y cada año gana el <strong>10%</strong> sobre su saldo acumulado. ¿Cómo se clasifica el saldo año a año?',
+      options: [
+        'Sucesión aritmética: suma $10 fijos cada año',
+        'Sucesión geométrica: multiplica por r = 1,10 cada año',
+        'Sucesión geométrica: multiplica por r = 0,10 cada año',
+      ],
+      expected: 1,
+      explanation: '¡Exacto! Conservar el 100% más el 10% de ganancia equivale al factor multiplicador (1 + 0,10) = 1,10.',
+      hints: [
+        'El 10% se calcula sobre el saldo del año anterior, no como un monto estático.',
+        'Saldo = Saldo viejo · (1 + 0,10).',
+      ],
+      solution: 'Es una sucesión geométrica con factor multiplicador <strong>r = 1,10</strong>.',
+    },
+    {
+      id: 'sec10-q2',
+      type: 'pair',
+      prompt: 'Completa <strong>k = a(1)</strong> y la razón común <strong>r</strong> para la cuenta de Caden:',
+      kLabel: 'k = Saldo año 1',
+      stepLabel: 'r = Factor anual',
+      kind: 'geo',
+      expected: { k: 70, r: 1.1 },
+      hints: [
+        'Depósito inicial k = 70.',
+        'Factor anual r = 1 + 0,10 = 1,1.',
+      ],
+      solution: '<strong>k = 70</strong> y <strong>r = 1,1</strong>.',
+    },
+  ],
+
+  'sec-11': [
+    {
+      id: 'sec11-q1',
+      type: 'number',
+      prompt: 'Para la sucesión geométrica <strong>64, 16, 4, 1, 1/4…</strong>, ¿hacia qué número tienden los términos a medida que n tiende a infinito (<strong>lim n→∞ a(n)</strong>)?',
+      expected: 0,
+      hints: [
+        'Observá cómo cada número es la cuarta parte del anterior: 64, 16, 4, 1, 0.25, 0.0625, 0.0156...',
+        'Se van haciendo infinitesimalmente pequeños acercándose a un valor límite.',
+      ],
+      solution: 'Como la razón es 1/4 (|r| < 1), los términos se achican indefinidamente aproximándose a <strong>0</strong>.',
+    },
+    {
+      id: 'sec11-q2',
+      type: 'choice',
+      prompt: '¿Para qué valores de la razón común r una sucesión geométrica converge a 0 cuando n → ∞?',
+      options: [
+        'Para cualquier r > 1',
+        'Únicamente cuando r es un número entero positivo',
+        'Cuando el valor absoluto de r es menor a 1 (|r| < 1, es decir −1 < r < 1)',
+        'Cuando r es negativa menor a −1',
+      ],
+      expected: 2,
+      explanation: '¡Perfecto! Cuando |r| < 1, elevar r a potencias cada vez mayores produce fracciones cada vez más pequeñas que tienden a 0.',
+      hints: [
+        'Pensá qué pasa con (1/2)ⁿ vs 2ⁿ a medida que n se hace gigante.',
+      ],
+      solution: 'Una sucesión geométrica converge a 0 si y solo si <strong>|r| &lt; 1</strong>.',
+    },
+  ],
 };
 
-/* ---------- Montaje de Widgets ---------- */
-
-// Fórmulas Anotadas
+/* ---------- Inicialización de Fórmulas Anotadas ---------- */
 const an1 = document.getElementById('annotated-sec-1');
 if (an1) annotatedFormula(an1, { type: 'explicit', seqName: 'a', k: 3, step: 2, kind: 'ari' });
 
@@ -424,7 +595,12 @@ if (an4) annotatedFormula(an4, { type: 'recursive', seqName: 'a', k: 3, step: 2,
 const an5a = document.getElementById('annotated-sec-5a');
 if (an5a) annotatedFormula(an5a, { type: 'explicit', seqName: 'a', k: 5, step: 3, kind: 'ari' });
 
-// Widgets Capítulo 1
+const an8 = document.getElementById('annotated-sec-8');
+if (an8) annotatedFormula(an8, { type: 'explicit', seqName: 'a', k: 54, step: 1 / 3, kind: 'geo' });
+
+/* ---------- Montaje de Widgets ---------- */
+
+// Capítulo 1
 const patronContainer = document.querySelector('[data-widget="patron"]');
 if (patronContainer) initPatronWidget(patronContainer);
 
@@ -434,7 +610,7 @@ if (detectiveContainer) initDetectiveWidget(detectiveContainer);
 const funcionContainer = document.querySelector('[data-widget="funcion"]');
 if (funcionContainer) initFuncionWidget(funcionContainer);
 
-// Widgets Capítulo 2
+// Capítulo 2
 const escaleraContainer = document.querySelector('[data-widget="escalera"]');
 if (escaleraContainer) initEscaleraWidget(escaleraContainer);
 
@@ -449,6 +625,23 @@ if (equivalentesContainer) initEquivalentesWidget(equivalentesContainer);
 
 const rosettaContainer = document.querySelector('[data-widget="rosetta"]');
 if (rosettaContainer) initRosettaWidget(rosettaContainer);
+
+// Capítulo 3
+const geomModoContainer = document.querySelector('[data-widget="geometrica-modo"]');
+if (geomModoContainer) initGeometricaModoWidget(geomModoContainer);
+
+const razonContainer = document.querySelector('[data-widget="razon"]');
+if (razonContainer) initRazonWidget(razonContainer);
+
+const compararContainer = document.querySelector('[data-widget="comparar"]');
+if (compararContainer) initCompararWidget(compararContainer);
+
+const limiteContainer = document.querySelector('[data-widget="limite"]');
+if (limiteContainer) initLimiteWidget(limiteContainer);
+
+// Capítulo 4
+const retosContainer = document.querySelector('[data-widget="retos"]');
+if (retosContainer) initRetosModule(retosContainer);
 
 // Montaje de Chequeos
 Object.entries(CHECKS_DATA).forEach(([secId, questions]) => {
