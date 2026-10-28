@@ -28,6 +28,10 @@ import { initLimiteWidget } from './widgets/limite.js';
 // Capítulo 4: Entrenador y Trampas
 import { initRetosModule } from './retos.js';
 
+// Sistema Visual Novel (Modo Tutora Alaska)
+import { playScript } from '../../core/vn.js';
+import { VN_SCRIPTS } from './vn-scripts.js';
+
 // Inicializa barra superior global
 renderNav();
 
@@ -841,3 +845,18 @@ export function initBlackboardController() {
 updateSidebarProgress();
 initScrollSpy();
 initBlackboardController();
+
+// Inicializar disparadores de Visual Novel
+function initVNTriggers() {
+  qsa('.vn-trigger[data-vn-script]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const scriptId = btn.dataset.vnScript;
+      if (VN_SCRIPTS[scriptId]) {
+        playScript(VN_SCRIPTS[scriptId]);
+      }
+    });
+  });
+}
+
+initVNTriggers();

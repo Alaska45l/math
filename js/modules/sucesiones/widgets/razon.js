@@ -6,6 +6,7 @@
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt, MINUS } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
+import { react } from '../../../core/vn.js';
 import { calcSafeAxis } from '../scale.js';
 
 const PRESETS = [
@@ -92,6 +93,13 @@ export function initRazonWidget(container) {
             change: (e) => {
               tryContinuous = e.target.checked;
               render();
+              if (tryContinuous && rVal < 0) {
+                react({
+                  pose: 'colapso',
+                  tag: '💧 Raíz prohibida en ℝ',
+                  html: `¡Alerta de cortocircuito! Con razón negativa (<span class="eq">r = ${fmt(rVal)}</span>), en <span class="eq">n = 1,5</span> necesitarías calcular <span class="eq">(${fmt(rVal)})<sup>0,5</sup> = √(${fmt(rVal)}) ∉ ℝ</span>. ¡No existe ninguna curva continua real que conecte los puntos alternantes!`,
+                });
+              }
             },
           },
         }),
@@ -270,9 +278,9 @@ export function initRazonWidget(container) {
       plane.layers.marks.append(
         s('line', {
           x1: midX,
-          y1: plane.sy(yMin),
+          y1: plane.sy(axis.yMin),
           x2: midX,
-          y2: plane.sy(yMax),
+          y2: plane.sy(axis.yMax),
           stroke: 'var(--pink)',
           'stroke-width': '1.5',
           'stroke-dasharray': '3 3',

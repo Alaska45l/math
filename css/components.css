@@ -916,3 +916,328 @@ svg text[fill="var(--yellow)"] {
   stroke: var(--blue);
   stroke-width: 2.5;
 }
+
+/* ==========================================================================
+   VISUAL NOVEL HUD — "MODO TUTORA ALASKA" (Reutilizable en todas las vistas)
+   ========================================================================== */
+
+.vn-hud {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.5rem;
+  z-index: 9999;
+  max-width: 660px;
+  width: calc(100vw - 3rem);
+  box-sizing: border-box;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.vn-hud.is-visible {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Botón flotante minimizado [ 👓 Alaska ] */
+.vn-fab {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 28, 22, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.vn-fab:hover {
+  transform: scale(1.05);
+  border-color: var(--yellow);
+}
+
+.vn-hud.is-minimized .vn-box {
+  display: none !important;
+}
+
+.vn-hud.is-minimized .vn-fab {
+  display: inline-flex !important;
+  pointer-events: auto;
+}
+
+/* Cuadro de diálogo estilo pizarrón con doble borde de tiza */
+.vn-box {
+  background: rgba(18, 28, 22, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Sprite de Alaska */
+.vn-sprite-wrap {
+  width: 155px;
+  height: 200px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  margin-left: 6px;
+  margin-bottom: -2px;
+  pointer-events: none;
+}
+
+.vn-sprite {
+  max-height: 215px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Animaciones de Sprite */
+@keyframes vn-shake-anim {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px) rotate(-1.5deg); }
+  40% { transform: translateX(5px) rotate(1.5deg); }
+  60% { transform: translateX(-3px) rotate(-1deg); }
+  80% { transform: translateX(3px) rotate(1deg); }
+}
+
+.vn-shake {
+  animation: vn-shake-anim 0.38s ease-in-out;
+}
+
+@keyframes vn-pop-anim {
+  0% { transform: scale(0.92) translateY(6px); }
+  60% { transform: scale(1.05) translateY(-3px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.vn-pop {
+  animation: vn-pop-anim 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vn-shake,
+  .vn-pop,
+  .vn-hud {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Interior del cuadro */
+.vn-box__inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px 16px 10px 10px;
+  cursor: default;
+}
+
+.vn-box__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vn-nameplate {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vn-name {
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.vn-role {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.vn-tag {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.vn-box__controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vn-ctrl-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.vn-ctrl-btn:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Área de texto con máquina de escribir */
+.vn-text {
+  font-size: 0.95rem;
+  line-height: 1.48;
+  color: var(--ink);
+  min-height: 3.9em;
+  margin-bottom: 6px;
+}
+
+.vn-text code {
+  font-size: 0.9em;
+  padding: 1px 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.vn-box__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.vn-counter {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.vn-btn-next {
+  min-height: 30px;
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  border-width: 3px;
+}
+
+/* Botón disparador dentro de secciones (.vn-trigger) */
+.vn-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 10px 0;
+  font-size: 0.92rem;
+  color: var(--yellow);
+  background: rgba(230, 211, 138, 0.06);
+  border: 1px solid rgba(230, 211, 138, 0.28);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.vn-trigger:hover {
+  background: rgba(230, 211, 138, 0.14);
+  border-color: var(--yellow);
+  transform: translateY(-1px);
+}
+
+.vn-trigger:active {
+  transform: translateY(0);
+}
+
+/* Responsive en móviles (≤ 600px y 375px) */
+@media (max-width: 600px) {
+  .vn-hud {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    width: auto;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .vn-box {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .vn-sprite-wrap {
+    width: 85px;
+    height: 135px;
+    margin-left: 2px;
+    margin-bottom: -2px;
+  }
+
+  .vn-sprite {
+    max-height: 140px;
+  }
+
+  .vn-box__inner {
+    padding: 8px 10px 8px 6px;
+  }
+
+  .vn-text {
+    font-size: 0.88rem;
+    min-height: 4.4em;
+  }
+
+  .vn-name {
+    font-size: 1rem;
+  }
+
+  .vn-role {
+    display: none;
+  }
+}
+
+/* Ocultar en impresión */
+@media print {
+  .vn-hud,
+  .vn-trigger,
+  .vn-fab {
+    display: none !important;
+  }
+}
+

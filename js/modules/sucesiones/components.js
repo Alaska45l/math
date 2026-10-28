@@ -7,6 +7,7 @@
 
 import { h, s, mount, on, chalkIcon } from '../../core/dom.js';
 import { fmt, fractionHtml, MINUS } from '../../core/math-format.js';
+import { react } from '../../core/vn.js';
 import { parse, equivalent, toDisplay, isStandardForm } from './expr.js';
 import { diagnose, approxEq } from './logic.js';
 
@@ -359,10 +360,112 @@ export function annotatedFormula(root, config = {}) {
  */
 export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null) {
   const state = {
-    answers: questions.map(() => ({ value: null, ok: false, feedback: null, hintIndex: 0, showSolution: false })),
+    answers: questions.map(() => ({
+      value: null,
+      ok: false,
+      feedback: null,
+      hintIndex: 0,
+      showSolution: false,
+      failCount: 0,
+    })),
   };
 
   const container = h('div', { class: 'seq-check-block', dataset: { section: sectionId } });
+
+  function triggerVnReaction(q, qState, isOk, diagId = null) {
+    if (isOk) {
+      if ((qState.failCount || 0) === 0) {
+        if (diagId === 'not_standard_but_equivalent') {
+          react({
+            pose: 'orgullosa',
+            tag: '😏 Te lo advertí',
+            html: '¡Ojo que está bien! Escribiste la forma simplificada equivalente. Genera exactamente los mismos términos, aunque acordate que ahí <span class="eq">k</span> no se ve a simple vista.',
+          });
+        } else {
+          const correctPhrases = [
+            { pose: 'orgullosa', tag: '😏 ¡Impecable!', html: '¡Clavadísimo a la primera! Ni tuviste que contar con los dedos.' },
+            { pose: 'orgullosa', tag: '😏 ¡Impecable!', html: 'Je, impecable. Así se lee una estructura sin caer en recetas de memoria.' },
+            { pose: 'feliz', tag: '😊 ¡Bien ahí!', html: '¡Exacto! Mirá qué limpio sale cuando respetás los <span class="eq">(n − 1)</span> saltos.' },
+          ];
+          const pick = correctPhrases[Math.floor(Math.random() * correctPhrases.length)];
+          react(pick);
+        }
+      } else {
+        react({
+          pose: 'feliz',
+          tag: '😊 ¡Bien ahí!',
+          html: '¡Ahora sí! B-bueno, costó un par de chispazos pero corregiste el desfasaje. ¡Sigamos!',
+        });
+      }
+    } else {
+      qState.failCount = (qState.failCount || 0) + 1;
+      if (qState.failCount === 1) {
+        if (q.type === 'expr') {
+          if (diagId === 'neg_pow_precedence') {
+            react({
+              pose: 'colapso',
+              tag: '💧 Jerarquía rota',
+              html: '¡Cuidado con la jerarquía! Escribiste la base negativa sin paréntesis y la potencia no está agarrando al signo menos.',
+            });
+          } else if (diagId === 'exponent_n') {
+            react({
+              pose: 'base',
+              tag: '👓 Exponente adelantado',
+              html: 'Te mandaste la gran Woo-Jin: pusiste exponente <span class="eq">n</span> en vez de <span class="eq">(n − 1)</span>. En <span class="eq">n = 1</span> ya estás multiplicando una vez de más.',
+            });
+          } else if (diagId === 'off_by_one') {
+            react({
+              pose: 'base',
+              tag: '👓 Desfasaje de poste',
+              html: 'Estás desfasado un poste: en el primer término (<span class="eq">n = 1</span>) todavía hiciste 0 saltos, así que el paso multiplica a <span class="eq">(n − 1)</span>, no a <span class="eq">n</span>.',
+            });
+          } else if (diagId === 'wrong_anchor_a2') {
+            react({
+              pose: 'colapso',
+              tag: '💧 Ancla corrida',
+              html: '¡Hiciste la gran Kiran! Armaste bien los <span class="eq">(n − 1)</span> saltos, pero pusiste el segundo término como punto de partida en vez de <span class="eq">a(1)</span>.',
+            });
+          } else if (diagId === 'sign_of_step') {
+            react({
+              pose: 'base',
+              tag: '👓 Ojo al signo',
+              html: 'Miraste bien el tamaño del salto, pero le pifiaste al signo: fijate si la sucesión está subiendo o bajando.',
+            });
+          } else if (diagId === 'swapped_k_step') {
+            react({
+              pose: 'colapso',
+              tag: '💧 Cables cruzados',
+              html: '¡Me diste vuelta los cables! Pusiste la diferencia común donde iba el primer término <span class="eq">k</span> y viceversa.',
+            });
+          } else {
+            react({
+              pose: 'base',
+              tag: '👓 Revisá el planteo',
+              html: 'Revisá la fórmula: compará lo que genera para <span class="eq">n = 1</span> y <span class="eq">n = 2</span> con los términos de la lista.',
+            });
+          }
+        } else {
+          react({
+            pose: 'base',
+            tag: '👓 Primer intento',
+            html: 'Mmm, no coincide. Mirá bien los datos del problema o revisá las cuentas antes de volver a intentar.',
+          });
+        }
+      } else if (qState.failCount === 2) {
+        react({
+          pose: 'enojada',
+          tag: '💢 ¡Frená la mano!',
+          html: '¿¡Me estás tirando números al azar para ver si embocás!? ¡No estamos en una verdulería! Mirá la cinta de saltos o tocá el botón de Pista antes de seguir adivinando.',
+        });
+      } else {
+        react({
+          pose: 'enojada',
+          tag: '💢 ¡Colapso nervioso!',
+          html: '¡Me vas a hacer dar un colapso nervioso! Evaluá con <span class="eq">n = 1</span> en lo que escribiste y fijate que ni siquiera te da el primer término de la lista.',
+        });
+      }
+    }
+  }
 
   function checkCompletion() {
     const allOk = state.answers.every((a) => a.ok);
@@ -416,6 +519,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           const val = parseFloat(inputNum.value);
           if (Number.isNaN(val)) {
             qState.feedback = { ok: false, message: 'Ingresá un número válido.' };
+            triggerVnReaction(q, qState, false);
           } else {
             const isMatch = approxEq(val, q.expected);
             qState.value = val;
@@ -423,6 +527,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             qState.feedback = isMatch
               ? { ok: true, message: '¡Excelente! Respuesta correcta.' }
               : { ok: false, message: `Revisá el cálculo: obtuviste ${fmt(val)}, pero no coincide.` };
+            triggerVnReaction(q, qState, isMatch);
           }
           checkCompletion();
           render();
@@ -471,6 +576,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           const parsed = parse(raw);
           if (!parsed.ok) {
             qState.feedback = { ok: false, message: parsed.error?.message || 'Error de sintaxis en la fórmula.' };
+            triggerVnReaction(q, qState, false);
             render();
             return;
           }
@@ -489,12 +595,16 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
                 ok: false,
                 message: diags[0]?.message || 'La fórmula es matemáticamente equivalente, pero debés escribirla en la forma estándar con (n − 1).',
               };
+              triggerVnReaction(q, qState, false, diags[0]?.id || 'not_standard');
             } else {
               qState.ok = true;
               qState.feedback = {
                 ok: true,
                 message: isStd ? '¡Perfecto! Fórmula estándar correcta.' : '¡Correcto! Es una fórmula equivalente válida.',
               };
+              const diags = !isStd ? diagnose(ast, expected) : [];
+              const isEquivWarn = (!isStd) || diags.some((d) => d.id === 'not_standard_but_equivalent');
+              triggerVnReaction(q, qState, true, isEquivWarn ? 'not_standard_but_equivalent' : null);
             }
           } else {
             qState.ok = false;
@@ -503,6 +613,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               ok: false,
               message: diags[0]?.message || 'La fórmula no coincide con los términos de la sucesión pedida.',
             };
+            triggerVnReaction(q, qState, false, diags[0]?.id || null);
           }
 
           checkCompletion();
@@ -551,6 +662,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           const valStep = parseFloat(inputStep.value);
           if (Number.isNaN(valK) || Number.isNaN(valStep)) {
             qState.feedback = { ok: false, message: 'Completá ambos casilleros con números válidos.' };
+            triggerVnReaction(q, qState, false);
           } else {
             const expK = q.expected.k;
             const expStep = q.expected.step !== undefined ? q.expected.step : (q.expected.d ?? q.expected.r);
@@ -569,6 +681,9 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             } else {
               qState.feedback = { ok: false, message: `Ninguno de los dos valores coincide. Revisá el inicio y el salto.` };
             }
+
+            const diagPair = (!matchK && matchStep) ? 'wrong_k' : (matchK && !matchStep) ? 'wrong_step' : null;
+            triggerVnReaction(q, qState, qState.ok, diagPair);
           }
           checkCompletion();
           render();
@@ -605,6 +720,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               qState.feedback = isMatch
                 ? { ok: true, message: q.explanation || '¡Correcto! Opción acertada.' }
                 : { ok: false, message: 'Opción incorrecta. Leé la pregunta con atención y volvé a probar.' };
+              triggerVnReaction(q, qState, isMatch);
               checkCompletion();
               render();
             });
@@ -650,12 +766,14 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           const allFilled = matchState.every((val) => val !== '');
           if (!allFilled) {
             qState.feedback = { ok: false, message: 'Asigná un patrón a cada una de las sucesiones.' };
+            triggerVnReaction(q, qState, false);
           } else {
             const allMatched = pairs.every((p, i) => matchState[i] === p.pattern);
             qState.ok = allMatched;
             qState.feedback = allMatched
               ? { ok: true, message: '¡Impecable! Todas las relaciones son correctas.' }
               : { ok: false, message: 'Hay emparejamientos incorrectos. Revisá el tipo de operación y signo en cada caso.' };
+            triggerVnReaction(q, qState, allMatched);
           }
           checkCompletion();
           render();
@@ -687,8 +805,14 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
         btnHint.addEventListener('click', () => {
           if (qState.hintIndex < q.hints.length) {
+            const hintText = q.hints[qState.hintIndex];
             qState.hintIndex++;
             render();
+            react({
+              pose: 'base',
+              tag: '👓 Pista desbloqueada',
+              html: `Acá tenés una pista: <em>${hintText}</em>`,
+            });
           }
         });
         toolsRow.append(btnHint);
@@ -703,6 +827,13 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         btnSol.addEventListener('click', () => {
           qState.showSolution = !qState.showSolution;
           render();
+          if (qState.showSolution) {
+            react({
+              pose: 'colapso',
+              tag: '💧 Suspiro...',
+              html: 'Suspiro... está bien, no sufras más. Guardá la goma de borrar y mirá cómo se desarma paso por paso:',
+            });
+          }
         });
         toolsRow.append(btnSol);
       }

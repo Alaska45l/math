@@ -6,6 +6,7 @@
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane, bindSvgDrag } from '../../../core/plot.js';
+import { react } from '../../../core/vn.js';
 
 const PRESETS = [
   { id: 'impares', label: '3, 5, 7, 9…', fn: (n) => 3 + 2 * (n - 1), d: 2, isGeo: false, yMax: 14, yMin: 0 },
@@ -215,8 +216,18 @@ export function initFuncionWidget(container) {
 
     // Eventos de arrastre/clic en el plano
     bindSvgDrag(svgEl, plane, ({ x }) => {
+      const prevN = cursorN;
       cursorN = Math.max(0.5, Math.min(5.5, Math.round(x * 10) / 10));
       render();
+
+      const isDecimal = Math.abs(cursorN - Math.round(cursorN)) >= 0.05;
+      if (isDecimal && cursorN !== prevN) {
+        react({
+          pose: 'enojada',
+          tag: '💢 Dominio discreto',
+          html: `¡En ℕ no existen términos con coma! Caíste en el vacío de <span class="eq">n = ${fmt(cursorN, 1)} ∉ ℕ</span>. Las sucesiones son funciones de dominio estrictamente entero.`,
+        });
+      }
     });
   }
 

@@ -8,6 +8,7 @@
 
 import { h, mount } from '../../../core/dom.js';
 import { fmt, MINUS } from '../../../core/math-format.js';
+import { react } from '../../../core/vn.js';
 import { GENERAL_RULES, expandRecursive } from '../logic.js';
 
 export function initEscaleraWidget(container) {
@@ -175,6 +176,13 @@ export function initEscaleraWidget(container) {
                 change: (e) => {
                   enableSecondAnchor = e.target.checked;
                   render();
+                  if (!enableSecondAnchor) {
+                    react({
+                      pose: 'colapso',
+                      tag: '💧 ¿Y el combustible?',
+                      html: '¿¡Desactivaste la segunda ancla!? La regla de Fibonacci suma los <strong>dos</strong> escalones previos: <span class="eq">a(n − 1) + a(n − 2)</span>. Sin <span class="eq">a(2)</span>, la máquina queda ciega y no sabe cómo arrancar.',
+                    });
+                  }
                 },
               },
             }),
