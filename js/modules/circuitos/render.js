@@ -51,7 +51,7 @@ function lamp(refs, cx, y) {
     s('line', { x1: cx - 10, y1: y - 10, x2: cx + 10, y2: y + 10 }),
     s('line', { x1: cx - 10, y1: y + 10, x2: cx + 10, y2: y - 10 }));
   refs.lamp = s('g', { class: 'lamp' }, rays, bulb, cross,
-    s('text', { class: 'svg-ts', x: cx, y: y + 56, 'text-anchor': 'middle' }, 'lámpara'));
+    s('text', { class: 'svg-ts', x: cx, y: y + 66, 'text-anchor': 'middle' }, 'lámpara'));
   return refs.lamp;
 }
 
@@ -139,7 +139,7 @@ function endpoint(x, y, cls, closed) {
 
 function row(list, y, cls, label, thick = false) {
   const out = [
-    s('text', { class: 'svg-ts', x: 60, y: y - 14 }, label),
+    s('text', { class: 'svg-ts', x: 60, y: y - 20 }, label),
     s('line', { x1: 60, y1: y, x2: 620, y2: y, class: 'nl-track' }),
   ];
   if (!list.length) out.push(s('text', { class: 'svg-ts', x: 340, y: y + 4, 'text-anchor': 'middle' }, 'conjunto vacío'));
@@ -160,26 +160,26 @@ function row(list, y, cls, label, thick = false) {
 }
 
 export function renderNumberLine(svg, state, { iA, iB, res }) {
-  svg.setAttribute('viewBox', '0 0 680 256');
+  svg.setAttribute('viewBox', '0 0 680 286');
   bindSvgScale(svg, 680);
   const ticks = [];
   for (let t = X_MIN; t <= X_MAX; t += 5) {
     ticks.push(
-      s('line', { x1: px(t), y1: 208, x2: px(t), y2: 213, class: 'nl-axis' }),
-      s('text', { class: 'svg-ts', x: px(t), y: 238, 'text-anchor': 'middle' }, fmt(t)),
+      s('line', { x1: px(t), y1: 238, x2: px(t), y2: 244, class: 'nl-axis' }),
+      s('text', { class: 'svg-ts plot-tick', x: px(t), y: 268, 'text-anchor': 'middle' }, fmt(t)),
     );
   }
   const mx = px(state.x);
   mount(svg,
-    row([iA], 76, 'nl--a', `A · ${condText(state.A)}`),
-    row([iB], 120, 'nl--b', `B · ${condText(state.B)}`),
-    row(res, 164, 'nl--res', `Resultado · ${state.mode === 'and' ? 'A ∧ B' : 'A ∨ B'}`, true),
-    s('line', { x1: 60, y1: 208, x2: 620, y2: 208, class: 'nl-axis' }),
+    row([iA], 70, 'nl--a', `A · ${condText(state.A)}`),
+    row([iB], 126, 'nl--b', `B · ${condText(state.B)}`),
+    row(res, 182, 'nl--res', `Resultado · ${state.mode === 'and' ? 'A ∧ B' : 'A ∨ B'}`, true),
+    s('line', { x1: 60, y1: 238, x2: 620, y2: 238, class: 'nl-axis' }),
     ticks,
-    s('line', { x1: mx, y1: 68, x2: mx, y2: 82, class: 'nl-cursor' }),
-    s('line', { x1: mx, y1: 112, x2: mx, y2: 126, class: 'nl-cursor' }),
-    s('line', { x1: mx, y1: 156, x2: mx, y2: 170, class: 'nl-cursor' }),
-    s('line', { x1: mx, y1: 202, x2: mx, y2: 212, class: 'nl-cursor' }),
+    s('line', { x1: mx, y1: 64, x2: mx, y2: 76, class: 'nl-cursor' }),
+    s('line', { x1: mx, y1: 120, x2: mx, y2: 132, class: 'nl-cursor' }),
+    s('line', { x1: mx, y1: 176, x2: mx, y2: 188, class: 'nl-cursor' }),
+    s('line', { x1: mx, y1: 232, x2: mx, y2: 244, class: 'nl-cursor' }),
     s('text', { class: 'svg-ts', x: mx, y: 14, 'text-anchor': 'middle' }, `x = ${fmt(state.x)}`),
   );
 }

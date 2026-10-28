@@ -351,8 +351,8 @@ export function initInversa(container) {
     // Etiquetas en el gráfico
     plane.layers.labels.append(
       s('text', {
-        x: plane.sx(2.0),
-        y: plane.sy(3.5),
+        x: plane.sx(1.4),
+        y: plane.sy(3.8),
         class: 'plot-label',
         fill: 'var(--muted)',
         'text-anchor': 'middle',
