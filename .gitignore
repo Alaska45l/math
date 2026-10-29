@@ -4,6 +4,7 @@
 
 # Scripts de prueba exploratorios, temporales y scratch
 /scratch/
+/tests/
 
 # Reportes y artefactos de navegadores y suites de pruebas (Playwright/Node)
 /test-results/
