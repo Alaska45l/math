@@ -64,6 +64,39 @@ export const VN_SCRIPTS = {
     },
   ],
 
+  'sec1-duda-distancia': [
+    {
+      pose: 'colapso',
+      tag: 'El dilema de |x + 2| = 6',
+      html: '¡Te entiendo tanto! Ves una ecuación como <span class="eq">|x + 2| = 6</span> y tu cabeza entra en cortocircuito: <em>«¡Pará! Si la fórmula de la distancia tiene una resta <span class="eq">|x − h|</span>, ¿de dónde salió ese signo más? ¿Y por qué al despejar el 6 no pasa como negativo?»</em>. No te preocupes: es la traba clásica del ingreso. Vamos a desarmarla con lupa paso por paso.',
+    },
+    {
+      pose: 'base',
+      tag: 'Paso 1 · El molde de la resta',
+      html: 'En geometría, la distancia entre dos posiciones <span class="eq">A</span> y <span class="eq">B</span> en la recta se define siempre con una resta: <span class="eq">|A − B|</span>. Para ver el ancla real, tenés que forzar esa resta. ¿Cómo convertís un <span class="eq">+2</span> en resta? Por regla de signos, <span class="eq">+2 = −(−2)</span>. Por eso <span class="eq">|x + 2|</span> se reescribe como <span class="eq">|x − (−2)|</span>. ¡El ancla o centro NO es 2, sino <span class="eq">h = −2</span>!',
+    },
+    {
+      pose: 'orgullosa',
+      tag: 'Paso 2 · El truco ninja del cero',
+      html: 'Si no te querés acordar de memoria de «cambiarle el signo a <span class="eq">h</span>», te regalo el truco que uso yo: <strong>preguntale al interior de las barras qué número lo anula</strong>. Hacé la cuenta mental: <span class="eq">x + 2 = 0 ⟹ x = −2</span>. ¡Listo! El número que apaga lo de adentro a cero es siempre tu ancla física en la recta.',
+    },
+    {
+      pose: 'base',
+      tag: 'Paso 3 · La distancia se desdobla',
+      html: 'Ahora la duda mortal del despeje: <em>¿por qué la distancia 6 no pasa negativa?</em> ¡Porque el 6 NUNCA cambia de miembro! El 6 es una distancia fijada. Lo que hace el valor absoluto al abrirse es abrir dos caminos físicos posibles: podés estar 6 pasos a la derecha o 6 pasos a la izquierda. O sea: <strong>Camino 1:</strong> <span class="eq">x + 2 = +6</span> y <strong>Camino 2:</strong> <span class="eq">x + 2 = −6</span> (compacto: <span class="eq">x + 2 = ±6</span>).',
+    },
+    {
+      pose: 'feliz',
+      tag: 'Paso 4 · El despeje limpio',
+      html: 'El único número que «pasa» (se traslada de miembro) es el <span class="eq">+2</span> que acompañaba a la <span class="eq">x</span>, que pasa restando como <span class="eq">−2</span> a ambos lados: <span class="eq">x = −2 ± 6</span>. Caminando hacia la izquierda: <span class="eq">x₁ = −2 − 6 = −8</span>. Caminando hacia la derecha: <span class="eq">x₂ = −2 + 6 = 4</span>. Ordenadas de menor a mayor: <span class="eq">x₁ = −8</span> y <span class="eq">x₂ = 4</span>.',
+    },
+    {
+      pose: 'orgullosa',
+      tag: 'Paso 5 · Verificación de examen',
+      html: 'Para tener 100% de seguridad en un examen, probá ambos números en la ecuación original: con <span class="eq">x = −8</span> tenés <span class="eq">|(−8) + 2| = |−6| = 6</span>. ¡Dio 6! Y con <span class="eq">x = 4</span> tenés <span class="eq">|4 + 2| = |6| = 6</span>. ¡Dio 6 de nuevo! La distancia desde el ancla <span class="eq">−2</span> hasta ambos puntos es de exactamente 6 unidades. ¡Ahora andá al chequeo de comprensión y resolvelo con total seguridad!',
+    },
+  ],
+
   // =========================================================================
   // SECCIÓN 2 · EL ESPEJO DEL EJE X (y = |x|)
   // =========================================================================

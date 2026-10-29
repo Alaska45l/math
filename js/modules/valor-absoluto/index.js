@@ -785,7 +785,7 @@ initBlackboardController();
 
 // Inicializar disparadores de Visual Novel
 function initVNTriggers() {
-  qsa('.vn-trigger[data-vn-script]').forEach((btn) => {
+  qsa('.vn-trigger[data-vn-script], .seq-doubt-btn[data-vn-script]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const scriptId = btn.dataset.vnScript;

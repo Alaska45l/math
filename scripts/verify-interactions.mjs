@@ -292,9 +292,21 @@ const absResults = await client.eval(`(async () => {
     }
   }
 
-  // 3. Probar botones de VN trigger (tanto explicación principal como repaso básico secX-basico)
+  // 3. Probar botones de VN trigger (tanto explicación principal como repaso básico secX-basico y duda sec-1)
   const mainTriggerBtns = document.querySelectorAll('.vn-trigger[data-vn-script]');
   const basicTriggerBtns = document.querySelectorAll('.vn-trigger--base[data-vn-script$="-basico"]');
+  const doubtBtn = document.querySelector('.seq-doubt-btn[data-vn-script="sec1-duda-distancia"]');
+  let doubtBtnWorks = false;
+  if (doubtBtn) {
+    doubtBtn.click();
+    await new Promise((r) => setTimeout(r, 100));
+    const tag = document.querySelector('.vn-tag');
+    if (tag && tag.textContent.includes('dilema')) doubtBtnWorks = true;
+    const vnClose = document.querySelector('.vn-close');
+    if (vnClose) vnClose.click();
+    await new Promise((r) => setTimeout(r, 60));
+  }
+
   const firstBasicBtn = basicTriggerBtns[0];
   if (firstBasicBtn) firstBasicBtn.click();
   await new Promise((r) => setTimeout(r, 100));
@@ -356,6 +368,7 @@ const absResults = await client.eval(`(async () => {
     allSvgsSameNodeReference,
     mainTriggerBtnsCount: mainTriggerBtns.length,
     basicTriggerBtnsCount: basicTriggerBtns.length,
+    doubtBtnWorks,
     vnOverlayActive,
     vnTagSvgPresent,
     bossBoardMounted,
@@ -381,6 +394,7 @@ const allOk =
   absResults.allSvgsSameNodeReference &&
   absResults.mainTriggerBtnsCount === 20 &&
   absResults.basicTriggerBtnsCount === 10 &&
+  absResults.doubtBtnWorks &&
   absResults.vnOverlayActive &&
   absResults.vnTagSvgPresent &&
   absResults.bossBoardMounted &&

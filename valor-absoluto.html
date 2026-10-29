@@ -178,7 +178,18 @@
 
         <div class="seq-block seq-block--caution">
           <span class="seq-block__label">Cuidado con</span>
-          <p>No leas <code>|x + 4|</code> como «distancia al +4». Reescribilo siempre como una resta respecto al ancla: <code>|x − (−4)|</code> mide la distancia desde <code>x</code> hasta el centro negativo <strong>h = −4</strong>.</p>
+          <p>No leas <code>|x + 4|</code> como «distancia al +4». La fórmula de distancia exige por definición una resta: <code>|A − B|</code>. Como por regla de signos <code>+4 = −(−4)</code>, la expresión <code>|x + 4|</code> es idéntica a <code>|x − (−4)|</code>: mide la distancia desde <code>x</code> hasta el <strong>ancla negativa h = −4</strong> (el valor que anula el interior: <code>x + 4 = 0 ⟹ x = −4</code>).</p>
+          <p>Al resolver una ecuación como <code>|x + 2| = 6</code>, la distancia <code>6</code> se reparte hacia ambos lados: <code>x + 2 = ±6</code>. Al despejar <code>x</code>, el <code>+2</code> pasa restando a ambos miembros: <code>x = −2 ± 6</code>, dando <code>x₁ = −2 − 6 = −8</code> y <code>x₂ = −2 + 6 = 4</code>. ¡La distancia <code>6</code> nunca cambia de signo al despejar, sino que se abre hacia la izquierda (−) y hacia la derecha (+)!</p>
+        </div>
+
+        <div class="seq-doubt-wrap">
+          <button type="button" class="seq-doubt-btn" data-vn-script="sec1-duda-distancia" aria-label="Sigo sin entenderlo bien: ¿por qué |x + 2| = 6 da dos soluciones y cómo se despeja con Alaska?">
+            <span class="seq-doubt-btn__icon"><svg class="chalk-icon chalk-icon--help" viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="7"/><path d="M6.2 6a2 2 0 0 1 3.8.7c0 1.3-1.8 1.6-1.8 2.8"/><circle cx="8" cy="12.5" r="0.6" fill="currentColor"/></svg></span>
+            <span class="seq-doubt-btn__content">
+              <strong class="seq-doubt-btn__title">Sigo sin entenderlo bien</strong>
+              <span class="seq-doubt-btn__desc">¿Por qué |x + 2| = 6 da dos soluciones, cómo se despeja paso a paso y qué truco usar?</span>
+            </span>
+          </button>
         </div>
 
         <div class="seq-block seq-block--check">
