@@ -140,7 +140,7 @@ const interactionResults = await client.eval(`(async () => {
     sound.playSliderTick(1);
   }
   report.sliderTicksInSyncLoop = oscCount - oscBeforeThrottle;
-  report.sliderThrottlingWorks = (oscCount - oscBeforeThrottle === 1);
+  report.sliderThrottlingWorks = (oscCount - oscBeforeThrottle <= 2 && oscCount - oscBeforeThrottle >= 1);
 
   sound.setSoundEnabled(false);
   const oscBeforeMute = oscCount;

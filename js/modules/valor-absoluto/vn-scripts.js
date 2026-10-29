@@ -500,8 +500,8 @@ export const VN_SCRIPTS = {
     },
     {
       pose: 'orgullosa',
-      tag: 'Camino 1 · Pasar sumando el término entero',
-      html: 'La forma más directa y segura de despejar es por pasaje de términos. El término <span class="eq">−2 · A</span> está restando a la izquierda; lo pasamos sumando a la derecha:<br><span class="eq">6 = +2 · A ⟹ 2 · A = 6 ⟹ 2|x − 3| = 6</span>.<br>¡Fijate qué pasó! El paquete <span class="eq">A = |x − 3|</span> viajó entero hacia el otro lado. Lo que estaba adentro (<span class="eq">x − 3</span>) no se tocó porque nadie operó dentro de la caja.',
+      tag: 'Camino 1 · Propiedad uniforme (sin magia de «pasar»)',
+      html: '¡Desterremos la frase escolar de «pasa sumando»! Las expresiones no tienen piernas ni cruzan el signo igual por arte de magia. En matemática rigurosa usamos la <strong>propiedad uniforme</strong>: sumamos el opuesto aditivo <span class="eq">+2 · A</span> en ambos miembros de la ecuación:<br><span class="eq">(−2 · A + 6) + 2 · A = 0 + 2 · A</span>.<br>A la izquierda, <span class="eq">−2 · A + 2 · A = 0</span> (se cancelan) y sobrevive únicamente el <span class="eq">6</span>. A la derecha queda <span class="eq">2 · A</span>:<br><span class="eq">6 = 2 · A ⟹ 2 · A = 6 ⟹ 2|x − 3| = 6</span>.<br>¡Fijate en la estructura real! Le agregamos la misma cantidad <span class="eq">2 · A</span> a los dos platillos de la balanza. Lo que estaba adentro de las barras (<span class="eq">x − 3</span>) jamás se alteró porque el bloque <span class="eq">A</span> operó completo como una unidad indivisible.',
     },
     {
       pose: 'colapso',
@@ -516,7 +516,7 @@ export const VN_SCRIPTS = {
     {
       pose: 'feliz',
       tag: 'El paso final hacia las dos raíces',
-      html: 'Con <span class="eq">2|x − 3| = 6</span>, dividimos ambos miembros por 2:<br><span class="eq">|x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> <span class="eq">x − 3 = −3 ⟹ x₁ = −3 + 3 = 0</span>.<br>• <strong>Rama derecha:</strong> <span class="eq">x − 3 = +3 ⟹ x₂ = 3 + 3 = 6</span>.<br>Por eso las dos raíces son <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>.',
+      html: `Con <span class="eq">2|x − 3| = 6</span>, aplicamos propiedad uniforme multiplicando por el inverso ${FRAC_HALF} (dividir por 2) a ambos miembros:<br><span class="eq">|x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades de distancia del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> sumamos 3 a ambos miembros: <span class="eq">x − 3 + 3 = −3 + 3 ⟹ x₁ = 0</span>.<br>• <strong>Rama derecha:</strong> sumamos 3 a ambos miembros: <span class="eq">x − 3 + 3 = +3 + 3 ⟹ x₂ = 6</span>.<br>Por eso las dos raíces son <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>.`,
     },
   ],
 
