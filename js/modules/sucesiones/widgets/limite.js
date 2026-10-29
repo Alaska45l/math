@@ -3,7 +3,7 @@
  * Puente a Análisis Matemático I: Comportamiento asintótico hacia infinito (lim n→∞ a(n)).
  */
 
-import { h, s, mount } from '../../../core/dom.js';
+import { h, s, mount, chalkIcon } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
 import { calcSafeAxis } from '../scale.js';
@@ -19,7 +19,46 @@ export function initLimiteWidget(container) {
   let presetIdx = 0;
   let maxN = 12;
 
-  function render() {
+  const presetButtonsSlot = h('div', { class: 'seq-controls' });
+  const maxNLabel = h('strong', { style: 'color: var(--yellow);' }, String(maxN));
+  const sliderN = h('input', {
+    type: 'range',
+    min: 6,
+    max: 30,
+    value: maxN,
+    class: 'seq-range',
+    on: {
+      input: (e) => {
+        maxN = parseInt(e.target.value, 10);
+        updateDynamic();
+      },
+    },
+  });
+
+  const controls = h('div', { class: 'seq-controls' },
+    h('label', { class: 'field__label' },
+      'Evaluar hasta el término n = ',
+      maxNLabel,
+      sliderN
+    )
+  );
+
+  const tableSlot = h('div', { class: 'seq-table-wrap', style: 'flex: 1; min-width: 200px;' });
+  const svgEl = s('svg', {
+    viewBox: '0 0 540 300',
+    class: 'seq-plot',
+    role: 'img',
+    'aria-label': 'Gráfico de convergencia de la sucesión hacia el límite',
+  });
+  const plotCard = h('div', { class: 'seq-plot-card', style: 'flex: 1.5; min-width: 300px;' }, svgEl);
+  const layoutGrid = h('div', { class: 'seq-fn-grid' }, tableSlot, plotCard);
+  const limitNoticeSlot = h('div');
+
+  mount(container, presetButtonsSlot, controls, layoutGrid, limitNoticeSlot);
+
+  function updateDynamic() {
+    maxNLabel.textContent = String(maxN);
+
     const p = PRESETS[presetIdx];
     const absR = Math.abs(p.r);
     const isConvergent = absR < 1;
@@ -31,34 +70,23 @@ export function initLimiteWidget(container) {
 
     const lastVal = data[data.length - 1].val;
 
-    const presetButtons = h('div', { class: 'seq-controls' },
-      PRESETS.map((pr, idx) =>
+    mount(presetButtonsSlot,
+      ...PRESETS.map((pr, idx) =>
         h('button', {
           type: 'button',
           class: ['chip', idx === presetIdx ? 'is-active' : ''],
-          on: { click: () => { presetIdx = idx; render(); } },
+          on: {
+            click: () => {
+              presetIdx = idx;
+              updateDynamic();
+            },
+          },
         }, pr.label)
       )
     );
 
-    const controls = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        `Evaluar hasta el término n = `,
-        h('strong', { style: 'color: var(--yellow);' }, String(maxN)),
-        h('input', {
-          type: 'range',
-          min: 6,
-          max: 30,
-          value: maxN,
-          class: 'seq-range',
-          on: { input: (e) => { maxN = parseInt(e.target.value, 10); render(); } },
-        })
-      )
-    );
-
-    // Tabla de valores lejanos
     const previewIndices = [1, 2, 3, 5, 10, maxN].filter((v, i, a) => v <= maxN && a.indexOf(v) === i);
-    const tableEl = h('div', { class: 'seq-table-wrap', style: 'flex: 1; min-width: 200px;' },
+    mount(tableSlot,
       h('table', { class: 'seq-table' },
         h('thead', null,
           h('tr', null,
@@ -80,42 +108,23 @@ export function initLimiteWidget(container) {
       )
     );
 
-    // Gráfico Cartesiano
-    const svgEl = s('svg', {
-      viewBox: '0 0 540 300',
-      class: 'seq-plot',
-      role: 'img',
-      'aria-label': 'Gráfico de convergencia de la sucesión hacia el límite',
-    });
-
-    const plotCard = h('div', { class: 'seq-plot-card', style: 'flex: 1.5; min-width: 300px;' }, svgEl);
-
-    // Cartel explicativo de límite
-    const limitNotice = h('div', { class: ['notice', isConvergent ? 'notice--ok' : 'notice--err'] },
-      h('strong', null, isConvergent ? '✓ Sucesión Convergente: ' : '✗ Sucesión Divergente: '),
-      h('span', null,
-        isConvergent
-          ? `Como |r| = ${fmt(absR)} < 1, cada término es una fracción del anterior. A medida que n → ∞, los términos tienden a 0 (límite = 0).`
-          : `Como |r| = ${fmt(absR)} > 1, los términos se multiplican indefinidamente y la sucesión diverge hacia ±∞ (no tiene límite finito).`
-      ),
-      h('p', { class: 'small muted', style: 'margin-top: 6px;' },
-        `En n = ${maxN}, el término vale a(${maxN}) = ${typeof lastVal === 'number' && Math.abs(lastVal) < 1e-4 ? lastVal.toExponential(4).replace('.', ',') : fmt(lastVal, 4)}. ¡Se acerca infinitesimalmente a 0 sin ser exactamente 0!`
+    mount(limitNoticeSlot,
+      h('div', { class: ['notice', isConvergent ? 'notice--ok' : 'notice--err'] },
+        h('strong', { style: 'display: inline-flex; align-items: center; gap: 5px;' },
+          chalkIcon(isConvergent ? 'check' : 'cross', { width: 16, height: 16 }),
+          isConvergent ? 'Sucesión Convergente: ' : 'Sucesión Divergente: '
+        ),
+        h('span', null,
+          isConvergent
+            ? `Como |r| = ${fmt(absR)} < 1, cada término es una fracción del anterior. A medida que n → ∞, los términos tienden a 0 (límite = 0).`
+            : `Como |r| = ${fmt(absR)} > 1, los términos se multiplican indefinidamente y la sucesión diverge hacia ±∞ (no tiene límite finito).`
+        ),
+        h('p', { class: 'small muted', style: 'margin-top: 6px;' },
+          `En n = ${maxN}, el término vale a(${maxN}) = ${typeof lastVal === 'number' && Math.abs(lastVal) < 1e-4 ? lastVal.toExponential(4).replace('.', ',') : fmt(lastVal, 4)}. ¡Se acerca infinitesimalmente a 0 sin ser exactamente 0!`
+        )
       )
     );
 
-    const layoutGrid = h('div', { class: 'seq-fn-grid' },
-      tableEl,
-      plotCard
-    );
-
-    mount(container,
-      presetButtons,
-      controls,
-      layoutGrid,
-      limitNotice
-    );
-
-    // Render del plano con escala adaptativa segura
     const allVals = data.map((d) => d.val);
     const minVal = Math.min(...allVals, 0);
     const maxValPl = Math.max(...allVals, 0);
@@ -135,7 +144,6 @@ export function initLimiteWidget(container) {
       yLabel: 'a(n)',
     });
 
-    // Línea de asíntota y = 0
     plane.layers.under.append(
       s('line', {
         x1: plane.sx(0),
@@ -149,7 +157,6 @@ export function initLimiteWidget(container) {
       })
     );
 
-    // Puntos
     data.forEach((d) => {
       plane.layers.marks.append(
         s('circle', {
@@ -164,5 +171,5 @@ export function initLimiteWidget(container) {
     });
   }
 
-  render();
+  updateDynamic();
 }

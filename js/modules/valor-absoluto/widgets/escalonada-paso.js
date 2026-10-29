@@ -1,254 +1,452 @@
 /**
- * widgets/escalonada-paso.js — Widget interactivo para la Sección 10:
- * Funciones de paso (escalonadas), tarifas del mundo real y por qué la Imagen es un conjunto discreto {y1, y2, ...}.
+ * escalonada-paso.js — Widget 10 (Sección 10):
+ * «Simulador de Escalera: Piso ⌊x⌋, Techo ⌈x⌉, Tarifa Postal y Proyección de Rango Discreto».
+ * Proyecta los escalones horizontales contra el Eje Y como puntos aislados brillantes
+ * para demostrar por qué el Rango se escribe entre llaves {…} y no como intervalo continuo.
  */
 
 import { h, s, mount } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane, bindSvgDrag } from '../../../core/plot.js';
-import { piecewiseBrace } from '../components.js';
-import { evalPiecewise } from '../logic.js';
-
-const CONTEXTS = [
-  {
-    id: 'parking',
-    label: 'Contexto Real: Tarifa de Estacionamiento por Hora',
-    xLabel: 't (Horas estacionado)',
-    yLabel: 'Costo ($)',
-    xMin: 0,
-    xMax: 5,
-    yMin: 0,
-    yMax: 10,
-    domainText: '(0; 4]',
-    rangeText: '{2; 4; 6; 8}',
-    wrongRangeText: '[2; 8]',
-    pieces: [
-      { exprText: '$2', condition: '0 < t ≤ 1', minX: 0, maxX: 1, minInclusive: false, maxInclusive: true, fn: () => 2 },
-      { exprText: '$4', condition: '1 < t ≤ 2', minX: 1, maxX: 2, minInclusive: false, maxInclusive: true, fn: () => 4 },
-      { exprText: '$6', condition: '2 < t ≤ 3', minX: 2, maxX: 3, minInclusive: false, maxInclusive: true, fn: () => 6 },
-      { exprText: '$8', condition: '3 < t ≤ 4', minX: 3, maxX: 4, minInclusive: false, maxInclusive: true, fn: () => 8 },
-    ],
-  },
-  {
-    id: 'math-step',
-    label: 'Función de Paso Matemática en [−3; 3]',
-    xLabel: 'x',
-    yLabel: 'f(x)',
-    xMin: -4,
-    xMax: 4,
-    yMin: -2,
-    yMax: 6,
-    domainText: '[−3; 3]',
-    rangeText: '{1; 3; 5}',
-    wrongRangeText: '[1; 5]',
-    pieces: [
-      { exprText: '1', condition: '−3 ≤ x < −1', minX: -3, maxX: -1, minInclusive: true, maxInclusive: false, fn: () => 1 },
-      { exprText: '3', condition: '−1 ≤ x < 1', minX: -1, maxX: 1, minInclusive: true, maxInclusive: false, fn: () => 3 },
-      { exprText: '5', condition: '1 ≤ x ≤ 3', minX: 1, maxX: 3, minInclusive: true, maxInclusive: true, fn: () => 5 },
-    ],
-  },
-];
+import { dotBadge } from '../components.js';
 
 export function initEscalonadaPasoWidget(container) {
-  let ctxIdx = 0;
-  let probeX = 1.5;
-  let showRangeProjection = true;
+  let state = {
+    mode: 'floor', // 'floor' | 'ceil' | 'postal'
+    x: -1.4,
+    showRangeProjection: true,
+  };
 
-  function render() {
-    const ctx = CONTEXTS[ctxIdx];
-    const ev = evalPiecewise(ctx.pieces, probeX);
+  const modesRow = h('div', { class: 'seq-controls' });
+  const controlsRow = h('div', { class: 'seq-controls' });
+  const plotCard = h('div', { class: 'seq-plot-card' });
+  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
 
-    const topBar = h('div', { class: 'seq-controls' },
-      CONTEXTS.map((c, idx) =>
-        h('button', {
-          type: 'button',
-          class: ['chip', idx === ctxIdx ? 'is-active' : ''],
-          on: {
-            click: () => {
-              ctxIdx = idx;
-              probeX = idx === 0 ? 1.5 : 0;
-              render();
-            },
-          },
-        }, c.label)
-      ),
-      h('button', {
-        type: 'button',
-        class: ['chip', showRangeProjection ? 'is-active' : ''],
-        on: {
-          click: () => {
-            showRangeProjection = !showRangeProjection;
-            render();
-          },
-        },
-      }, 'Proyectar Escalones hacia el Eje Y (Ver Rango Discreto)')
-    );
+  const valX = h('strong', { class: 'eq', style: 'color: var(--yellow);' });
+  const labelPrefix = h('span', null, 'Entrada x = ');
 
-    const sliderBar = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        `Explorar entrada (${fmt(probeX)}): `,
-        h('input', {
-          type: 'range',
-          min: String(ctx.xMin + 0.5),
-          max: String(ctx.xMax - 0.5),
-          step: '0.25',
-          value: String(probeX),
-          on: {
-            input: (e) => {
-              probeX = parseFloat(e.target.value) || 0;
-              render();
-            },
-          },
-        })
-      )
-    );
+  const sliderX = h('input', {
+    type: 'range',
+    min: -2.8,
+    max: 3.8,
+    step: 0.1,
+    value: state.x,
+    'aria-label': 'Valor de entrada x en la función escalonada',
+  });
 
-    const svg = s('svg', {
-      viewBox: '0 0 580 340',
-      class: 'seq-plot abs-board-svg',
-      role: 'img',
-      'aria-label': 'Gráfico de función escalonada mostrando que su imagen son puntos aislados en el eje Y',
-    });
+  const btnRangeProj = h('button', {
+    type: 'button',
+    class: 'chip is-active',
+    on: {
+      click: () => {
+        state.showRangeProjection = !state.showRangeProjection;
+        syncUI();
+      },
+    },
+  });
 
-    const plane = createPlane(svg, {
-      width: 580,
-      height: 340,
-      xMin: ctx.xMin,
-      xMax: ctx.xMax,
-      yMin: ctx.yMin,
-      yMax: ctx.yMax,
-      xStep: 1,
-      yStep: ctxIdx === 0 ? 2 : 1,
-      xLabel: ctx.xLabel,
-      yLabel: ctx.yLabel,
-    });
+  const btnTrapNeg = h('button', {
+    type: 'button',
+    class: 'chip',
+    on: {
+      click: () => {
+        state.x = -1.4;
+        sliderX.value = '-1.4';
+        syncUI();
+      },
+    },
+  }, 'Probar trampa negativa: x = −1,4');
 
-    ctx.pieces.forEach((p, idx) => {
-      const yVal = p.fn(p.minX);
-      const isSelected = idx === ev.activePieceIndex;
-      const color = isSelected ? 'var(--yellow)' : 'var(--blue)';
+  const btnQuickInt = h('button', {
+    type: 'button',
+    class: 'chip',
+    on: {
+      click: () => {
+        state.x = 2;
+        sliderX.value = '2';
+        syncUI();
+      },
+    },
+  }, 'Probar entero exacto: x = 2');
 
-      // Escalón horizontal
-      plane.layers.curve.append(
-        s('line', {
-          x1: plane.sx(p.minX),
-          y1: plane.sy(yVal),
-          x2: plane.sx(p.maxX),
-          y2: plane.sy(yVal),
-          stroke: color,
-          'stroke-width': isSelected ? '4' : '3',
-        })
-      );
+  const svg = s('svg', {
+    class: 'seq-svg abs-board__svg',
+    style: 'width: 100%; height: auto; max-height: 360px; display: block; touch-action: none; cursor: grab;',
+    role: 'img',
+    'aria-label': 'Gráfico de función escalonada con proyección de rango discreto sobre el eje Y',
+  });
+  plotCard.append(svg);
 
-      // Extremos abierto/cerrado
-      plane.layers.marks.append(
-        s('circle', {
-          cx: plane.sx(p.minX),
-          cy: plane.sy(yVal),
-          r: 5.5,
-          fill: p.minInclusive ? color : 'var(--bg)',
-          stroke: color,
-          'stroke-width': '2.2',
-        }),
-        s('circle', {
-          cx: plane.sx(p.maxX),
-          cy: plane.sy(yVal),
-          r: 5.5,
-          fill: p.maxInclusive ? color : 'var(--bg)',
-          stroke: color,
-          'stroke-width': '2.2',
-        })
-      );
+  let activePlane = null;
+  let lastPlaneMode = null;
 
-      // Proyección hacia el eje Y mostrando un ÚNICO punto aislado
-      if (showRangeProjection) {
-        plane.layers.under.append(
+  bindSvgDrag(
+    svg,
+    () => activePlane,
+    ({ x: mathX }) => {
+      const isPostal = state.mode === 'postal';
+      const minX = isPostal ? 0.1 : -2.8;
+      const maxX = isPostal ? 3.9 : 3.8;
+      const rounded = Math.round(mathX * 10) / 10;
+      const clamped = Math.max(minX, Math.min(maxX, rounded));
+      if (clamped !== state.x) {
+        state.x = clamped;
+        sliderX.value = String(state.x);
+        syncUI();
+      }
+    }
+  );
+
+  sliderX.addEventListener('input', (e) => {
+    state.x = parseFloat(e.target.value);
+    syncUI();
+  });
+
+  function renderPlane() {
+    const isPostal = state.mode === 'postal';
+    const planeKey = isPostal ? 'postal' : 'math';
+
+    if (!activePlane || lastPlaneMode !== planeKey) {
+      lastPlaneMode = planeKey;
+      activePlane = createPlane(svg, {
+        xMin: isPostal ? 0 : -3,
+        xMax: 4,
+        yMin: isPostal ? 0 : -3,
+        yMax: isPostal ? 10 : 4,
+        width: 560,
+        height: 340,
+        yStep: isPostal ? 2 : 1,
+        xLabel: isPostal ? 'peso (kg)' : 'x',
+        yLabel: isPostal ? 'costo ($×100)' : 'y',
+      });
+    } else {
+      activePlane.clear('under', 'curves', 'marks', 'labels');
+    }
+
+    const plane = activePlane;
+    const xZero = plane.sx(0);
+
+    if (!isPostal) {
+      for (let n = -3; n <= 3; n++) {
+        const yStepVal = state.mode === 'floor' ? n : n + 1;
+        if (yStepVal < -3 || yStepVal > 4) continue;
+
+        const x1 = plane.sx(n);
+        const x2 = plane.sx(n + 1);
+        const yPx = plane.sy(yStepVal);
+        const isCurrentStep =
+          state.mode === 'floor'
+            ? state.x >= n && state.x < n + 1
+            : state.x > n && state.x <= n + 1;
+
+        const strokeCol = isCurrentStep ? 'var(--yellow)' : 'var(--teal)';
+
+        // Proyección punteada hacia el Eje Y (Sombra de Rango Discreto)
+        if (state.showRangeProjection) {
+          plane.layers.under.append(
+            s('line', {
+              x1: x1,
+              y1: yPx,
+              x2: xZero,
+              y2: yPx,
+              stroke: isCurrentStep ? 'var(--yellow)' : 'var(--pink)',
+              'stroke-width': isCurrentStep ? '2' : '1.3',
+              'stroke-dasharray': '3 4',
+              opacity: isCurrentStep ? '0.95' : '0.55',
+            }),
+            s('circle', {
+              cx: xZero,
+              cy: yPx,
+              r: isCurrentStep ? 6.5 : 5,
+              fill: isCurrentStep ? 'var(--yellow)' : 'var(--pink)',
+              stroke: 'var(--bg)',
+              'stroke-width': '1.8',
+            })
+          );
+        }
+
+        plane.layers.curves.append(
           s('line', {
-            x1: plane.sx(p.minX),
-            y1: plane.sy(yVal),
-            x2: plane.yAxisX,
-            y2: plane.sy(yVal),
-            stroke: 'var(--green)',
-            'stroke-width': '1.6',
-            'stroke-dasharray': '4 4',
+            x1,
+            y1: yPx,
+            x2,
+            y2: yPx,
+            stroke: strokeCol,
+            'stroke-width': isCurrentStep ? '4' : '2.8',
+          })
+        );
+
+        const leftClosed = state.mode === 'floor';
+        const rightClosed = state.mode === 'ceil';
+
+        plane.layers.marks.append(
+          s('circle', {
+            cx: x1,
+            cy: yPx,
+            r: 6,
+            fill: leftClosed ? strokeCol : 'var(--bg)',
+            stroke: strokeCol,
+            'stroke-width': '2.4',
+          }),
+          s('circle', {
+            cx: x2,
+            cy: yPx,
+            r: 6,
+            fill: rightClosed ? strokeCol : 'var(--bg)',
+            stroke: strokeCol,
+            'stroke-width': '2.4',
+          })
+        );
+      }
+
+      if (state.showRangeProjection) {
+        plane.layers.labels.append(
+          s('text', {
+            x: xZero + 10,
+            y: plane.sy(3.6),
+            fill: 'var(--pink)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+            'font-weight': 'bold',
+          }, 'Rango en Eje Y: puntos aislados {−3; −2; −1; 0; 1; 2; 3}')
+        );
+      }
+    } else {
+      // Tarifa postal escalonada: (0,1] -> 3 ($300), (1,2] -> 5 ($500), (2,3] -> 7 ($700), (3,4] -> 9 ($900)
+      const rates = [
+        { min: 0, max: 1, y: 3, label: '$300' },
+        { min: 1, max: 2, y: 5, label: '$500' },
+        { min: 2, max: 3, y: 7, label: '$700' },
+        { min: 3, max: 4, y: 9, label: '$900' },
+      ];
+      rates.forEach((r) => {
+        const x1 = plane.sx(r.min);
+        const x2 = plane.sx(r.max);
+        const yPx = plane.sy(r.y);
+        const isCurrent = state.x > r.min && state.x <= r.max;
+        const col = isCurrent ? 'var(--yellow)' : 'var(--green)';
+
+        if (state.showRangeProjection) {
+          plane.layers.under.append(
+            s('line', {
+              x1: x1,
+              y1: yPx,
+              x2: xZero,
+              y2: yPx,
+              stroke: isCurrent ? 'var(--yellow)' : 'var(--pink)',
+              'stroke-width': isCurrent ? '2' : '1.4',
+              'stroke-dasharray': '3 4',
+            }),
+            s('circle', {
+              cx: xZero,
+              cy: yPx,
+              r: isCurrent ? 6.5 : 5,
+              fill: isCurrent ? 'var(--yellow)' : 'var(--pink)',
+              stroke: 'var(--bg)',
+              'stroke-width': '1.8',
+            })
+          );
+        }
+
+        plane.layers.curves.append(
+          s('line', {
+            x1,
+            y1: yPx,
+            x2,
+            y2: yPx,
+            stroke: col,
+            'stroke-width': isCurrent ? '4' : '2.8',
           })
         );
         plane.layers.marks.append(
-          s('circle', {
-            cx: plane.yAxisX,
-            cy: plane.sy(yVal),
-            r: 6.5,
-            fill: 'var(--green)',
-            stroke: 'var(--bg)',
-            'stroke-width': '2',
-          })
+          s('circle', { cx: x1, cy: yPx, r: 6, fill: 'var(--bg)', stroke: col, 'stroke-width': '2.4' }),
+          s('circle', { cx: x2, cy: yPx, r: 6, fill: col, stroke: col, 'stroke-width': '2.4' })
+        );
+      });
+
+      if (state.showRangeProjection) {
+        plane.layers.labels.append(
+          s('text', {
+            x: xZero + 12,
+            y: plane.sy(9.5),
+            fill: 'var(--pink)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+            'font-weight': 'bold',
+          }, 'Rango discreto en Eje Y: {$300; $500; $700; $900}')
         );
       }
-    });
-
-    if (ev.defined && ev.y !== null) {
-      plane.layers.over.append(
-        s('line', {
-          x1: plane.sx(probeX),
-          y1: plane.xAxisY,
-          x2: plane.sx(probeX),
-          y2: plane.sy(ev.y),
-          stroke: 'var(--yellow)',
-          'stroke-width': '1.8',
-          'stroke-dasharray': '3 3',
-        }),
-        s('circle', {
-          cx: plane.sx(probeX),
-          cy: plane.sy(ev.y),
-          r: 7,
-          fill: 'var(--yellow)',
-          stroke: 'var(--bg)',
-          'stroke-width': '2',
-        })
-      );
     }
 
-    bindSvgDrag(svg, plane, ({ x }) => {
-      const next = Math.max(ctx.xMin, Math.min(ctx.xMax, Math.round(x * 4) / 4));
-      if (next !== probeX) {
-        probeX = next;
-        render();
-      }
-    });
+    // Punto evaluado actual
+    let yEval = 0;
+    if (state.mode === 'floor') yEval = Math.floor(state.x);
+    else if (state.mode === 'ceil') yEval = Math.ceil(state.x);
+    else {
+      const kStep = Math.max(1, Math.ceil(state.x));
+      yEval = 1 + 2 * kStep;
+    }
 
-    const braceSlot = h('div', { style: 'flex: 1; min-width: 240px;' });
-    piecewiseBrace(braceSlot, ctx.pieces, ev.activePieceIndex, { fnName: 'f(x)' });
+    const px = plane.sx(state.x);
+    const py = plane.sy(yEval);
 
-    const infoCard = h('div', { class: 'seq-check__card', style: 'flex: 1.25; min-width: 260px;' },
-      h('h3', { class: 'seq-sidebar__chapter-title' }, 'Dominio Continuo vs. Imagen Discreta'),
-      h('p', { class: 'small' },
-        ev.defined
-          ? `Para entrada ${fmt(probeX)}, estás en el escalón de altura ${fmt(ev.y)}.`
-          : `Para entrada ${fmt(probeX)}, la función no está definida.`
-      ),
-      h('p', { class: 'small' },
-        h('strong', { style: 'color: var(--yellow);' }, 'Dominio (Eje X): '),
-        h('span', { class: 'eq' }, ctx.domainText),
-        ' (intervalo continuo).'
-      ),
-      h('p', { class: 'small' },
-        h('strong', { style: 'color: var(--green);' }, 'Rango / Imagen (Eje Y): '),
-        h('span', { class: 'eq', style: 'font-size: 1.2rem; color: var(--green);' }, ctx.rangeText),
-        ' (conjunto discreto entre llaves).'
-      ),
-      h('div', { class: 'notice notice--err small', style: 'margin-top: 8px;' },
-        `¡Cuidado! Nunca escribas que el rango es el intervalo continuo ${ctx.wrongRangeText}, porque la función jamás toma valores intermedios con coma entre un escalón y el otro.`
-      )
-    );
-
-    mount(
-      container,
-      topBar,
-      sliderBar,
-      svg,
-      h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, braceSlot, infoCard)
+    plane.layers.marks.append(
+      s('line', {
+        x1: px,
+        y1: plane.sy(0),
+        x2: px,
+        y2: py,
+        stroke: 'var(--yellow)',
+        'stroke-width': '1.8',
+        'stroke-dasharray': '4 3',
+      }),
+      s('circle', {
+        cx: px,
+        cy: py,
+        r: 8,
+        fill: 'var(--yellow)',
+        stroke: 'var(--bg)',
+        'stroke-width': '2.4',
+      }),
+      s('text', {
+        x: Math.max(60, Math.min(500, px + 10)),
+        y: Math.max(22, py - 12),
+        fill: 'var(--yellow)',
+        'font-family': 'var(--font-hand)',
+        'font-size': 'var(--svg-scale-caveat, 15px)',
+        'font-weight': 'bold',
+      }, isPostal ? `(${fmt(state.x)} kg; $${yEval * 100})` : `(${fmt(state.x)}; ${fmt(yEval)})`)
     );
   }
 
-  render();
+  function syncUI() {
+    const isPostal = state.mode === 'postal';
+    sliderX.min = isPostal ? '0.1' : '-2.8';
+    sliderX.max = isPostal ? '3.9' : '3.8';
+
+    labelPrefix.textContent = isPostal ? 'Peso del paquete x (kg) = ' : 'Entrada x = ';
+    valX.textContent = fmt(state.x);
+
+    btnRangeProj.classList.toggle('is-active', state.showRangeProjection);
+    btnRangeProj.textContent = state.showRangeProjection
+      ? 'Proyectar Rango contra Eje Y: ACTIVO'
+      : 'Proyectar Rango contra Eje Y: OCULTO';
+
+    mount(
+      modesRow,
+      h('button', {
+        type: 'button',
+        class: ['chip', state.mode === 'floor' ? 'is-active' : ''],
+        on: {
+          click: () => {
+            state.mode = 'floor';
+            state.x = -1.4;
+            sliderX.value = '-1.4';
+            syncUI();
+          },
+        },
+      }, '1. Función Piso  f(x) = ⌊x⌋'),
+      h('button', {
+        type: 'button',
+        class: ['chip', state.mode === 'ceil' ? 'is-active' : ''],
+        on: {
+          click: () => {
+            state.mode = 'ceil';
+            state.x = 1.3;
+            sliderX.value = '1.3';
+            syncUI();
+          },
+        },
+      }, '2. Función Techo  g(x) = ⌈x⌉'),
+      h('button', {
+        type: 'button',
+        class: ['chip', state.mode === 'postal' ? 'is-active' : ''],
+        on: {
+          click: () => {
+            state.mode = 'postal';
+            state.x = 1.4;
+            sliderX.value = '1.4';
+            syncUI();
+          },
+        },
+      }, '3. Aplicación Real: Tarifa Postal por Tramos')
+    );
+
+    if (isPostal) {
+      if (btnTrapNeg.parentNode === controlsRow) btnTrapNeg.remove();
+      if (btnQuickInt.parentNode === controlsRow) btnQuickInt.remove();
+    } else {
+      if (btnTrapNeg.parentNode !== controlsRow) controlsRow.append(btnTrapNeg);
+      if (btnQuickInt.parentNode !== controlsRow) controlsRow.append(btnQuickInt);
+    }
+
+    renderPlane();
+
+    const floorVal = Math.floor(state.x);
+    const ceilVal = Math.ceil(state.x);
+
+    mount(
+      readoutCard,
+      !isPostal
+        ? h('div', null,
+            h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.1rem;' },
+              state.mode === 'floor'
+                ? `Función Piso (mayor entero ≤ x):  ⌊${fmt(state.x)}⌋ = ${fmt(floorVal)}`
+                : `Función Techo (menor entero ≥ x):  ⌈${fmt(state.x)}⌉ = ${fmt(ceilVal)}`
+            ),
+            state.x < 0 && !Number.isInteger(state.x)
+              ? h('p', { class: 'small', style: 'margin: 0 0 6px; color: var(--pink);' },
+                  `¡Ojo con los negativos! En la recta numérica, ${fmt(state.x)} está entre ${fmt(floorVal)} (a la izquierda) y ${fmt(ceilVal)} (a la derecha). Por eso el piso ⌊${fmt(state.x)}⌋ baja al entero de la izquierda (${fmt(floorVal)}) y NO es ${fmt(ceilVal)}.`
+                )
+              : null,
+            h('p', { class: 'small muted', style: 'margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;' },
+              state.mode === 'floor'
+                ? [
+                    'Cada escalón tiene punto cerrado a la izquierda',
+                    dotBadge(true),
+                    'y círculo abierto a la derecha',
+                    dotBadge(false),
+                    '. Su Imagen en el Eje Y es el conjunto discreto entre llaves ℤ = {…, −2, −1, 0, 1, 2, …}.',
+                  ]
+                : [
+                    'Cada escalón tiene círculo abierto a la izquierda',
+                    dotBadge(false),
+                    'y punto cerrado a la derecha',
+                    dotBadge(true),
+                    '. Su Imagen en el Eje Y es el conjunto discreto entre llaves ℤ = {…, −2, −1, 0, 1, 2, …}.',
+                  ]
+            )
+          )
+        : h('div', null,
+            h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.1rem;' },
+              `Paquete de ${fmt(state.x)} kg  ⟹  entra en el escalón (${Math.ceil(state.x) - 1}; ${Math.ceil(state.x)}] kg  ⟹  Tarifa = $${(1 + 2 * Math.ceil(state.x)) * 100}`
+            ),
+            h('p', { class: 'small muted', style: 'margin: 0;' },
+              'Dominio continuo: (0; 4] kg · Conjunto Imagen (Rango) discreto entre llaves: {$300; $500; $700; $900} (nunca cobra valores intermedios como $415).'
+            )
+          )
+    );
+  }
+
+  mount(
+    controlsRow,
+    h('label', { class: 'field__label' },
+      labelPrefix,
+      valX,
+      sliderX
+    ),
+    btnRangeProj,
+    btnTrapNeg,
+    btnQuickInt
+  );
+
+  mount(
+    container,
+    modesRow,
+    controlsRow,
+    plotCard,
+    readoutCard
+  );
+
+  syncUI();
 }

@@ -98,9 +98,12 @@
   --surface: #26352d;     /* igual que el pizarrón */
   --ink: #ece8dc;         /* blanco tiza: estructura y texto */
   --text: var(--ink);     /* alias de texto principal */
+  --chalk: var(--ink);    /* alias de blanco tiza */
   --muted: #a9b3a6;       /* tiza gastada */
+  --chalk-dim: var(--muted); /* alias de tiza gastada */
   --yellow: #e6d38a;     /* "mirá acá": respuesta, resultado, selección */
   --blue: #9bbfd9;       /* datos, entradas, lo que el usuario mueve */
+  --teal: var(--blue);   /* alias de azul tiza / turquesa de entrada */
   --pink: #e3a1a1;       /* error, cuidado, tachado */
   --green: #aed1a2;      /* correcto, neutro multiplicativo, cancelación */
 
@@ -127,6 +130,7 @@
   --font-math: "Math fallback", "DejaVu Math TeX Gyre", "Cambria Math", "STIX Two Math", "Latin Modern Math", "DejaVu Serif", Georgia, serif;
   --font-hand: 'Caveat', 'Math for Caveat', var(--font-math), cursive;
   --font-note: 'Kalam', 'Math for Kalam', var(--font-math), cursive;
+  --font-mono: var(--font-hand);
 }
 
 *,

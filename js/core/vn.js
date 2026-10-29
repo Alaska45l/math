@@ -3,7 +3,7 @@
  * Reutilizable, sin dependencias externas, accesible y con estética de pizarra de tiza.
  */
 
-import { h, mount } from './dom.js';
+import { h, mount, chalkIcon } from './dom.js';
 import { playVoiceBlip, playPoseEmote } from './sound.js';
 
 export const VN_POSES = {
@@ -12,6 +12,14 @@ export const VN_POSES = {
   colapso: 'assets/vn/colapso.webp',
   enojada: 'assets/vn/enojada.webp',
   feliz: 'assets/vn/feliz.webp',
+};
+
+const POSE_ICONS = {
+  base: 'glasses',
+  orgullosa: 'smug',
+  colapso: 'drop',
+  enojada: 'anger',
+  feliz: 'smile',
 };
 
 export const ALASKA_TITLES = [
@@ -158,7 +166,7 @@ class VisualNovelController {
           this.close();
         },
       },
-    }, '✕');
+    }, chalkIcon('cross', { width: 14, height: 14 }));
 
     const headerEl = h('div', { class: 'vn-box__header' },
       nameplateEl,
@@ -349,7 +357,7 @@ class VisualNovelController {
     }
 
     if (this.btnNext) {
-      this.btnNext.textContent = isLast ? 'Cerrar ✕' : `Siguiente [${current}/${total}] ▸`;
+      this.btnNext.textContent = isLast ? 'Cerrar ×' : `Siguiente [${current}/${total}] ▸`;
     }
   }
 
@@ -394,9 +402,14 @@ class VisualNovelController {
       }
     }
 
-    // Actualizar tag
+    // Actualizar tag con icono vectorial de pose
     if (this.tagEl) {
-      this.tagEl.textContent = tag;
+      const iconType = POSE_ICONS[pose] || 'glasses';
+      mount(
+        this.tagEl,
+        chalkIcon(iconType, { width: 15, height: 15, class: 'vn-tag__icon' }),
+        h('span', { class: 'vn-tag__text' }, tag)
+      );
     }
 
     // Iniciar máquina de escribir

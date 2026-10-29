@@ -1,155 +1,251 @@
 /**
- * widgets/escalado-rama.js — Widget interactivo para la Sección 4:
- * Escalar y reflejar funciones de valor absoluto (f(x) = a|x|) y comparador -|x| vs |-x|.
+ * escalado-rama.js — Widget 4 (Sección 4):
+ * «Control de Apertura y Reflexión a·|x|» + Comparador «Menos afuera −|x| vs Menos adentro |−x|».
+ * Mantiene persistentes todos los sliders y el pizarrón SVG durante el arrastre.
  */
 
-import { h, mount } from '../../../core/dom.js';
-import { fmt, fractionHtml, MINUS } from '../../../core/math-format.js';
-import { createAbsBoard } from '../components.js';
-import { approxEq } from '../logic.js';
-
-const PRESETS_A = [
-  { label: 'y = |x| (a = 1)', a: 1 },
-  { label: 'y = 3|x| (a = 3)', a: 3 },
-  { label: 'y = 1/2 |x| (a = 0,5)', a: 0.5 },
-  { label: 'y = −|x| (a = −1)', a: -1 },
-  { label: 'y = −2|x| (a = −2)', a: -2 },
-  { label: 'y = −1/3 |x|', a: -1 / 3 },
-];
+import { h, s, mount } from '../../../core/dom.js';
+import { fmt } from '../../../core/math-format.js';
+import { createAbsBoard, formatNumOrFracNode } from '../components.js';
+import { approxEq, formatCanonicalAbs } from '../logic.js';
 
 export function initEscaladoRamaWidget(container) {
-  let aVal = 3;
-  let compareSignMode = false;
+  let state = {
+    a: 2,
+    sampleX: -3,
+  };
 
-  function renderCoeffNode(a) {
-    if (approxEq(a, 0.5)) return fractionHtml('1', '2');
-    if (approxEq(a, -0.5)) return h('span', null, MINUS, fractionHtml('1', '2'));
-    if (approxEq(a, -1 / 3)) return h('span', null, MINUS, fractionHtml('1', '3'));
-    if (approxEq(a, 1)) return '';
-    if (approxEq(a, -1)) return MINUS;
-    return fmt(a);
-  }
-
-  function render() {
-    const presetRow = h('div', { class: 'seq-controls' },
-      PRESETS_A.map((p) =>
-        h('button', {
-          type: 'button',
-          class: ['chip', approxEq(p.a, aVal) && !compareSignMode ? 'is-active' : ''],
-          on: {
-            click: () => {
-              compareSignMode = false;
-              aVal = p.a;
-              render();
-            },
-          },
-        }, p.label)
+  const presets = [
+    { labelNode: 'a = 1 (estándar)', val: 1 },
+    { labelNode: 'a = 3 (angosta ↑)', val: 3 },
+    {
+      labelNode: h('span', { style: 'display: inline-flex; align-items: center; gap: 4px;' },
+        'a = ',
+        formatNumOrFracNode(0.5),
+        ' (ancha ↑)'
       ),
-      h('button', {
-        type: 'button',
-        class: ['chip', compareSignMode ? 'is-active' : ''],
-        on: {
-          click: () => {
-            compareSignMode = !compareSignMode;
-            if (compareSignMode) aVal = -1;
-            render();
-          },
-        },
-      }, '¿Menos afuera −|x| vs. Menos adentro |−x|?')
-    );
+      val: 0.5,
+    },
+    { labelNode: 'a = −1 (espejo ↓)', val: -1 },
+    { labelNode: 'a = −2 (angosta ↓)', val: -2 },
+    {
+      labelNode: h('span', { style: 'display: inline-flex; align-items: center; gap: 4px;' },
+        'a = ',
+        formatNumOrFracNode(-0.5),
+        ' (ancha ↓)'
+      ),
+      val: -0.5,
+    },
+  ];
 
-    const sliderRow = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        `Factor de apertura y sentido a (${fmt(aVal)}): `,
-        h('input', {
-          type: 'range',
-          min: '-4',
-          max: '4',
-          step: '0.5',
-          value: String(approxEq(aVal, -1 / 3) ? -0.5 : aVal),
-          on: {
-            input: (e) => {
-              let v = parseFloat(e.target.value);
-              if (Math.abs(v) < 0.1) v = 0.5;
-              aVal = v;
-              render();
-            },
-          },
-        })
+  const boardSlot = h('div', { class: 'seq-plot-card' });
+  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const comparatorWrap = h('div', { style: 'margin-top: 12px;' });
+
+  const valA = h('strong', { class: 'eq', style: 'color: var(--pink); display: inline-flex; align-items: center; margin: 0 4px;' });
+  const sliderA = h('input', {
+    type: 'range',
+    min: -4,
+    max: 4,
+    step: 0.5,
+    value: state.a,
+    'aria-label': 'Coeficiente de apertura y signo a',
+  });
+
+  const valSampleX = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.sampleX));
+  const sliderSampleX = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 1,
+    value: state.sampleX,
+    'aria-label': 'Valor de prueba x para comparar −|x| versus |−x|',
+  });
+
+  const presetBtns = presets.map((p) =>
+    h('button', {
+      type: 'button',
+      class: 'chip',
+      on: {
+        click: () => {
+          state.a = p.val;
+          sliderA.value = String(state.a);
+          syncUI(true);
+        },
+      },
+    }, p.labelNode)
+  );
+
+  const board = createAbsBoard(boardSlot, {
+    a: state.a,
+    h: 0,
+    k: 0,
+    xMin: -6,
+    xMax: 6,
+    yMin: -6,
+    yMax: 6,
+    snapStep: 0.5,
+    draggableVertex: false,
+    draggableSlope: true,
+    showSlopeTriangle: true,
+    showSymmetryAxis: true,
+    showReflectionGhost: false,
+    customUnderRender(plane, props) {
+      const ox = plane.sx(0);
+      const oy = plane.sy(0);
+      plane.layers.under.append(
+        // Referencia madre |x|
+        s('polyline', {
+          points: `${plane.sx(-6)},${plane.sy(6)} ${ox},${oy} ${plane.sx(6)},${plane.sy(6)}`,
+          fill: 'none',
+          stroke: 'var(--chalk-dim)',
+          'stroke-width': '1.6',
+          'stroke-dasharray': '4 4',
+        }),
+        s('text', {
+          x: plane.sx(4.3),
+          y: plane.sy(4.8),
+          fill: 'var(--muted)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 13px)',
+        }, 'Ref: |x| (a = 1)'),
+        // Triángulo unitario rama izquierda (Δx = -1, Δy = a => m_izq = -a)
+        s('polyline', {
+          points: `${ox},${oy} ${plane.sx(-1)},${oy} ${plane.sx(-1)},${plane.sy(props.a)}`,
+          fill: 'rgba(137, 180, 250, 0.10)',
+          stroke: 'var(--blue)',
+          'stroke-width': '1.5',
+          'stroke-dasharray': '3 3',
+        }),
+        s('text', {
+          x: plane.sx(-1.15),
+          y: (oy + plane.sy(props.a)) / 2 + 4,
+          'text-anchor': 'end',
+          fill: 'var(--blue)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 13px)',
+        }, `m_izq = ${fmt(-props.a)}`)
+      );
+    },
+    onChange(next) {
+      state.a = next.a;
+      sliderA.value = String(state.a);
+      syncUI(false);
+    },
+  });
+
+  sliderA.addEventListener('input', (e) => {
+    let nextA = parseFloat(e.target.value);
+    if (approxEq(nextA, 0)) {
+      nextA = state.a >= 0 ? -0.5 : 0.5;
+    }
+    state.a = nextA;
+    sliderA.value = String(state.a);
+    syncUI(true);
+  });
+
+  sliderSampleX.addEventListener('input', (e) => {
+    state.sampleX = parseFloat(e.target.value);
+    syncUI(false);
+  });
+
+  function syncUI(updateBoard = true) {
+    mount(valA, formatNumOrFracNode(state.a));
+    valSampleX.textContent = fmt(state.sampleX);
+
+    presetBtns.forEach((btn, idx) => {
+      btn.classList.toggle('is-active', approxEq(state.a, presets[idx].val));
+    });
+
+    if (updateBoard) {
+      board.update({ a: state.a });
+    }
+
+    const absA = Math.abs(state.a);
+    const widthDesc = approxEq(absA, 1)
+      ? 'apertura estándar (45° respecto a los ejes)'
+      : absA > 1
+        ? `más angosta y empinada (estiramiento vertical ×${fmt(absA)})`
+        : `más ancha y suave (compresión vertical ×${fmt(absA)})`;
+
+    const signDesc = state.a > 0
+      ? 'abre hacia arriba (forma V) — el vértice (0; 0) es el MÍNIMO absoluto'
+      : 'se refleja hacia abajo (forma ∧) — el vértice (0; 0) es el MÁXIMO absoluto';
+
+    mount(
+      readoutCard,
+      h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.1rem;' },
+        'Función actual: ',
+        h('strong', { style: 'color: var(--yellow);' }, `f(x) = ${formatCanonicalAbs(state.a, 0, 0)}`),
+        `  ·  Pendiente derecha: m = ${state.a > 0 ? `+${fmt(state.a)}` : fmt(state.a)}`,
+        `  ·  Pendiente izquierda: m = ${-state.a > 0 ? `+${fmt(-state.a)}` : fmt(-state.a)}`
+      ),
+      h('p', { class: 'small muted', style: 'margin: 0;' },
+        `Efecto geométrico: ${signDesc}; ${widthDesc}.`
       )
     );
 
-    const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.4; min-width: 280px;' });
-    createAbsBoard(boardSlot, {
-      a: aVal,
-      h: 0,
-      k: 0,
-      xMin: -6,
-      xMax: 6,
-      yMin: -6,
-      yMax: 6,
-      snapStep: 0.5,
-      draggableSlope: true,
-      showSlopeTriangles: true,
-      referenceCurve: { a: 1, h: 0, k: 0 },
-      onChange(next) {
-        aVal = next.a;
-        render();
-      },
-    });
-
-    const absA = Math.abs(aVal);
-    const scaleDesc = approxEq(absA, 1)
-      ? 'Misma abertura que la función madre |x| (45°).'
-      : absA > 1
-      ? `Estiramiento vertical (|a| = ${fmt(absA)} > 1): la «V» es más cerrada y empinada.`
-      : `Compresión vertical (0 < |a| = ${fmt(absA)} < 1): la «V» es más ancha y abierta.`;
-
-    const dirDesc = aVal > 0
-      ? 'Abre hacia arriba (forma de V): tiene un mínimo absoluto en (0; 0).'
-      : 'Reflejada verticalmente hacia abajo (forma de Λ): tiene un máximo absoluto en (0; 0).';
-
-    const sideCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 250px;' },
-      h('h3', { class: 'seq-sidebar__chapter-title' },
-        compareSignMode ? 'Duelo de Signos: −|x| vs. |−x|' : 'Anatomía del Coeficiente a'
-      ),
-      h('div', { class: 'eq', style: 'font-size: 1.45rem; margin: 8px 0; color: var(--yellow); display: flex; align-items: center; gap: 4px;' },
-        'y = ',
-        renderCoeffNode(aVal),
-        '|x|'
-      ),
-      compareSignMode
-        ? h('div', null,
-            h('p', { class: 'small' },
-              h('strong', { style: 'color: var(--pink);' }, '• Menos AFUERA: y = −|x|'),
-              h('br'),
-              'Primero calculás |x| (siempre ≥ 0) y al resultado final lo multiplicás por −1. Por ejemplo, para x = 3: −|3| = −3. ¡Vuelca toda la gráfica hacia abajo!'
-            ),
-            h('p', { class: 'small' },
-              h('strong', { style: 'color: var(--green);' }, '• Menos ADENTRO: y = |−x|'),
-              h('br'),
-              'El signo menos queda atrapado dentro de las barras: como la distancia de −x al 0 es idéntica a la de x al 0, ',
-              h('span', { class: 'eq' }, '|−x| = |x|'),
-              '. ¡La gráfica gris punteada arriba queda intacta!'
-            )
-          )
-        : h('div', null,
-            h('p', { class: 'small' },
-              h('strong', null, 'Puntos testigo en x = ±1: '),
-              `(${fmt(1)}; ${fmt(aVal)}) y (${fmt(-1)}; ${fmt(aVal)}).`
-            ),
-            h('p', { class: 'small' }, scaleDesc),
-            h('p', { class: 'small', style: 'color: var(--yellow);' }, dirDesc)
-          )
-    );
+    const sxVal = state.sampleX;
+    const insideMinusVal = Math.abs(-sxVal);
+    const outsideMinusVal = -Math.abs(sxVal);
 
     mount(
-      container,
-      presetRow,
-      sliderRow,
-      h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, sideCard)
+      comparatorWrap,
+      h('div', { class: 'seq-check__card', style: 'border-style: dashed;' },
+        h('div', { style: 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;' },
+          h('strong', { style: 'color: var(--yellow); font-family: var(--font-hand); font-size: 1.25rem;' },
+            'Comparador de Signos: «Menos Adentro |−x|» vs. «Menos Afuera −|x|»'
+          ),
+          h('label', { class: 'field__label' },
+            'Probar con x = ',
+            valSampleX,
+            sliderSampleX
+          )
+        ),
+        h('div', { class: 'va-comparator-grid' },
+          h('div', { class: 'va-comparator-col', style: 'border-color: rgba(148, 226, 213, 0.35);' },
+            h('strong', { class: 'eq', style: 'color: var(--teal); font-size: 1.1rem; display: block; margin-bottom: 4px;' },
+              'Caso A: Menos ADENTRO  g(x) = |−x|'
+            ),
+            h('p', { class: 'eq', style: 'margin: 4px 0;' },
+              `g(${fmt(sxVal)}) = |−(${fmt(sxVal)})| = |${fmt(-sxVal)}| = `,
+              h('strong', { style: 'color: var(--green); font-size: 1.15rem;' }, fmt(insideMinusVal))
+            ),
+            h('p', { class: 'small muted', style: 'margin: 0;' },
+              'Las barras absorben el signo menos interno: |−x| = |x| ≥ 0 para todo x. ¡La «V» sigue abriendo hacia arriba!'
+            )
+          ),
+          h('div', { class: 'va-comparator-col', style: 'border-color: rgba(242, 143, 173, 0.35);' },
+            h('strong', { class: 'eq', style: 'color: var(--pink); font-size: 1.1rem; display: block; margin-bottom: 4px;' },
+              'Caso B: Menos AFUERA  h(x) = −|x|'
+            ),
+            h('p', { class: 'eq', style: 'margin: 4px 0;' },
+              `h(${fmt(sxVal)}) = −|${fmt(sxVal)}| = −(${fmt(Math.abs(sxVal))}) = `,
+              h('strong', { style: 'color: var(--pink); font-size: 1.15rem;' }, fmt(outsideMinusVal))
+            ),
+            h('p', { class: 'small muted', style: 'margin: 0;' },
+              'El menos está afuera esperando el resultado positivo de las barras y lo invierte hacia abajo: −|x| ≤ 0 (forma ∧).'
+            )
+          )
+        )
+      )
     );
   }
 
-  render();
+  mount(
+    container,
+    h('div', { class: 'seq-controls' },
+      h('label', { class: 'field__label' },
+        'Coeficiente a = ',
+        valA,
+        sliderA
+      ),
+      ...presetBtns
+    ),
+    boardSlot,
+    readoutCard,
+    comparatorWrap
+  );
+
+  syncUI(false);
 }

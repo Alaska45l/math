@@ -1,268 +1,330 @@
 /**
- * widgets/espejo-cartesiano.js — Widget interactivo para la Sección 2:
- * El Espejo Tectónico del Eje X (plegado de 0% a 100% de y = g(x) hacia y = |g(x)|)
- * y explorador de puntos simétricos (-x, |x|) vs (x, |x|).
+ * espejo-cartesiano.js — Widget 2 (Sección 2):
+ * «El Espejo del Eje X: de y = x a f(x) = |x|».
+ * Sombrea el semiplano superior (C+) y el semiplano inferior prohibido (C-),
+ * dibuja triángulos de pendiente m = -1 y m = +1, y permite arrastrar el punto explorador
+ * tanto desde el slider como directamente sobre el plano cartesiano.
  */
 
 import { h, s, mount } from '../../../core/dom.js';
-import { fmt, MINUS } from '../../../core/math-format.js';
-import { createPlane, bindSvgDrag } from '../../../core/plot.js';
-
-const PRESETS = [
-  {
-    id: 'identidad',
-    label: 'Recta identidad: g(x) = x  →  y = |x|',
-    g: (x) => x,
-    rootDesc: 'Vértice en el origen (0; 0). Eje de simetría x = 0.',
-  },
-  {
-    id: 'corrida',
-    label: 'Recta desplazada: g(x) = x − 2  →  y = |x − 2|',
-    g: (x) => x - 2,
-    rootDesc: 'La recta cortaba al eje X en x = 2: ahí nace el nuevo vértice (2; 0).',
-  },
-  {
-    id: 'parabola',
-    label: 'Bonus Exactas: Parábola g(x) = x² − 4  →  y = |x² − 4|',
-    g: (x) => (x * x) - 4,
-    rootDesc: '¡El espejo funciona con cualquier función! La panza negativa entre −2 y 2 rebota hacia arriba.',
-  },
-];
+import { fmt } from '../../../core/math-format.js';
+import { createAbsBoard, piecewiseBrace } from '../components.js';
 
 export function initEspejoCartesianoWidget(container) {
-  let presetIdx = 0;
-  let foldPct = 100; // 0 a 100%
-  let probeX = 3;
+  let state = {
+    mirrorActive: true,
+    explorerX: -3,
+  };
 
-  function render() {
-    const p = PRESETS[presetIdx];
-    const t = foldPct / 100; // 0 = sin reflejar (g(x)), 1 = reflejado total (|g(x)|)
+  const boardSlot = h('div', { class: 'seq-plot-card' });
+  const braceSlot = h('div', { style: 'margin-top: 8px;' });
+  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
 
-    // Función interpolada durante el plegado del tramo negativo:
-    // Si g(x) >= 0 queda igual; si g(x) < 0 se interpola entre g(x) (t=0) y -g(x) (t=1)
-    const foldedFn = (x) => {
-      const y = p.g(x);
-      if (y >= 0) return y;
-      return y * (1 - 2 * t);
-    };
+  const btnMirrorOn = h('button', {
+    type: 'button',
+    class: 'chip is-active',
+    on: {
+      click: () => {
+        state.mirrorActive = true;
+        syncUI();
+      },
+    },
+  }, 'Espejo del Eje X: ACTIVADO  f(x) = |x|');
 
-    const presetRow = h('div', { class: 'seq-controls' },
-      PRESETS.map((item, idx) =>
-        h('button', {
-          type: 'button',
-          class: ['chip', idx === presetIdx ? 'is-active' : ''],
-          on: {
-            click: () => {
-              presetIdx = idx;
-              render();
-            },
-          },
-        }, item.label)
-      )
-    );
+  const btnMirrorOff = h('button', {
+    type: 'button',
+    class: 'chip',
+    on: {
+      click: () => {
+        state.mirrorActive = false;
+        syncUI();
+      },
+    },
+  }, 'Ver recta identidad sin doblar  y = x');
 
-    const sliderControls = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        `Plegar con el Espejo |·| (${foldPct}%): `,
-        h('input', {
-          type: 'range',
-          min: '0',
-          max: '100',
-          step: '5',
-          value: String(foldPct),
-          on: {
-            input: (e) => {
-              foldPct = parseInt(e.target.value, 10) || 0;
-              render();
-            },
-          },
-        })
-      ),
-      h('button', {
-        type: 'button',
-        class: 'chip',
-        on: {
-          click: () => {
-            foldPct = foldPct < 100 ? 100 : 0;
-            render();
-          },
-        },
-      }, foldPct < 100 ? 'Activar espejo al 100%' : 'Ver recta original sin espejo (0%)'),
-      h('label', { class: 'field__label' },
-        `Explorar par simétrico x = ±${fmt(Math.abs(probeX))}: `,
-        h('input', {
-          type: 'range',
-          min: '0.5',
-          max: '5',
-          step: '0.5',
-          value: String(Math.abs(probeX)),
-          on: {
-            input: (e) => {
-              probeX = parseFloat(e.target.value) || 2;
-              render();
-            },
-          },
-        })
-      )
-    );
+  const valX = h('strong', { class: 'eq', style: 'color: var(--pink);' }, fmt(state.explorerX));
 
-    const svg = s('svg', {
-      viewBox: '0 0 580 350',
-      class: 'seq-plot abs-board-svg',
-      role: 'img',
-      'aria-label': 'Plano cartesiano mostrando cómo el eje X actúa como espejo reflejando la parte negativa',
-    });
+  const sliderX = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: state.explorerX,
+    'aria-label': 'Abscisa del punto explorador x',
+  });
 
-    const plane = createPlane(svg, {
-      width: 580,
-      height: 350,
-      xMin: -6,
-      xMax: 6,
-      yMin: -6,
-      yMax: 6,
-      xStep: 1,
-      yStep: 1,
-    });
+  const board = createAbsBoard(boardSlot, {
+    a: 1,
+    h: 0,
+    k: 0,
+    xMin: -6,
+    xMax: 6,
+    yMin: -6,
+    yMax: 6,
+    snapStep: 0.5,
+    showReflectionGhost: true,
+    showSymmetryAxis: true,
+    showSlopeTriangle: false,
+    draggableExplorer: true,
+    explorerX: state.explorerX,
+    customUnderRender(plane) {
+      const yZero = plane.sy(0);
+      const xLeft = plane.sx(-6);
+      const xRight = plane.sx(6);
+      const yTop = plane.sy(6);
+      const yBot = plane.sy(-6);
 
-    // Zona sombreada del semiplano inferior C- (bajo tierra)
-    plane.layers.shade.append(
-      s('rect', {
-        x: plane.sx(-6),
-        y: plane.sy(0),
-        width: plane.sx(6) - plane.sx(-6),
-        height: plane.sy(-6) - plane.sy(0),
-        fill: 'color-mix(in srgb, var(--pink) 7%, transparent)',
-      })
-    );
-
-    // Espejo sobre el eje X
-    plane.layers.axes.append(
-      s('line', {
-        x1: plane.sx(-6),
-        y1: plane.sy(0),
-        x2: plane.sx(6),
-        y2: plane.sy(0),
-        stroke: 'var(--yellow)',
-        'stroke-width': '2.6',
-        opacity: '0.75',
-      })
-    );
-
-    // Rastro original fantasma debajo del eje X (g(x) original)
-    const ghostPath = plane.fnPath(p.g, -6, 6, { samples: 200 });
-    plane.layers.under.append(
-      s('path', {
-        d: ghostPath,
-        fill: 'none',
-        stroke: 'var(--muted)',
-        'stroke-width': '2',
-        'stroke-dasharray': '5 5',
-        opacity: '0.7',
-      })
-    );
-
-    // Curva plegada actual
-    const foldedPath = plane.fnPath(foldedFn, -6, 6, { samples: 240, breaks: [0, 2, -2] });
-    plane.layers.curve.append(
-      s('path', {
-        d: foldedPath,
-        fill: 'none',
-        stroke: 'var(--blue)',
-        'stroke-width': '3.2',
-      })
-    );
-
-    // Puntos simétricos (-probeX, yL) y (+probeX, yR)
-    const xPos = Math.abs(probeX);
-    const xNeg = -xPos;
-    const yPos = foldedFn(xPos);
-    const yNeg = foldedFn(xNeg);
-    const yNegOrig = p.g(xNeg);
-
-    // Flecha desde el punto negativo original hasta el reflejado
-    if (yNegOrig < 0 && t > 0.05) {
+      // Semiplano superior C+ (y > 0) y semiplano inferior prohibido (y < 0)
       plane.layers.under.append(
-        s('line', {
-          x1: plane.sx(xNeg),
-          y1: plane.sy(yNegOrig),
-          x2: plane.sx(xNeg),
-          y2: plane.sy(yNeg),
-          stroke: 'var(--yellow)',
-          'stroke-width': '1.8',
-          'stroke-dasharray': '3 3',
-          'marker-end': `url(#${plane.arrowId})`,
+        s('rect', {
+          x: xLeft,
+          y: yTop,
+          width: xRight - xLeft,
+          height: yZero - yTop,
+          fill: 'rgba(166, 227, 161, 0.06)',
         }),
-        s('circle', {
-          cx: plane.sx(xNeg),
-          cy: plane.sy(yNegOrig),
-          r: 4.5,
-          fill: 'var(--muted)',
-        })
+        s('rect', {
+          x: xLeft,
+          y: yZero,
+          width: xRight - xLeft,
+          height: yBot - yZero,
+          fill: 'rgba(242, 143, 173, 0.09)',
+        }),
+        s('text', {
+          x: xLeft + 10,
+          y: yTop + 18,
+          fill: 'var(--green)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 14px)',
+          'font-weight': 'bold',
+        }, 'Semiplano superior (y ≥ 0): salidas permitidas para |x|'),
+        s('text', {
+          x: xLeft + 10,
+          y: yBot - 12,
+          fill: 'var(--pink)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 14px)',
+          'font-weight': 'bold',
+        }, 'Zona bajo tierra (y < 0): prohibida para |·| — ¡el espejo la rebota arriba!')
       );
+
+      // Triángulos de pendiente m = -1 (izquierda) y m = +1 (derecha)
+      if (state.mirrorActive) {
+        plane.layers.under.append(
+          // Triángulo derecho m = +1 entre x=2 y x=3
+          s('polyline', {
+            points: `${plane.sx(2)},${plane.sy(2)} ${plane.sx(3)},${plane.sy(2)} ${plane.sx(3)},${plane.sy(3)}`,
+            fill: 'rgba(166, 227, 161, 0.14)',
+            stroke: 'var(--green)',
+            'stroke-width': '1.6',
+            'stroke-dasharray': '3 2',
+          }),
+          s('text', {
+            x: plane.sx(3.15),
+            y: plane.sy(2.5),
+            fill: 'var(--green)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+            'font-weight': 'bold',
+          }, 'm = +1 (y = x)'),
+          // Triángulo izquierdo m = -1 entre x=-2 y x=-3
+          s('polyline', {
+            points: `${plane.sx(-2)},${plane.sy(2)} ${plane.sx(-3)},${plane.sy(2)} ${plane.sx(-3)},${plane.sy(3)}`,
+            fill: 'rgba(242, 143, 173, 0.14)',
+            stroke: 'var(--pink)',
+            'stroke-width': '1.6',
+            'stroke-dasharray': '3 2',
+          }),
+          s('text', {
+            x: plane.sx(-3.15),
+            y: plane.sy(2.5),
+            'text-anchor': 'end',
+            fill: 'var(--pink)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+            'font-weight': 'bold',
+          }, 'm = −1 (y = −x)')
+        );
+      }
+    },
+    customOverRender(plane) {
+      const ex = state.explorerX;
+      const rawY = ex;
+      const absY = Math.abs(ex);
+      const px = plane.sx(ex);
+      const pyRaw = plane.sy(rawY);
+      const pyAbs = plane.sy(absY);
+
+      if (!state.mirrorActive) {
+        plane.layers.curves.innerHTML = '';
+        plane.layers.under.append(
+          s('line', {
+            x1: plane.sx(-6),
+            y1: plane.sy(-6),
+            x2: plane.sx(6),
+            y2: plane.sy(6),
+            stroke: 'var(--blue)',
+            'stroke-width': '3.2',
+          })
+        );
+      }
+
+      // Si x < 0 y el espejo está activo, mostrar el punto fantasma bajo tierra (x, x) y la flecha de rebote
+      if (ex < 0 && state.mirrorActive) {
+        plane.layers.marks.append(
+          s('line', {
+            x1: px,
+            y1: pyRaw,
+            x2: px,
+            y2: pyAbs,
+            stroke: 'var(--pink)',
+            'stroke-width': '2.2',
+            'stroke-dasharray': '4 3',
+          }),
+          s('polygon', {
+            points: `${px},${pyAbs + 8} ${px - 5},${pyAbs + 16} ${px + 5},${pyAbs + 16}`,
+            fill: 'var(--pink)',
+          }),
+          s('circle', {
+            cx: px,
+            cy: pyRaw,
+            r: 5.5,
+            fill: 'none',
+            stroke: 'var(--pink)',
+            'stroke-width': '2',
+          }),
+          s('text', {
+            x: px - 10,
+            y: pyRaw + 16,
+            'text-anchor': 'end',
+            fill: 'var(--pink)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+          }, `(${fmt(ex)}; ${fmt(rawY)}) rebota ↑`)
+        );
+      }
+
+      // Punto gemelo simétrico (-x; |x|) cuando x != 0 y espejo activo
+      if (ex !== 0 && state.mirrorActive) {
+        const twinX = plane.sx(-ex);
+        plane.layers.marks.append(
+          s('line', {
+            x1: px,
+            y1: pyAbs,
+            x2: twinX,
+            y2: pyAbs,
+            stroke: 'var(--teal)',
+            'stroke-width': '1.3',
+            'stroke-dasharray': '3 4',
+          }),
+          s('circle', {
+            cx: twinX,
+            cy: pyAbs,
+            r: 5.5,
+            fill: 'var(--teal)',
+            stroke: 'var(--bg)',
+            'stroke-width': '1.8',
+          }),
+          s('text', {
+            x: twinX + (ex < 0 ? 10 : -10),
+            y: pyAbs - 10,
+            'text-anchor': ex < 0 ? 'start' : 'end',
+            fill: 'var(--teal)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 13px)',
+          }, `Gemelo (${fmt(-ex)}; ${fmt(absY)})`)
+        );
+      }
+
+      // Punto explorador principal (arrastrable en el plano)
+      const finalY = state.mirrorActive ? pyAbs : pyRaw;
+      const finalValY = state.mirrorActive ? absY : rawY;
+      plane.layers.marks.append(
+        s('g', { dataset: { handle: 'explorer' }, style: 'cursor: grab;' },
+          s('circle', { cx: px, cy: finalY, r: 15, fill: 'transparent' }),
+          s('circle', {
+            cx: px,
+            cy: finalY,
+            r: 8,
+            fill: 'var(--green)',
+            stroke: 'var(--bg)',
+            'stroke-width': '2.2',
+          })
+        ),
+        s('text', {
+          x: px + (ex >= 0 ? 12 : -12),
+          y: finalY - 11,
+          'text-anchor': ex >= 0 ? 'start' : 'end',
+          fill: 'var(--green)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 15px)',
+          'font-weight': 'bold',
+        }, `P(${fmt(ex)}; ${fmt(finalValY)})`)
+      );
+    },
+    onChange(next) {
+      if (typeof next.explorerX === 'number' && next.explorerX !== state.explorerX) {
+        state.explorerX = next.explorerX;
+        sliderX.value = String(state.explorerX);
+        syncUI(false);
+      }
+    },
+  });
+
+  sliderX.addEventListener('input', (e) => {
+    state.explorerX = parseFloat(e.target.value);
+    syncUI(true);
+  });
+
+  function syncUI(updateBoard = true) {
+    btnMirrorOn.classList.toggle('is-active', state.mirrorActive);
+    btnMirrorOff.classList.toggle('is-active', !state.mirrorActive);
+    valX.textContent = fmt(state.explorerX);
+
+    if (updateBoard) {
+      board.update({ explorerX: state.explorerX });
     }
 
-    plane.layers.marks.append(
-      s('circle', {
-        cx: plane.sx(xPos),
-        cy: plane.sy(yPos),
-        r: 6.5,
-        fill: 'var(--yellow)',
-        stroke: 'var(--bg)',
-        'stroke-width': '2',
-      }),
-      s('circle', {
-        cx: plane.sx(xNeg),
-        cy: plane.sy(yNeg),
-        r: 6.5,
-        fill: 'var(--yellow)',
-        stroke: 'var(--bg)',
-        'stroke-width': '2',
-      })
+    const activeBranchIdx = state.explorerX < 0 ? 0 : 1;
+    piecewiseBrace(
+      braceSlot,
+      [
+        { exprText: '−x   (pendiente m = −1)', condition: 'x < 0  (rama izquierda reflejada)' },
+        { exprText: 'x    (pendiente m = +1)', condition: 'x ≥ 0  (rama derecha intacta)' },
+      ],
+      state.mirrorActive ? activeBranchIdx : null,
+      { fnName: '|x|' }
     );
 
-    plane.layers.labels.append(
-      s('text', {
-        x: plane.sx(xPos),
-        y: plane.sy(yPos) - 12,
-        'text-anchor': 'middle',
-        fill: 'var(--yellow)',
-        'font-family': 'var(--font-hand)',
-        'font-size': 'var(--svg-scale-caveat, 14px)',
-        'font-weight': 'bold',
-      }, `(${fmt(xPos)}; ${fmt(yPos)})`),
-      s('text', {
-        x: plane.sx(xNeg),
-        y: plane.sy(yNeg) - 12,
-        'text-anchor': 'middle',
-        fill: 'var(--yellow)',
-        'font-family': 'var(--font-hand)',
-        'font-size': 'var(--svg-scale-caveat, 14px)',
-        'font-weight': 'bold',
-      }, `(${fmt(xNeg)}; ${fmt(yNeg)})`)
-    );
-
-    bindSvgDrag(svg, plane, ({ x }) => {
-      const next = Math.max(0.5, Math.min(5.5, Math.round(Math.abs(x) * 2) / 2));
-      if (next !== probeX) {
-        probeX = next;
-        render();
-      }
-    });
-
-    const infoCard = h('div', { class: 'notice', style: 'margin-top: 10px;' },
-      h('div', null,
-        h('strong', { style: 'color: var(--yellow);' }, p.rootDesc),
-        h('p', { class: 'small', style: 'margin: 4px 0 0;' },
-          `En x = ${fmt(xNeg)}, antes del espejo la altura era ${fmt(yNegOrig)}. Al plegar al ${foldPct}%, la salida vale ${fmt(yNeg)}. `,
-          presetIdx === 0 && foldPct === 100
-            ? `Fijate que (${fmt(xNeg)}; ${fmt(yNeg)}) y (${fmt(xPos)}; ${fmt(yPos)}) dan la misma altura: la rama izquierda tiene pendiente ${MINUS}1 y la derecha tiene pendiente +1.`
-            : ''
-        )
+    const isNegative = state.explorerX < 0;
+    mount(
+      readoutCard,
+      h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.05rem;' },
+        isNegative
+          ? `Para x = ${fmt(state.explorerX)} < 0: la recta y = x daría ${fmt(state.explorerX)} (bajo el eje X). El espejo invierte el signo: |${fmt(state.explorerX)}| = −(${fmt(state.explorerX)}) = +${fmt(Math.abs(state.explorerX))}.`
+          : `Para x = ${fmt(state.explorerX)} ≥ 0: el punto ya está en el semiplano superior (o en el origen), así que |${fmt(state.explorerX)}| = ${fmt(state.explorerX)}.`
+      ),
+      h('p', { class: 'small muted', style: 'margin: 0;' },
+        `Simetría par: f(${fmt(state.explorerX)}) = f(${fmt(-state.explorerX)}) = ${fmt(Math.abs(state.explorerX))}. Eje de simetría en x = 0 (Eje Y) y vértice en V(0; 0).`
       )
     );
-
-    mount(container, presetRow, sliderControls, svg, infoCard);
   }
 
-  render();
+  mount(
+    container,
+    h('div', { class: 'seq-controls' },
+      btnMirrorOn,
+      btnMirrorOff,
+      h('label', { class: 'field__label' },
+        'Explorar punto x = ',
+        valX,
+        sliderX
+      )
+    ),
+    boardSlot,
+    braceSlot,
+    readoutCard
+  );
+
+  syncUI();
 }

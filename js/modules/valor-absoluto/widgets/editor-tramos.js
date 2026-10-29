@@ -1,330 +1,502 @@
 /**
- * widgets/editor-tramos.js — Widget interactivo para la Sección 9:
- * Constructor Visual de Tramos, alternancia al clic entre punto abierto (◦) y cerrado (•),
- * Detector de Unicidad en la Frontera y proyección de Sombras de Dominio y Rango.
+ * editor-tramos.js — Widget 9 (Sección 9):
+ * «Constructor de Tramos, Fronteras Abierta/Cerrada y Prueba de la Recta Vertical».
+ * Permite alternar extremos haciendo clic en los botones o directamente sobre los círculos
+ * de frontera en el SVG en x = 1, proyecta sombras de Dominio (Eje X) y Rango (Eje Y)
+ * con corchetes/paréntesis, y dispara el Láser Vertical de Colisión si hay doble punto cerrado.
  */
 
 import { h, s, mount, chalkIcon } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { createPlane } from '../../../core/plot.js';
-import { piecewiseBrace } from '../components.js';
-import { validatePiecewiseFunction, formatLinearExpr } from '../logic.js';
+import { piecewiseBrace, dotBadge } from '../components.js';
+import { approxEq } from '../logic.js';
+import { DIAGNOSE_REACTIONS } from '../vn-scripts.js';
 import { react } from '../../../core/vn.js';
-import { playClick, playError } from '../../../core/sound.js';
+import { playError, playSuccess } from '../../../core/sound.js';
 
 export function initEditorTramosWidget(container) {
-  // 2 tramos en [-5, 1] y [1, 5] con frontera en x = 1
-  const state = {
-    splitX: 1,
-    left: { m: 1, b: 1, minX: -5, minInc: true, maxInc: false }, // en x=1 vale 2 (abierto ◦)
-    right: { m: -1, b: 4, maxX: 5, minInc: true, maxInc: true },  // en x=1 vale 3 (cerrado •)
-    showDomainShadow: true,
-    showRangeShadow: false,
+  let state = {
+    // Tramo 1 en [-4, 1]: y = m1 * x + b1
+    m1: 1,
+    b1: 1,
+    leftClosedAtBoundary: false, // en x = 1: false => '<', true => '≤'
+    // Tramo 2 en [1, 5]: y = m2 * x + b2
+    m2: -1,
+    b2: 5,
+    rightClosedAtBoundary: true, // en x = 1: false => '>', true => '≥'
+    showShadows: true,
   };
 
-  function getPiecesForLogic() {
-    const { splitX, left, right } = state;
-    const condLeft = `${fmt(left.minX)} ${left.minInc ? '≤' : '<'} x ${left.maxInc ? '≤' : '<'} ${fmt(splitX)}`;
-    const condRight = `${fmt(splitX)} ${right.minInc ? '≤' : '<'} x ${right.maxInc ? '≤' : '<'} ${fmt(right.maxX)}`;
-    return [
-      {
-        m: left.m,
-        b: left.b,
-        minX: left.minX,
-        maxX: splitX,
-        minInclusive: left.minInc,
-        maxInclusive: left.maxInc,
-        exprText: formatLinearExpr(left.m, left.b),
-        condition: condLeft,
-        fn: (x) => left.m * x + left.b,
-      },
-      {
-        m: right.m,
-        b: right.b,
-        minX: splitX,
-        maxX: right.maxX,
-        minInclusive: right.minInc,
-        maxInclusive: right.maxInc,
-        exprText: formatLinearExpr(right.m, right.b),
-        condition: condRight,
-        fn: (x) => right.m * x + right.b,
-      },
-    ];
-  }
+  const BOUNDARY_X = 1;
+  const X_START = -4;
+  const X_END = 5;
 
-  function computeDomainText() {
-    const { splitX, left, right } = state;
-    const lBr = left.minInc ? '[' : '(';
-    const rBr = right.maxInc ? ']' : ')';
-    const hasSplitIncluded = left.maxInc || right.minInc;
-    if (hasSplitIncluded) {
-      return `${lBr}${fmt(left.minX)}; ${fmt(right.maxX)}${rBr}`;
-    }
-    return `${lBr}${fmt(left.minX)}; ${fmt(splitX)}) ∪ (${fmt(splitX)}; ${fmt(right.maxX)}${rBr}`;
-  }
+  const topControlsRow = h('div', { class: 'seq-controls' });
+  const slidersRow = h('div', { class: 'seq-controls' });
+  const plotCard = h('div', { class: 'seq-plot-card' });
+  const braceSlot = h('div', { style: 'margin-top: 8px;' });
+  const statusCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
 
-  function computeRangeText() {
-    const { splitX, left, right } = state;
-    const yL1 = left.m * left.minX + left.b;
-    const yL2 = left.m * splitX + left.b;
-    const yR1 = right.m * splitX + right.b;
-    const yR2 = right.m * right.maxX + right.b;
-    const minY = Math.min(yL1, yL2, yR1, yR2);
-    const maxY = Math.max(yL1, yL2, yR1, yR2);
-    return `[${fmt(minY)}; ${fmt(maxY)}] (ver sombra proyectada en el eje Y)`;
-  }
+  const valB1 = h('strong', { class: 'eq', style: 'color: var(--blue);' }, fmt(state.b1));
+  const valM2 = h('strong', { class: 'eq', style: 'color: var(--green);' }, fmt(state.m2));
+  const valB2 = h('strong', { class: 'eq', style: 'color: var(--green);' }, fmt(state.b2));
 
-  function toggleEndpoint(which) {
-    if (which === 'left-min') state.left.minInc = !state.left.minInc;
-    else if (which === 'left-max') state.left.maxInc = !state.left.maxInc;
-    else if (which === 'right-min') state.right.minInc = !state.right.minInc;
-    else if (which === 'right-max') state.right.maxInc = !state.right.maxInc;
+  const sliderB1 = h('input', {
+    type: 'range',
+    min: -2,
+    max: 4,
+    step: 1,
+    value: state.b1,
+    'aria-label': 'Ordenada b1 del tramo izquierdo',
+  });
+  const sliderM2 = h('input', {
+    type: 'range',
+    min: -2,
+    max: 2,
+    step: 1,
+    value: state.m2,
+    'aria-label': 'Pendiente m2 del tramo derecho',
+  });
+  const sliderB2 = h('input', {
+    type: 'range',
+    min: -1,
+    max: 6,
+    step: 1,
+    value: state.b2,
+    'aria-label': 'Ordenada b2 del tramo derecho',
+  });
 
-    const pieces = getPiecesForLogic();
-    const validation = validatePiecewiseFunction(pieces);
-    if (!validation.isValidFunction) {
+  const svg = s('svg', {
+    class: 'seq-svg abs-board__svg',
+    style: 'width: 100%; height: auto; max-height: 360px; display: block;',
+    role: 'img',
+    'aria-label': 'Editor de tramos con fronteras abiertas o cerradas y sombras de dominio e imagen',
+  });
+  plotCard.append(svg);
+
+  let activePlane = null;
+
+  function triggerCollisionIfNeeded() {
+    const yL = state.m1 * BOUNDARY_X + state.b1;
+    const yR = state.m2 * BOUNDARY_X + state.b2;
+    const isCollision =
+      state.leftClosedAtBoundary &&
+      state.rightClosedAtBoundary &&
+      !approxEq(yL, yR);
+
+    if (isCollision) {
       playError(2);
-      react({
-        pose: 'enojada',
-        tag: '¡Violación de Unicidad!',
-        html: `¡Acabás de poner <strong>dos puntos cerrados (•)</strong> en la frontera <span class="eq">x = ${fmt(state.splitX)}</span> a distinta altura! Una recta vertical corta dos veces la gráfica: ¡deja de ser función!`,
+      if (DIAGNOSE_REACTIONS.both_endpoints_closed_violation) {
+        react(DIAGNOSE_REACTIONS.both_endpoints_closed_violation);
+      }
+    } else {
+      playSuccess('normal');
+    }
+  }
+
+  sliderB1.addEventListener('input', (e) => {
+    state.b1 = parseFloat(e.target.value);
+    syncUI();
+  });
+  sliderM2.addEventListener('input', (e) => {
+    state.m2 = parseFloat(e.target.value);
+    syncUI();
+  });
+  sliderB2.addEventListener('input', (e) => {
+    state.b2 = parseFloat(e.target.value);
+    syncUI();
+  });
+
+  function renderPlane() {
+    const yLeftBoundary = state.m1 * BOUNDARY_X + state.b1;
+    const yRightBoundary = state.m2 * BOUNDARY_X + state.b2;
+    const yStartLeft = state.m1 * X_START + state.b1;
+    const yEndRight = state.m2 * X_END + state.b2;
+
+    const isCollision =
+      state.leftClosedAtBoundary &&
+      state.rightClosedAtBoundary &&
+      !approxEq(yLeftBoundary, yRightBoundary);
+
+    if (!activePlane) {
+      activePlane = createPlane(svg, {
+        xMin: -5,
+        xMax: 6,
+        yMin: -4,
+        yMax: 6,
+        width: 560,
+        height: 340,
+        xLabel: 'x',
+        yLabel: 'y',
       });
     } else {
-      playClick();
+      activePlane.clear('under', 'curves', 'marks', 'labels');
     }
-    render();
-  }
 
-  function render() {
-    const pieces = getPiecesForLogic();
-    const validation = validatePiecewiseFunction(pieces);
-    const isCollision = !validation.isValidFunction;
+    const plane = activePlane;
+    const bx = plane.sx(BOUNDARY_X);
+    const yZero = plane.sy(0);
+    const xZero = plane.sx(0);
 
-    const topButtons = h('div', { class: 'seq-controls' },
-      h('button', {
-        type: 'button',
-        class: ['chip', state.left.maxInc && !state.right.minInc ? 'is-active' : ''],
-        on: {
-          click: () => {
-            state.left.maxInc = true;
-            state.right.minInc = false;
-            render();
-          },
-        },
-      }, 'Frontera x = 1: Izquierda cerrada (•) / Derecha abierta (◦)'),
-      h('button', {
-        type: 'button',
-        class: ['chip', !state.left.maxInc && state.right.minInc ? 'is-active' : ''],
-        on: {
-          click: () => {
-            state.left.maxInc = false;
-            state.right.minInc = true;
-            render();
-          },
-        },
-      }, 'Frontera x = 1: Izquierda abierta (◦) / Derecha cerrada (•)'),
-      h('button', {
-        type: 'button',
-        class: ['chip', isCollision ? 'is-active' : ''],
-        on: {
-          click: () => {
-            state.left.maxInc = true;
-            state.right.minInc = true;
-            playError(2);
-            react({
-              pose: 'enojada',
-              tag: '¡Violación de Unicidad!',
-              html: '¡Mirá esa línea vertical rosa en <span class="eq">x = 1</span>! Al cerrar ambos extremos en distinta altura, para <span class="eq">x = 1</span> habría dos salidas a la vez.',
-            });
-            render();
-          },
-        },
-      }, '💥 Provocar Colisión (Ambos cerrados • y •)'),
-      h('button', {
-        type: 'button',
-        class: ['chip', state.showDomainShadow ? 'is-active' : ''],
-        on: {
-          click: () => {
-            state.showDomainShadow = !state.showDomainShadow;
-            render();
-          },
-        },
-      }, 'Sombra de Dominio (Eje X)'),
-      h('button', {
-        type: 'button',
-        class: ['chip', state.showRangeShadow ? 'is-active' : ''],
-        on: {
-          click: () => {
-            state.showRangeShadow = !state.showRangeShadow;
-            render();
-          },
-        },
-      }, 'Sombra de Rango (Eje Y)')
-    );
-
-    const svg = s('svg', {
-      viewBox: '0 0 580 350',
-      class: 'seq-plot abs-board-svg',
-      role: 'img',
-      'aria-label': 'Editor interactivo de tramos con puntos abiertos y cerrados clickeables',
-    });
-
-    const plane = createPlane(svg, {
-      width: 580,
-      height: 350,
-      xMin: -6,
-      xMax: 6,
-      yMin: -5,
-      yMax: 6,
-      xStep: 1,
-      yStep: 1,
-    });
-
-    // Sombra de Dominio en el eje X
-    if (state.showDomainShadow) {
-      plane.layers.over.append(
-        s('line', {
-          x1: plane.sx(state.left.minX),
-          y1: plane.xAxisY,
-          x2: plane.sx(state.splitX),
-          y2: plane.xAxisY,
-          stroke: 'var(--yellow)',
-          'stroke-width': '6',
-          opacity: '0.65',
+    // Sombras de Dominio (sobre eje X) y Rango (sobre eje Y) con corchetes
+    if (state.showShadows) {
+      const domLeftPx = plane.sx(X_START);
+      const domRightPx = plane.sx(X_END);
+      plane.layers.under.append(
+        s('rect', {
+          x: domLeftPx,
+          y: yZero - 5,
+          width: domRightPx - domLeftPx,
+          height: 10,
+          fill: 'rgba(148, 226, 213, 0.30)',
+          rx: 3,
         }),
-        s('line', {
-          x1: plane.sx(state.splitX),
-          y1: plane.xAxisY,
-          x2: plane.sx(state.right.maxX),
-          y2: plane.xAxisY,
-          stroke: 'var(--yellow)',
-          'stroke-width': '6',
-          opacity: '0.65',
-        })
+        // Corchetes de dominio en X_START y X_END
+        s('line', { x1: domLeftPx, y1: yZero - 8, x2: domLeftPx, y2: yZero + 8, stroke: 'var(--teal)', 'stroke-width': '2.6' }),
+        s('line', { x1: domRightPx, y1: yZero - 8, x2: domRightPx, y2: yZero + 8, stroke: 'var(--teal)', 'stroke-width': '2.6' }),
+        s('text', {
+          x: (domLeftPx + domRightPx) / 2,
+          y: yZero + 22,
+          'text-anchor': 'middle',
+          fill: 'var(--teal)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 14px)',
+          'font-weight': 'bold',
+        }, !state.leftClosedAtBoundary && !state.rightClosedAtBoundary
+          ? 'Dom(f) = [−4; 1) ∪ (1; 5]'
+          : 'Dom(f) = [−4; 5]')
+      );
+
+      // Sombra de Rango en el eje Y para cada tramo
+      const y1Min = Math.min(yStartLeft, yLeftBoundary);
+      const y1Max = Math.max(yStartLeft, yLeftBoundary);
+      const y2Min = Math.min(yRightBoundary, yEndRight);
+      const y2Max = Math.max(yRightBoundary, yEndRight);
+
+      plane.layers.under.append(
+        s('rect', {
+          x: xZero - 6,
+          y: plane.sy(y1Max),
+          width: 6,
+          height: Math.max(3, plane.sy(y1Min) - plane.sy(y1Max)),
+          fill: 'rgba(137, 180, 250, 0.38)',
+          rx: 2,
+        }),
+        s('rect', {
+          x: xZero,
+          y: plane.sy(y2Max),
+          width: 6,
+          height: Math.max(3, plane.sy(y2Min) - plane.sy(y2Max)),
+          fill: 'rgba(166, 227, 161, 0.38)',
+          rx: 2,
+        }),
+        s('text', {
+          x: xZero - 10,
+          y: plane.sy(Math.max(y1Max, y2Max)) - 6,
+          'text-anchor': 'end',
+          fill: 'var(--yellow)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 13px)',
+          'font-weight': 'bold',
+        }, 'Sombra Im(f) en Eje Y')
       );
     }
 
-    // Sombra de Rango en el eje Y
-    if (state.showRangeShadow) {
-      const yLMin = Math.min(pieces[0].fn(state.left.minX), pieces[0].fn(state.splitX));
-      const yLMax = Math.max(pieces[0].fn(state.left.minX), pieces[0].fn(state.splitX));
-      const yRMin = Math.min(pieces[1].fn(state.splitX), pieces[1].fn(state.right.maxX));
-      const yRMax = Math.max(pieces[1].fn(state.splitX), pieces[1].fn(state.right.maxX));
-      const totalMinY = Math.min(yLMin, yRMin);
-      const totalMaxY = Math.max(yLMax, yRMax);
-
-      plane.layers.over.append(
-        s('line', {
-          x1: plane.yAxisX,
-          y1: plane.sy(totalMinY),
-          x2: plane.yAxisX,
-          y2: plane.sy(totalMaxY),
-          stroke: 'var(--green)',
-          'stroke-width': '6',
-          opacity: '0.65',
-        })
-      );
-    }
-
-    // Frontera vertical x = splitX
-    const bx = plane.sx(state.splitX);
+    // Recta vertical en la frontera x = 1 (Láser de colisión rosa si ambos están cerrados a distinta altura)
     plane.layers.under.append(
       s('line', {
         x1: bx,
-        y1: plane.sy(-5),
+        y1: plane.sy(6),
         x2: bx,
-        y2: plane.sy(6),
-        stroke: isCollision ? 'var(--pink)' : 'var(--muted)',
-        'stroke-width': isCollision ? '2.8' : '1.6',
-        'stroke-dasharray': isCollision ? 'none' : '4 4',
+        y2: plane.sy(-4),
+        stroke: isCollision ? 'var(--pink)' : 'var(--chalk-dim)',
+        'stroke-width': isCollision ? '3.4' : '1.6',
+        'stroke-dasharray': isCollision ? 'none' : '5 4',
+      }),
+      s('text', {
+        x: bx + 8,
+        y: plane.sy(5.3),
+        fill: isCollision ? 'var(--pink)' : 'var(--muted)',
+        'font-family': 'var(--font-hand)',
+        'font-size': 'var(--svg-scale-caveat, 15px)',
+        'font-weight': 'bold',
+      }, isCollision ? '¡COLISIÓN VERTICAL EN x = 1! (2 salidas)' : 'Recta vertical x = 1')
+    );
+
+    // Segmento Tramo 1: [-4, 1]
+    plane.layers.curves.append(
+      s('line', {
+        x1: plane.sx(X_START),
+        y1: plane.sy(yStartLeft),
+        x2: bx,
+        y2: plane.sy(yLeftBoundary),
+        stroke: 'var(--blue)',
+        'stroke-width': '3.4',
+      }),
+      // Segmento Tramo 2: [1, 5]
+      s('line', {
+        x1: bx,
+        y1: plane.sy(yRightBoundary),
+        x2: plane.sx(X_END),
+        y2: plane.sy(yEndRight),
+        stroke: 'var(--green)',
+        'stroke-width': '3.4',
       })
     );
 
-    // Segmentos
-    pieces.forEach((p, idx) => {
-      const pts = [
-        [p.minX, p.fn(p.minX)],
-        [p.maxX, p.fn(p.maxX)],
-      ];
-      plane.layers.curve.append(
-        s('path', {
-          d: plane.linePath(pts),
-          fill: 'none',
-          stroke: isCollision ? 'var(--pink)' : (idx === 0 ? 'var(--blue)' : 'var(--yellow)'),
-          'stroke-width': '3.2',
-        })
-      );
+    // Extremos exteriores cerrados en x = -4 y x = 5
+    plane.layers.marks.append(
+      s('circle', {
+        cx: plane.sx(X_START),
+        cy: plane.sy(yStartLeft),
+        r: 6,
+        fill: 'var(--blue)',
+        stroke: 'var(--bg)',
+        'stroke-width': '2',
+      }),
+      s('circle', {
+        cx: plane.sx(X_END),
+        cy: plane.sy(yEndRight),
+        r: 6,
+        fill: 'var(--green)',
+        stroke: 'var(--bg)',
+        'stroke-width': '2',
+      })
+    );
+
+    // Extremos interactivos en la frontera x = 1 (clicables directamente en el SVG)
+    const leftEndpointGroup = s('g', {
+      style: 'cursor: pointer;',
+      role: 'button',
+      tabindex: '0',
+      'aria-label': 'Alternar extremo del tramo izquierdo en x = 1 entre abierto y cerrado',
+    },
+      s('circle', { cx: bx, cy: plane.sy(yLeftBoundary), r: 15, fill: 'transparent' }),
+      s('circle', {
+        cx: bx,
+        cy: plane.sy(yLeftBoundary),
+        r: 8,
+        fill: state.leftClosedAtBoundary ? 'var(--blue)' : 'var(--bg)',
+        stroke: isCollision ? 'var(--pink)' : 'var(--blue)',
+        'stroke-width': '3',
+      }),
+      s('text', {
+        x: bx - 12,
+        y: plane.sy(yLeftBoundary) - 10,
+        'text-anchor': 'end',
+        fill: 'var(--blue)',
+        'font-family': 'var(--font-hand)',
+        'font-size': 'var(--svg-scale-caveat, 14px)',
+        'font-weight': 'bold',
+      }, `(1; ${fmt(yLeftBoundary)}) ${state.leftClosedAtBoundary ? '[Cerrado]' : '(Abierto)'}`)
+    );
+
+    leftEndpointGroup.addEventListener('click', () => {
+      state.leftClosedAtBoundary = !state.leftClosedAtBoundary;
+      triggerCollisionIfNeeded();
+      syncUI();
     });
 
-    // Nodos de extremo clickeables para alternar ◦ vs •
-    const endpoints = [
-      { id: 'left-min', x: state.left.minX, y: pieces[0].fn(state.left.minX), inc: state.left.minInc, color: 'var(--blue)' },
-      { id: 'left-max', x: state.splitX, y: pieces[0].fn(state.splitX), inc: state.left.maxInc, color: isCollision ? 'var(--pink)' : 'var(--blue)' },
-      { id: 'right-min', x: state.splitX, y: pieces[1].fn(state.splitX), inc: state.right.minInc, color: isCollision ? 'var(--pink)' : 'var(--yellow)' },
-      { id: 'right-max', x: state.right.maxX, y: pieces[1].fn(state.right.maxX), inc: state.right.maxInc, color: 'var(--yellow)' },
-    ];
+    const rightEndpointGroup = s('g', {
+      style: 'cursor: pointer;',
+      role: 'button',
+      tabindex: '0',
+      'aria-label': 'Alternar extremo del tramo derecho en x = 1 entre abierto y cerrado',
+    },
+      s('circle', { cx: bx, cy: plane.sy(yRightBoundary), r: 15, fill: 'transparent' }),
+      s('circle', {
+        cx: bx,
+        cy: plane.sy(yRightBoundary),
+        r: 8,
+        fill: state.rightClosedAtBoundary ? 'var(--green)' : 'var(--bg)',
+        stroke: isCollision ? 'var(--pink)' : 'var(--green)',
+        'stroke-width': '3',
+      }),
+      s('text', {
+        x: bx + 12,
+        y: plane.sy(yRightBoundary) + 18,
+        'text-anchor': 'start',
+        fill: 'var(--green)',
+        'font-family': 'var(--font-hand)',
+        'font-size': 'var(--svg-scale-caveat, 14px)',
+        'font-weight': 'bold',
+      }, `(1; ${fmt(yRightBoundary)}) ${state.rightClosedAtBoundary ? '[Cerrado]' : '(Abierto)'}`)
+    );
 
-    endpoints.forEach((ep) => {
-      const cx = plane.sx(ep.x);
-      const cy = plane.sy(ep.y);
-      const g = s('g', {
-        class: 'abs-board__handle is-draggable',
-        tabindex: '0',
-        role: 'button',
-        'aria-label': `Extremo en (${fmt(ep.x)}; ${fmt(ep.y)}): actualmente ${ep.inc ? 'cerrado (incluido)' : 'abierto (excluido)'}. Clic para alternar.`,
+    rightEndpointGroup.addEventListener('click', () => {
+      state.rightClosedAtBoundary = !state.rightClosedAtBoundary;
+      triggerCollisionIfNeeded();
+      syncUI();
+    });
+
+    plane.layers.marks.append(leftEndpointGroup, rightEndpointGroup);
+  }
+
+  function syncUI() {
+    valB1.textContent = fmt(state.b1);
+    valM2.textContent = fmt(state.m2);
+    valB2.textContent = fmt(state.b2);
+
+    const yLeftBoundary = state.m1 * BOUNDARY_X + state.b1;
+    const yRightBoundary = state.m2 * BOUNDARY_X + state.b2;
+    const isContinuous = approxEq(yLeftBoundary, yRightBoundary);
+    const isCollision =
+      state.leftClosedAtBoundary &&
+      state.rightClosedAtBoundary &&
+      !isContinuous;
+    const isHoleAtBoundary =
+      !state.leftClosedAtBoundary && !state.rightClosedAtBoundary;
+
+    mount(
+      topControlsRow,
+      h('button', {
+        type: 'button',
+        class: ['chip', state.leftClosedAtBoundary ? 'is-active' : ''],
+        style: 'display: inline-flex; align-items: center; gap: 6px;',
+        on: {
+          click: () => {
+            state.leftClosedAtBoundary = !state.leftClosedAtBoundary;
+            triggerCollisionIfNeeded();
+            syncUI();
+          },
+        },
       },
-        s('circle', { cx, cy, r: 14, fill: 'transparent' }),
-        s('circle', {
-          cx,
-          cy,
-          r: 7,
-          fill: ep.inc ? ep.color : 'var(--bg)',
-          stroke: ep.color,
-          'stroke-width': '2.6',
-        })
-      );
-      g.addEventListener('click', () => toggleEndpoint(ep.id));
-      g.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleEndpoint(ep.id);
-        }
-      });
-      plane.layers.marks.append(g);
-    });
-
-    const braceSlot = h('div', { style: 'flex: 1; min-width: 250px;' });
-    piecewiseBrace(braceSlot, pieces, null, { fnName: 'f(x)' });
-
-    const statusCard = h('div', { class: 'seq-check__card', style: 'flex: 1.2; min-width: 260px;' },
-      h('h3', { class: 'seq-sidebar__chapter-title' }, 'Diagnóstico de Función, Dominio y Rango'),
-      isCollision
-        ? h('div', { class: 'notice notice--err' },
-            chalkIcon('cross'),
-            h('span', null, validation.collisions[0].reason)
-          )
-        : h('div', { class: 'notice notice--ok' },
-            chalkIcon('check'),
-            h('span', null, `Cumple unicidad en todo su dominio (en x = ${fmt(state.splitX)} a lo sumo un tramo tiene punto cerrado •).`)
-          ),
-      h('p', { class: 'small', style: 'margin-top: 10px;' },
-        h('strong', { style: 'color: var(--yellow);' }, 'Dominio (Sombra en Eje X): '),
-        h('span', { class: 'eq' }, computeDomainText())
+        'Borde Tramo 1 en x = 1:',
+        dotBadge(state.leftClosedAtBoundary),
+        state.leftClosedAtBoundary ? '(x ≤ 1)' : '(x < 1)'
       ),
-      h('p', { class: 'small' },
-        h('strong', { style: 'color: var(--green);' }, 'Rango / Imagen (Sombra en Eje Y): '),
-        h('span', { class: 'eq' }, computeRangeText())
+      h('button', {
+        type: 'button',
+        class: ['chip', state.rightClosedAtBoundary ? 'is-active' : ''],
+        style: 'display: inline-flex; align-items: center; gap: 6px;',
+        on: {
+          click: () => {
+            state.rightClosedAtBoundary = !state.rightClosedAtBoundary;
+            triggerCollisionIfNeeded();
+            syncUI();
+          },
+        },
+      },
+        'Borde Tramo 2 en x = 1:',
+        dotBadge(state.rightClosedAtBoundary),
+        state.rightClosedAtBoundary ? '(x ≥ 1)' : '(x > 1)'
       ),
-      h('p', { class: 'small muted' }, '💡 Tip: podés hacer clic directamente sobre cualquiera de los 4 círculos de los extremos en el gráfico para abrirlos (◦) o cerrarlos (•).')
+      h('button', {
+        type: 'button',
+        class: ['chip', state.showShadows ? 'is-active' : ''],
+        on: {
+          click: () => {
+            state.showShadows = !state.showShadows;
+            syncUI();
+          },
+        },
+      }, state.showShadows ? 'Sombras Dom/Rango: VISIBLES' : 'Sombras Dom/Rango: OCULTAS')
+    );
+
+    renderPlane();
+
+    const leftExpr = `x ${state.b1 >= 0 ? `+ ${fmt(state.b1)}` : `− ${fmt(Math.abs(state.b1))}`}`;
+    const rightExpr = `${state.m2 === 0 ? '' : state.m2 === 1 ? 'x ' : state.m2 === -1 ? '−x ' : `${fmt(state.m2)}x `}${state.b2 >= 0 ? `+ ${fmt(state.b2)}` : `− ${fmt(Math.abs(state.b2))}`}`;
+
+    piecewiseBrace(
+      braceSlot,
+      [
+        {
+          exprText: leftExpr,
+          condition: `−4 ≤ x ${state.leftClosedAtBoundary ? '≤' : '<'} 1`,
+        },
+        {
+          exprText: rightExpr,
+          condition: `1 ${state.rightClosedAtBoundary ? '≤' : '<'} x ≤ 5`,
+        },
+      ],
+      null,
+      { fnName: isCollision ? 'Relación (NO función)' : 'f(x)' }
     );
 
     mount(
-      container,
-      topButtons,
-      svg,
-      h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, braceSlot, statusCard)
+      statusCard,
+      isCollision
+        ? h('div', { class: 'notice notice--err' },
+            chalkIcon('cross'),
+            h('div', null,
+              h('strong', null, '¡VIOLACIÓN DE LA RECTA VERTICAL EN x = 1! No es una función.'),
+              h('p', { class: 'small', style: 'margin: 4px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;' },
+                `Ambos tramos tienen punto cerrado`,
+                dotBadge(true),
+                `en x = 1 y asignan dos alturas distintas: y = ${fmt(yLeftBoundary)} e y = ${fmt(yRightBoundary)}. Una función exige una única salida por cada entrada.`
+              )
+            )
+          )
+        : isContinuous && (state.leftClosedAtBoundary || state.rightClosedAtBoundary)
+          ? h('div', { class: 'notice notice--ok' },
+              chalkIcon('check'),
+              h('div', null,
+                h('strong', null, '¡Pegado continuo perfecto en x = 1! Es función sin salto.'),
+                h('p', { class: 'small', style: 'margin: 4px 0 0;' },
+                  `Ambas ramas llegan a la misma altura y = ${fmt(yLeftBoundary)} en la frontera x = 1. Dominio: [−4; 5].`
+                )
+              )
+            )
+          : isHoleAtBoundary
+            ? h('div', { class: 'notice notice--ok' },
+                chalkIcon('check'),
+                h('div', null,
+                  h('strong', null, 'Es una función válida, pero con un hueco de dominio en x = 1.'),
+                  h('p', { class: 'small', style: 'margin: 4px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;' },
+                    'Como ambos extremos son abiertos',
+                    dotBadge(false),
+                    ', la recta vertical x = 1 corta 0 veces (≤ 1). Dom(f) = [−4; 1) ∪ (1; 5].'
+                  )
+                )
+              )
+            : h('div', { class: 'notice notice--ok' },
+                chalkIcon('check'),
+                h('div', null,
+                  h('strong', null, `Es una función válida con salto en x = 1. Valor oficial: f(1) = ${fmt(state.leftClosedAtBoundary ? yLeftBoundary : yRightBoundary)}.`),
+                  h('p', { class: 'small', style: 'margin: 4px 0 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;' },
+                    'Un solo tramo tiene punto cerrado',
+                    dotBadge(true),
+                    'en x = 1 y el otro tiene círculo abierto',
+                    dotBadge(false),
+                    '. Consejo: ajustá b₁ o b₂ para lograr un pegado continuo sin salto.'
+                  )
+                )
+              )
     );
   }
 
-  render();
+  mount(
+    slidersRow,
+    h('label', { class: 'field__label' },
+      'Ordenada Tramo 1 (b₁ = ',
+      valB1,
+      ')',
+      sliderB1
+    ),
+    h('label', { class: 'field__label' },
+      'Pendiente Tramo 2 (m₂ = ',
+      valM2,
+      ')',
+      sliderM2
+    ),
+    h('label', { class: 'field__label' },
+      'Ordenada Tramo 2 (b₂ = ',
+      valB2,
+      ')',
+      sliderB2
+    )
+  );
+
+  mount(
+    container,
+    topControlsRow,
+    slidersRow,
+    plotCard,
+    braceSlot,
+    statusCard
+  );
+
+  syncUI();
 }

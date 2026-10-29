@@ -5,7 +5,7 @@
  * 2. Sub-modo 2: Puente entre dos postes lejanos (Tasa de cambio promedio d = Δa / Δn).
  */
 
-import { h, mount } from '../../../core/dom.js';
+import { h, mount, chalkIcon } from '../../../core/dom.js';
 import { fmt, fractionHtml, MINUS } from '../../../core/math-format.js';
 import { isTerm, stepFromTwo } from '../logic.js';
 import { createRibbon } from '../components.js';
@@ -143,7 +143,10 @@ export function initAlRevesWidget(container) {
 
       // Veredicto
       const verdict = h('div', { class: ['notice', result.isTerm ? 'notice--ok' : 'notice--err'] },
-        h('strong', null, result.isTerm ? '✓ Sí pertenece a la sucesión:' : '✗ NO pertenece a la sucesión:'),
+        h('strong', { style: 'display: inline-flex; align-items: center; gap: 6px;' },
+          chalkIcon(result.isTerm ? 'check' : 'cross', { width: 16, height: 16 }),
+          result.isTerm ? 'Sí pertenece a la sucesión:' : 'NO pertenece a la sucesión:'
+        ),
         h('p', { style: 'margin: 4px 0;' },
           result.isTerm
             ? `El valor ${fmt(fTarget)} cae exactamente en el poste entero n = ${result.n}.`

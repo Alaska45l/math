@@ -3,7 +3,7 @@
  * Fórmulas equivalentes y la trampa mortal de examen (2 + 6(n − 1) vs 2 + 6n).
  */
 
-import { h, mount } from '../../../core/dom.js';
+import { h, mount, chalkIcon } from '../../../core/dom.js';
 import { fmt } from '../../../core/math-format.js';
 import { parse, evalRange, equivalent, toDisplay } from '../expr.js';
 
@@ -29,7 +29,67 @@ export function initEquivalentesWidget(container) {
   let formA = '2 + 6(n - 1)';
   let formB = '2 + 6n';
 
-  function render() {
+  const presetButtons = h('div', { class: 'seq-controls' },
+    PRESETS.map((pr) =>
+      h('button', {
+        type: 'button',
+        class: 'chip',
+        on: {
+          click: () => {
+            formA = pr.fA;
+            formB = pr.fB;
+            inputA.value = formA;
+            inputB.value = formB;
+            updateDynamic();
+          },
+        },
+      }, pr.label)
+    )
+  );
+
+  const inputA = h('input', {
+    type: 'text',
+    class: 'seq-check__input',
+    value: formA,
+    on: {
+      input: (e) => {
+        formA = e.target.value;
+        updateDynamic();
+      },
+    },
+  });
+
+  const inputB = h('input', {
+    type: 'text',
+    class: 'seq-check__input',
+    value: formB,
+    on: {
+      input: (e) => {
+        formB = e.target.value;
+        updateDynamic();
+      },
+    },
+  });
+
+  const parsedHintA = h('div', { class: 'muted small' });
+  const parsedHintB = h('div', { class: 'muted small' });
+
+  const inputRow = h('div', { class: 'seq-controls', style: 'align-items: flex-start;' },
+    h('div', { style: 'flex: 1; min-width: 220px;' },
+      h('label', { class: 'field__label' }, 'Fórmula A: ', inputA),
+      parsedHintA
+    ),
+    h('div', { style: 'flex: 1; min-width: 220px;' },
+      h('label', { class: 'field__label' }, 'Fórmula B: ', inputB),
+      parsedHintB
+    )
+  );
+
+  const dynamicSlot = h('div');
+
+  mount(container, presetButtons, inputRow, dynamicSlot);
+
+  function updateDynamic() {
     const parsedA = parse(formA);
     const parsedB = parse(formB);
 
@@ -38,62 +98,8 @@ export function initEquivalentesWidget(container) {
 
     const isMatch = parsedA.ok && parsedB.ok && equivalent(parsedA.ast, parsedB.ast, { from: 1, to: 5 });
 
-    const presetButtons = h('div', { class: 'seq-controls' },
-      PRESETS.map((pr) =>
-        h('button', {
-          type: 'button',
-          class: 'chip',
-          on: {
-            click: () => {
-              formA = pr.fA;
-              formB = pr.fB;
-              render();
-            },
-          },
-        }, pr.label)
-      )
-    );
-
-    const inputRow = h('div', { class: 'seq-controls', style: 'align-items: flex-start;' },
-      h('div', { style: 'flex: 1; min-width: 220px;' },
-        h('label', { class: 'field__label' },
-          'Fórmula A: ',
-          h('input', {
-            type: 'text',
-            class: 'seq-check__input',
-            value: formA,
-            on: {
-              input: (e) => {
-                formA = e.target.value;
-                render();
-              },
-            },
-          })
-        ),
-        h('div', { class: 'muted small' },
-          parsedA.ok ? `Interpretado como: ${toDisplay(parsedA.ast)}` : 'Sintaxis incompleta'
-        )
-      ),
-      h('div', { style: 'flex: 1; min-width: 220px;' },
-        h('label', { class: 'field__label' },
-          'Fórmula B: ',
-          h('input', {
-            type: 'text',
-            class: 'seq-check__input',
-            value: formB,
-            on: {
-              input: (e) => {
-                formB = e.target.value;
-                render();
-              },
-            },
-          })
-        ),
-        h('div', { class: 'muted small' },
-          parsedB.ok ? `Interpretado como: ${toDisplay(parsedB.ast)}` : 'Sintaxis incompleta'
-        )
-      )
-    );
+    parsedHintA.textContent = parsedA.ok ? `Interpretado como: ${toDisplay(parsedA.ast)}` : 'Sintaxis incompleta';
+    parsedHintB.textContent = parsedB.ok ? `Interpretado como: ${toDisplay(parsedB.ast)}` : 'Sintaxis incompleta';
 
     // Tabla comparativa término a término
     const nList = [1, 2, 3, 4, 5];
@@ -118,8 +124,14 @@ export function initEquivalentesWidget(container) {
               h('td', null, typeof vB === 'number' ? fmt(vB) : '?'),
               h('td', null,
                 cellMatch
-                  ? h('span', { style: 'color: var(--green);' }, '✓ Idéntico')
-                  : h('span', { style: 'color: var(--pink); font-weight: bold;' }, '✗ Desfasado')
+                  ? h('span', { style: 'color: var(--green); display: inline-flex; align-items: center; gap: 4px;' },
+                      chalkIcon('check', { width: 14, height: 14 }),
+                      'Idéntico'
+                    )
+                  : h('span', { style: 'color: var(--pink); font-weight: bold; display: inline-flex; align-items: center; gap: 4px;' },
+                      chalkIcon('cross', { width: 14, height: 14 }),
+                      'Desfasado'
+                    )
               )
             );
           })
@@ -131,11 +143,17 @@ export function initEquivalentesWidget(container) {
     const verdict = h('div', { class: ['notice', isMatch ? 'notice--ok' : 'notice--err'] },
       isMatch
         ? h('div', null,
-            h('strong', null, '✓ Fórmulas equivalentes: '),
+            h('strong', { style: 'display: inline-flex; align-items: center; gap: 5px;' },
+              chalkIcon('check', { width: 16, height: 16 }),
+              'Fórmulas equivalentes: '
+            ),
             h('span', null, 'Ambas expresiones generan exactamente los mismos números término a término en todo el dominio ℕ.')
           )
         : h('div', null,
-            h('strong', null, '✗ ¡Cuidado con el desfasaje! '),
+            h('strong', { style: 'display: inline-flex; align-items: center; gap: 5px;' },
+              chalkIcon('cross', { width: 16, height: 16 }),
+              '¡Cuidado con el desfasaje! '
+            ),
             h('p', { style: 'margin: 4px 0;' },
               'Al omitir los paréntesis en ',
               h('code', null, '(n − 1)'),
@@ -146,13 +164,8 @@ export function initEquivalentesWidget(container) {
           )
     );
 
-    mount(container,
-      presetButtons,
-      inputRow,
-      table,
-      verdict
-    );
+    mount(dynamicSlot, table, verdict);
   }
 
-  render();
+  updateDynamic();
 }

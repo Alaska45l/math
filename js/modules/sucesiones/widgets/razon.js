@@ -21,7 +21,94 @@ export function initRazonWidget(container) {
   let rVal = -5;
   let tryContinuous = false;
 
-  function render() {
+  const presetButtonsSlot = h('div', { class: 'seq-controls' });
+
+  const inputK = h('input', {
+    type: 'number',
+    min: -500,
+    max: 500,
+    class: 'seq-check__input-sm',
+    value: kVal,
+    on: {
+      input: (e) => {
+        const parsed = parseFloat(e.target.value);
+        if (Number.isFinite(parsed)) {
+          kVal = Math.max(-500, Math.min(500, parsed));
+          updateDynamic();
+        }
+      },
+      change: (e) => {
+        const parsed = parseFloat(e.target.value);
+        kVal = Number.isFinite(parsed) ? Math.max(-500, Math.min(500, parsed)) : 1;
+        inputK.value = kVal;
+        updateDynamic();
+      },
+    },
+  });
+
+  const rValueLabel = h('strong', { style: 'color: var(--yellow);' }, fmt(rVal));
+  const sliderR = h('input', {
+    type: 'range',
+    min: -3,
+    max: 3,
+    step: 0.1,
+    value: Math.max(-3, Math.min(3, rVal)),
+    class: 'seq-range',
+    on: {
+      input: (e) => {
+        rVal = parseFloat(e.target.value);
+        updateDynamic();
+      },
+    },
+  });
+
+  const checkboxContinuous = h('input', {
+    type: 'checkbox',
+    checked: tryContinuous,
+    on: {
+      change: (e) => {
+        tryContinuous = e.target.checked;
+        updateDynamic();
+        if (tryContinuous && rVal < 0) {
+          react({
+            pose: 'colapso',
+            tag: 'Raíz prohibida en ℝ',
+            html: `¡Alerta de cortocircuito! Con razón negativa (<span class="eq">r = ${fmt(rVal)}</span>), en <span class="eq">n = 1,5</span> necesitarías calcular <span class="eq">(${fmt(rVal)})<sup>0,5</sup> = √(${fmt(rVal)}) ∉ ℝ</span>. ¡No existe ninguna curva continua real que conecte los puntos alternantes!`,
+          });
+        }
+      },
+    },
+  });
+
+  const controls = h('div', { class: 'seq-controls' },
+    h('label', { class: 'field__label' }, 'Primer término k: ', inputK),
+    h('label', { class: 'field__label', style: 'min-width: 220px;' },
+      'Razón común r: ',
+      rValueLabel,
+      sliderR
+    ),
+    h('label', { class: 'chip chip--toggle' },
+      checkboxContinuous,
+      'Intentar trazar curva continua en ℝ'
+    )
+  );
+
+  const tableSlot = h('div', { class: 'seq-table-wrap', style: 'flex: 1; min-width: 220px;' });
+  const svgEl = s('svg', {
+    viewBox: '0 0 540 320',
+    class: 'seq-plot',
+    role: 'img',
+    'aria-label': 'Gráfico de alternancia de signos de la sucesión geométrica',
+  });
+  const plotCard = h('div', { class: 'seq-plot-card', style: 'flex: 1.5; min-width: 300px;' }, svgEl);
+  const layoutGrid = h('div', { class: 'seq-fn-grid' }, tableSlot, plotCard);
+  const noticesSlot = h('div');
+
+  mount(container, presetButtonsSlot, controls, layoutGrid, noticesSlot);
+
+  function updateDynamic() {
+    rValueLabel.textContent = fmt(rVal);
+
     const nList = [1, 2, 3, 4];
     const terms = nList.map((n) => {
       const withParen = kVal * Math.pow(rVal, n - 1);
@@ -30,85 +117,27 @@ export function initRazonWidget(container) {
     });
 
     // Botones de presets
-    const presetButtons = h('div', { class: 'seq-controls' },
-      PRESETS.map((item) => {
+    mount(presetButtonsSlot,
+      ...PRESETS.map((item) => {
         const isActive = Math.abs(kVal - item.k) < 1e-4 && Math.abs(rVal - item.r) < 1e-4;
-        const btn = h('button', {
+        return h('button', {
           type: 'button',
           class: ['chip', isActive ? 'is-active' : ''],
           on: {
             click: () => {
               kVal = item.k;
               rVal = item.r;
-              render();
+              inputK.value = kVal;
+              sliderR.value = Math.max(-3, Math.min(3, rVal));
+              updateDynamic();
             },
           },
         }, item.label);
-        return btn;
       })
     );
 
-    // Controles de sliders
-    const controls = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        'Primer término k: ',
-        h('input', {
-          type: 'number',
-          min: -500,
-          max: 500,
-          class: 'seq-check__input-sm',
-          value: kVal,
-          on: {
-            change: (e) => {
-              const parsed = parseFloat(e.target.value);
-              kVal = Number.isFinite(parsed) ? Math.max(-500, Math.min(500, parsed)) : 1;
-              render();
-            },
-          },
-        })
-      ),
-      h('label', { class: 'field__label', style: 'min-width: 220px;' },
-        `Razón común r: `,
-        h('strong', { style: 'color: var(--yellow);' }, fmt(rVal)),
-        h('input', {
-          type: 'range',
-          min: -3,
-          max: 3,
-          step: 0.1,
-          value: Math.max(-3, Math.min(3, rVal)),
-          class: 'seq-range',
-          on: {
-            input: (e) => {
-              rVal = parseFloat(e.target.value);
-              render();
-            },
-          },
-        })
-      ),
-      h('label', { class: 'chip chip--toggle' },
-        h('input', {
-          type: 'checkbox',
-          checked: tryContinuous,
-          on: {
-            change: (e) => {
-              tryContinuous = e.target.checked;
-              render();
-              if (tryContinuous && rVal < 0) {
-                react({
-                  pose: 'colapso',
-                  tag: 'Raíz prohibida en ℝ',
-                  html: `¡Alerta de cortocircuito! Con razón negativa (<span class="eq">r = ${fmt(rVal)}</span>), en <span class="eq">n = 1,5</span> necesitarías calcular <span class="eq">(${fmt(rVal)})<sup>0,5</sup> = √(${fmt(rVal)}) ∉ ℝ</span>. ¡No existe ninguna curva continua real que conecte los puntos alternantes!`,
-                });
-              }
-            },
-          },
-        }),
-        'Intentar trazar curva continua en ℝ'
-      )
-    );
-
     // Tabla de valores
-    const tableEl = h('div', { class: 'seq-table-wrap', style: 'flex: 1; min-width: 220px;' },
+    mount(tableSlot,
       h('table', { class: 'seq-table' },
         h('thead', null,
           h('tr', null,
@@ -131,16 +160,6 @@ export function initRazonWidget(container) {
         )
       )
     );
-
-    // Gráfico Cartesiano SVG
-    const svgEl = s('svg', {
-      viewBox: '0 0 540 320',
-      class: 'seq-plot',
-      role: 'img',
-      'aria-label': 'Gráfico de alternancia de signos de la sucesión geométrica',
-    });
-
-    const plotCard = h('div', { class: 'seq-plot-card', style: 'flex: 1.5; min-width: 300px;' }, svgEl);
 
     // Diagnóstico del radar de la razón
     let regimeText = '';
@@ -222,19 +241,7 @@ export function initRazonWidget(container) {
       );
     }
 
-    const layoutGrid = h('div', { class: 'seq-fn-grid' },
-      tableEl,
-      plotCard
-    );
-
-    mount(container,
-      presetButtons,
-      controls,
-      layoutGrid,
-      regimeNotice,
-      continuityNotice,
-      liveParenComparator
-    );
+    mount(noticesSlot, regimeNotice, continuityNotice, liveParenComparator);
 
     // Configuración y dibujo del plano con escala adaptativa segura
     const allVals = terms.map((t) => t.withParen);
@@ -352,5 +359,5 @@ export function initRazonWidget(container) {
     });
   }
 
-  render();
+  updateDynamic();
 }

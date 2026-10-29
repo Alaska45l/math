@@ -3,7 +3,7 @@
  * Inicializa navegación, widgets interactivos y gestión de progreso en localStorage.
  */
 
-import { byId, qsa, mount, h } from '../../core/dom.js';
+import { byId, qsa, mount, h, chalkIcon } from '../../core/dom.js';
 import { renderNav } from '../../core/nav.js';
 import { createCheckBlock, annotatedFormula, getProgress } from './components.js';
 
@@ -57,7 +57,7 @@ function updateSidebarProgress() {
     const statusEl = link.querySelector('.seq-sidebar__status');
     if (statusEl) {
       if (progress[secId]) {
-        statusEl.textContent = '✓';
+        mount(statusEl, chalkIcon('check', { width: 14, height: 14 }));
         statusEl.classList.add('is-done');
       } else {
         statusEl.textContent = '';

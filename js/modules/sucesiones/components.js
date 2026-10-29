@@ -350,6 +350,28 @@ export function annotatedFormula(root, config = {}) {
   );
 }
 
+function resolveExpectedChoiceIndex(q) {
+  if (typeof q.expected === 'number') {
+    return q.expected;
+  }
+  if (typeof q.expected === 'string') {
+    const trimmed = q.expected.trim();
+    if (/^[A-D]$/i.test(trimmed)) {
+      return trimmed.toUpperCase().charCodeAt(0) - 65;
+    }
+    const idx = q.options.findIndex((opt) => {
+      if (typeof opt === 'string') {
+        const cleanOpt = opt.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '').trim();
+        const cleanExp = trimmed.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '').trim();
+        return cleanOpt === cleanExp || opt.trim() === trimmed;
+      }
+      return opt === q.expected;
+    });
+    if (idx !== -1) return idx;
+  }
+  return 0;
+}
+
 /**
  * createCheckBlock(root, questions, sectionId, onComplete)
  * Soporta:
@@ -360,15 +382,36 @@ export function annotatedFormula(root, config = {}) {
  * - 'match': emparejamiento
  */
 export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null) {
+  let lastCorrectSlot = -1;
   const state = {
-    answers: questions.map(() => ({
-      value: null,
-      ok: false,
-      feedback: null,
-      hintIndex: 0,
-      showSolution: false,
-      failCount: 0,
-    })),
+    answers: questions.map((q) => {
+      let optionOrder = null;
+      if (q.type === 'choice' && Array.isArray(q.options) && q.options.length > 1) {
+        const n = q.options.length;
+        const expectedIdx = resolveExpectedChoiceIndex(q);
+        optionOrder = q.options.map((_, i) => i);
+        for (let attempt = 0; attempt < 10; attempt++) {
+          for (let i = n - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optionOrder[i], optionOrder[j]] = [optionOrder[j], optionOrder[i]];
+          }
+          const correctSlot = optionOrder.indexOf(expectedIdx);
+          if (correctSlot !== lastCorrectSlot || n <= 1) {
+            lastCorrectSlot = correctSlot;
+            break;
+          }
+        }
+      }
+      return {
+        value: null,
+        ok: false,
+        feedback: null,
+        hintIndex: 0,
+        showSolution: false,
+        failCount: 0,
+        optionOrder,
+      };
+    }),
   };
 
   const container = h('div', { class: 'seq-check-block', dataset: { section: sectionId } });
@@ -706,23 +749,31 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           )
         );
       } else if (q.type === 'choice') {
+        const expectedIdx = resolveExpectedChoiceIndex(q);
+        const order = qState.optionOrder || q.options.map((_, i) => i);
         const optionsContainer = h('div', { class: 'seq-check__options' },
-          q.options.map((opt, optIdx) => {
-            const letter = String.fromCharCode(65 + optIdx);
-            const isSelectedOpt = qState.value === optIdx;
+          order.map((origIdx, displayIdx) => {
+            const rawOpt = q.options[origIdx];
+            const opt = typeof rawOpt === 'string'
+              ? rawOpt.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '')
+              : rawOpt;
+            const letter = String.fromCharCode(65 + displayIdx);
+            const isSelectedOpt = qState.value === origIdx;
+            const isMatch = origIdx === expectedIdx;
             const btn = h('button', {
               type: 'button',
-              class: ['seq-check__opt-btn', isSelectedOpt ? 'is-selected' : '', isResolved && optIdx === q.expected ? 'is-correct' : ''],
-              dataset: { answer: optIdx },
+              class: ['seq-check__opt-btn', isSelectedOpt ? 'is-selected' : '', isResolved && isMatch ? 'is-correct' : ''],
+              dataset: { answer: displayIdx, origIndex: origIdx },
               disabled: isResolved,
             },
               h('strong', { class: 'seq-check__opt-tag' }, `${letter}) `),
-              opt
+              typeof opt === 'string' && opt.includes('<')
+                ? (() => { const sp = h('span'); sp.innerHTML = opt; return sp; })()
+                : opt
             );
 
             btn.addEventListener('click', () => {
-              qState.value = optIdx;
-              const isMatch = optIdx === q.expected;
+              qState.value = origIdx;
               qState.ok = isMatch;
               qState.feedback = isMatch
                 ? { ok: true, message: q.explanation || '¡Correcto! Opción acertada.' }

@@ -14,7 +14,114 @@ export function initTeletransportadorWidget(container) {
   let dVal = 3;
   let nTarget = 5;
 
-  function render() {
+  const inputK = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    value: kVal,
+    on: {
+      input: (e) => {
+        const v = parseFloat(e.target.value);
+        if (Number.isFinite(v)) {
+          kVal = v;
+          updateDynamic();
+        }
+      },
+      change: (e) => {
+        kVal = parseFloat(e.target.value) || 0;
+        updateDynamic();
+      },
+    },
+  });
+
+  const inputD = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    value: dVal,
+    on: {
+      input: (e) => {
+        const v = parseFloat(e.target.value);
+        if (Number.isFinite(v)) {
+          dVal = v;
+          updateDynamic();
+        }
+      },
+      change: (e) => {
+        dVal = parseFloat(e.target.value) || 0;
+        updateDynamic();
+      },
+    },
+  });
+
+  const inputN = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    min: 1,
+    max: 500,
+    value: nTarget,
+    on: {
+      input: (e) => {
+        const v = parseInt(e.target.value, 10);
+        if (Number.isFinite(v) && v >= 1) {
+          nTarget = Math.min(500, v);
+          updateDynamic();
+        }
+      },
+      change: (e) => {
+        nTarget = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1));
+        inputN.value = nTarget;
+        updateDynamic();
+      },
+    },
+  });
+
+  const controls = h('div', { class: 'seq-controls' },
+    h('label', { class: 'field__label' }, 'Primer término k = a(1): ', inputK),
+    h('label', { class: 'field__label' }, 'Diferencia común d: ', inputD),
+    h('label', { class: 'field__label' }, 'Destino de teletransportación (n): ', inputN),
+    h('button', {
+      type: 'button',
+      class: 'chip',
+      on: {
+        click: () => {
+          kVal = 199;
+          dVal = -3;
+          nTarget = 124;
+          inputK.value = kVal;
+          inputD.value = dVal;
+          inputN.value = nTarget;
+          updateDynamic();
+        },
+      },
+    }, 'Cargar caso Khan: 199, 196, 193… (n = 124)')
+  );
+
+  const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
+  const dynamicSlot = h('div');
+
+  // Recuadro lateral colapsable: Otro punto de partida (N0)
+  const detailsN0 = h('details', { class: 'seq-block seq-block--caution' },
+    h('summary', { style: 'cursor: pointer; font-weight: bold;' }, 'Otro punto de partida: ¿Qué pasa si arrancás en n = 0 (ℕ₀)?'),
+    h('div', { style: 'margin-top: 10px;' },
+      h('p', null,
+        'En computación y en algunos problemas especiales (como el de Supriya), el primer poste se numera como ',
+        h('code', null, 'a(0)'),
+        '. En ese caso, para llegar al poste ',
+        h('code', null, 'n'),
+        ' diste exactamente ',
+        h('strong', null, 'n saltos'),
+        ' completos (porque de 0 a n hay n pasos). La fórmula pasa a ser ',
+        h('code', null, 'k + d · n'),
+        '.'
+      ),
+      h('p', { class: 'small muted' },
+        'En matemática escolar y en Khan Academy, el dominio estándar siempre arranca en n = 1 (ℕ), por lo que siempre usamos (n − 1) saltos.'
+      )
+    )
+  );
+
+  mount(container, controls, ribbonSlot, dynamicSlot, detailsN0);
+
+  function updateDynamic() {
     const jumps = nTarget - 1;
     const resultVal = kVal + jumps * dVal;
 
@@ -25,44 +132,6 @@ export function initTeletransportadorWidget(container) {
       ribbonTerms.push(kVal + (i - 1) * dVal);
     }
 
-    const controls = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        'Primer término k = a(1): ',
-        h('input', {
-          type: 'number',
-          class: 'seq-check__input-sm',
-          value: kVal,
-          on: { change: (e) => { kVal = parseFloat(e.target.value) || 0; render(); } },
-        })
-      ),
-      h('label', { class: 'field__label' },
-        'Diferencia común d: ',
-        h('input', {
-          type: 'number',
-          class: 'seq-check__input-sm',
-          value: dVal,
-          on: { change: (e) => { dVal = parseFloat(e.target.value) || 0; render(); } },
-        })
-      ),
-      h('label', { class: 'field__label' },
-        'Destino de teletransportación (n): ',
-        h('input', {
-          type: 'number',
-          class: 'seq-check__input-sm',
-          min: 1,
-          max: 500,
-          value: nTarget,
-          on: { change: (e) => { nTarget = Math.max(1, parseInt(e.target.value, 10) || 1); render(); } },
-        })
-      ),
-      h('button', {
-        type: 'button',
-        class: 'chip',
-        on: { click: () => { kVal = 199; dVal = -3; nTarget = 124; render(); } },
-      }, 'Cargar caso Khan: 199, 196, 193… (n = 124)')
-    );
-
-    const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
     createRibbon(ribbonSlot, {
       terms: ribbonTerms,
       startIndex: 1,
@@ -124,35 +193,8 @@ export function initTeletransportadorWidget(container) {
       h('span', { class: 'small' }, `¡Sin necesidad de calcular ninguno de los ${jumps} términos intermedios!`)
     );
 
-    // Recuadro lateral colapsable: Otro punto de partida (N0)
-    const detailsN0 = h('details', { class: 'seq-block seq-block--caution' },
-      h('summary', { style: 'cursor: pointer; font-weight: bold;' }, 'Otro punto de partida: ¿Qué pasa si arrancás en n = 0 (ℕ₀)?'),
-      h('div', { style: 'margin-top: 10px;' },
-        h('p', null,
-          'En computación y en algunos problemas especiales (como el de Supriya), el primer poste se numera como ',
-          h('code', null, 'a(0)'),
-          '. En ese caso, para llegar al poste ',
-          h('code', null, 'n'),
-          ' diste exactamente ',
-          h('strong', null, 'n saltos'),
-          ' completos (porque de 0 a n hay n pasos). La fórmula pasa a ser ',
-          h('code', null, 'k + d · n'),
-          '.'
-        ),
-        h('p', { class: 'small muted' },
-          'En matemática escolar y en Khan Academy, el dominio estándar siempre arranca en n = 1 (ℕ), por lo que siempre usamos (n − 1) saltos.'
-        )
-      )
-    );
-
-    mount(container,
-      controls,
-      ribbonSlot,
-      table,
-      teleportBox,
-      detailsN0
-    );
+    mount(dynamicSlot, table, teleportBox);
   }
 
-  render();
+  updateDynamic();
 }

@@ -120,8 +120,12 @@ export function createPlane(svg, cfg) {
     s('clipPath', { id: clipId }, s('rect', { x: P.l, y: P.t, width: pw, height: ph })),
     s('marker', {
       id: `${clipId}-arrow`, viewBox: '0 0 10 10', refX: 8, refY: 5,
-      markerWidth: 8, markerHeight: 8, orient: 'auto-start-reverse',
+      markerWidth: 8, markerHeight: 8, orient: 'auto',
     }, s('path', { d: 'M 1.5 1.5 L 8.5 5 L 1.5 8.5', class: 'plot-arrowhead' })),
+    s('marker', {
+      id: `${clipId}-arrow-start`, viewBox: '0 0 10 10', refX: 2, refY: 5,
+      markerWidth: 8, markerHeight: 8, orient: 'auto',
+    }, s('path', { d: 'M 8.5 1.5 L 1.5 5 L 8.5 8.5', class: 'plot-arrowhead' })),
     s('filter', {
       id: `${clipId}-chalk`, x: '-5%', y: '-5%', width: '110%', height: '110%',
       filterUnits: 'userSpaceOnUse',
@@ -204,9 +208,35 @@ export function createPlane(svg, cfg) {
   }
   const axes = layers.axes;
   const axisLabels = layers.axisLabels;
+
+  const hasLeftArrow = c.arrowLeft !== undefined ? Boolean(c.arrowLeft) : (c.xMin < 0);
+  const hasBottomArrow = c.arrowBottom !== undefined ? Boolean(c.arrowBottom) : (c.yMin < 0);
+  const hasRightArrow = c.arrowRight !== undefined ? Boolean(c.arrowRight) : true;
+  const hasTopArrow = c.arrowTop !== undefined ? Boolean(c.arrowTop) : true;
+
+  const xAxisAttrs = {
+    x1: hasLeftArrow ? P.l - 8 : P.l,
+    y1: xAxisY,
+    x2: hasRightArrow ? P.l + pw + 8 : P.l + pw,
+    y2: xAxisY,
+    class: 'plot-axis',
+  };
+  if (hasLeftArrow) xAxisAttrs['marker-start'] = `url(#${clipId}-arrow-start)`;
+  if (hasRightArrow) xAxisAttrs['marker-end'] = `url(#${clipId}-arrow)`;
+
+  const yAxisAttrs = {
+    x1: yAxisX,
+    y1: hasBottomArrow ? P.t + ph + 8 : P.t + ph,
+    x2: yAxisX,
+    y2: hasTopArrow ? P.t - 8 : P.t,
+    class: 'plot-axis',
+  };
+  if (hasBottomArrow) yAxisAttrs['marker-start'] = `url(#${clipId}-arrow-start)`;
+  if (hasTopArrow) yAxisAttrs['marker-end'] = `url(#${clipId}-arrow)`;
+
   axes.append(
-    s('line', { x1: P.l, y1: xAxisY, x2: P.l + pw + 8, y2: xAxisY, class: 'plot-axis', 'marker-end': `url(#${clipId}-arrow)` }),
-    s('line', { x1: yAxisX, y1: P.t + ph, x2: yAxisX, y2: P.t - 8, class: 'plot-axis', 'marker-end': `url(#${clipId}-arrow)` }),
+    s('line', xAxisAttrs),
+    s('line', yAxisAttrs),
   );
   axisLabels.append(
     s('text', { x: P.l + pw + 6, y: xAxisY - 8, class: 'plot-axis-label', 'text-anchor': 'end' }, c.xLabel),
@@ -287,9 +317,11 @@ export function createPlane(svg, cfg) {
     return linePath([[c.xMin, m * c.xMin + b], [c.xMax, m * c.xMax + b]]);
   }
 
+  layers.curves = layers.curve;
+
   return {
     cfg: c, sx, sy, invX, invY, layers, fnPath, linePath, linePathMB,
-    box: { x: P.l, y: P.t, w: pw, h: ph }, xAxisY, yAxisX, arrowId: `${clipId}-arrow`,
-    clear(...names) { names.forEach((nm) => layers[nm].replaceChildren()); },
+    box: { x: P.l, y: P.t, w: pw, h: ph }, xAxisY, yAxisX, arrowId: `${clipId}-arrow`, arrowStartId: `${clipId}-arrow-start`,
+    clear(...names) { names.forEach((nm) => layers[nm]?.replaceChildren()); },
   };
 }

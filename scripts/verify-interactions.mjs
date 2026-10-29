@@ -13,6 +13,7 @@ const MIME_MAP = {
   '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.webp': 'image/webp',
+  '.png': 'image/png',
   '.json': 'application/json',
 };
 
@@ -96,21 +97,25 @@ await client.ready;
 
 await client.send('Runtime.enable');
 await client.send('Page.enable');
-await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/sucesiones.html` });
+await client.send('Emulation.setDeviceMetricsOverride', {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
 
+await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/sucesiones.html` });
 await new Promise((r) => setTimeout(r, 1200));
 
 const interactionResults = await client.eval(`(async () => {
   const sound = await import('./js/core/sound.js');
   const vn = await import('./js/core/vn.js');
-  const components = await import('./js/modules/sucesiones/components.js');
 
   const report = {};
 
   const ctx = sound.getAudioContext();
   report.hasAudioContext = Boolean(ctx);
 
-  // Instrumentar AudioContext para contar nodos reales creados
   let oscCount = 0;
   let bufCount = 0;
   const origCreateOsc = ctx.createOscillator.bind(ctx);
@@ -118,18 +123,14 @@ const interactionResults = await client.eval(`(async () => {
   ctx.createOscillator = () => { oscCount++; return origCreateOsc(); };
   ctx.createBufferSource = () => { bufCount++; return origCreateBuf(); };
 
-  // 1. Verificar throttling REAL de playSliderTick
-  // Esperar a que pase cualquier ventana de throttle previa
   await new Promise((r) => setTimeout(r, 50));
   const oscBeforeThrottle = oscCount;
   for (let i = 0; i < 10; i++) {
     sound.playSliderTick(1);
   }
-  // En un bucle sincrónico de 10 ticks, sólo el primero debe dispararse (1 osc), los otros 9 throttled
   report.sliderTicksInSyncLoop = oscCount - oscBeforeThrottle;
   report.sliderThrottlingWorks = (oscCount - oscBeforeThrottle === 1);
 
-  // 2. Verificar que cuando está silenciado, NO genera ningún nodo de audio
   sound.setSoundEnabled(false);
   const oscBeforeMute = oscCount;
   const bufBeforeMute = bufCount;
@@ -144,11 +145,9 @@ const interactionResults = await client.eval(`(async () => {
   report.nodesCreatedWhileMuted = nodesCreatedWhileMuted;
   report.soundDisabledWorks = (nodesCreatedWhileMuted === 0 && !sound.isSoundEnabled());
 
-  // Restaurar sonido
   sound.setSoundEnabled(true);
   report.soundEnabledRestored = sound.isSoundEnabled();
 
-  // 3. Probar playSuccess, playError, playClick, playPoseEmote sin errores
   let audioErrors = 0;
   try {
     await new Promise((r) => setTimeout(r, 50));
@@ -171,7 +170,6 @@ const interactionResults = await client.eval(`(async () => {
   }
   report.audioCallsPassed = audioErrors === 0;
 
-  // 4. Probar Visual Novel typewriter con voz
   let vnError = null;
   try {
     vn.react({
@@ -183,6 +181,37 @@ const interactionResults = await client.eval(`(async () => {
     vnError = err.message;
   }
   report.vnReactTriggered = !vnError;
+  report.vnTagHasSvgIcon = Boolean(document.querySelector('.vn-tag svg.chalk-icon'));
+
+  // Verificar persistencia de sliders en sucesiones.html durante eventos input continuos
+  const seqRangeInputs = Array.from(document.querySelectorAll('input[type="range"]'));
+  let seqSlidersPersistent = seqRangeInputs.length > 0;
+  for (const slider of seqRangeInputs) {
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const step = parseFloat(slider.step) || 1;
+    for (let k = 1; k <= 3; k++) {
+      const nextVal = Math.min(max, min + k * step);
+      slider.value = String(nextVal);
+      slider.dispatchEvent(new Event('input', { bubbles: true }));
+      if (!slider.isConnected) {
+        seqSlidersPersistent = false;
+      }
+    }
+  }
+  report.seqSlidersCount = seqRangeInputs.length;
+  report.seqSlidersPersistent = seqSlidersPersistent;
+
+  // Verificar persistencia de SVG en widget funcion durante pointerdown -> pointermove -> pointerup
+  const fnSvg = document.querySelector('[data-widget="funcion"] svg');
+  if (fnSvg) {
+    fnSvg.dispatchEvent(new PointerEvent('pointerdown', { clientX: 220, clientY: 160, pointerId: 1, bubbles: true }));
+    fnSvg.dispatchEvent(new PointerEvent('pointermove', { clientX: 260, clientY: 140, pointerId: 1, bubbles: true }));
+    fnSvg.dispatchEvent(new PointerEvent('pointermove', { clientX: 300, clientY: 120, pointerId: 1, bubbles: true }));
+    fnSvg.dispatchEvent(new PointerEvent('pointerup', { clientX: 300, clientY: 120, pointerId: 1, bubbles: true }));
+  }
+  const fnSvgAfter = document.querySelector('[data-widget="funcion"] svg');
+  report.seqFuncionSvgSameNode = Boolean(fnSvg && fnSvg === fnSvgAfter && fnSvg.isConnected);
 
   return report;
 })()`);
@@ -193,26 +222,103 @@ await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/valor-absolu
 await new Promise((r) => setTimeout(r, 1200));
 
 const absResults = await client.eval(`(async () => {
+  // Cambiar a vista continua para que todos los widgets tengan layout visible y podamos probar arrastre
+  const modeToggle = document.getElementById('seq-mode-toggle');
+  if (modeToggle) modeToggle.click();
+  await new Promise((r) => setTimeout(r, 100));
+
   const widgets = Array.from(document.querySelectorAll('[data-widget]'));
   const populatedWidgets = widgets.filter((el) => el.children.length > 0).map((el) => el.dataset.widget);
 
   const checks = Array.from(document.querySelectorAll('[data-check]'));
   const populatedChecks = checks.filter((el) => el.children.length > 0).map((el) => el.dataset.check);
 
-  // Probar un botón de VN trigger
-  const firstVnBtn = document.querySelector('.vn-trigger[data-vn-script="sec1-distancia"]');
-  if (firstVnBtn) firstVnBtn.click();
-  await new Promise((r) => setTimeout(r, 100));
-  const vnOverlayActive = Boolean(document.querySelector('.vn-overlay, .vn-stage, [class*="vn"]'));
+  // 1. Verificar que TODOS los <input type="range"> en los 10 widgets mantienen la misma referencia DOM durante múltiples eventos input
+  const rangeInputs = Array.from(document.querySelectorAll('input[type="range"]'));
+  let allSlidersSameNodeReference = rangeInputs.length >= 15;
+  const sliderDetails = [];
 
-  // Probar cambio de pestaña en Retos al Escudo Deflector V
+  for (const input of rangeInputs) {
+    const widgetHost = input.closest('[data-widget]')?.dataset?.widget || 'other';
+    const min = parseFloat(input.min);
+    const max = parseFloat(input.max);
+    const step = parseFloat(input.step) || 0.5;
+    const refBefore = input;
+
+    for (let i = 1; i <= 4; i++) {
+      let nextV = min + i * step;
+      if (Math.abs(nextV) < 1e-6 && widgetHost !== 'distancia-1d') nextV += step;
+      nextV = Math.min(max, Math.max(min, nextV));
+      input.value = String(nextV);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      if (!input.isConnected || input !== refBefore) {
+        allSlidersSameNodeReference = false;
+      }
+    }
+    sliderDetails.push({ widget: widgetHost, connected: input.isConnected });
+  }
+
+  // 2. Verificar arrastre continuo pointerdown -> pointermove -> pointerup sobre SVGs interactivos
+  const svgTargets = [
+    '[data-widget="distancia-1d"] svg',
+    '[data-widget="espejo-cartesiano"] svg',
+    '[data-widget="traslacion-vh"] svg',
+    '[data-widget="escalado-rama"] svg',
+    '[data-widget="constructor-v"] svg',
+    '[data-widget="desarmador-barras"] svg',
+    '[data-widget="radiografia-abs"] svg',
+    '[data-widget="aduana-partes"] svg',
+    '[data-widget="escalonada-paso"] svg',
+  ];
+
+  let allSvgsSameNodeReference = true;
+  for (const sel of svgTargets) {
+    const svg = document.querySelector(sel);
+    if (!svg) {
+      allSvgsSameNodeReference = false;
+      continue;
+    }
+    const rect = svg.getBoundingClientRect();
+    const startX = rect.left + rect.width * 0.5;
+    const startY = rect.top + rect.height * 0.5;
+    svg.dispatchEvent(new PointerEvent('pointerdown', { clientX: startX, clientY: startY, pointerId: 1, bubbles: true }));
+    svg.dispatchEvent(new PointerEvent('pointermove', { clientX: startX + 35, clientY: startY - 25, pointerId: 1, bubbles: true }));
+    svg.dispatchEvent(new PointerEvent('pointermove', { clientX: startX + 70, clientY: startY - 50, pointerId: 1, bubbles: true }));
+    svg.dispatchEvent(new PointerEvent('pointerup', { clientX: startX + 70, clientY: startY - 50, pointerId: 1, bubbles: true }));
+
+    const svgAfter = document.querySelector(sel);
+    if (svg !== svgAfter || !svg.isConnected) {
+      allSvgsSameNodeReference = false;
+    }
+  }
+
+  // 3. Probar botones de VN trigger (tanto explicación principal como repaso básico secX-basico)
+  const mainTriggerBtns = document.querySelectorAll('.vn-trigger[data-vn-script]');
+  const basicTriggerBtns = document.querySelectorAll('.vn-trigger--base[data-vn-script$="-basico"]');
+  const firstBasicBtn = basicTriggerBtns[0];
+  if (firstBasicBtn) firstBasicBtn.click();
+  await new Promise((r) => setTimeout(r, 100));
+  const vnOverlayActive = Boolean(document.querySelector('.vn-hud:not([hidden])'));
+  const vnTagSvgPresent = Boolean(document.querySelector('.vn-tag svg.chalk-icon'));
+  const vnCloseBtn = document.querySelector('.vn-close');
+  if (vnCloseBtn) vnCloseBtn.click();
+
+  // 4. Probar cambio de pestaña en Retos al Escudo Deflector V y persistencia de sliders del Boss
   const retoTabs = Array.from(document.querySelectorAll('[data-widget="retos-abs"] button.chip'));
   const bossTab = retoTabs.find((b) => b.textContent.includes('Escudo Deflector'));
   if (bossTab) bossTab.click();
   await new Promise((r) => setTimeout(r, 100));
-  const bossBoardMounted = Boolean(document.querySelector('[data-widget="retos-abs"] svg.abs-board-svg'));
+  const bossBoardSvg = document.querySelector('[data-widget="retos-abs"] svg.abs-board__svg');
+  const bossSliders = Array.from(document.querySelectorAll('[data-widget="retos-abs"] input[type="range"]'));
+  let bossSlidersPersistent = bossSliders.length === 3;
+  for (const sInput of bossSliders) {
+    sInput.value = '1';
+    sInput.dispatchEvent(new Event('input', { bubbles: true }));
+    if (!sInput.isConnected) bossSlidersPersistent = false;
+  }
+  const bossBoardMounted = Boolean(bossBoardSvg && bossBoardSvg.isConnected && bossSlidersPersistent);
 
-  // Probar respuesta en sec-1 (número) y diagnóstico en sec-3 (vértice invertido)
+  // 5. Probar respuesta en sec-1 (número)
   const sec1Input = document.querySelector('[data-check="sec-1"] input[type="number"]');
   const sec1Btn = document.querySelector('[data-check="sec-1"] button.btn--check');
   if (sec1Input && sec1Btn) {
@@ -221,7 +327,7 @@ const absResults = await client.eval(`(async () => {
   }
   const sec1FirstCardResolved = Boolean(document.querySelector('[data-check="sec-1"] .seq-check__card.is-resolved'));
 
-  // Probar controles de teclado sobre los nodos SVG enfocados (vértice, pendiente y láser)
+  // 6. Probar controles de teclado sobre los nodos SVG enfocados (vértice y láser)
   const sec7VertexHandle = document.querySelector('[data-widget="radiografia-abs"] [data-handle="vertex"]');
   const sec7BeforeLabel = sec7VertexHandle ? sec7VertexHandle.getAttribute('aria-label') : '';
   if (sec7VertexHandle) {
@@ -243,10 +349,15 @@ const absResults = await client.eval(`(async () => {
   return {
     totalWidgets: widgets.length,
     populatedWidgetsCount: populatedWidgets.length,
-    populatedWidgets,
     totalChecks: checks.length,
     populatedChecksCount: populatedChecks.length,
+    rangeInputsCount: rangeInputs.length,
+    allSlidersSameNodeReference,
+    allSvgsSameNodeReference,
+    mainTriggerBtnsCount: mainTriggerBtns.length,
+    basicTriggerBtnsCount: basicTriggerBtns.length,
     vnOverlayActive,
+    vnTagSvgPresent,
     bossBoardMounted,
     sec1FirstCardResolved,
     keyboardVertexWorks,
@@ -261,8 +372,17 @@ const allOk =
   interactionResults.soundDisabledWorks &&
   interactionResults.audioCallsPassed &&
   interactionResults.vnReactTriggered &&
+  interactionResults.vnTagHasSvgIcon &&
+  interactionResults.seqSlidersPersistent &&
+  interactionResults.seqFuncionSvgSameNode &&
   absResults.populatedWidgetsCount === 11 &&
   absResults.populatedChecksCount === 10 &&
+  absResults.allSlidersSameNodeReference &&
+  absResults.allSvgsSameNodeReference &&
+  absResults.mainTriggerBtnsCount === 20 &&
+  absResults.basicTriggerBtnsCount === 10 &&
+  absResults.vnOverlayActive &&
+  absResults.vnTagSvgPresent &&
   absResults.bossBoardMounted &&
   absResults.sec1FirstCardResolved &&
   absResults.keyboardVertexWorks &&
@@ -276,4 +396,3 @@ if (!allOk) {
   console.error('Falló alguna verificación interactiva.');
   process.exit(1);
 }
-

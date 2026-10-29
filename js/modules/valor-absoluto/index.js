@@ -4,7 +4,7 @@
  * chequeos con diagnóstico cognitivo, Modo Pizarrón y progreso en localStorage.
  */
 
-import { byId, qsa, h } from '../../core/dom.js';
+import { byId, qsa, h, mount, chalkIcon } from '../../core/dom.js';
 import { renderNav } from '../../core/nav.js';
 import {
   createCheckBlock,
@@ -61,10 +61,10 @@ function updateSidebarProgress() {
     const statusEl = link.querySelector('.seq-sidebar__status');
     if (statusEl) {
       if (progress[secId]) {
-        statusEl.textContent = '✓';
+        mount(statusEl, chalkIcon('check', { width: 14, height: 14 }));
         statusEl.classList.add('is-done');
       } else {
-        statusEl.textContent = '';
+        mount(statusEl);
         statusEl.classList.remove('is-done');
       }
     }
@@ -110,12 +110,12 @@ const CHECKS_DATA = {
       type: 'choice',
       prompt: '¿Qué representa geométricamente la ecuación con valor absoluto <strong>|x − 3| = 5</strong> en la recta numérica?',
       options: [
-        'Todos los números x que están a exactamente 5 unidades de distancia del punto 3 (es decir, x = 8 y x = −2).',
         'Únicamente el número x = 8, porque el valor absoluto elimina los negativos.',
+        'Todos los números x que están a exactamente 5 unidades de distancia del punto 3 (es decir, x = 8 y x = −2).',
         'Todos los números x cuya distancia al origen 0 es igual a 2.',
         'No tiene solución porque adentro de las barras hay una resta.',
       ],
-      expected: 0,
+      expected: 1,
       explanation: '¡Exacto! |x − 3| mide la distancia al ancla h = 3. Estar a 5 pasos del 3 te lleva a 3 + 5 = 8 (derecha) y a 3 − 5 = −2 (izquierda).',
       hints: [
         'Recordá que |x − h| se lee como «la distancia entre x y el centro h».',
@@ -155,12 +155,12 @@ const CHECKS_DATA = {
       type: 'choice',
       prompt: '¿Por qué la gráfica de <strong>f(x) = |x|</strong> tiene un «quiebre» (vértice en punta) en el origen <strong>(0, 0)</strong> en lugar de seguir bajando como una recta?',
       options: [
-        'Porque para x < 0 la recta y = x intenta cruzar hacia alturas negativas, pero las barras invierten su signo transformando ese tramo en la semirrecta y = −x de pendiente −1.',
         'Porque en x = 0 la función no está definida y tiene una asíntota.',
         'Porque para x < 0 la función vale constantemente 0.',
+        'Porque para x < 0 la recta y = x intenta cruzar hacia alturas negativas, pero las barras invierten su signo transformando ese tramo en la semirrecta y = −x de pendiente −1.',
         'Porque las barras elevan los números al cuadrado como una parábola.',
       ],
-      expected: 0,
+      expected: 2,
       explanation: '¡Clarísimo! A la derecha de 0 actúa y = x (pendiente +1) y a la izquierda actúa y = −x (pendiente −1). El cambio brusco de pendiente en x = 0 forma la «V».',
       hints: [
         'Compará la fórmula cuando x ≥ 0 versus cuando x < 0.',
@@ -234,19 +234,19 @@ const CHECKS_DATA = {
     {
       id: 'sec4-q2',
       type: 'choice',
-      prompt: 'Comparando las gráficas de <strong>f(x) = |x|</strong> y <strong>g(x) = −(1/2)|x|</strong>, ¿cuál de las siguientes afirmaciones describe correctamente la transformación?',
+      prompt: 'Comparando las gráficas de <strong>f(x) = |x|</strong> y <strong>g(x) = −<span class="fr"><span class="num">1</span><span class="den">2</span></span>|x|</strong>, ¿cuál de las siguientes afirmaciones describe correctamente la transformación?',
       options: [
-        'La gráfica de g se refleja hacia abajo (abre como ∧) y es más ancha (achatada verticalmente) que f.',
         'La gráfica de g se refleja hacia abajo y es más angosta (empinada) que f.',
-        'La gráfica de g se desplaza 1/2 unidad hacia abajo sin cambiar la apertura.',
+        'La gráfica de g se desplaza <span class="fr"><span class="num">1</span><span class="den">2</span></span> unidad hacia abajo sin cambiar la apertura.',
         'La gráfica de g abre hacia arriba pero desplazada hacia la izquierda.',
+        'La gráfica de g se refleja hacia abajo (abre como ∧) y es más ancha (achatada verticalmente) que f.',
       ],
-      expected: 0,
-      explanation: '¡Exacto! El signo menos en a = −1/2 invierte la V hacia abajo (∧), y como |a| = 1/2 < 1, por cada paso horizontal la rama solo baja medio paso vertical (más ancha).',
+      expected: 3,
+      explanation: '¡Exacto! El signo menos en a = −<span class="fr"><span class="num">1</span><span class="den">2</span></span> invierte la V hacia abajo (∧), y como |a| = <span class="fr"><span class="num">1</span><span class="den">2</span></span> &lt; 1, por cada paso horizontal la rama solo baja medio paso vertical (más ancha).',
       hints: [
-        'Miramos dos cosas por separado en a = −1/2: su signo (−) y su tamaño absoluto (1/2 < 1).',
+        'Miramos dos cosas por separado en a = −<span class="fr"><span class="num">1</span><span class="den">2</span></span>: su signo (−) y su tamaño absoluto (<span class="fr"><span class="num">1</span><span class="den">2</span></span> &lt; 1).',
       ],
-      solution: 'Como a = −1/2 < 0, las ramas se reflejan hacia abajo (forma ∧). Además, como |a| = 0,5 < 1, la pendiente es más suave y la V se abre más ancha.',
+      solution: 'Como a = −<span class="fr"><span class="num">1</span><span class="den">2</span></span> &lt; 0, las ramas se reflejan hacia abajo (forma ∧). Además, como |a| = 0,5 &lt; 1, la pendiente es más suave y la V se abre más ancha.',
     },
     {
       id: 'sec4-q3',
@@ -341,12 +341,12 @@ const CHECKS_DATA = {
       type: 'choice',
       prompt: 'Para la función invertida <strong>f(x) = −2|x − 3| + 6</strong>, ¿cuáles son su <strong>Conjunto Imagen Im(f)</strong> y su <strong>Intervalo de Crecimiento I↑</strong>?',
       options: [
-        'Im(f) = (−∞, 6]  e  I↑ = (−∞, 3)',
         'Im(f) = [6, +∞)  e  I↑ = (3, +∞)',
+        'Im(f) = (−∞, 6]  e  I↑ = (−∞, 3)',
         'Im(f) = (−∞, 3]  e  I↑ = (−∞, 6)',
         'Im(f) = ℝ        e  I↑ = (3, 6)',
       ],
-      expected: 0,
+      expected: 1,
       optionDiagnostics: {
         2: 'confused_x_and_y_in_intervals',
       },
@@ -375,12 +375,12 @@ const CHECKS_DATA = {
       type: 'choice',
       prompt: '¿Para qué valores de x se cumple la inecuación de positividad <strong>|x − 1| − 4 &lt; 0</strong> (Conjunto de Negatividad C⁻ de f(x) = |x − 1| − 4)?',
       options: [
-        'El intervalo abierto (−3, 5), es decir, todos los x cuya distancia al 1 es menor que 4.',
         'La unión (−∞, −3) ∪ (5, +∞).',
         'Únicamente los puntos x = −3 y x = 5.',
+        'El intervalo abierto (−3, 5), es decir, todos los x cuya distancia al 1 es menor que 4.',
         'El conjunto vacío ∅ porque un valor absoluto nunca es negativo.',
       ],
-      expected: 0,
+      expected: 2,
       explanation: '¡Exacto! |x − 1| − 4 < 0 equivale a |x − 1| < 4: estar a menos de 4 pasos del centro h = 1 nos deja entre 1 − 4 = −3 y 1 + 4 = 5.',
       hints: [
         'Sumá 4 a ambos lados: |x − 1| < 4.',
@@ -409,7 +409,7 @@ const CHECKS_DATA = {
       prompt: 'En esa misma función <code>f(x) = { 2x + 5  si x &lt; 1 ;  −x + 8  si x ≥ 1 }</code>, ¿cuánto vale exactamente en la frontera <strong>f(1)</strong>?',
       expected: 7,
       hints: [
-        'Mirá las desigualdades en x = 1: el primer renglón dice x < 1 (estricto, círculo abierto ○) y el segundo dice x ≥ 1 (incluye el igual, punto lleno ●).',
+        'Mirá las desigualdades en x = 1: el primer renglón dice x &lt; 1 (estricto, círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span>) y el segundo dice x ≥ 1 (incluye el igual, punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span>).',
         'Evaluá el segundo renglón en x = 1: −(1) + 8.',
       ],
       solution: 'En la frontera x = 1, el signo «≥» está en el segundo tramo. Por lo tanto evaluamos −(1) + 8 = <strong>7</strong>.',
@@ -417,19 +417,19 @@ const CHECKS_DATA = {
     {
       id: 'sec8-q3',
       type: 'choice',
-      prompt: 'Si en otra función por partes el tramo izquierdo termina en <strong>(2, 5) con círculo abierto ○</strong> y el tramo derecho arranca en <strong>(2, 1) con punto lleno ●</strong>, ¿cuánto vale <strong>f(2)</strong> mirando el gráfico?',
+      prompt: 'Si en otra función por partes el tramo izquierdo termina en <strong>(2, 5) con círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span></strong> y el tramo derecho arranca en <strong>(2, 1) con punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span></strong>, ¿cuánto vale <strong>f(2)</strong> mirando el gráfico?',
       options: [
-        'f(2) = 1, porque el punto lleno ● indica qué altura incluye realmente a la frontera x = 2.',
         'f(2) = 5, porque siempre manda el tramo que viene desde la izquierda.',
         'f(2) = 3, porque se promedian las dos alturas en el salto.',
         'f(2) tiene dos valores al mismo tiempo: 1 y 5.',
+        'f(2) = 1, porque el punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span> indica qué altura incluye realmente a la frontera x = 2.',
       ],
-      expected: 0,
-      explanation: '¡Perfecto! El punto lleno ● es el dueño del valor en la frontera; el círculo abierto ○ solo marca hasta dónde se acerca la otra rama sin tocar.',
+      expected: 3,
+      explanation: '¡Perfecto! El punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span> es el dueño del valor en la frontera; el círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span> solo marca hasta dónde se acerca la otra rama sin tocar.',
       hints: [
-        'Recordá qué significa ○ (no incluye el borde) frente a ● (sí incluye el borde).',
+        'Recordá qué significa <span class="va-dot va-dot--open" title="Círculo abierto"></span> (no incluye el borde) frente a <span class="va-dot va-dot--closed" title="Punto cerrado"></span> (sí incluye el borde).',
       ],
-      solution: 'En el gráfico, el punto relleno ● en (2, 1) indica que para x = 2 la única salida asignada es <strong>f(2) = 1</strong>.',
+      solution: 'En el gráfico, el punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span> en (2, 1) indica que para x = 2 la única salida asignada es <strong>f(2) = 1</strong>.',
     },
   ],
 
@@ -437,17 +437,17 @@ const CHECKS_DATA = {
     {
       id: 'sec9-q1',
       type: 'choice',
-      prompt: 'Si al graficar una definición por partes en la frontera <strong>x = 3</strong> ambos tramos tienen un <strong>punto lleno ●</strong> a distinta altura —por ejemplo en (3, 2) y en (3, 6)—, ¿qué ocurre matemáticamente?',
+      prompt: 'Si al graficar una definición por partes en la frontera <strong>x = 3</strong> ambos tramos tienen un <strong>punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span></strong> a distinta altura —por ejemplo en (3, 2) y en (3, 6)—, ¿qué ocurre matemáticamente?',
       options: [
-        'Viola la unicidad y la prueba de la recta vertical en x = 3: una misma entrada x tendría dos salidas distintas, por lo que NO es una función.',
         'Es una función continua con un segmento vertical que une (3, 2) con (3, 6).',
+        'Viola la unicidad y la prueba de la recta vertical en x = 3: una misma entrada x tendría dos salidas distintas, por lo que NO es una función.',
         'Es una función válida cuyo valor en x = 3 es la suma 2 + 6 = 8.',
         'Simplemente se anulan ambos puntos y x = 3 queda fuera del dominio.',
       ],
-      expected: 0,
-      explanation: '¡Exacto! Una función exige que cada x del dominio tenga una única imagen. Dos puntos llenos ● en la misma vertical x = 3 rompen la definición de función.',
+      expected: 1,
+      explanation: '¡Exacto! Una función exige que cada x del dominio tenga una única imagen. Dos puntos cerrados <span class="va-dot va-dot--closed" title="Punto cerrado"></span> en la misma vertical x = 3 rompen la definición de función.',
       hints: [
-        'Imaginá trazar la recta vertical x = 3: ¿cuántos puntos llenos ● tocaría?',
+        'Imaginá trazar la recta vertical x = 3: ¿cuántos puntos cerrados <span class="va-dot va-dot--closed" title="Punto cerrado"></span> tocaría?',
       ],
       solution: 'Si ambos tramos incluyen x = 3 (por ejemplo con ≤ y ≥) y dan alturas distintas, la recta vertical x = 3 corta dos veces a la gráfica: <strong>no es función</strong>.',
     },
@@ -465,15 +465,15 @@ const CHECKS_DATA = {
     {
       id: 'sec9-q3',
       type: 'choice',
-      prompt: 'En una función por partes donde el tramo 1 vale para <strong>x &lt; 0</strong> y el tramo 2 vale para <strong>x &gt; 0</strong> (ambos con círculo abierto ○ en x = 0), ¿qué pasa con <strong>x = 0</strong>?',
+      prompt: 'En una función por partes donde el tramo 1 vale para <strong>x &lt; 0</strong> y el tramo 2 vale para <strong>x &gt; 0</strong> (ambos con círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span> en x = 0), ¿qué pasa con <strong>x = 0</strong>?',
       options: [
-        'Sigue siendo una función válida, pero x = 0 no pertenece a su dominio: Dom(f) = ℝ − {0}.',
         'Deja de ser función porque una función no puede tener huecos en el dominio.',
         'En x = 0 la función vale automáticamente 0.',
-        'Ambos círculos abiertos se fusionan formando un punto lleno.',
+        'Sigue siendo una función válida, pero x = 0 no pertenece a su dominio: Dom(f) = ℝ − {0}.',
+        'Ambos círculos abiertos se fusionan formando un punto cerrado.',
       ],
-      expected: 0,
-      explanation: '¡Muy bien! Dos círculos abiertos ○ no violan la unicidad (la recta vertical x = 0 corta 0 veces, que es ≤ 1). Simplemente x = 0 queda fuera del dominio.',
+      expected: 2,
+      explanation: '¡Muy bien! Dos círculos abiertos <span class="va-dot va-dot--open" title="Círculo abierto"></span> no violan la unicidad (la recta vertical x = 0 corta 0 veces, que es ≤ 1). Simplemente x = 0 queda fuera del dominio.',
       hints: [
         '¿Alguna condición incluye el signo igual para x = 0?',
       ],
@@ -615,7 +615,7 @@ export const LESSON_SECTIONS = [
   { id: 'sec-6', chapter: 'Capítulo 2', title: 'Abriendo las barras: de |u| a función por partes', short: '6. Abriendo las barras' },
   { id: 'sec-7', chapter: 'Capítulo 2', title: 'Radiografía completa (Nivel Exactas)', short: '7. Radiografía Exactas' },
   { id: 'sec-8', chapter: 'Capítulo 3', title: 'La aduana de dominios: evaluar por partes', short: '8. Aduana por partes' },
-  { id: 'sec-9', chapter: 'Capítulo 3', title: 'Fronteras ○ vs ● y prueba de la recta vertical', short: '9. Fronteras ○ vs ●' },
+  { id: 'sec-9', chapter: 'Capítulo 3', title: 'Fronteras abierta vs cerrada y prueba de la recta vertical', short: '9. Fronteras abierta vs cerrada' },
   { id: 'sec-10', chapter: 'Capítulo 3', title: 'Funciones escalonadas: piso ⌊x⌋ y techo ⌈x⌉', short: '10. Piso ⌊x⌋ y techo ⌈x⌉' },
   { id: 'sec-retos', chapter: 'Capítulo 4', title: 'Entrenador, 5 Trampas y Escudo Deflector V', short: 'Entrenador y Deflector V' },
   { id: 'sec-repaso', chapter: 'Capítulo 4', title: 'Hoja de Repaso Imprimible', short: 'Hoja de Repaso' },

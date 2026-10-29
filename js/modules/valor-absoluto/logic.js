@@ -14,6 +14,8 @@ import {
   equivalentFx,
 } from './expr.js';
 
+export { equivalentFx };
+
 export const approxEq = (a, b) =>
   Number.isFinite(a) && Number.isFinite(b) &&
   Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
@@ -169,6 +171,10 @@ export function analyzeAbs(a, h, k) {
     extremum = { type: 'max', x: hC, y: kC };
   }
 
+  const rootsText = roots.length === 0
+    ? '∅ (no corta al eje X)'
+    : `{${roots.map(fmt).join('; ')}}`;
+
   return {
     vertex: { x: hC, y: kC },
     axisOfSymmetry: hC,
@@ -177,6 +183,7 @@ export function analyzeAbs(a, h, k) {
     leftSlope: cleanZero(-aC),
     yIntercept: { x: 0, y: y0 },
     roots,
+    rootsText,
     domain: 'ℝ',
     range,
     positivity,
@@ -308,15 +315,18 @@ export function solveAbsComparison(a, h, k, op, c) {
       return {
         solutions: [],
         intervalText: '∅',
+        solutionText: '∅',
         steps,
         caseType: 'no_solution',
       };
     }
     if (approxEq(rhs, 0)) {
       steps.push(`La distancia es cero únicamente en el vértice: x = ${fmt(hC)}.`);
+      const txt = `{${fmt(hC)}}`;
       return {
         solutions: [hC],
-        intervalText: `{${fmt(hC)}}`,
+        intervalText: txt,
+        solutionText: txt,
         steps,
         caseType: 'vertex_only',
       };
@@ -324,10 +334,12 @@ export function solveAbsComparison(a, h, k, op, c) {
     const x1 = cleanZero(hC - rhs);
     const x2 = cleanZero(hC + rhs);
     const sols = x1 <= x2 ? [x1, x2] : [x2, x1];
+    const txt = `{${fmt(sols[0])}; ${fmt(sols[1])}}`;
     steps.push(`Desdoblamos en dos ramas simétricas a distancia ${fmt(rhs)} de ${fmt(hC)}: x₁ = ${fmt(sols[0])} y x₂ = ${fmt(sols[1])}.`);
     return {
       solutions: sols,
-      intervalText: `{${fmt(sols[0])}; ${fmt(sols[1])}}`,
+      intervalText: txt,
+      solutionText: txt,
       steps,
       caseType: 'two_solutions',
     };
@@ -341,15 +353,18 @@ export function solveAbsComparison(a, h, k, op, c) {
       return {
         solutions: [],
         intervalText: '∅',
+        solutionText: '∅',
         steps,
         caseType: 'no_solution',
       };
     }
     if (approxEq(rhs, 0) && !strict) {
+      const txt = `{${fmt(hC)}}`;
       steps.push(`La distancia es ≤ 0 únicamente cuando vale exactamente 0 en el vértice: x = ${fmt(hC)}.`);
       return {
         solutions: [hC],
-        intervalText: `{${fmt(hC)}}`,
+        intervalText: txt,
+        solutionText: txt,
         steps,
         caseType: 'vertex_only',
       };
@@ -363,6 +378,7 @@ export function solveAbsComparison(a, h, k, op, c) {
     return {
       solutions: [x1, x2],
       intervalText,
+      solutionText: intervalText,
       steps,
       caseType: 'two_solutions',
     };
@@ -376,6 +392,7 @@ export function solveAbsComparison(a, h, k, op, c) {
       return {
         solutions: [],
         intervalText: 'ℝ',
+        solutionText: 'ℝ',
         steps,
         caseType: 'all_reals',
       };
@@ -386,6 +403,7 @@ export function solveAbsComparison(a, h, k, op, c) {
       return {
         solutions: [hC],
         intervalText,
+        solutionText: intervalText,
         steps,
         caseType: 'vertex_only',
       };
@@ -399,6 +417,7 @@ export function solveAbsComparison(a, h, k, op, c) {
     return {
       solutions: [x1, x2],
       intervalText,
+      solutionText: intervalText,
       steps,
       caseType: 'two_solutions',
     };
@@ -420,21 +439,21 @@ function evalSinglePiece(piece, x) {
 
 /**
  * Evalúa una función definida por partes [{ exprAst, minX, maxX, minInclusive, maxInclusive, label }] en un punto x.
- * Devuelve { defined: boolean, y: number | null, activePieceIndex: number, isBoundary: boolean, collision: boolean }
+ * Devuelve { defined: boolean, y: number | null, value: number | null, activePieceIndex: number, pieceIndex: number, isBoundary: boolean, collision: boolean }
  */
 export function evalPiecewise(pieces, x) {
   if (!Array.isArray(pieces) || pieces.length === 0) {
-    return { defined: false, y: null, activePieceIndex: -1, isBoundary: false, collision: false };
+    return { defined: false, y: null, value: null, activePieceIndex: -1, pieceIndex: -1, isBoundary: false, collision: false };
   }
 
   const matchingIndices = [];
   let isBoundary = false;
 
   pieces.forEach((p, idx) => {
-    const minX = p.minX ?? -Infinity;
-    const maxX = p.maxX ?? Infinity;
-    const minInc = Boolean(p.minInclusive);
-    const maxInc = Boolean(p.maxInclusive);
+    const minX = p.minX ?? p.min ?? -Infinity;
+    const maxX = p.maxX ?? p.max ?? Infinity;
+    const minInc = Boolean(p.minInclusive ?? p.leftClosed);
+    const maxInc = Boolean(p.maxInclusive ?? p.rightClosed);
 
     const atMin = Number.isFinite(minX) && approxEq(x, minX);
     const atMax = Number.isFinite(maxX) && approxEq(x, maxX);
@@ -452,7 +471,9 @@ export function evalPiecewise(pieces, x) {
     return {
       defined: false,
       y: null,
+      value: null,
       activePieceIndex: -1,
+      pieceIndex: -1,
       isBoundary,
       collision: false,
     };
@@ -470,16 +491,21 @@ export function evalPiecewise(pieces, x) {
     }
   }
 
+  const finalY = collision ? null : ys[0];
   return {
     defined: !collision,
-    y: collision ? null : ys[0],
+    y: finalY,
+    value: finalY,
     activePieceIndex: matchingIndices[0],
+    pieceIndex: matchingIndices[0],
     isBoundary,
     collision,
     matchingIndices,
     candidateYs: ys,
   };
 }
+
+export const evaluatePiecewise = evalPiecewise;
 
 /**
  * Verifica si un conjunto de tramos viola la unicidad en algún borde (dos puntos cerrados en el mismo x con distinto y)
@@ -524,7 +550,7 @@ export function validatePiecewiseFunction(pieces) {
             x: bx,
             pieces: [i, j],
             yValues: [y1, y2],
-            reason: `En la frontera x = ${fmt(bx)} hay dos puntos cerrados (•) a distinta altura: y = ${fmt(y1)} e y = ${fmt(y2)}. Viola unicidad (deja de ser función).`,
+            reason: `En la frontera x = ${fmt(bx)} hay dos puntos cerrados a distinta altura: y = ${fmt(y1)} e y = ${fmt(y2)}. Viola unicidad (deja de ser función).`,
           });
         }
       }

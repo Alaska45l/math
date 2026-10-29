@@ -43,7 +43,57 @@ export function initPatronWidget(container) {
     }
   }
 
-  function render() {
+  const selectorButtons = h('div', { class: 'seq-controls' });
+  const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
+
+  const input1 = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    step: 'any',
+    placeholder: '¿?',
+    value: userInputs[0],
+    on: {
+      input: (e) => {
+        userInputs[0] = e.target.value;
+        updateDynamic();
+      },
+      change: (e) => {
+        userInputs[0] = e.target.value;
+        validateTermSubmission(0, e.target.value);
+        updateDynamic();
+      },
+    },
+  });
+
+  const input2 = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    step: 'any',
+    placeholder: '¿?',
+    value: userInputs[1],
+    on: {
+      input: (e) => {
+        userInputs[1] = e.target.value;
+        updateDynamic();
+      },
+      change: (e) => {
+        userInputs[1] = e.target.value;
+        validateTermSubmission(1, e.target.value);
+        updateDynamic();
+      },
+    },
+  });
+
+  const inputRow = h('div', { class: 'seq-widget-inputs' },
+    h('label', { class: 'field__label' }, '4.º término: ', input1),
+    h('label', { class: 'field__label' }, '5.º término: ', input2)
+  );
+
+  const feedbackBox = h('div', { class: 'seq-widget-feedback', 'aria-live': 'polite' });
+
+  mount(container, selectorButtons, ribbonSlot, inputRow, feedbackBox);
+
+  function updateDynamic() {
     const p = PRESETS[presetIdx];
     const fullTerms = [...p.terms, userInputs[0] !== '' ? userInputs[0] : '?', userInputs[1] !== '' ? userInputs[1] : '?'];
 
@@ -53,6 +103,9 @@ export function initPatronWidget(container) {
     const ok2 = !Number.isNaN(v2) && Math.abs(v2 - p.next[1]) < 1e-4;
     const err1 = userInputs[0] !== '' && !ok1;
     const err2 = userInputs[1] !== '' && !ok2;
+
+    input1.className = ['seq-check__input-sm', ok1 ? 'is-correct' : err1 ? 'is-error' : ''].filter(Boolean).join(' ');
+    input2.className = ['seq-check__input-sm', ok2 ? 'is-correct' : err2 ? 'is-error' : ''].filter(Boolean).join(' ');
 
     const validities = {
       [p.terms.length]: ok1 ? 'ok' : err1 ? 'err' : 'none',
@@ -65,10 +118,12 @@ export function initPatronWidget(container) {
       feedback = { ok: false, text: `El 4.º término (${fmt(p.next[0])}) es correcto. Ahora completá el 5.º término.` };
     } else if (err1) {
       feedback = { ok: false, text: `El 4.º término no coincide. ${p.hint}` };
+    } else {
+      feedback = null;
     }
 
-    const selectorButtons = h('div', { class: 'seq-controls' },
-      PRESETS.map((preset, idx) => {
+    mount(selectorButtons,
+      ...PRESETS.map((preset, idx) => {
         const btn = h('button', {
           type: 'button',
           class: ['chip', idx === presetIdx ? 'is-active' : ''],
@@ -76,15 +131,16 @@ export function initPatronWidget(container) {
         btn.addEventListener('click', () => {
           presetIdx = idx;
           userInputs = ['', ''];
+          input1.value = '';
+          input2.value = '';
           feedback = null;
           failCount = 0;
-          render();
+          updateDynamic();
         });
         return btn;
       })
     );
 
-    const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
     createRibbon(ribbonSlot, {
       terms: fullTerms,
       startIndex: 1,
@@ -96,71 +152,22 @@ export function initPatronWidget(container) {
         const inputSlotIdx = termIdx - p.terms.length;
         if (inputSlotIdx >= 0 && inputSlotIdx < 2) {
           userInputs[inputSlotIdx] = val;
+          if (inputSlotIdx === 0) input1.value = val;
+          if (inputSlotIdx === 1) input2.value = val;
           validateTermSubmission(inputSlotIdx, val);
-          render();
+          updateDynamic();
         }
       },
     });
 
-    const inputRow = h('div', { class: 'seq-widget-inputs' },
-      h('label', { class: 'field__label' },
-        `4.º término: `,
-        h('input', {
-          type: 'number',
-          class: ['seq-check__input-sm', ok1 ? 'is-correct' : err1 ? 'is-error' : ''],
-          step: 'any',
-          placeholder: '¿?',
-          value: userInputs[0],
-          on: {
-            input: (e) => {
-              userInputs[0] = e.target.value;
-              render();
-            },
-            change: (e) => {
-              userInputs[0] = e.target.value;
-              validateTermSubmission(0, e.target.value);
-              render();
-            },
-          },
-        })
-      ),
-      h('label', { class: 'field__label' },
-        `5.º término: `,
-        h('input', {
-          type: 'number',
-          class: ['seq-check__input-sm', ok2 ? 'is-correct' : err2 ? 'is-error' : ''],
-          step: 'any',
-          placeholder: '¿?',
-          value: userInputs[1],
-          on: {
-            input: (e) => {
-              userInputs[1] = e.target.value;
-              render();
-            },
-            change: (e) => {
-              userInputs[1] = e.target.value;
-              validateTermSubmission(1, e.target.value);
-              render();
-            },
-          },
-        })
-      )
-    );
-
-    const feedbackBox = h('div', { class: 'seq-widget-feedback', 'aria-live': 'polite' });
     if (feedback) {
       mount(feedbackBox,
         h('div', { class: ['notice', feedback.ok ? 'notice--ok' : 'notice--err'] }, feedback.text)
       );
+    } else {
+      mount(feedbackBox);
     }
-
-    mount(container,
-      selectorButtons,
-      ribbonSlot,
-      inputRow,
-      feedbackBox
-    );
   }
 
-  render();
+  updateDynamic();
 }

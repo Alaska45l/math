@@ -7,7 +7,7 @@
  */
 
 import { h, s, mount, chalkIcon } from '../../core/dom.js';
-import { fmt, MINUS } from '../../core/math-format.js';
+import { fmt, frac, MINUS } from '../../core/math-format.js';
 import { createPlane, bindSvgDrag, snapTo } from '../../core/plot.js';
 import { react } from '../../core/vn.js';
 import { playSuccess, playError, playSliderTick } from '../../core/sound.js';
@@ -41,10 +41,45 @@ export function saveSectionProgress(sectionId) {
 }
 
 /**
+ * Helper visual para punto abierto vs cerrado inmune a la fuente (evita ○ vs ● idénticos).
+ */
+export function dotBadge(closed = false, extraClass = '') {
+  return h('span', {
+    class: ['va-dot', closed ? 'va-dot--closed' : 'va-dot--open', extraClass],
+    'aria-label': closed ? 'punto cerrado' : 'punto abierto',
+  });
+}
+
+/**
+ * Formatea un número real devolviendo un nodo .fr si es una fracción racional simple
+ * (ej. 1/2, -1/2, 1/3, -1/3, 2/3, 3/2, 1/4, 3/4), o texto limpio en caso contrario.
+ */
+export function formatNumOrFracNode(val, { forcePlus = false } = {}) {
+  if (!Number.isFinite(val)) return document.createTextNode(String(val));
+  const sign = val < -1e-9 ? `${MINUS}` : (forcePlus && val > 1e-9 ? '+' : '');
+  const absV = Math.abs(val);
+  if (Math.abs(absV - Math.round(absV)) < 1e-6) {
+    return document.createTextNode(`${sign}${fmt(Math.round(absV))}`);
+  }
+  const denoms = [2, 3, 4, 5];
+  for (const d of denoms) {
+    const n = Math.round(absV * d);
+    if (Math.abs(absV - n / d) < 1e-4 && n > 0) {
+      return h('span', { style: 'display: inline-flex; align-items: center; gap: 2px;' },
+        sign ? h('span', null, sign) : null,
+        frac(String(n), String(d))
+      );
+    }
+  }
+  return document.createTextNode(`${sign}${fmt(absV)}`);
+}
+
+/**
  * 1. createAbsBoard(root, props)
  * Dibuja el plano cartesiano con la función f(x) = a|x - h| + k, eje de simetría x = h,
  * guías al vértice (h, k), prolongación fantasma opcional, láser horizontal y = c opcional,
- * y nodos arrastrables para el vértice (h, k) y la pendiente (h + 1, k + a).
+ * y nodos arrastrables para el vértice (h, k), pendiente (h + 1, k + a) y explorador x.
+ * Mantiene el nodo <svg> y la estructura base de createPlane persistentes durante el arrastre.
  */
 export function createAbsBoard(root, initialProps = {}) {
   let props = {
@@ -52,6 +87,7 @@ export function createAbsBoard(root, initialProps = {}) {
     h: 0,
     k: 0,
     laserY: 3,
+    explorerX: null,
     xMin: -8,
     xMax: 8,
     yMin: -8,
@@ -61,11 +97,12 @@ export function createAbsBoard(root, initialProps = {}) {
     snapStep: 0.5,
     draggableVertex: false,
     draggableSlope: false,
+    draggableExplorer: false,
     showGhostLine: false,
     showHorizontalLaser: false,
     showSymmetryAxis: true,
     showSlopeTriangles: false,
-    referenceCurve: null, // ej. { a: 1, h: 0, k: 0, label: 'y = |x|' }
+    referenceCurve: null,
     customUnderRender: null,
     customOverRender: null,
     onChange: null,
@@ -73,7 +110,7 @@ export function createAbsBoard(root, initialProps = {}) {
   };
 
   const svg = s('svg', {
-    class: 'abs-board-svg seq-plot',
+    class: 'abs-board-svg abs-board__svg seq-plot',
     viewBox: `0 0 ${props.width} ${props.height}`,
     role: 'img',
     'aria-label': 'Plano cartesiano interactivo de valor absoluto',
@@ -82,7 +119,8 @@ export function createAbsBoard(root, initialProps = {}) {
   mount(root, svg);
 
   let plane = null;
-  let activeDragMode = null; // 'vertex' | 'slope-right' | 'slope-left' | 'laser'
+  let planeCfgKey = '';
+  let activeDragMode = null; // 'vertex' | 'slope-right' | 'slope-left' | 'laser' | 'explorer'
 
   function snapVal(val, step = props.snapStep) {
     if (!step || step <= 0) return val;
@@ -96,6 +134,28 @@ export function createAbsBoard(root, initialProps = {}) {
       keys.push(Number(v.toFixed(4)));
     }
     return keys;
+  }
+
+  function ensurePlane() {
+    const { xMin, xMax, yMin, yMax, width, height } = props;
+    const nextKey = `${width}:${height}:${xMin}:${xMax}:${yMin}:${yMax}`;
+    if (!plane || planeCfgKey !== nextKey) {
+      planeCfgKey = nextKey;
+      plane = createPlane(svg, {
+        width,
+        height,
+        xMin,
+        xMax,
+        yMin,
+        yMax,
+        xStep: (xMax - xMin) > 16 ? 2 : 1,
+        yStep: (yMax - yMin) > 16 ? 2 : 1,
+        xLabel: 'x',
+        yLabel: 'y',
+      });
+    } else {
+      plane.clear('shade', 'under', 'curve', 'over', 'marks', 'labels');
+    }
   }
 
   function renderBoard() {
@@ -119,18 +179,7 @@ export function createAbsBoard(root, initialProps = {}) {
       referenceCurve,
     } = props;
 
-    plane = createPlane(svg, {
-      width,
-      height,
-      xMin,
-      xMax,
-      yMin,
-      yMax,
-      xStep: (xMax - xMin) > 16 ? 2 : 1,
-      yStep: (yMax - yMin) > 16 ? 2 : 1,
-      xLabel: 'x',
-      yLabel: 'y',
-    });
+    ensurePlane();
 
     // Curva testigo de referencia opcional (ej. y = |x| en gris)
     if (referenceCurve) {
@@ -149,11 +198,21 @@ export function createAbsBoard(root, initialProps = {}) {
           opacity: '0.65',
         })
       );
+      if (referenceCurve.label) {
+        plane.layers.labels.append(
+          s('text', {
+            x: plane.sx(referenceCurve.h + 2.2),
+            y: plane.sy(evalAbs(referenceCurve.a, referenceCurve.h, referenceCurve.k, referenceCurve.h + 2.2)) - 8,
+            fill: 'var(--muted)',
+            'font-family': 'var(--font-hand)',
+            'font-size': '13px',
+          }, referenceCurve.label)
+        );
+      }
     }
 
     // Prolongación fantasma de la recta original sin rebotar
     if (showGhostLine && !approxEq(a, 0)) {
-      // Rama que seguía de largo del otro lado del vértice: y = a(x - h) + k para x < h
       const ghostPts = [
         [xMin, a * (xMin - hVal) + kVal],
         [hVal, kVal],
@@ -169,7 +228,6 @@ export function createAbsBoard(root, initialProps = {}) {
         })
       );
 
-      // Flecha curva de plegado si x = h - 2.5 está dentro del plano
       const sampleX = Math.max(xMin + 1, hVal - 2.5);
       if (sampleX < hVal - 0.4) {
         const yRaw = a * (sampleX - hVal) + kVal;
@@ -246,7 +304,6 @@ export function createAbsBoard(root, initialProps = {}) {
       const lx = plane.sx(hVal - 1);
       const ly = plane.sy(kVal + a);
 
-      // Triángulo derecho: (h, k) -> (h+1, k) -> (h+1, k+a)
       plane.layers.under.append(
         s('path', {
           d: `M ${vx} ${vy} L ${rx} ${vy} L ${rx} ${ry}`,
@@ -392,7 +449,7 @@ export function createAbsBoard(root, initialProps = {}) {
         playSliderTick(1);
         props.laserY = nextC;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       });
 
       plane.layers.labels.append(laserHandle);
@@ -405,21 +462,21 @@ export function createAbsBoard(root, initialProps = {}) {
       const lx = plane.sx(hVal - 1);
       const ly = plane.sy(kVal + a);
 
-      // Gemelo izquierdo
-      plane.layers.marks.append(
+      const leftGroup = s('g', {
+        class: 'abs-board__handle abs-board__handle--slope-left',
+        dataset: { handle: 'slope-left' },
+      },
+        s('circle', { cx: lx, cy: ly, r: 13, fill: 'transparent' }),
         s('circle', {
           cx: lx,
           cy: ly,
-          r: 6,
+          r: 6.5,
           fill: 'var(--bg)',
           stroke: 'var(--blue)',
           'stroke-width': '2.2',
-          class: 'abs-board__handle abs-board__handle--slope-left',
-          dataset: { handle: 'slope-left' },
         })
       );
 
-      // Manija principal derecha (con soporte de teclado)
       const slopeGroup = s('g', {
         class: 'abs-board__handle abs-board__handle--slope',
         tabindex: '0',
@@ -460,10 +517,10 @@ export function createAbsBoard(root, initialProps = {}) {
         playSliderTick(1);
         props.a = nextA;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       });
 
-      plane.layers.marks.append(slopeGroup);
+      plane.layers.marks.append(leftGroup, slopeGroup);
     }
 
     // Nodo Vértice (h, k)
@@ -504,24 +561,27 @@ export function createAbsBoard(root, initialProps = {}) {
         props.h = nextH;
         props.k = nextK;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       });
     }
 
     plane.layers.marks.append(vertexGroup);
 
-    // Etiqueta del vértice V(h; k)
-    const labelOffsetY = a >= 0 ? 22 : -14;
+    // Etiqueta del vértice V(h; k) con halo de pizarra para evitar colisión con ejes
+    const nearOrigin = Math.abs(hVal) < 0.6 && Math.abs(kVal) < 0.6;
+    const labelOffsetX = nearOrigin ? 28 : 0;
+    const labelOffsetY = a >= 0 ? 24 : -14;
     const clampedLabelY = Math.max(20, Math.min(height - 12, vy + labelOffsetY));
     plane.layers.labels.append(
       s('text', {
-        x: Math.max(48, Math.min(width - 48, vx)),
+        x: Math.max(48, Math.min(width - 48, vx + labelOffsetX)),
         y: clampedLabelY,
         fill: 'var(--yellow)',
         'text-anchor': 'middle',
         'font-family': 'var(--font-hand)',
         'font-size': 'var(--svg-scale-caveat, 15px)',
         'font-weight': 'bold',
+        style: 'paint-order: stroke; stroke: var(--bg); stroke-width: 4.5px; stroke-linejoin: round;',
       }, `V(${fmt(hVal)}; ${fmt(kVal)})`)
     );
 
@@ -535,6 +595,7 @@ export function createAbsBoard(root, initialProps = {}) {
     const {
       draggableVertex,
       draggableSlope,
+      draggableExplorer,
       showHorizontalLaser,
       xMin,
       xMax,
@@ -543,10 +604,9 @@ export function createAbsBoard(root, initialProps = {}) {
       snapStep,
     } = props;
 
-    if (!draggableVertex && !draggableSlope && !showHorizontalLaser) return;
+    if (!draggableVertex && !draggableSlope && !showHorizontalLaser && !draggableExplorer) return;
 
     if (phase === 'start') {
-      // Determinar qué nodo está más cerca del puntero
       const targetHandle = event?.target?.closest?.('[data-handle]')?.dataset?.handle;
       if (targetHandle) {
         activeDragMode = targetHandle;
@@ -555,12 +615,16 @@ export function createAbsBoard(root, initialProps = {}) {
         const distSlopeR = draggableSlope ? Math.hypot(x - (props.h + 1), y - (props.k + props.a)) : Infinity;
         const distSlopeL = draggableSlope ? Math.hypot(x - (props.h - 1), y - (props.k + props.a)) : Infinity;
         const distLaser = showHorizontalLaser ? Math.abs(y - props.laserY) : Infinity;
+        const distExplorer = draggableExplorer && props.explorerX !== null
+          ? Math.abs(x - props.explorerX)
+          : (draggableExplorer ? 0.5 : Infinity);
 
-        const minD = Math.min(distVertex, distSlopeR, distSlopeL, distLaser);
+        const minD = Math.min(distVertex, distSlopeR, distSlopeL, distLaser, distExplorer);
         if (minD === distSlopeR) activeDragMode = 'slope-right';
         else if (minD === distSlopeL) activeDragMode = 'slope-left';
         else if (minD === distVertex) activeDragMode = 'vertex';
         else if (minD === distLaser) activeDragMode = 'laser';
+        else if (minD === distExplorer) activeDragMode = 'explorer';
       }
     }
 
@@ -578,7 +642,7 @@ export function createAbsBoard(root, initialProps = {}) {
         props.h = nextH;
         props.k = nextK;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       }
     } else if ((activeDragMode === 'slope-right' || activeDragMode === 'slope-left') && draggableSlope) {
       const rawA = y - props.k;
@@ -588,14 +652,21 @@ export function createAbsBoard(root, initialProps = {}) {
       if (snappedA !== props.a) {
         props.a = snappedA;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       }
     } else if (activeDragMode === 'laser' && showHorizontalLaser) {
       const nextC = Math.max(yMin, Math.min(yMax, snapVal(y, 0.5)));
       if (nextC !== props.laserY) {
         props.laserY = nextC;
         renderBoard();
-        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY });
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
+      }
+    } else if (activeDragMode === 'explorer' && draggableExplorer) {
+      const nextX = Math.max(xMin + 0.5, Math.min(xMax - 0.5, snapVal(x, snapStep || 0.5)));
+      if (nextX !== props.explorerX) {
+        props.explorerX = nextX;
+        renderBoard();
+        props.onChange?.({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX });
       }
     }
 
@@ -609,7 +680,7 @@ export function createAbsBoard(root, initialProps = {}) {
   return {
     svg,
     getPlane: () => plane,
-    getState: () => ({ a: props.a, h: props.h, k: props.k, laserY: props.laserY }),
+    getState: () => ({ a: props.a, h: props.h, k: props.k, laserY: props.laserY, explorerX: props.explorerX }),
     update(newProps = {}) {
       props = { ...props, ...newProps };
       renderBoard();
@@ -644,18 +715,18 @@ export function annotatedAbsFormula(root, config = {}) {
   }
 
   function showNote(text) {
-    mount(noteArea, h('p', { class: 'seq-annotated__note' }, text));
+    mount(noteArea, h('p', { class: 'seq-annotated__note annotated-Callout' }, text));
   }
 
-  function makeToken(label, subLabel, noteText, ariaDesc) {
+  function makeToken(mainNode, subLabel, noteText, ariaDesc, colorMod = 'yellow') {
     const btn = h('button', {
       type: 'button',
-      class: 'seq-token abs-token',
-      'aria-label': `${ariaDesc}: ${label}`,
+      class: `seq-token abs-token af-token af-token--${colorMod}`,
+      'aria-label': ariaDesc,
       tabindex: '0',
     },
-      h('span', { class: 'abs-token__main' }, label),
-      subLabel ? h('span', { class: 'abs-token__sub' }, subLabel) : null
+      h('span', { class: 'abs-token__main af-token__main' }, mainNode),
+      subLabel ? h('span', { class: 'abs-token__sub af-token__sub' }, subLabel) : null
     );
 
     btn.addEventListener('mouseenter', () => showNote(noteText));
@@ -675,31 +746,38 @@ export function annotatedAbsFormula(root, config = {}) {
     const kAbsStr = fmt(Math.abs(kVal));
 
     const tokA = makeToken(
-      aStr,
+      formatNumOrFracNode(a),
       'apertura a',
       `← Coeficiente a = ${aStr}: controla la pendiente de las ramas (${a > 0 ? 'abre hacia arriba V' : 'se refleja hacia abajo Λ'}). A la derecha del vértice la pendiente es +${aStr} y a la izquierda es ${fmt(-a)}.`,
-      'Coeficiente de apertura y reflexión a'
+      `Coeficiente de apertura y reflexión a: ${aStr}`,
+      'pink'
     );
 
     const tokMinus = makeToken(
       hInsideSign,
       'distancia',
       `← ¿Por qué lleva signo «${hInsideSign}»? Porque medimos la distancia |x − (${fmt(hVal)})|. El vértice ocurre cuando esa distancia vale CERO: x ${hInsideSign} ${hAbsStr} = 0 ⟹ x = ${fmt(hVal)}.`,
-      'Operador de distancia dentro de las barras'
+      `Operador de distancia dentro de las barras: ${hInsideSign}`,
+      'teal'
     );
 
     const tokH = makeToken(
-      hAbsStr,
+      formatNumOrFracNode(Math.abs(hVal)),
       `vértice X (h = ${fmt(hVal)})`,
       `← Coordenada X del vértice y Eje de Simetría (x = ${fmt(hVal)}): traslada toda la «V» horizontalmente hacia x = ${fmt(hVal)}.`,
-      'Coordenada horizontal del vértice h'
+      `Coordenada horizontal del vértice h: ${hAbsStr}`,
+      'teal'
     );
 
     const tokK = makeToken(
-      `${kSign} ${kAbsStr}`,
+      h('span', { style: 'display: inline-flex; align-items: center; gap: 4px;' },
+        kSign,
+        formatNumOrFracNode(Math.abs(kVal))
+      ),
       `piso/techo Y (k = ${fmt(kVal)})`,
       `← Coordenada Y del vértice (k = ${fmt(kVal)}): cuando x = ${fmt(hVal)}, las barras se anulan (valen 0) y la altura resultante es exactamente f(${fmt(hVal)}) = ${fmt(kVal)}.`,
-      'Desplazamiento vertical k'
+      `Desplazamiento vertical k: ${kSign} ${kAbsStr}`,
+      'yellow'
     );
 
     mount(
@@ -729,8 +807,8 @@ export function annotatedAbsFormula(root, config = {}) {
 
 /**
  * 3. piecewiseBrace(root, pieces, activePieceIdx = null)
- * Renderiza una llave matemática grande { ... } estilizada en CSS con tiza donde cada renglón
- * muestra la expresión algebraica a la izquierda y la condición de dominio a la derecha.
+ * Renderiza una llave matemática vectorial escalable (.va-piecewise + .va-pw-brace-svg)
+ * donde cada renglón muestra la expresión algebraica a la izquierda y la condición de dominio a la derecha.
  */
 export function piecewiseBrace(root, pieces = [], activePieceIdx = null, options = {}) {
   const { fnName = 'f(x)', rejectedIndices = [] } = options;
@@ -739,27 +817,67 @@ export function piecewiseBrace(root, pieces = [], activePieceIdx = null, options
     const isActive = activePieceIdx === idx;
     const isRejected = rejectedIndices.includes(idx);
 
+    const exprContent = p.exprNode || p.exprText || p.simplifiedText || p.label || '';
+
     return h('div', {
       class: [
+        'va-pw-row',
         'abs-brace__row',
         isActive ? 'is-active' : '',
         isRejected ? 'is-rejected' : '',
       ],
       dataset: { pieceIndex: idx },
     },
-      h('span', { class: 'abs-brace__expr eq' }, p.exprText || p.simplifiedText || p.label || ''),
-      h('span', { class: 'abs-brace__cond' }, p.condition ? `si ${p.condition.replace(/^si\s+/i, '')}` : '')
+      h('span', { class: 'va-pw-expr abs-brace__expr eq' }, exprContent),
+      h('span', { class: 'va-pw-cond abs-brace__cond' }, p.condition ? `si ${p.condition.replace(/^si\s+/i, '')}` : '')
     );
   });
 
-  const braceBox = h('div', { class: 'seq-annotated__brace-box abs-brace-box' },
-    fnName ? h('span', { class: 'abs-brace__lhs eq' }, `${fnName} = `) : null,
-    h('div', { class: 'seq-annotated__brace abs-brace__symbol', 'aria-hidden': 'true' }, '{'),
-    h('div', { class: 'seq-annotated__cases abs-brace__cases' }, ...rows)
+  const braceSvg = s('svg', {
+    class: 'va-pw-brace-svg',
+    viewBox: '0 0 24 100',
+    preserveAspectRatio: 'none',
+    'aria-hidden': 'true',
+  },
+    s('path', {
+      d: 'M 22 2 Q 12 2 12 18 L 12 42 Q 12 50 3 50 Q 12 50 12 58 L 12 82 Q 12 98 22 98',
+      stroke: 'var(--yellow)',
+      'stroke-width': '2.5',
+      fill: 'none',
+      'vector-effect': 'non-scaling-stroke',
+    })
+  );
+
+  const braceBox = h('div', { class: 'va-piecewise seq-annotated__brace-box abs-brace-box' },
+    fnName ? h('span', { class: 'va-pw-lhs abs-brace__lhs eq' }, `${fnName} = `) : null,
+    h('div', { class: 'va-pw-brace seq-annotated__brace abs-brace__symbol', 'aria-hidden': 'true' }, braceSvg),
+    h('div', { class: 'va-pw-rows seq-annotated__cases abs-brace__cases abs-brace__rows' }, ...rows)
   );
 
   mount(root, braceBox);
   return braceBox;
+}
+
+function resolveExpectedChoiceIndex(q) {
+  if (typeof q.expected === 'number') {
+    return q.expected;
+  }
+  if (typeof q.expected === 'string') {
+    const trimmed = q.expected.trim();
+    if (/^[A-D]$/i.test(trimmed)) {
+      return trimmed.toUpperCase().charCodeAt(0) - 65;
+    }
+    const idx = q.options.findIndex((opt) => {
+      if (typeof opt === 'string') {
+        const cleanOpt = opt.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '').trim();
+        const cleanExp = trimmed.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '').trim();
+        return cleanOpt === cleanExp || opt.trim() === trimmed;
+      }
+      return opt === q.expected;
+    });
+    if (idx !== -1) return idx;
+  }
+  return 0;
 }
 
 /**
@@ -773,17 +891,38 @@ export function piecewiseBrace(root, pieces = [], activePieceIdx = null, options
  * - 'graph-target': lienzo cartesiano interactivo donde el usuario arrastra (h; k) y pendiente 'a'
  */
 export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null) {
+  let lastCorrectSlot = -1;
   const state = {
-    answers: questions.map((q) => ({
-      value: q.type === 'graph-target'
-        ? { a: q.initial?.a ?? 1, h: q.initial?.h ?? 0, k: q.initial?.k ?? 0 }
-        : null,
-      ok: false,
-      feedback: null,
-      hintIndex: 0,
-      showSolution: false,
-      failCount: 0,
-    })),
+    answers: questions.map((q) => {
+      let optionOrder = null;
+      if (q.type === 'choice' && Array.isArray(q.options) && q.options.length > 1) {
+        const n = q.options.length;
+        const expectedIdx = resolveExpectedChoiceIndex(q);
+        optionOrder = q.options.map((_, i) => i);
+        for (let attempt = 0; attempt < 10; attempt++) {
+          for (let i = n - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optionOrder[i], optionOrder[j]] = [optionOrder[j], optionOrder[i]];
+          }
+          const correctSlot = optionOrder.indexOf(expectedIdx);
+          if (correctSlot !== lastCorrectSlot || n <= 1) {
+            lastCorrectSlot = correctSlot;
+            break;
+          }
+        }
+      }
+      return {
+        value: q.type === 'graph-target'
+          ? { a: q.initial?.a ?? 1, h: q.initial?.h ?? 0, k: q.initial?.k ?? 0 }
+          : null,
+        ok: false,
+        feedback: null,
+        hintIndex: 0,
+        showSolution: false,
+        failCount: 0,
+        optionOrder,
+      };
+    }),
     allCompletedReported: false,
   };
 
@@ -1095,32 +1234,40 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           )
         );
       } else if (q.type === 'choice') {
+        const expectedIdx = resolveExpectedChoiceIndex(q);
+        const order = qState.optionOrder || q.options.map((_, i) => i);
         const optionsContainer = h('div', { class: 'seq-check__options' },
-          q.options.map((opt, optIdx) => {
-            const letter = String.fromCharCode(65 + optIdx);
-            const isSelectedOpt = qState.value === optIdx;
+          order.map((origIdx, displayIdx) => {
+            const rawOpt = q.options[origIdx];
+            const opt = typeof rawOpt === 'string'
+              ? rawOpt.replace(/^(\([A-Za-z0-9]\)|[A-Za-z0-9][\)\.\-:])\s*/i, '')
+              : rawOpt;
+            const letter = String.fromCharCode(65 + displayIdx);
+            const isSelectedOpt = qState.value === origIdx;
+            const isMatch = origIdx === expectedIdx;
             const btn = h('button', {
               type: 'button',
               class: [
                 'seq-check__opt-btn',
                 isSelectedOpt ? 'is-selected' : '',
-                isResolved && optIdx === q.expected ? 'is-correct' : '',
+                isResolved && isMatch ? 'is-correct' : '',
               ],
-              dataset: { answer: optIdx },
+              dataset: { answer: displayIdx, origIndex: origIdx },
               disabled: isResolved,
             },
               h('strong', { class: 'seq-check__opt-tag' }, `${letter}) `),
-              opt
+              typeof opt === 'string' && opt.includes('<')
+                ? (() => { const sp = h('span'); sp.innerHTML = opt; return sp; })()
+                : opt
             );
 
             btn.addEventListener('click', () => {
-              qState.value = optIdx;
-              const isMatch = optIdx === q.expected;
+              qState.value = origIdx;
               qState.ok = isMatch;
-              const diagId = (!isMatch && q.optionDiagnostics?.[optIdx]) || null;
+              const diagId = (!isMatch && q.optionDiagnostics?.[origIdx]) || null;
               qState.feedback = isMatch
                 ? { ok: true, message: q.explanation || '¡Correcto! Opción acertada.' }
-                : { ok: false, message: q.optionFeedback?.[optIdx] || 'Opción incorrecta. Analizá la definición y volvé a probar.' };
+                : { ok: false, message: q.optionFeedback?.[origIdx] || 'Opción incorrecta. Analizá la definición y volvé a probar.' };
               triggerVnReaction(q, qState, isMatch, diagId);
               checkCompletion();
               render();
@@ -1257,11 +1404,17 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
       const feedbackEl = h('div', { class: 'seq-check__feedback', 'aria-live': 'polite' });
       if (qState.feedback) {
+        const msgSpan = h('span');
+        if (typeof qState.feedback.message === 'string' && qState.feedback.message.includes('<')) {
+          msgSpan.innerHTML = qState.feedback.message;
+        } else {
+          msgSpan.textContent = qState.feedback.message;
+        }
         mount(
           feedbackEl,
           h('div', { class: ['notice', qState.feedback.ok ? 'notice--ok' : 'notice--err'] },
             qState.feedback.ok ? chalkIcon('check') : chalkIcon('cross'),
-            h('span', null, qState.feedback.message)
+            msgSpan
           )
         );
       }
@@ -1314,10 +1467,17 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       if (qState.hintIndex > 0 && q.hints) {
         hintsDisplay = h('div', { class: 'seq-check__hints-box' });
         for (let hIdx = 0; hIdx < qState.hintIndex; hIdx++) {
+          const hintSpan = h('span');
+          const hValStr = q.hints[hIdx];
+          if (typeof hValStr === 'string' && hValStr.includes('<')) {
+            hintSpan.innerHTML = hValStr;
+          } else {
+            hintSpan.textContent = hValStr;
+          }
           hintsDisplay.append(
             h('div', { class: 'seq-check__hint-item small' },
               h('strong', null, `Pista ${hIdx + 1}: `),
-              q.hints[hIdx]
+              hintSpan
             )
           );
         }

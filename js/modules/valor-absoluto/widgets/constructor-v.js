@@ -1,263 +1,413 @@
 /**
- * widgets/constructor-v.js — Widget interactivo para la Sección 5:
- * El Laboratorio Maestro: Graficar f(x) = a|x - h| + k en dos pasos (con nodos Vértice y Pendiente)
- * y Modo Desafío Inverso (De la Gráfica a la Ecuación).
+ * constructor-v.js — Widget 5 (Sección 5):
+ * «Laboratorio Maestro f(x) = a|x - h| + k» con Modo Exploración Libre (arrastrando nodos
+ * y sliders persistentes) + Modo Desafío Inverso con 6 gráficas misteriosas variadas.
  */
 
 import { h, mount, chalkIcon } from '../../../core/dom.js';
-import { fmt, MINUS } from '../../../core/math-format.js';
+import { fmt } from '../../../core/math-format.js';
+import { tryParseExpr, toDisplay } from '../expr.js';
 import { createAbsBoard, annotatedAbsFormula } from '../components.js';
-import { tryParseExpr, equivalentFx } from '../expr.js';
-import { approxEq, diagnoseAbs, formatCanonicalAbs } from '../logic.js';
-import { playSuccess, playError } from '../../../core/sound.js';
-import { react } from '../../../core/vn.js';
+import {
+  approxEq,
+  formatCanonicalAbs,
+  equivalentFx,
+  diagnoseAbs,
+} from '../logic.js';
 import { DIAGNOSE_REACTIONS } from '../vn-scripts.js';
+import { react } from '../../../core/vn.js';
+import { playSuccess, playError } from '../../../core/sound.js';
 
-const LAB_PRESETS = [
-  { label: 'Repaso Khan 1: f(x) = |x − 1| + 5', a: 1, h: 1, k: 5 },
-  { label: 'Repaso Khan 2: f(x) = −2|x| + 4', a: -2, h: 0, k: 4 },
-  { label: 'Khan 3: f(x) = −1/2 |x − 4| + 3', a: -0.5, h: 4, k: 3 },
-  { label: 'Khan 4: f(x) = 2|x + 3| − 4', a: 2, h: -3, k: -4 },
-];
-
-const MYSTERY_GRAPHS = [
-  { a: -2, h: 1, k: 4, hint: 'Mirando el pico: está en (1; 4). Si avanzás 1 a la derecha (x = 2), bajás 2 unidades hasta y = 2.' },
-  { a: 3, h: -2, k: -3, hint: 'El vértice está en (−2; −3). Si avanzás 1 a la derecha (x = −1), subís 3 unidades hasta y = 0.' },
-  { a: -1, h: -3, k: 2, hint: 'El vértice está en (−3; 2) y abre hacia abajo con pendiente −1.' },
+const MYSTERY_CHALLENGES = [
+  { a: 2, h: -1, k: -3, hintPoint: '(0; −1)' },
+  { a: -1, h: 2, k: 4, hintPoint: '(3; 3)' },
+  { a: -2, h: -2, k: 3, hintPoint: '(−1; 1)' },
+  { a: 0.5, h: 1, k: -2, hintPoint: '(3; −1)' },
+  { a: 3, h: -3, k: -4, hintPoint: '(−2; −1)' },
+  { a: -0.5, h: 2, k: 3, hintPoint: '(4; 2)' },
 ];
 
 export function initConstructorVWidget(container) {
-  let mode = 'explore'; // 'explore' | 'inverse'
-  let aVal = -2;
-  let hVal = 0;
-  let kVal = 4;
+  let state = {
+    mode: 'explore', // 'explore' | 'inverse'
+    a: -2,
+    h: 1,
+    k: 3,
+    challengeIdx: 0,
+    invFeedback: null,
+  };
 
-  let mysteryIdx = 0;
-  let userFormula = '';
-  let inverseFeedback = null;
+  // Persistent DOM for Explore Mode
+  const exploreWrap = h('div');
+  const exploreBoardSlot = h('div', { class: 'seq-plot-card' });
+  const exploreFormulaSlot = h('div', { style: 'margin-top: 8px;' });
+  const exploreStepsCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
 
-  function render() {
-    const modeTabs = h('div', { class: 'seq-controls' },
+  const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
+  const valK = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, fmt(state.k));
+  const valA = h('strong', { class: 'eq', style: 'color: var(--pink);' }, fmt(state.a));
+
+  const sliderH = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: state.h,
+    'aria-label': 'Vértice horizontal h',
+  });
+  const sliderK = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: state.k,
+    'aria-label': 'Vértice vertical k',
+  });
+  const sliderA = h('input', {
+    type: 'range',
+    min: -4,
+    max: 4,
+    step: 0.5,
+    value: state.a,
+    'aria-label': 'Apertura y signo a',
+  });
+
+  const annotatedApi = annotatedAbsFormula(exploreFormulaSlot, {
+    fnName: 'f',
+    a: state.a,
+    h: state.h,
+    k: state.k,
+  });
+
+  const exploreBoard = createAbsBoard(exploreBoardSlot, {
+    a: state.a,
+    h: state.h,
+    k: state.k,
+    xMin: -7,
+    xMax: 7,
+    yMin: -7,
+    yMax: 7,
+    snapStep: 0.5,
+    draggableVertex: true,
+    draggableSlope: true,
+    showSymmetryAxis: true,
+    showSlopeTriangle: true,
+    onChange(next) {
+      state.a = next.a;
+      state.h = next.h;
+      state.k = next.k;
+      sliderH.value = String(state.h);
+      sliderK.value = String(state.k);
+      sliderA.value = String(state.a);
+      syncExploreUI(false);
+    },
+  });
+
+  sliderH.addEventListener('input', (e) => {
+    state.h = parseFloat(e.target.value);
+    syncExploreUI(true);
+  });
+  sliderK.addEventListener('input', (e) => {
+    state.k = parseFloat(e.target.value);
+    syncExploreUI(true);
+  });
+  sliderA.addEventListener('input', (e) => {
+    let v = parseFloat(e.target.value);
+    if (approxEq(v, 0)) v = state.a >= 0 ? -0.5 : 0.5;
+    state.a = v;
+    sliderA.value = String(state.a);
+    syncExploreUI(true);
+  });
+
+  function syncExploreUI(updateBoard = true) {
+    valH.textContent = fmt(state.h);
+    valK.textContent = fmt(state.k);
+    valA.textContent = fmt(state.a);
+
+    if (updateBoard) {
+      exploreBoard.update({ a: state.a, h: state.h, k: state.k });
+    }
+    annotatedApi.update({ a: state.a, h: state.h, k: state.k });
+
+    const rightPointY = state.k + state.a;
+    const leftPointY = state.k + state.a;
+    mount(
+      exploreStepsCard,
+      h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.08rem;' },
+        'Receta geométrica en 2 pasos para ',
+        h('strong', { style: 'color: var(--yellow);' }, `f(x) = ${formatCanonicalAbs(state.a, state.h, state.k)}`),
+        ':'
+      ),
+      h('p', { class: 'small', style: 'margin: 0 0 4px;' },
+        `1. Anclá el vértice en V(${fmt(state.h)}; ${fmt(state.k)}) y trazá el eje de simetría vertical x = ${fmt(state.h)}.`
+      ),
+      h('p', { class: 'small muted', style: 'margin: 0;' },
+        `2. Desde el vértice caminá Δx = +1 a la derecha hasta (${fmt(state.h + 1)}; ${fmt(rightPointY)}) y Δx = −1 a la izquierda hasta (${fmt(state.h - 1)}; ${fmt(leftPointY)}) usando Δy = a = ${fmt(state.a)}.`
+      )
+    );
+  }
+
+  mount(
+    exploreWrap,
+    h('div', { class: 'seq-controls' },
+      h('label', { class: 'field__label' }, 'Vértice h = ', valH, sliderH),
+      h('label', { class: 'field__label' }, 'Vértice k = ', valK, sliderK),
+      h('label', { class: 'field__label' }, 'Apertura a = ', valA, sliderA)
+    ),
+    exploreBoardSlot,
+    exploreFormulaSlot,
+    exploreStepsCard
+  );
+
+  // Persistent DOM for Inverse Challenge Mode
+  const inverseWrap = h('div');
+  const mysteryBtnsRow = h('div', { class: 'seq-controls' });
+  const invBoardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.3; min-width: 280px;' });
+  const invPromptText = h('p', { class: 'small', style: 'margin: 0 0 8px;' });
+
+  const inH = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    placeholder: 'h',
+    step: '0.5',
+    'aria-label': 'Coordenada h del vértice misterioso',
+  });
+  const inK = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    placeholder: 'k',
+    step: '0.5',
+    'aria-label': 'Coordenada k del vértice misterioso',
+  });
+  const inA = h('input', {
+    type: 'number',
+    class: 'seq-check__input-sm',
+    placeholder: 'a',
+    step: '0.5',
+    'aria-label': 'Pendiente derecha a',
+  });
+  const inExpr = h('input', {
+    type: 'text',
+    class: 'seq-check__input',
+    placeholder: 'ej. 2|x + 1| - 3',
+    style: 'width: 100%; margin-top: 4px;',
+    'aria-label': 'Fórmula canónica completa',
+  });
+  const previewExprEl = h('div', { class: 'small muted', style: 'min-height: 1.3em; margin-top: 4px;' });
+
+  inExpr.addEventListener('input', () => {
+    const raw = inExpr.value.trim();
+    if (!raw) {
+      mount(previewExprEl);
+      return;
+    }
+    const parsed = tryParseExpr(raw);
+    if (parsed.ok) {
+      mount(previewExprEl, 'Interpretado como: ', h('strong', { class: 'eq' }, toDisplay(parsed.ast)));
+    } else {
+      mount(previewExprEl, h('span', { class: 'text-warn' }, 'Fórmula incompleta...'));
+    }
+  });
+
+  const invFeedbackSlot = h('div');
+
+  const invBoard = createAbsBoard(invBoardSlot, {
+    a: MYSTERY_CHALLENGES[0].a,
+    h: MYSTERY_CHALLENGES[0].h,
+    k: MYSTERY_CHALLENGES[0].k,
+    xMin: -6,
+    xMax: 6,
+    yMin: -6,
+    yMax: 6,
+    draggableVertex: false,
+    draggableSlope: false,
+    showSymmetryAxis: true,
+    showSlopeTriangle: true,
+  });
+
+  const checkInverse = () => {
+    const target = MYSTERY_CHALLENGES[state.challengeIdx];
+    const targetExpr = formatCanonicalAbs(target.a, target.h, target.k);
+    const valHNum = parseFloat(String(inH.value).replace(',', '.'));
+    const valKNum = parseFloat(String(inK.value).replace(',', '.'));
+    const valANum = parseFloat(String(inA.value).replace(',', '.'));
+    const rawExpr = inExpr.value.trim();
+
+    const parsed = tryParseExpr(rawExpr);
+    if (!parsed.ok) {
+      state.invFeedback = {
+        ok: false,
+        msg: 'Escribí una fórmula válida en el Paso 3 (por ejemplo: 2|x + 1| - 3).',
+      };
+      playError(1);
+      syncInverseUI();
+      return;
+    }
+
+    const okH = approxEq(valHNum, target.h);
+    const okK = approxEq(valKNum, target.k);
+    const okA = approxEq(valANum, target.a);
+    const okExpr = equivalentFx(parsed.ast, targetExpr);
+
+    if (okH && okK && okA && okExpr) {
+      state.invFeedback = {
+        ok: true,
+        msg: `¡Impecable! Vértice (${fmt(target.h)}; ${fmt(target.k)}), apertura a = ${fmt(target.a)} y ecuación f(x) = ${targetExpr}.`,
+      };
+      playSuccess('normal');
+      react({
+        pose: 'orgullosa',
+        tag: '¡Lectura inversa perfecta!',
+        html: `¡Así se deduce una función mirando el gráfico! Identificaste el vértice en <span class="eq">(${fmt(target.h)}; ${fmt(target.k)})</span> y la pendiente <span class="eq">a = ${fmt(target.a)}</span> sin caer en la trampa de signo.`,
+      });
+    } else {
+      const diags = diagnoseAbs(parsed.ast, target);
+      const errMsg =
+        diags[0]?.message ||
+        (!okH || !okK
+          ? `Revisá las coordenadas del vértice: mirá dónde está la punta amarilla en el gráfico.`
+          : !okA
+            ? `Revisá el coeficiente de apertura a: desde el vértice avanzá 1 unidad a la derecha y contá cuánto sube o baja.`
+            : `La fórmula final no coincide con el vértice (${fmt(target.h)}; ${fmt(target.k)}) y pendiente a = ${fmt(target.a)}.`);
+
+      state.invFeedback = { ok: false, msg: errMsg };
+      playError(1);
+      if (diags[0]?.id && DIAGNOSE_REACTIONS[diags[0].id]) {
+        react(DIAGNOSE_REACTIONS[diags[0].id]);
+      } else {
+        react({
+          pose: 'base',
+          tag: 'Mirá el triángulo de pendiente',
+          html: errMsg,
+        });
+      }
+    }
+    syncInverseUI();
+  };
+
+  function selectMystery(idx) {
+    state.challengeIdx = idx;
+    state.invFeedback = null;
+    inH.value = '';
+    inK.value = '';
+    inA.value = '';
+    inExpr.value = '';
+    mount(previewExprEl);
+    syncInverseUI();
+  }
+
+  function syncInverseUI() {
+    const target = MYSTERY_CHALLENGES[state.challengeIdx];
+    invBoard.update({ a: target.a, h: target.h, k: target.k });
+
+    mount(
+      mysteryBtnsRow,
+      ...MYSTERY_CHALLENGES.map((ch, idx) =>
+        h('button', {
+          type: 'button',
+          class: ['chip', state.challengeIdx === idx ? 'is-active' : ''],
+          on: { click: () => selectMystery(idx) },
+        }, `Misterio ${idx + 1}`)
+      ),
       h('button', {
         type: 'button',
-        class: ['chip', mode === 'explore' ? 'is-active' : ''],
+        class: 'btn',
         on: {
           click: () => {
-            mode = 'explore';
-            render();
+            const nextIdx = (state.challengeIdx + 1) % MYSTERY_CHALLENGES.length;
+            selectMystery(nextIdx);
           },
         },
-      }, 'Laboratorio Libre (Manipular Vértice y Bisagra)'),
-      h('button', {
-        type: 'button',
-        class: ['chip', mode === 'inverse' ? 'is-active' : ''],
-        on: {
-          click: () => {
-            mode = 'inverse';
-            inverseFeedback = null;
-            render();
-          },
-        },
-      }, 'Desafío Inverso (De la Gráfica a la Ecuación)')
+      }, chalkIcon('reset'), ' Nueva gráfica misteriosa')
     );
 
-    if (mode === 'explore') {
-      const presetBar = h('div', { class: 'seq-controls' },
-        LAB_PRESETS.map((p) =>
-          h('button', {
-            type: 'button',
-            class: ['chip', approxEq(p.a, aVal) && approxEq(p.h, hVal) && approxEq(p.k, kVal) ? 'is-active' : ''],
-            on: {
-              click: () => {
-                aVal = p.a;
-                hVal = p.h;
-                kVal = p.k;
-                render();
-              },
-            },
-          }, p.label)
-        )
-      );
+    invPromptText.textContent = `Observá el vértice amarillo y el punto de paso ${target.hintPoint} en la rama derecha para deducir la ecuación:`;
 
-      const annotatedSlot = h('div', null);
-      const annotatedCtrl = annotatedAbsFormula(annotatedSlot, {
-        fnName: 'f',
-        a: aVal,
-        h: hVal,
-        k: kVal,
-      });
-
-      const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.4; min-width: 280px;' });
-      const stepCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 250px;' });
-
-      function updateStepCard() {
-        mount(
-          stepCard,
-          h('h3', { class: 'seq-sidebar__chapter-title' }, 'Protocolo de 2 Pasos en Vivo'),
-          h('p', { class: 'eq', style: 'font-size: 1.35rem; color: var(--yellow); margin: 4px 0 10px;' },
-            `f(x) = ${formatCanonicalAbs(aVal, hVal, kVal)}`
-          ),
-          h('div', { style: 'margin-bottom: 10px;' },
-            h('strong', { style: 'color: var(--yellow);' }, `Paso 1 · Clavar el Vértice (h; k):`),
-            h('p', { class: 'small', style: 'margin: 2px 0;' },
-              `Lo de adentro se anula en x = ${fmt(hVal)} y la altura de partida es k = ${fmt(kVal)} → `,
-              h('strong', null, `V(${fmt(hVal)}; ${fmt(kVal)})`),
-              '.'
-            )
-          ),
-          h('div', null,
-            h('strong', { style: 'color: var(--blue);' }, `Paso 2 · Medir la Pendiente a = ${fmt(aVal)}:`),
-            h('p', { class: 'small', style: 'margin: 2px 0;' },
-              `Desde V(${fmt(hVal)}; ${fmt(kVal)}), caminá 1 unidad a la derecha (x = ${fmt(hVal + 1)}) y ${aVal >= 0 ? 'subí' : 'bajá'} ${fmt(Math.abs(aVal))} hasta `,
-              h('strong', null, `(${fmt(hVal + 1)}; ${fmt(kVal + aVal)})`),
-              `. Por simetría, a la izquierda pasa por (${fmt(hVal - 1)}; ${fmt(kVal + aVal)}).`
-            )
+    mount(
+      invFeedbackSlot,
+      state.invFeedback
+        ? h('div', { class: ['notice', state.invFeedback.ok ? 'notice--ok' : 'notice--err'], style: 'margin-top: 8px;' },
+            state.invFeedback.ok ? chalkIcon('check') : chalkIcon('cross'),
+            h('span', null, state.invFeedback.msg)
           )
-        );
-      }
+        : null
+    );
+  }
 
-      createAbsBoard(boardSlot, {
-        a: aVal,
-        h: hVal,
-        k: kVal,
-        xMin: -7,
-        xMax: 7,
-        yMin: -7,
-        yMax: 8,
-        snapStep: 0.5,
-        draggableVertex: true,
-        draggableSlope: true,
-        showGhostLine: true,
-        onChange(next) {
-          aVal = next.a;
-          hVal = next.h;
-          kVal = next.k;
-          annotatedCtrl.update({ a: aVal, h: hVal, k: kVal });
-          updateStepCard();
-        },
-      });
+  const invFormCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 260px;' },
+    invPromptText,
+    h('div', { style: 'margin-bottom: 8px;' },
+      h('strong', { class: 'small' }, 'Paso 1 · Coordenadas del vértice (h; k):'),
+      h('div', { class: 'seq-check__pair-grid', style: 'margin-top: 4px;' },
+        h('label', { class: 'seq-check__pair-label' }, 'h = ', inH),
+        h('label', { class: 'seq-check__pair-label' }, 'k = ', inK)
+      )
+    ),
+    h('div', { style: 'margin-bottom: 8px;' },
+      h('strong', { class: 'small' }, 'Paso 2 · Pendiente derecha a = Δy / Δx: '),
+      inA
+    ),
+    h('div', { style: 'margin-bottom: 10px;' },
+      h('strong', { class: 'small' }, 'Paso 3 · Fórmula completa f(x) = a|x − h| + k:'),
+      inExpr,
+      previewExprEl
+    ),
+    h('button', {
+      type: 'button',
+      class: 'btn btn--check',
+      on: { click: checkInverse },
+    }, 'Verificar deducción inversa'),
+    invFeedbackSlot
+  );
 
-      updateStepCard();
+  mount(
+    inverseWrap,
+    mysteryBtnsRow,
+    h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, invBoardSlot, invFormCard)
+  );
 
-      mount(
-        container,
-        modeTabs,
-        presetBar,
-        annotatedSlot,
-        h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, stepCard)
-      );
+  // Mode switcher
+  const btnModeExplore = h('button', {
+    type: 'button',
+    class: 'chip is-active',
+    on: {
+      click: () => {
+        state.mode = 'explore';
+        updateModeView();
+      },
+    },
+  }, 'Modo 1: Exploración Libre (Arrastrá V y P)');
+
+  const btnModeInverse = h('button', {
+    type: 'button',
+    class: 'chip',
+    on: {
+      click: () => {
+        state.mode = 'inverse';
+        updateModeView();
+      },
+    },
+  }, 'Modo 2: Desafío Inverso (6 Gráficas Misteriosas)');
+
+  const modeContentSlot = h('div');
+
+  function updateModeView() {
+    btnModeExplore.classList.toggle('is-active', state.mode === 'explore');
+    btnModeInverse.classList.toggle('is-active', state.mode === 'inverse');
+    if (state.mode === 'explore') {
+      mount(modeContentSlot, exploreWrap);
+      syncExploreUI(true);
     } else {
-      // Modo Desafío Inverso
-      const target = MYSTERY_GRAPHS[mysteryIdx];
-      const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.3; min-width: 280px;' });
-
-      createAbsBoard(boardSlot, {
-        a: target.a,
-        h: target.h,
-        k: target.k,
-        xMin: -7,
-        xMax: 7,
-        yMin: -7,
-        yMax: 7,
-        draggableVertex: false,
-        draggableSlope: false,
-        showSlopeTriangles: true,
-      });
-
-      const inputEl = h('input', {
-        type: 'text',
-        class: 'seq-check__input',
-        placeholder: 'ej. -2|x - 1| + 4',
-        value: userFormula,
-        on: {
-          input: (e) => {
-            userFormula = e.target.value;
-          },
-        },
-      });
-
-      const checkInverse = () => {
-        const parsed = tryParseExpr(userFormula);
-        if (!parsed.ok) {
-          inverseFeedback = { ok: false, msg: parsed.error?.message || 'Expresión incompleta.' };
-          playError(1);
-          render();
-          return;
-        }
-        const targetStr = formatCanonicalAbs(target.a, target.h, target.k);
-        const isOk = equivalentFx(parsed.ast, targetStr);
-        const diags = diagnoseAbs(parsed.ast, target);
-        if (isOk) {
-          playSuccess('normal');
-          inverseFeedback = {
-            ok: true,
-            msg: `¡Impecable! La ecuación exacta de la gráfica es f(x) = ${targetStr}.`,
-          };
-          react({
-            pose: 'orgullosa',
-            tag: 'Ojo clínico',
-            html: `¡Exacto! Leíste el vértice <span class="eq">(${fmt(target.h)}; ${fmt(target.k)})</span> y el triángulo de pendiente <span class="eq">a = ${fmt(target.a)}</span> como una profesional.`,
-          });
-        } else {
-          playError(1);
-          const diag = diags[0];
-          inverseFeedback = {
-            ok: false,
-            msg: diag?.message || `No coincide con la gráfica. Pista: ${target.hint}`,
-          };
-          if (diag?.id && DIAGNOSE_REACTIONS[diag.id]) {
-            react(DIAGNOSE_REACTIONS[diag.id]);
-          }
-        }
-        render();
-      };
-
-      inputEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') checkInverse();
-      });
-
-      const mysterySelector = h('div', { class: 'seq-controls' },
-        MYSTERY_GRAPHS.map((_, i) =>
-          h('button', {
-            type: 'button',
-            class: ['chip', i === mysteryIdx ? 'is-active' : ''],
-            on: {
-              click: () => {
-                mysteryIdx = i;
-                userFormula = '';
-                inverseFeedback = null;
-                render();
-              },
-            },
-          }, `Gráfica Misteriosa #${i + 1}`)
-        )
-      );
-
-      const challengeCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 250px;' },
-        h('h3', { class: 'seq-sidebar__chapter-title' }, `Deducí la Ecuación #${mysteryIdx + 1}`),
-        h('p', { class: 'small' },
-          'Observá las coordenadas del vértice amarillo V(h; k) y el triángulo punteado Δy / Δx = a. Escribí la fórmula f(x):'
-        ),
-        h('div', { class: 'seq-check__row' },
-          inputEl,
-          h('button', { type: 'button', class: 'btn btn--check', on: { click: checkInverse } }, 'Verificar')
-        ),
-        inverseFeedback
-          ? h('div', { class: ['notice', inverseFeedback.ok ? 'notice--ok' : 'notice--err'], style: 'margin-top: 8px;' },
-              inverseFeedback.ok ? chalkIcon('check') : chalkIcon('cross'),
-              h('span', null, inverseFeedback.msg)
-            )
-          : null
-      );
-
-      mount(
-        container,
-        modeTabs,
-        mysterySelector,
-        h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, challengeCard)
-      );
+      mount(modeContentSlot, inverseWrap);
+      syncInverseUI();
     }
   }
 
-  render();
+  mount(
+    container,
+    h('div', { class: 'seq-controls' }, btnModeExplore, btnModeInverse),
+    modeContentSlot
+  );
+
+  updateModeView();
 }

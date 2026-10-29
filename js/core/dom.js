@@ -60,7 +60,12 @@ export function s(tag, attrs, ...children) {
   return el;
 }
 
-/** Icono vectorial estilo tiza (lock, check, cross). */
+/**
+ * Icono vectorial estilo tiza:
+ * lock, check, cross, tutor/glasses, smug/star, drop/sweat, anger,
+ * smile/spark, print, shield, book, play, hint, reset, target,
+ * dot-open, dot-closed.
+ */
 export function chalkIcon(type, attrs = {}) {
   const { class: customClass, ...restAttrs } = attrs;
   const fullClass = customClass
@@ -68,11 +73,11 @@ export function chalkIcon(type, attrs = {}) {
     : `chalk-icon chalk-icon--${type}`;
   const icon = s('svg', {
     viewBox: '0 0 16 16',
-    width: '20',
-    height: '20',
+    width: '18',
+    height: '18',
     fill: 'none',
     stroke: 'currentColor',
-    'stroke-width': '2',
+    'stroke-width': '1.8',
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
     'aria-hidden': 'true',
@@ -80,6 +85,7 @@ export function chalkIcon(type, attrs = {}) {
     ...restAttrs,
     class: fullClass,
   });
+
   if (type === 'lock') {
     icon.append(
       s('rect', { x: 3, y: 7, width: 10, height: 8, rx: 1.5 }),
@@ -89,6 +95,73 @@ export function chalkIcon(type, attrs = {}) {
     icon.append(s('path', { d: 'M3 8.5l3.5 3.5 6.5-8' }));
   } else if (type === 'cross') {
     icon.append(s('path', { d: 'M4 4l8 8M12 4l-8 8' }));
+  } else if (type === 'tutor' || type === 'glasses') {
+    icon.append(
+      s('circle', { cx: 4.5, cy: 9, r: 2.8 }),
+      s('circle', { cx: 11.5, cy: 9, r: 2.8 }),
+      s('path', { d: 'M7.3 9h1.4M1.7 8.5L3 5M14.3 8.5L13 5' })
+    );
+  } else if (type === 'smug' || type === 'star') {
+    icon.append(
+      s('path', { d: 'M8 1.8l1.6 3.8 4.1.4-3.1 2.7.9 4-3.5-2.1-3.5 2.1.9-4-3.1-2.7 4.1-.4L8 1.8z' })
+    );
+  } else if (type === 'drop' || type === 'sweat') {
+    icon.append(
+      s('path', { d: 'M8 2.2C8 2.2 4 7.2 4 10.2a4 4 0 0 0 8 0c0-3-4-8-4-8z' }),
+      s('path', { d: 'M6.5 10.5a1.8 1.8 0 0 0 1.5 1.5' })
+    );
+  } else if (type === 'anger') {
+    icon.append(
+      s('path', { d: 'M3 6.5c2.2 0 3.5-1.3 3.5-3.5M9.5 3c0 2.2 1.3 3.5 3.5 3.5M13 9.5c-2.2 0-3.5 1.3-3.5 3.5M6.5 13c0-2.2-1.3-3.5-3.5-3.5' })
+    );
+  } else if (type === 'smile' || type === 'spark') {
+    icon.append(
+      s('path', { d: 'M8 1.5v3M8 11.5v3M1.5 8h3M11.5 8h3M3.6 3.6l2 2M10.4 10.4l2 2M12.4 3.6l-2 2M5.6 10.4l-2 2' })
+    );
+  } else if (type === 'print') {
+    icon.append(
+      s('path', { d: 'M4.5 5.5V2.5h7v3' }),
+      s('rect', { x: 2.5, y: 5.5, width: 11, height: 6, rx: 1 }),
+      s('rect', { x: 4.5, y: 9.5, width: 7, height: 4 })
+    );
+  } else if (type === 'shield') {
+    icon.append(
+      s('path', { d: 'M8 1.8l5.2 2.2v3.8c0 3.5-2.2 5.5-5.2 6.6-3-1.1-5.2-3.1-5.2-6.6V4L8 1.8z' }),
+      s('path', { d: 'M8.5 5.2L6.5 8.5h3L7.5 11.8' })
+    );
+  } else if (type === 'book') {
+    icon.append(
+      s('path', { d: 'M2 3.5h4.5a1.5 1.5 0 0 1 1.5 1.5v8a1.2 1.2 0 0 0-1.2-1.2H2V3.5z' }),
+      s('path', { d: 'M14 3.5H9.5A1.5 1.5 0 0 0 8 5v8a1.2 1.2 0 0 1 1.2-1.2H14V3.5z' })
+    );
+  } else if (type === 'play') {
+    icon.append(
+      s('polygon', { points: '4.5,3 12.5,8 4.5,13' })
+    );
+  } else if (type === 'hint') {
+    icon.append(
+      s('path', { d: 'M5.5 10.2A4 4 0 1 1 10.5 10.2c-.5.5-.8 1.1-.8 1.8H6.3c0-.7-.3-1.3-.8-1.8z' }),
+      s('path', { d: 'M6.5 14h3' })
+    );
+  } else if (type === 'reset') {
+    icon.append(
+      s('path', { d: 'M3.2 6.5A5 5 0 1 1 4 11.5' }),
+      s('path', { d: 'M2.5 3.5v3.2h3.2' })
+    );
+  } else if (type === 'target') {
+    icon.append(
+      s('circle', { cx: 8, cy: 8, r: 5.2 }),
+      s('circle', { cx: 8, cy: 8, r: 1.8 }),
+      s('path', { d: 'M8 1.2v2M8 12.8v2M1.2 8h2M12.8 8h2' })
+    );
+  } else if (type === 'dot-open') {
+    icon.append(
+      s('circle', { cx: 8, cy: 8, r: 4.5, fill: 'var(--bg, #1b261e)', 'stroke-width': '2.2' })
+    );
+  } else if (type === 'dot-closed') {
+    icon.append(
+      s('circle', { cx: 8, cy: 8, r: 4.5, fill: 'currentColor', 'stroke-width': '2.2' })
+    );
   }
   return icon;
 }

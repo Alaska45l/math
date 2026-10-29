@@ -110,9 +110,21 @@ class CdpClient {
   }
 }
 
-// Obtener target WebSocket
-const newTargetRes = await fetch('http://127.0.0.1:9333/json/new', { method: 'PUT' });
-const targetData = await newTargetRes.json();
+// Obtener target WebSocket con reintentos hasta que Chromium escuche en 9333
+let targetData = null;
+for (let attempt = 0; attempt < 25; attempt++) {
+  try {
+    const newTargetRes = await fetch('http://127.0.0.1:9333/json/new', { method: 'PUT' });
+    if (newTargetRes.ok) {
+      targetData = await newTargetRes.json();
+      break;
+    }
+  } catch {
+    // Esperar a que Chromium abra el puerto CDP
+  }
+  await new Promise((resolve) => setTimeout(resolve, 200));
+}
+if (!targetData) throw new Error('No se pudo conectar a Chromium CDP en 127.0.0.1:9333');
 const client = new CdpClient(targetData.webSocketDebuggerUrl);
 await client.ready;
 
@@ -276,7 +288,7 @@ for (const pageName of PAGES) {
   console.log(`  Mobile 320px width: innerWidth=${evalMobile320.innerWidth}, scrollWidth=${evalMobile320.docScrollWidth}, desborde=${evalMobile320.overflow320}`);
   console.log(`  Mobile 375px width: innerWidth=${evalMobile.innerWidth}, scrollWidth=${evalMobile.docScrollWidth}, desborde=${evalMobile.hasHorizontalOverflow}`);
   console.log(`  Desktop 1280px desborde: ${evalDesktop.overflow}`);
-  console.log(`  Resultado página: ${pageOk ? 'PASÓ ✅' : 'FALLÓ ❌'}`);
+  console.log(`  Resultado página: ${pageOk ? 'PASÓ [OK]' : 'FALLÓ [ERROR]'}`);
 
   results.push({ page: pageName, passed: pageOk, details: evalMobile, errors: consoleErrors });
 }
@@ -286,7 +298,7 @@ chromeProc.kill();
 server.close();
 
 console.log('\n========================================');
-console.log(`RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? `TODAS LAS PÁGINAS PASARON (${PAGES.length}/${PAGES.length}) ✅` : 'ALGUNA PÁGINA FALLÓ ❌'}`);
+console.log(`RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? `TODAS LAS PÁGINAS PASARON (${PAGES.length}/${PAGES.length}) [OK]` : 'ALGUNA PÁGINA FALLÓ [ERROR]'}`);
 console.log('========================================');
 
 if (!allPassed) {

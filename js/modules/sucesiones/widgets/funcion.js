@@ -18,14 +18,90 @@ export function initFuncionWidget(container) {
   let presetIdx = 0;
   let cursorN = 2;
   let showSlopeLine = false;
+  let activePlane = null;
 
-  function render() {
+  const presetBtnsSlot = h('span', { style: 'display: inline-flex; flex-wrap: wrap; gap: 8px;' });
+  const slopeCheckbox = h('input', {
+    type: 'checkbox',
+    checked: showSlopeLine,
+    on: {
+      change: (e) => {
+        showSlopeLine = e.target.checked;
+        updateDynamic();
+      },
+    },
+  });
+
+  const controls = h('div', { class: 'seq-controls' },
+    presetBtnsSlot,
+    h('label', { class: 'chip chip--toggle' },
+      slopeCheckbox,
+      'Mostrar recta/curva guía punteada'
+    )
+  );
+
+  const tableSlot = h('div', { class: 'seq-table-wrap' });
+  const svgEl = s('svg', {
+    viewBox: '0 0 540 320',
+    class: 'seq-plot',
+    role: 'img',
+    'aria-label': 'Gráfico de la sucesión con puntos aislados en números enteros',
+  });
+  const domainNotice = h('div', { class: 'notice notice--domain' });
+  const layoutGrid = h('div', { class: 'seq-fn-grid' },
+    tableSlot,
+    h('div', { class: 'seq-plot-card' }, svgEl, domainNotice)
+  );
+
+  mount(container, controls, layoutGrid);
+
+  function buildPlaneForPreset() {
+    const p = PRESETS[presetIdx];
+    const yStep = (p.yMax - p.yMin) > 20 ? 5 : (p.yMax - p.yMin) > 10 ? 2 : 1;
+    activePlane = createPlane(svgEl, {
+      width: 540,
+      height: 320,
+      xMin: 0,
+      xMax: 6,
+      yMin: p.yMin,
+      yMax: p.yMax,
+      xStep: 1,
+      yStep,
+      xLabel: 'n (índice entero ∈ ℕ)',
+      yLabel: 'a(n)',
+    });
+  }
+
+  // Eventos de arrastre/clic en el plano (registrados UNA sola vez sobre svgEl)
+  bindSvgDrag(svgEl, {
+    ix: (px) => (activePlane ? activePlane.ix(px) : 0),
+    iy: (py) => (activePlane ? activePlane.iy(py) : 0),
+  }, ({ x }) => {
+    const prevN = cursorN;
+    cursorN = Math.max(0.5, Math.min(5.5, Math.round(x * 10) / 10));
+    updateDynamic();
+
+    const isDecimal = Math.abs(cursorN - Math.round(cursorN)) >= 0.05;
+    if (isDecimal && cursorN !== prevN) {
+      react({
+        pose: 'enojada',
+        tag: 'Dominio discreto',
+        html: `¡En ℕ no existen términos con coma! Caíste en el vacío de <span class="eq">n = ${fmt(cursorN, 1)} ∉ ℕ</span>. Las sucesiones son funciones de dominio estrictamente entero.`,
+      });
+    }
+  });
+
+  function updateDynamic(rebuildPlane = false) {
+    if (!activePlane || rebuildPlane) {
+      buildPlaneForPreset();
+    }
+
     const p = PRESETS[presetIdx];
     const nList = [1, 2, 3, 4, 5];
     const termPoints = nList.map((n) => ({ n, val: p.fn(n) }));
 
-    const controls = h('div', { class: 'seq-controls' },
-      PRESETS.map((preset, idx) => {
+    mount(presetBtnsSlot,
+      ...PRESETS.map((preset, idx) => {
         const btn = h('button', {
           type: 'button',
           class: ['chip', idx === presetIdx ? 'is-active' : ''],
@@ -33,27 +109,13 @@ export function initFuncionWidget(container) {
         btn.addEventListener('click', () => {
           presetIdx = idx;
           cursorN = 2;
-          render();
+          updateDynamic(true);
         });
         return btn;
-      }),
-      h('label', { class: 'chip chip--toggle' },
-        h('input', {
-          type: 'checkbox',
-          checked: showSlopeLine,
-          on: {
-            change: (e) => {
-              showSlopeLine = e.target.checked;
-              render();
-            },
-          },
-        }),
-        'Mostrar recta/curva guía punteada'
-      )
+      })
     );
 
-    // Tabla n | a(n)
-    const tableEl = h('div', { class: 'seq-table-wrap' },
+    mount(tableSlot,
       h('table', { class: 'seq-table' },
         h('thead', null,
           h('tr', null,
@@ -73,19 +135,10 @@ export function initFuncionWidget(container) {
       )
     );
 
-    // Gráfico cartesiano
-    const svgEl = s('svg', {
-      viewBox: '0 0 540 320',
-      class: 'seq-plot',
-      role: 'img',
-      'aria-label': 'Gráfico de la sucesión con puntos aislados en números enteros',
-    });
-
     const isIntegerN = Math.abs(cursorN - Math.round(cursorN)) < 0.05;
     const roundedN = Math.round(cursorN);
 
-    // Mensaje de dominio
-    const domainNotice = h('div', { class: 'notice notice--domain' },
+    mount(domainNotice,
       isIntegerN && roundedN >= 1 && roundedN <= 5
         ? h('span', null, `En n = ${roundedN} (entero positivo), el término está perfectamente definido: a(${roundedN}) = ${fmt(p.fn(roundedN))}.`)
         : h('span', { class: 'text-warn' },
@@ -93,34 +146,9 @@ export function initFuncionWidget(container) {
           )
     );
 
-    const layoutGrid = h('div', { class: 'seq-fn-grid' },
-      tableEl,
-      h('div', { class: 'seq-plot-card' },
-        svgEl,
-        domainNotice
-      )
-    );
+    const plane = activePlane;
+    plane.clear('under', 'marks', 'labels');
 
-    mount(container,
-      controls,
-      layoutGrid
-    );
-
-    const yStep = (p.yMax - p.yMin) > 20 ? 5 : (p.yMax - p.yMin) > 10 ? 2 : 1;
-    const plane = createPlane(svgEl, {
-      width: 540,
-      height: 320,
-      xMin: 0,
-      xMax: 6,
-      yMin: p.yMin,
-      yMax: p.yMax,
-      xStep: 1,
-      yStep,
-      xLabel: 'n (índice entero ∈ ℕ)',
-      yLabel: 'a(n)',
-    });
-
-    // Curva punteada continua si está activa
     if (showSlopeLine) {
       const dPath = plane.fnPath(p.fn, 0.5, 5.5, { samples: 100 });
       plane.layers.under.append(
@@ -135,13 +163,11 @@ export function initFuncionWidget(container) {
       );
     }
 
-    // Puntos discretos aislados
     termPoints.forEach((pt) => {
       const cx = plane.sx(pt.n);
       const cy = plane.sy(pt.val);
       const isCur = Math.abs(cursorN - pt.n) < 0.1;
 
-      // Círculo del punto
       plane.layers.marks.append(
         s('circle', {
           cx,
@@ -153,7 +179,6 @@ export function initFuncionWidget(container) {
         })
       );
 
-      // Etiqueta del punto (n, a(n))
       plane.layers.labels.append(
         s('text', {
           x: cx,
@@ -167,7 +192,6 @@ export function initFuncionWidget(container) {
       );
     });
 
-    // Indicador del cursor N
     const cursorX = plane.sx(cursorN);
     plane.layers.marks.append(
       s('line', {
@@ -201,7 +225,7 @@ export function initFuncionWidget(container) {
           'font-size': '12px',
           'font-weight': 'bold',
           'text-anchor': 'middle',
-        }, '✕'),
+        }, '×'),
         s('text', {
           x: cursorX,
           y: midY - 14,
@@ -213,23 +237,7 @@ export function initFuncionWidget(container) {
         }, `n = ${fmt(cursorN, 1)} ∉ ℕ (Vacío)`)
       );
     }
-
-    // Eventos de arrastre/clic en el plano
-    bindSvgDrag(svgEl, plane, ({ x }) => {
-      const prevN = cursorN;
-      cursorN = Math.max(0.5, Math.min(5.5, Math.round(x * 10) / 10));
-      render();
-
-      const isDecimal = Math.abs(cursorN - Math.round(cursorN)) >= 0.05;
-      if (isDecimal && cursorN !== prevN) {
-        react({
-          pose: 'enojada',
-          tag: 'Dominio discreto',
-          html: `¡En ℕ no existen términos con coma! Caíste en el vacío de <span class="eq">n = ${fmt(cursorN, 1)} ∉ ℕ</span>. Las sucesiones son funciones de dominio estrictamente entero.`,
-        });
-      }
-    });
   }
 
-  render();
+  updateDynamic(true);
 }

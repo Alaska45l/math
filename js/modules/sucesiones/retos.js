@@ -265,10 +265,10 @@ const TRAMPAS_CLASICAS = [
       <table class="seq-table" style="margin: 8px 0;">
         <tr><th>Fórmula</th><th>Evaluación en n = 1</th><th>Resultado</th><th>¿Coincide con a(1)=64?</th></tr>
         <tr><td>Sucesión pedida</td><td>Poste inicial</td><td><b>64</b></td><td>—</td></tr>
-        <tr><td>Woo-Jin: 64 · (1/4)ⁿ</td><td>64 · (1/4)¹</td><td>16</td><td><span class="text-err">✗ Falsa</span></td></tr>
-        <tr><td>Kiran: 16 · (1/4)ⁿ⁻¹</td><td>16 · (1/4)⁰</td><td>16</td><td><span class="text-err">✗ Falsa</span></td></tr>
+        <tr><td>Woo-Jin: 64 · (1/4)ⁿ</td><td>64 · (1/4)¹</td><td>16</td><td><span class="text-err">× Falsa</span></td></tr>
+        <tr><td>Kiran: 16 · (1/4)ⁿ⁻¹</td><td>16 · (1/4)⁰</td><td>16</td><td><span class="text-err">× Falsa</span></td></tr>
       </table>
-      <p>Ambos obtuvieron 16 en vez de 64. La opción correcta es <strong>D) Ni Woo-Jin ni Kiran</strong>.</p>
+      <p>Ambos obtuvieron 16 en vez de 64. La opción correcta es <strong>Ni Woo-Jin ni Kiran (ninguno acertó)</strong>.</p>
     `,
   },
   {

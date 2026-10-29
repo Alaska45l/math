@@ -1,6 +1,7 @@
 # Capturas y evidencias visuales de testing
 /screenshots/
 /evidence/
+/.tmp-screens/
 
 # Scripts de prueba exploratorios, temporales y scratch
 /scratch/

@@ -146,18 +146,27 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const exprStr = formatCanonicalAbs(a, hVal, kVal);
       const wrongWithH = a > 0 ? `[${fmt(hVal)}; +∞)` : `(−∞; ${fmt(hVal)}]`;
       const wrongInverted = a > 0 ? `(−∞; ${fmt(kVal)}]` : `[${fmt(kVal)}; +∞)`;
+      const rawItems = [
+        { text: info.range.text, correct: true, diag: null },
+        { text: wrongInverted, correct: false, diag: 'wrong_reflection_sign' },
+        { text: wrongWithH, correct: false, diag: 'confused_x_and_y_in_intervals' },
+        { text: 'ℝ = (−∞; +∞)', correct: false, diag: null },
+      ];
+      for (let i = rawItems.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [rawItems[i], rawItems[j]] = [rawItems[j], rawItems[i]];
+      }
+      const optionDiagnostics = {};
+      rawItems.forEach((it, idx) => {
+        if (it.diag) optionDiagnostics[idx] = it.diag;
+      });
       return {
         id: `seed-rng-${seed}`,
         type: 'choice',
         prompt: `¿Cuál es el <strong>Conjunto Imagen (Rango)</strong> de la función <strong>f(x) = ${exprStr}</strong>?`,
-        options: [
-          info.range.text,
-          wrongInverted,
-          wrongWithH,
-          'ℝ = (−∞; +∞)',
-        ],
-        expected: 0,
-        optionDiagnostics: { 1: 'wrong_reflection_sign', 2: 'confused_x_and_y_in_intervals' },
+        options: rawItems.map((it) => it.text),
+        expected: rawItems.findIndex((it) => it.correct),
+        optionDiagnostics,
         explanation: `¡Exacto! Como a = ${fmt(a)} ${a > 0 ? '> 0 (abre hacia arriba)' : '< 0 (abre hacia abajo)'} y el vértice tiene altura k = ${fmt(kVal)}, la imagen es ${info.range.text}.`,
         hints: [
           `Miramos la coordenada Y del vértice (k = ${fmt(kVal)}) y el signo de a = ${fmt(a)}.`,
@@ -191,22 +200,27 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const y1 = randInt(1, 3);
       const y2 = y1 + 2;
       const y3 = y2 + 2;
+      const rawItems = [
+        { text: `El conjunto discreto {${y1}; ${y2}; ${y3}}`, correct: true },
+        { text: `El intervalo continuo [${y1}; ${y3}]`, correct: false },
+        { text: 'El intervalo continuo [0; 6]', correct: false },
+        { text: `El intervalo (${y1}; ${y3})`, correct: false },
+      ];
+      for (let i = rawItems.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [rawItems[i], rawItems[j]] = [rawItems[j], rawItems[i]];
+      }
       return {
         id: `seed-step-${seed}`,
         type: 'choice',
         prompt: `Una función escalonada de paso vale <strong>${y1}</strong> para <code>0 ≤ x &lt; 2</code>, vale <strong>${y2}</strong> para <code>2 ≤ x &lt; 4</code> y vale <strong>${y3}</strong> para <code>4 ≤ x ≤ 6</code>. ¿Cuál es su <strong>Rango (Imagen)</strong>?`,
-        options: [
-          `El conjunto discreto {${y1}; ${y2}; ${y3}}`,
-          `El intervalo continuo [${y1}; ${y3}]`,
-          'El intervalo continuo [0; 6]',
-          `El intervalo (${y1}; ${y3})`,
-        ],
-        expected: 0,
+        options: rawItems.map((it) => it.text),
+        expected: rawItems.findIndex((it) => it.correct),
         explanation: `¡Impecable! Como la función solo toma esos tres valores constantes aislados, su imagen es el conjunto discreto {${y1}; ${y2}; ${y3}}.`,
         hints: [
           'Proyectá los tres escalones horizontales contra el eje Y: ¿cubren todos los decimales intermedios o solo tres puntos?',
         ],
-        solution: `El rango es el conjunto discreto entre llaves <strong>{${y1}; ${y2}; ${y3}}</strong> ( mientras que [0; 6] es su dominio).`,
+        solution: `El rango es el conjunto discreto entre llaves <strong>{${y1}; ${y2}; ${y3}}</strong> (mientras que [0; 6] es su dominio).`,
       };
     }
 
@@ -243,12 +257,12 @@ export const TRAMPAS_EXAMEN = [
     desc: 'En un parcial piden marcar el vértice de <code>f(x) = |x + 3| − 2</code>. Un alumno recuerda «adentro es X y afuera es Y» y marca el vértice en <strong>(3; −2)</strong>.',
     question: '¿Por qué (3; −2) es falso y cuál es el razonamiento geométrico correcto?',
     options: [
-      'Porque el vértice ocurre donde la distancia dentro de las barras se hace CERO: x + 3 = 0 ⟹ x = −3, dando (−3; −2).',
       'Porque en valor absoluto ambas coordenadas siempre deben ser positivas: (3; 2).',
+      'Porque el vértice ocurre donde la distancia dentro de las barras se hace CERO: x + 3 = 0 ⟹ x = −3, dando (−3; −2).',
       'Porque el −2 está adentro de las barras y el +3 afuera.',
     ],
-    expected: 0,
-    optionDiagnostics: { 1: 'inverted_h_sign', 2: 'swapped_h_k' },
+    expected: 1,
+    optionDiagnostics: { 0: 'inverted_h_sign', 2: 'swapped_h_k' },
     explanation: '¡Exacto! En x = 3 tendrías |3 + 3| − 2 = 4 (no estás en el pico). El pico ocurre en distancia cero: x + 3 = 0 ⟹ x = −3, donde f(−3) = |0| − 2 = −2.',
     hints: [
       'Evaluá f(3) y f(−3) para ver en cuál de los dos las barras valen 0.',
@@ -261,11 +275,11 @@ export const TRAMPAS_EXAMEN = [
     desc: 'Al ver la definición por partes <code>|x| = −x si x &lt; 0</code>, un estudiante protesta: <em>«¡Esa fórmula está mal escrita! El valor absoluto es una distancia y nunca puede dar un resultado negativo como −x»</em>.',
     question: '¿Dónde está el error conceptual del estudiante?',
     options: [
-      'En creer que la expresión «−x» es negativa: como x ya es negativo (x < 0), el signo menos delante actúa como inversor y hace que −x sea positivo (ej. si x = −4, −x = −(−4) = +4).',
       'En que el valor absoluto sí puede dar números negativos cuando graficamos en el tercer cuadrante.',
       'En que para x < 0 el valor absoluto no existe.',
+      'En creer que la expresión «−x» es negativa: como x ya es negativo (x < 0), el signo menos delante actúa como inversor y hace que −x sea positivo (ej. si x = −4, −x = −(−4) = +4).',
     ],
-    expected: 0,
+    expected: 2,
     explanation: '¡Brillante! Cuando x = −4, la letra x guarda un número negativo adentro. Ponerle un menos adelante (−x) invierte su signo: −(−4) = +4 > 0.',
     hints: [
       'Reemplazá x = −4 en la expresión −x con paréntesis.',
@@ -283,11 +297,11 @@ export const TRAMPAS_EXAMEN = [
       'Porque en x = 2 ambos tramos dan el mismo valor y se superponen.',
     ],
     expected: 0,
-    explanation: '¡Impecable! En x = 2 el primer renglón da 2(2)+1 = 5 (•) y el segundo da 2−1 = 1 (•). Una misma entrada x = 2 tendría dos salidas distintas, violando la definición de función.',
+    explanation: '¡Impecable! En x = 2 el primer renglón da 2(2)+1 = 5 (<span class="va-dot va-dot--closed" title="Punto cerrado"></span>) y el segundo da 2−1 = 1 (<span class="va-dot va-dot--closed" title="Punto cerrado"></span>). Una misma entrada x = 2 tendría dos salidas distintas, violando la definición de función.',
     hints: [
       'Evaluá el primer renglón en x = 2 y el segundo renglón en x = 2.',
     ],
-    solution: 'Para que sea función, en <code>x = 2</code> solo uno de los dos tramos puede incluir la igualdad (por ejemplo, <code>x &lt; 2</code> con <code>◦</code> arriba y <code>x ≥ 2</code> con <code>•</code> abajo).',
+    solution: 'Para que sea función, en <code>x = 2</code> solo uno de los dos tramos puede incluir la igualdad (por ejemplo, <code>x &lt; 2</code> con círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span> arriba y <code>x ≥ 2</code> con punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span> abajo).',
   },
   {
     id: 'trampa-abs-4',
@@ -295,11 +309,11 @@ export const TRAMPAS_EXAMEN = [
     desc: 'Una función escalonada tiene tres escalones horizontales a las alturas <strong>y = 1</strong>, <strong>y = 3</strong> e <strong>y = 5</strong> sobre el dominio <code>[0; 6]</code>.',
     question: '¿Cuál es el conjunto Imagen (Rango) correcto?',
     options: [
-      'El conjunto discreto de tres elementos {1; 3; 5} escrito entre llaves.',
       'El intervalo continuo [1; 5] escrito entre corchetes.',
+      'El conjunto discreto de tres elementos {1; 3; 5} escrito entre llaves.',
       'El intervalo continuo [0; 6].',
     ],
-    expected: 0,
+    expected: 1,
     explanation: '¡Exacto! El intervalo [1; 5] incluiría infinitos valores como 2 o 4,3 que la función jamás alcanza. La imagen son exclusivamente los tres números {1; 3; 5}.',
     hints: [
       '¿Existe algún x para el cual la función valga 2 o 3,5?',
@@ -312,11 +326,11 @@ export const TRAMPAS_EXAMEN = [
     desc: 'Para resolver la ecuación cuadrática <code>(x − 3)² = 4</code>, un alumno aplica raíz cuadrada en ambos miembros, tacha la raíz con el cuadrado escribiendo <code>x − 3 = 2</code> y entrega como única respuesta <code>x = 5</code>.',
     question: '¿Qué error cometió al simplificar y qué solución perdió en el camino?',
     options: [
-      'Olvidó que √((x − 3)²) = |x − 3| = 2, lo que abre dos ramas: x − 3 = 2 (x = 5) y x − 3 = −2 (perdió la segunda solución x = 1).',
       'Debería haber sumado 3 antes de sacar la raíz cuadrada.',
       'La ecuación (x − 3)² = 4 no tiene ninguna solución real.',
+      'Olvidó que √((x − 3)²) = |x − 3| = 2, lo que abre dos ramas: x − 3 = 2 (x = 5) y x − 3 = −2 (perdió la segunda solución x = 1).',
     ],
-    expected: 0,
+    expected: 2,
     explanation: '¡Nivel universitario desbloqueado! Como √(u²) = |u|, queda |x − 3| = 2, es decir, los puntos a distancia 2 del 3: x = 5 y x = 1. En efecto, (1 − 3)² = (−2)² = 4.',
     hints: [
       'Probá reemplazar x = 1 en (x − 3)² = 4 y fijate cuánto da (−2)².',
@@ -369,13 +383,181 @@ function createBossDeflector(root) {
   let clearedRounds = [false, false, false];
   let feedback = null;
 
-  function renderBoss() {
+  const roundSelector = h('div', { class: 'seq-controls' });
+  const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.4; min-width: 280px;' });
+
+  const titleEl = h('h3', { class: 'seq-sidebar__chapter-title' });
+  const descEl = h('p', { class: 'small' });
+  const readoutEl = h('p', { class: 'eq', style: 'font-size: 1.3rem; color: var(--yellow); margin: 6px 0;' });
+
+  const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, '0');
+  const valK = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, '0');
+  const valA = h('strong', { class: 'eq', style: 'color: var(--pink);' }, '1');
+
+  const sliderH = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: userShield.h,
+    'aria-label': 'Vértice h del escudo',
+  });
+  const sliderK = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: userShield.k,
+    'aria-label': 'Vértice k del escudo',
+  });
+  const sliderA = h('input', {
+    type: 'range',
+    min: -3,
+    max: 3,
+    step: 0.5,
+    value: userShield.a,
+    'aria-label': 'Apertura a del escudo',
+  });
+
+  const actionRow = h('div', { class: 'seq-controls' });
+  const feedbackSlot = h('div');
+  const victorySlot = h('div');
+
+  const board = createAbsBoard(boardSlot, {
+    a: userShield.a,
+    h: userShield.h,
+    k: userShield.k,
+    xMin: -6,
+    xMax: 6,
+    yMin: -6,
+    yMax: 6,
+    snapStep: 0.5,
+    draggableVertex: true,
+    draggableSlope: true,
+    customUnderRender(plane) {
+      const rData = BOSS_ROUNDS[roundIdx];
+      const isRoundCleared = clearedRounds[roundIdx];
+      rData.receptors.forEach((rec) => {
+        const rx = plane.sx(rec.x);
+        const ry = plane.sy(rec.y);
+        const beamStartY = rData.target.a > 0 ? plane.sy(6) : plane.sy(-6);
+
+        plane.layers.under.append(
+          s('line', {
+            x1: rx,
+            y1: beamStartY,
+            x2: rx,
+            y2: ry,
+            stroke: isRoundCleared ? 'var(--green)' : 'var(--pink)',
+            'stroke-width': '2.2',
+            'stroke-dasharray': '5 4',
+          }),
+          s('circle', {
+            cx: rx,
+            cy: ry,
+            r: 9,
+            fill: 'none',
+            stroke: isRoundCleared ? 'var(--green)' : 'var(--yellow)',
+            'stroke-width': '2.6',
+          }),
+          s('circle', {
+            cx: rx,
+            cy: ry,
+            r: 3.5,
+            fill: isRoundCleared ? 'var(--green)' : 'var(--yellow)',
+          }),
+          s('text', {
+            x: rx,
+            y: ry - 14,
+            'text-anchor': 'middle',
+            fill: 'var(--yellow)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 14px)',
+            'font-weight': 'bold',
+          }, `Receptor (${fmt(rec.x)}; ${fmt(rec.y)})`)
+        );
+      });
+    },
+    onChange(next) {
+      userShield = { a: next.a, h: next.h, k: next.k };
+      sliderH.value = String(userShield.h);
+      sliderK.value = String(userShield.k);
+      sliderA.value = String(userShield.a);
+      syncReadout();
+    },
+  });
+
+  function syncReadout() {
+    valH.textContent = fmt(userShield.h);
+    valK.textContent = fmt(userShield.k);
+    valA.textContent = fmt(userShield.a);
+    readoutEl.textContent = `Escudo actual: f(x) = ${formatCanonicalAbs(userShield.a, userShield.h, userShield.k)}`;
+  }
+
+  sliderH.addEventListener('input', (e) => {
+    userShield.h = parseFloat(e.target.value);
+    syncReadout();
+    board.update({ h: userShield.h });
+  });
+  sliderK.addEventListener('input', (e) => {
+    userShield.k = parseFloat(e.target.value);
+    syncReadout();
+    board.update({ k: userShield.k });
+  });
+  sliderA.addEventListener('input', (e) => {
+    let v = parseFloat(e.target.value);
+    if (approxEq(v, 0)) v = userShield.a >= 0 ? -0.5 : 0.5;
+    userShield.a = v;
+    sliderA.value = String(v);
+    syncReadout();
+    board.update({ a: userShield.a });
+  });
+
+  const fireCheck = () => {
+    const rData = BOSS_ROUNDS[roundIdx];
+    const t = rData.target;
+    const ok =
+      approxEq(userShield.a, t.a) &&
+      approxEq(userShield.h, t.h) &&
+      approxEq(userShield.k, t.k);
+
+    if (ok) {
+      clearedRounds[roundIdx] = true;
+      playSuccess('section');
+      feedback = {
+        ok: true,
+        msg: `¡Ataque desviado con éxito! El escudo f(x) = ${formatCanonicalAbs(t.a, t.h, t.k)} interceptó ambos receptores.`,
+      };
+      react({
+        pose: 'feliz',
+        tag: `¡Ronda ${rData.round} superada!`,
+        html: roundIdx < 2
+          ? '¡Tremendo reflejo! Clavaste el vértice y la pendiente justa para desviar los dos haces láser. ¡Pasá a la siguiente ronda!'
+          : '¡VICTORIA TOTAL! Dominaste las 3 rondas del Escudo Deflector V. Ya estás blindada para cualquier parcial de Exactas.',
+      });
+    } else {
+      playError(1);
+      feedback = {
+        ok: false,
+        msg: `El escudo todavía no alinea con el objetivo. Pista: buscá vértice (${fmt(t.h)}; ${fmt(t.k)}) y apertura a = ${fmt(t.a)}.`,
+      };
+      react({
+        pose: 'enojada',
+        tag: '¡Escudo desalineado!',
+        html: `¡Cuidado que pasa el láser! Ajustá el nodo amarillo en <span class="eq">(${fmt(t.h)}; ${fmt(t.k)})</span> y el nodo azul de apertura en <span class="eq">a = ${fmt(t.a)}</span>.`,
+      });
+    }
+    updateBossUI();
+  };
+
+  function updateBossUI() {
     const rData = BOSS_ROUNDS[roundIdx];
     const isRoundCleared = clearedRounds[roundIdx];
     const allCleared = clearedRounds.every(Boolean);
 
-    const roundSelector = h('div', { class: 'seq-controls' },
-      BOSS_ROUNDS.map((r, idx) =>
+    mount(
+      roundSelector,
+      ...BOSS_ROUNDS.map((r, idx) =>
         h('button', {
           type: 'button',
           class: ['chip', idx === roundIdx ? 'is-active' : ''],
@@ -383,145 +565,55 @@ function createBossDeflector(root) {
             click: () => {
               roundIdx = idx;
               feedback = null;
-              renderBoss();
+              updateBossUI();
             },
           },
-        }, `${clearedRounds[idx] ? '✓ ' : ''}Ronda ${r.round}`)
+        },
+          clearedRounds[idx] ? chalkIcon('check', { width: 14, height: 14 }) : null,
+          `Ronda ${r.round}`
+        )
       )
     );
 
-    const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.4; min-width: 280px;' });
+    titleEl.textContent = rData.title;
+    descEl.textContent = rData.desc;
+    syncReadout();
+    board.update({ a: userShield.a, h: userShield.h, k: userShield.k });
 
-    createAbsBoard(boardSlot, {
-      a: userShield.a,
-      h: userShield.h,
-      k: userShield.k,
-      xMin: -6,
-      xMax: 6,
-      yMin: -6,
-      yMax: 6,
-      snapStep: 0.5,
-      draggableVertex: true,
-      draggableSlope: true,
-      customUnderRender(plane) {
-        // Dibujar los dos nodos receptores y los haces entrantes
-        rData.receptors.forEach((rec) => {
-          const rx = plane.sx(rec.x);
-          const ry = plane.sy(rec.y);
-          const beamStartY = rData.target.a > 0 ? plane.sy(6) : plane.sy(-6);
-
-          plane.layers.under.append(
-            s('line', {
-              x1: rx,
-              y1: beamStartY,
-              x2: rx,
-              y2: ry,
-              stroke: isRoundCleared ? 'var(--green)' : 'var(--pink)',
-              'stroke-width': '2.2',
-              'stroke-dasharray': '5 4',
-            }),
-            s('circle', {
-              cx: rx,
-              cy: ry,
-              r: 9,
-              fill: 'none',
-              stroke: isRoundCleared ? 'var(--green)' : 'var(--yellow)',
-              'stroke-width': '2.6',
-            }),
-            s('circle', {
-              cx: rx,
-              cy: ry,
-              r: 3.5,
-              fill: isRoundCleared ? 'var(--green)' : 'var(--yellow)',
-            }),
-            s('text', {
-              x: rx,
-              y: ry - 14,
-              'text-anchor': 'middle',
-              fill: 'var(--yellow)',
-              'font-family': 'var(--font-hand)',
-              'font-size': 'var(--svg-scale-caveat, 14px)',
-              'font-weight': 'bold',
-            }, `Receptor (${fmt(rec.x)}; ${fmt(rec.y)})`)
-          );
-        });
-      },
-      onChange(next) {
-        userShield = { a: next.a, h: next.h, k: next.k };
-        readoutEl.textContent = `Escudo actual: f(x) = ${formatCanonicalAbs(userShield.a, userShield.h, userShield.k)}`;
-      },
-    });
-
-    const readoutEl = h('p', { class: 'eq', style: 'font-size: 1.3rem; color: var(--yellow); margin: 6px 0;' },
-      `Escudo actual: f(x) = ${formatCanonicalAbs(userShield.a, userShield.h, userShield.k)}`
+    mount(
+      actionRow,
+      h('button', {
+        type: 'button',
+        class: 'btn btn--check',
+        on: { click: fireCheck },
+      }, chalkIcon('shield'), ' Activar Escudo Deflector'),
+      roundIdx < BOSS_ROUNDS.length - 1 && isRoundCleared
+        ? h('button', {
+            type: 'button',
+            class: 'btn',
+            on: {
+              click: () => {
+                roundIdx++;
+                feedback = null;
+                updateBossUI();
+              },
+            },
+          }, 'Siguiente Ronda →')
+        : null
     );
 
-    const fireCheck = () => {
-      const t = rData.target;
-      const ok =
-        approxEq(userShield.a, t.a) &&
-        approxEq(userShield.h, t.h) &&
-        approxEq(userShield.k, t.k);
-
-      if (ok) {
-        clearedRounds[roundIdx] = true;
-        playSuccess('section');
-        feedback = {
-          ok: true,
-          msg: `¡Ataque desviado con éxito! El escudo f(x) = ${formatCanonicalAbs(t.a, t.h, t.k)} interceptó ambos receptores.`,
-        };
-        react({
-          pose: 'feliz',
-          tag: `¡Ronda ${rData.round} superada!`,
-          html: roundIdx < 2
-            ? '¡Tremendo reflejo! Clavaste el vértice y la pendiente justa para desviar los dos haces láser. ¡Pasá a la siguiente ronda!'
-            : '¡VICTORIA TOTAL! Dominaste las 3 rondas del Escudo Deflector V. Ya estás blindada para cualquier parcial de Exactas.',
-        });
-      } else {
-        playError(1);
-        feedback = {
-          ok: false,
-          msg: `El escudo todavía no alinea con el objetivo. Pista: buscá vértice (${fmt(t.h)}; ${fmt(t.k)}) y apertura a = ${fmt(t.a)}.`,
-        };
-        react({
-          pose: 'enojada',
-          tag: '¡Escudo desalineado!',
-          html: `¡Cuidado que pasa el láser! Ajustá el nodo amarillo en <span class="eq">(${fmt(t.h)}; ${fmt(t.k)})</span> y el nodo azul de apertura en <span class="eq">a = ${fmt(t.a)}</span>.`,
-        });
-      }
-      renderBoss();
-    };
-
-    const missionCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 260px;' },
-      h('h3', { class: 'seq-sidebar__chapter-title' }, rData.title),
-      h('p', { class: 'small' }, rData.desc),
-      readoutEl,
-      h('div', { class: 'seq-controls' },
-        h('button', {
-          type: 'button',
-          class: 'btn btn--check',
-          on: { click: fireCheck },
-        }, '⚡ Activar Escudo Deflector'),
-        roundIdx < BOSS_ROUNDS.length - 1 && isRoundCleared
-          ? h('button', {
-              type: 'button',
-              class: 'btn',
-              on: {
-                click: () => {
-                  roundIdx++;
-                  feedback = null;
-                  renderBoss();
-                },
-              },
-            }, 'Siguiente Ronda →')
-          : null
-      ),
+    mount(
+      feedbackSlot,
       feedback
         ? h('div', { class: ['notice', feedback.ok ? 'notice--ok' : 'notice--err'], style: 'margin-top: 8px;' },
             feedback.ok ? chalkIcon('check') : chalkIcon('cross'),
             h('span', null, feedback.msg)
           )
-        : null,
+        : null
+    );
+
+    mount(
+      victorySlot,
       allCleared
         ? h('div', { class: 'notice notice--ok', style: 'margin-top: 10px;' },
             chalkIcon('check'),
@@ -529,15 +621,31 @@ function createBossDeflector(root) {
           )
         : null
     );
-
-    mount(
-      root,
-      roundSelector,
-      h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, missionCard)
-    );
   }
 
-  renderBoss();
+  const slidersBox = h('div', { style: 'display: grid; gap: 8px; margin: 10px 0;' },
+    h('label', { class: 'field__label' }, 'Vértice h = ', valH, sliderH),
+    h('label', { class: 'field__label' }, 'Vértice k = ', valK, sliderK),
+    h('label', { class: 'field__label' }, 'Apertura a = ', valA, sliderA)
+  );
+
+  const missionCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 260px;' },
+    titleEl,
+    descEl,
+    readoutEl,
+    slidersBox,
+    actionRow,
+    feedbackSlot,
+    victorySlot
+  );
+
+  mount(
+    root,
+    roundSelector,
+    h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, missionCard)
+  );
+
+  updateBossUI();
 }
 
 export function initRetosAbsModule(container) {

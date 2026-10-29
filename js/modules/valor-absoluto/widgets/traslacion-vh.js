@@ -1,143 +1,270 @@
 /**
- * widgets/traslacion-vh.js — Widget interactivo para la Sección 3:
- * Desplazar la «V» sin recetas mágicas (f(x) = |x - h| + k) con el Buscador de Distancia Cero
- * y todos los ejemplos de Khan Academy como presets vivos.
+ * traslacion-vh.js — Widget 3 (Sección 3):
+ * «Desplazamiento del Vértice (h, k) en Vivo» para f(x) = |x - h| + k.
+ * Incluye referencia fantasma y = |x|, vectores de traslación con flechas (Δx = h, Δy = k),
+ * y medidor interactivo de distancia cero «¿Por qué h lleva el signo contrario adentro?».
  */
 
-import { h, mount } from '../../../core/dom.js';
-import { fmt, paren, MINUS } from '../../../core/math-format.js';
-import { createAbsBoard } from '../components.js';
+import { h, s, mount } from '../../../core/dom.js';
+import { fmt } from '../../../core/math-format.js';
+import { createAbsBoard, annotatedAbsFormula } from '../components.js';
 import { formatCanonicalAbs } from '../logic.js';
 
-const KHAN_PRESETS = [
-  { label: 'Base: y = |x|', h: 0, k: 0 },
-  { label: 'Khan 1: y = |x + 3| − 2', h: -3, k: -2 },
-  { label: 'Khan 2: f(x) = |x − 1| + 5', h: 1, k: 5 },
-  { label: 'Khan 3: y = |x + 4|', h: -4, k: 0 },
-];
-
 export function initTraslacionVHWidget(container) {
-  let hVal = -3;
-  let kVal = -2;
+  let state = {
+    h: 3,
+    k: -2,
+    testX: 3,
+  };
 
-  function render() {
-    const insideRaw = hVal === 0
-      ? 'x'
-      : hVal > 0
-      ? `x ${MINUS} ${fmt(hVal)}`
-      : `x + ${fmt(Math.abs(hVal))}`;
+  const boardSlot = h('div', { class: 'seq-plot-card' });
+  const formulaSlot = h('div', { style: 'margin-top: 8px;' });
+  const trapCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
 
-    const presetBar = h('div', { class: 'seq-controls' },
-      KHAN_PRESETS.map((p) =>
-        h('button', {
-          type: 'button',
-          class: ['chip', p.h === hVal && p.k === kVal ? 'is-active' : ''],
-          on: {
-            click: () => {
-              hVal = p.h;
-              kVal = p.k;
-              render();
-            },
-          },
-        }, p.label)
-      )
-    );
+  const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
+  const valK = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, fmt(state.k));
 
-    const slidersRow = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label' },
-        `Desplazamiento horizontal h (${fmt(hVal)}): `,
-        h('input', {
-          type: 'range',
-          min: '-6',
-          max: '6',
-          step: '1',
-          value: String(hVal),
-          on: {
-            input: (e) => {
-              hVal = parseFloat(e.target.value) || 0;
-              render();
-            },
-          },
-        })
-      ),
-      h('label', { class: 'field__label' },
-        `Desplazamiento vertical k (${fmt(kVal)}): `,
-        h('input', {
-          type: 'range',
-          min: '-6',
-          max: '6',
-          step: '1',
-          value: String(kVal),
-          on: {
-            input: (e) => {
-              kVal = parseFloat(e.target.value) || 0;
-              render();
-            },
-          },
-        })
-      )
-    );
+  const sliderH = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: state.h,
+    'aria-label': 'Coordenada horizontal h del vértice',
+  });
 
-    const boardSlot = h('div', { class: 'seq-plot-card', style: 'flex: 1.4; min-width: 280px;' });
-    createAbsBoard(boardSlot, {
-      a: 1,
-      h: hVal,
-      k: kVal,
-      xMin: -7,
-      xMax: 7,
-      yMin: -7,
-      yMax: 7,
-      snapStep: 1,
-      draggableVertex: true,
-      referenceCurve: { a: 1, h: 0, k: 0 },
-      onChange(next) {
-        hVal = next.h;
-        kVal = next.k;
-        render();
+  const sliderK = h('input', {
+    type: 'range',
+    min: -5,
+    max: 5,
+    step: 0.5,
+    value: state.k,
+    'aria-label': 'Coordenada vertical k del vértice',
+  });
+
+  const btnReset = h('button', {
+    type: 'button',
+    class: 'chip',
+    on: {
+      click: () => {
+        state.h = 0;
+        state.k = 0;
+        state.testX = 0;
+        sliderH.value = '0';
+        sliderK.value = '0';
+        syncUI(true);
       },
-    });
+    },
+  }, 'Centrar en el origen (0; 0)');
 
-    // Tarjeta «Buscador de Distancia Cero»
-    const zeroFinderCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 250px;' },
-      h('h3', { class: 'seq-sidebar__chapter-title' }, 'Buscador de Distancia Cero'),
-      h('p', { class: 'eq', style: 'font-size: 1.4rem; margin: 6px 0; color: var(--yellow);' },
-        `f(x) = ${formatCanonicalAbs(1, hVal, kVal)}`
-      ),
-      h('p', { class: 'small' },
-        h('strong', null, '1.º ¿Por qué el signo adentro de las barras parece al revés?'),
-        h('br'),
-        `Porque escribimos |x ${MINUS} h| = |x ${MINUS} ${paren(hVal)}| = `,
-        h('strong', { class: 'eq' }, `|${insideRaw}|`),
-        '.'
-      ),
-      h('p', { class: 'small' },
-        h('strong', null, '2.º ¿Qué valor de x anula la distancia dentro de las barras?'),
-        h('br'),
-        h('span', { class: 'eq', style: 'color: var(--green); font-size: 1.15rem;' },
-          `${insideRaw} = 0  ⟺  x = ${fmt(hVal)}`
-        )
-      ),
-      h('p', { class: 'small' },
-        h('strong', null, '3.º ¿Cuánto vale la altura f(x) en ese instante?'),
-        h('br'),
-        h('span', { class: 'eq', style: 'color: var(--yellow); font-size: 1.15rem;' },
-          `f(${fmt(hVal)}) = |0| ${kVal >= 0 ? `+ ${fmt(kVal)}` : `${MINUS} ${fmt(Math.abs(kVal))}`} = ${fmt(kVal)}`
-        )
-      ),
-      h('div', { class: 'notice notice--ok', style: 'margin-top: 10px;' },
-        h('span', { class: 'small' },
-          `Vértice clavado en V(${fmt(hVal)}; ${fmt(kVal)}) · Eje de simetría: x = ${fmt(hVal)}`
-        )
-      )
-    );
+  const annotatedApi = annotatedAbsFormula(formulaSlot, {
+    fnName: 'f',
+    a: 1,
+    h: state.h,
+    k: state.k,
+  });
+
+  const board = createAbsBoard(boardSlot, {
+    a: 1,
+    h: state.h,
+    k: state.k,
+    xMin: -7,
+    xMax: 7,
+    yMin: -6,
+    yMax: 6,
+    snapStep: 0.5,
+    draggableVertex: true,
+    draggableSlope: false,
+    showSymmetryAxis: true,
+    showReflectionGhost: false,
+    showSlopeTriangle: false,
+    customUnderRender(plane, props) {
+      // Referencia fantasma: función madre y = |x| en el origen
+      const ox = plane.sx(0);
+      const oy = plane.sy(0);
+      plane.layers.under.append(
+        s('polyline', {
+          points: `${plane.sx(-6)},${plane.sy(6)} ${ox},${oy} ${plane.sx(6)},${plane.sy(6)}`,
+          fill: 'none',
+          stroke: 'var(--chalk-dim)',
+          'stroke-width': '1.8',
+          'stroke-dasharray': '4 4',
+        }),
+        s('circle', {
+          cx: ox,
+          cy: oy,
+          r: 4.5,
+          fill: 'var(--chalk-dim)',
+        }),
+        s('text', {
+          x: plane.sx(-4.3),
+          y: plane.sy(4.8),
+          fill: 'var(--muted)',
+          'font-family': 'var(--font-hand)',
+          'font-size': 'var(--svg-scale-caveat, 13px)',
+        }, 'Madre y = |x|')
+      );
+
+      // Vectores de traslación: horizontal Δx = h y vertical Δy = k con flechas
+      const vx = plane.sx(props.h);
+      const vy = plane.sy(props.k);
+
+      if (props.h !== 0) {
+        const dirX = props.h > 0 ? 1 : -1;
+        plane.layers.under.append(
+          s('line', {
+            x1: ox,
+            y1: oy,
+            x2: vx,
+            y2: oy,
+            stroke: 'var(--teal)',
+            'stroke-width': '2.6',
+          }),
+          s('polygon', {
+            points: `${vx},${oy} ${vx - dirX * 8},${oy - 4.5} ${vx - dirX * 8},${oy + 4.5}`,
+            fill: 'var(--teal)',
+          }),
+          s('text', {
+            x: (ox + vx) / 2,
+            y: oy + (props.k >= 0 ? 19 : -9),
+            'text-anchor': 'middle',
+            fill: 'var(--teal)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 15px)',
+            'font-weight': 'bold',
+          }, `Δx = h = ${props.h > 0 ? `+${fmt(props.h)}` : fmt(props.h)}`)
+        );
+      }
+
+      if (props.k !== 0) {
+        const dirY = props.k > 0 ? -1 : 1; // en SVG arriba es -1
+        plane.layers.under.append(
+          s('line', {
+            x1: vx,
+            y1: oy,
+            x2: vx,
+            y2: vy,
+            stroke: 'var(--yellow)',
+            'stroke-width': '2.6',
+          }),
+          s('polygon', {
+            points: `${vx},${vy} ${vx - 4.5},${vy - dirY * 8} ${vx + 4.5},${vy - dirY * 8}`,
+            fill: 'var(--yellow)',
+          }),
+          s('text', {
+            x: vx + (props.h >= 0 ? 12 : -12),
+            y: (oy + vy) / 2 + 4,
+            'text-anchor': props.h >= 0 ? 'start' : 'end',
+            fill: 'var(--yellow)',
+            'font-family': 'var(--font-hand)',
+            'font-size': 'var(--svg-scale-caveat, 15px)',
+            'font-weight': 'bold',
+          }, `Δy = k = ${props.k > 0 ? `+${fmt(props.k)}` : fmt(props.k)}`)
+        );
+      }
+    },
+    onChange(next) {
+      state.h = next.h;
+      state.k = next.k;
+      state.testX = next.h;
+      sliderH.value = String(state.h);
+      sliderK.value = String(state.k);
+      syncUI(false);
+    },
+  });
+
+  sliderH.addEventListener('input', (e) => {
+    state.h = parseFloat(e.target.value);
+    state.testX = state.h;
+    syncUI(true);
+  });
+
+  sliderK.addEventListener('input', (e) => {
+    state.k = parseFloat(e.target.value);
+    syncUI(true);
+  });
+
+  function syncUI(updateBoard = true) {
+    valH.textContent = fmt(state.h);
+    valK.textContent = fmt(state.k);
+
+    if (updateBoard) {
+      board.update({ h: state.h, k: state.k });
+    }
+    annotatedApi.update({ a: 1, h: state.h, k: state.k });
+
+    const hInside = state.h === 0
+      ? '|x|'
+      : state.h > 0
+        ? `|x − ${fmt(state.h)}|`
+        : `|x + ${fmt(Math.abs(state.h))}|`;
+
+    const wrongX = -state.h;
+    const distAtVertex = 0;
+    const distAtWrong = Math.abs(wrongX - state.h);
 
     mount(
-      container,
-      presetBar,
-      slidersRow,
-      h('div', { class: 'seq-controls', style: 'align-items: stretch;' }, boardSlot, zeroFinderCard)
+      trapCard,
+      h('p', { class: 'eq', style: 'margin: 0 0 6px; font-size: 1.12rem;' },
+        'Fórmula actual: ',
+        h('strong', { style: 'color: var(--yellow);' }, `f(x) = ${formatCanonicalAbs(1, state.h, state.k)}`),
+        '  ·  Vértice en ',
+        h('strong', { style: 'color: var(--teal);' }, `V(${fmt(state.h)}; ${fmt(state.k)})`)
+      ),
+      h('div', {
+        style: 'margin-top: 8px; padding: 10px 12px; background: rgba(255,255,255,0.03); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0;',
+      },
+        h('strong', { style: 'color: var(--teal); display: block; margin-bottom: 4px;' },
+          `¿Por qué h = ${fmt(state.h)} lleva el signo contrario adentro de ${hInside}? (Medidor de Distancia Cero)`
+        ),
+        state.h === 0
+          ? h('p', { class: 'small', style: 'margin: 0;' },
+              'En el origen (h = 0), el interior |x − 0| = |x| se hace cero exactamente en x = 0. Mové h hacia la derecha o izquierda para ver cómo actúa el punto de distancia cero.'
+            )
+          : h('div', { style: 'display: grid; gap: 4px;' },
+              h('p', { class: 'small', style: 'margin: 0;' },
+                '• Si evaluamos en ',
+                h('strong', { class: 'eq', style: 'color: var(--green);' }, `x = ${fmt(state.h)}`),
+                `: la distancia interna es `,
+                h('strong', { class: 'eq', style: 'color: var(--green);' },
+                  `|${fmt(state.h)} ${state.h > 0 ? `− ${fmt(state.h)}` : `+ ${fmt(Math.abs(state.h))}`}| = |${fmt(distAtVertex)}| = 0`
+                ),
+                ` ⟹ ¡Vértice alcanzado! Altura f(${fmt(state.h)}) = 0 + (${fmt(state.k)}) = ${fmt(state.k)}.`
+              ),
+              h('p', { class: 'small muted', style: 'margin: 0;' },
+                '• Si cayeras en la trampa de signo y probaras ',
+                h('strong', { class: 'eq', style: 'color: var(--pink);' }, `x = ${fmt(wrongX)}`),
+                `: adentro daría `,
+                h('strong', { class: 'eq', style: 'color: var(--pink);' },
+                  `|${fmt(wrongX)} ${state.h > 0 ? `− ${fmt(state.h)}` : `+ ${fmt(Math.abs(state.h))}`}| = ${fmt(distAtWrong)} ≠ 0`
+                ),
+                ' (estás a ',
+                `${fmt(distAtWrong)} pasos del vértice, no en la punta).`
+              )
+            )
+      )
     );
   }
 
-  render();
+  mount(
+    container,
+    h('div', { class: 'seq-controls' },
+      h('label', { class: 'field__label' },
+        'Traslación horizontal h = ',
+        valH,
+        sliderH
+      ),
+      h('label', { class: 'field__label' },
+        'Traslación vertical k = ',
+        valK,
+        sliderK
+      ),
+      btnReset
+    ),
+    boardSlot,
+    formulaSlot,
+    trapCard
+  );
+
+  syncUI(false);
 }

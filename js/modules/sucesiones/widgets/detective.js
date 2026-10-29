@@ -4,7 +4,7 @@
  * Analiza simultáneamente dos filas: diferencias consecutivas y cocientes consecutivos.
  */
 
-import { h, mount } from '../../../core/dom.js';
+import { h, mount, chalkIcon } from '../../../core/dom.js';
 import { fmt, fractionHtml } from '../../../core/math-format.js';
 import { createRibbon } from '../components.js';
 import { classify } from '../logic.js';
@@ -44,61 +44,67 @@ export function initDetectiveWidget(container) {
   let customTerms = null;
   let customInputRaw = '';
 
-  function render() {
+  const presetButtonsSlot = h('div', { class: 'seq-controls' });
+  const customInput = h('input', {
+    type: 'text',
+    class: 'seq-check__input',
+    placeholder: 'Ej: 2, 8, 14, 20  o  10, 3, -4, -11',
+    value: customInputRaw,
+    style: 'margin-top: 4px;',
+    on: {
+      input: (e) => {
+        customInputRaw = e.target.value;
+        const parts = customInputRaw
+          .split(/[,;\s]+/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0)
+          .map((s) => parseFloat(s));
+        if (parts.length >= 2 && parts.every((n) => !Number.isNaN(n))) {
+          customTerms = parts;
+        } else if (customInputRaw.trim() === '') {
+          customTerms = null;
+        }
+        updateDynamic();
+      },
+    },
+  });
+
+  const customRow = h('div', { class: 'seq-controls' },
+    h('label', { class: 'field__label', style: 'flex: 1; max-width: 480px;' },
+      'O ingresá tus propios números: ',
+      customInput
+    )
+  );
+
+  const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
+  const dynamicSlot = h('div');
+
+  mount(container, presetButtonsSlot, customRow, ribbonSlot, dynamicSlot);
+
+  function updateDynamic() {
     const activeTerms = customTerms !== null ? customTerms : PRESETS[presetIdx].terms;
     const cl = classify(activeTerms);
 
     const isDiffConst = cl.kind === 'ari' || cl.kind === 'both';
     const isRatioConst = cl.kind === 'geo' || cl.kind === 'both';
 
-    // Botones de presets
-    const presetButtons = h('div', { class: 'seq-controls' },
-      PRESETS.map((item, idx) => {
+    mount(presetButtonsSlot,
+      ...PRESETS.map((item, idx) => {
         const btn = h('button', {
           type: 'button',
           class: ['chip', customTerms === null && idx === presetIdx ? 'is-active' : ''],
         }, item.label);
         btn.addEventListener('click', () => {
           customTerms = null;
+          customInputRaw = '';
+          customInput.value = '';
           presetIdx = idx;
-          render();
+          updateDynamic();
         });
         return btn;
       })
     );
 
-    // Entrada personalizada
-    const customRow = h('div', { class: 'seq-controls' },
-      h('label', { class: 'field__label', style: 'flex: 1; max-width: 480px;' },
-        'O ingresá tus propios números: ',
-        h('input', {
-          type: 'text',
-          class: 'seq-check__input',
-          placeholder: 'Ej: 2, 8, 14, 20  o  10, 3, -4, -11',
-          value: customInputRaw,
-          style: 'margin-top: 4px;',
-          on: {
-            input: (e) => {
-              customInputRaw = e.target.value;
-              const parts = customInputRaw
-                .split(/[,;\s]+/)
-                .map((s) => s.trim())
-                .filter((s) => s.length > 0)
-                .map((s) => parseFloat(s));
-              if (parts.length >= 2 && parts.every((n) => !Number.isNaN(n))) {
-                customTerms = parts;
-              } else if (customInputRaw.trim() === '') {
-                customTerms = null;
-              }
-              render();
-            },
-          },
-        })
-      )
-    );
-
-    // Cinta SVG
-    const ribbonSlot = h('div', { class: 'seq-ribbon-wrap' });
     createRibbon(ribbonSlot, {
       terms: activeTerms,
       startIndex: 1,
@@ -125,26 +131,38 @@ export function initDetectiveWidget(container) {
       );
     });
 
-    const diffHeaderTitle = isDiffConst
-      ? `✓ Diferencia constante (d = ${fmt(cl.d)}) ⟹ Sucesión Aritmética`
-      : '✗ Diferencias variables (no es aritmética)';
+    const diffHeaderBadge = h('span', {
+      class: ['small', isDiffConst ? 'text-ok' : 'muted'],
+      style: 'display: inline-flex; align-items: center; gap: 4px;',
+    },
+      chalkIcon(isDiffConst ? 'check' : 'cross', { width: 14, height: 14 }),
+      isDiffConst
+        ? `Diferencia constante (d = ${fmt(cl.d)}) ⟹ Sucesión Aritmética`
+        : 'Diferencias variables (no es aritmética)'
+    );
 
-    const ratioHeaderTitle = isRatioConst
-      ? `✓ Razón o cociente constante (r = ${fmt(cl.r)}) ⟹ Sucesión Geométrica`
-      : '✗ Cocientes variables (no es geométrica)';
+    const ratioHeaderBadge = h('span', {
+      class: ['small', isRatioConst ? 'text-ok' : 'muted'],
+      style: 'display: inline-flex; align-items: center; gap: 4px;',
+    },
+      chalkIcon(isRatioConst ? 'check' : 'cross', { width: 14, height: 14 }),
+      isRatioConst
+        ? `Razón o cociente constante (r = ${fmt(cl.r)}) ⟹ Sucesión Geométrica`
+        : 'Cocientes variables (no es geométrica)'
+    );
 
     const comparisonTable = h('div', { class: 'seq-detective__grid' },
       h('div', { class: ['seq-detective__row', isDiffConst ? 'is-constant' : ''] },
         h('div', { class: 'seq-detective__header' },
           h('strong', null, '1. Análisis de Diferencias: a(n) − a(n − 1)'),
-          h('span', { class: ['small', isDiffConst ? 'text-ok' : 'muted'] }, diffHeaderTitle)
+          diffHeaderBadge
         ),
         h('div', { class: 'seq-detective__values' }, ...diffCells)
       ),
       h('div', { class: ['seq-detective__row', isRatioConst ? 'is-constant' : ''] },
         h('div', { class: 'seq-detective__header' },
           h('strong', null, '2. Análisis de Cocientes (Razones): a(n) / a(n − 1)'),
-          h('span', { class: ['small', isRatioConst ? 'text-ok' : 'muted'] }, ratioHeaderTitle)
+          ratioHeaderBadge
         ),
         h('div', { class: 'seq-detective__values' }, ...ratioCells)
       )
@@ -172,14 +190,8 @@ export function initDetectiveWidget(container) {
     const verdictBox = h('div', { class: ['notice', noticeClass] });
     verdictBox.innerHTML = verdictHtml;
 
-    mount(container,
-      presetButtons,
-      customRow,
-      ribbonSlot,
-      comparisonTable,
-      verdictBox
-    );
+    mount(dynamicSlot, comparisonTable, verdictBox);
   }
 
-  render();
+  updateDynamic();
 }
