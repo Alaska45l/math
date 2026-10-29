@@ -130,7 +130,7 @@ export function initRosettaWidget(container) {
 
     // 3. Llave recursiva
     const dRecSign = dVal >= 0 ? `+ ${fmt(dVal)}` : `${MINUS} ${fmt(Math.abs(dVal))}`;
-    const recursivePanel = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 220px;' },
+    const recursivePanel = h('div', { class: 'seq-rosetta__panel' },
       h('h3', { class: 'seq-sidebar__chapter-title' }, 'Llave Recursiva'),
       h('div', { class: 'seq-annotated__brace-box' },
         h('div', { class: 'seq-annotated__brace' }, '{'),
@@ -145,7 +145,7 @@ export function initRosettaWidget(container) {
     const dStdSign = dVal >= 0 ? `+ ${fmt(dVal)}` : `${MINUS} ${fmt(Math.abs(dVal))}`;
     const dSimpSign = dVal >= 0 ? `+ ${fmt(dVal)}n` : `${MINUS} ${fmt(Math.abs(dVal))}n`;
 
-    const explicitPanel = h('div', { class: 'seq-check__card', style: 'flex: 1.2; min-width: 260px;' },
+    const explicitPanel = h('div', { class: 'seq-rosetta__panel', style: 'flex: 1.2;' },
       h('h3', { class: 'seq-sidebar__chapter-title' }, 'Fórmulas Explícitas'),
       h('div', { style: 'margin-bottom: 10px;' },
         h('span', { class: 'small muted' }, 'Forma estándar k + d(n − 1):'),

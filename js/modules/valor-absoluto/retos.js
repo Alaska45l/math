@@ -629,7 +629,7 @@ function createBossDeflector(root) {
     h('label', { class: 'field__label' }, 'Apertura a = ', valA, sliderA)
   );
 
-  const missionCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 260px;' },
+  const missionCard = h('div', { class: 'va-readout', style: 'flex: 1; min-width: 260px;' },
     titleEl,
     descEl,
     readoutEl,

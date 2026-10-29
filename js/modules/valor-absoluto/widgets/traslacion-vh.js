@@ -19,7 +19,7 @@ export function initTraslacionVHWidget(container) {
 
   const boardSlot = h('div', { class: 'seq-plot-card' });
   const formulaSlot = h('div', { style: 'margin-top: 8px;' });
-  const trapCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const trapCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
   const valK = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, fmt(state.k));
@@ -211,9 +211,7 @@ export function initTraslacionVHWidget(container) {
         '  ·  Vértice en ',
         h('strong', { style: 'color: var(--teal);' }, `V(${fmt(state.h)}; ${fmt(state.k)})`)
       ),
-      h('div', {
-        style: 'margin-top: 8px; padding: 10px 12px; background: rgba(255,255,255,0.03); border-left: 3px solid var(--teal); border-radius: 0 8px 8px 0;',
-      },
+      h('div', { class: 'va-chalk-callout' },
         h('strong', { style: 'color: var(--teal); display: block; margin-bottom: 4px;' },
           `¿Por qué h = ${fmt(state.h)} lleva el signo contrario adentro de ${hInside}? (Medidor de Distancia Cero)`
         ),
@@ -262,6 +260,7 @@ export function initTraslacionVHWidget(container) {
       btnReset
     ),
     boardSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     formulaSlot,
     trapCard
   );

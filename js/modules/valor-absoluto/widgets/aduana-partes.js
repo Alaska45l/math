@@ -92,7 +92,7 @@ export function initAduanaPartesWidget(container) {
   const plotCard = h('div', { class: 'seq-plot-card' });
   const braceSlot = h('div', { style: 'margin-top: 8px;' });
   const customsGrid = h('div', { class: 'va-customs-grid' });
-  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const readoutCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const valX = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, fmt(state.x));
   const sliderX = h('input', {
@@ -404,8 +404,10 @@ export function initAduanaPartesWidget(container) {
     presetBtnsRow,
     quickJumpRow,
     plotCard,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     braceSlot,
     customsGrid,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     readoutCard
   );
 

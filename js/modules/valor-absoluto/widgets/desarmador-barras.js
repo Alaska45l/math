@@ -20,7 +20,7 @@ export function initDesarmadorBarrasWidget(container) {
 
   const boardSlot = h('div', { class: 'seq-plot-card' });
   const braceSlot = h('div', { style: 'margin-top: 10px;' });
-  const stepsCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const stepsCard = h('div', { class: 'va-readout', style: 'margin-top: 12px;' });
 
   const valA = h('strong', { class: 'eq', style: 'color: var(--pink);' }, fmt(state.a));
   const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
@@ -303,6 +303,7 @@ export function initDesarmadorBarrasWidget(container) {
       h('label', { class: 'field__label' }, 'Escáner x = ', valX, sliderX)
     ),
     boardSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     braceSlot,
     stepsCard
   );

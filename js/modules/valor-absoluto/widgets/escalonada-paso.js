@@ -20,7 +20,7 @@ export function initEscalonadaPasoWidget(container) {
   const modesRow = h('div', { class: 'seq-controls' });
   const controlsRow = h('div', { class: 'seq-controls' });
   const plotCard = h('div', { class: 'seq-plot-card' });
-  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const readoutCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const valX = h('strong', { class: 'eq', style: 'color: var(--yellow);' });
   const labelPrefix = h('span', null, 'Entrada x = ');
@@ -445,6 +445,7 @@ export function initEscalonadaPasoWidget(container) {
     modesRow,
     controlsRow,
     plotCard,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     readoutCard
   );
 

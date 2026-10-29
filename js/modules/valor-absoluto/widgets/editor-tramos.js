@@ -36,7 +36,7 @@ export function initEditorTramosWidget(container) {
   const slidersRow = h('div', { class: 'seq-controls' });
   const plotCard = h('div', { class: 'seq-plot-card' });
   const braceSlot = h('div', { style: 'margin-top: 8px;' });
-  const statusCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const statusCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const valB1 = h('strong', { class: 'eq', style: 'color: var(--blue);' }, fmt(state.b1));
   const valM2 = h('strong', { class: 'eq', style: 'color: var(--green);' }, fmt(state.m2));
@@ -494,6 +494,7 @@ export function initEditorTramosWidget(container) {
     topControlsRow,
     slidersRow,
     plotCard,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     braceSlot,
     statusCard
   );

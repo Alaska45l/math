@@ -41,8 +41,8 @@ export function initRadiografiaAbsWidget(container) {
   const lensBtnsRow = h('div', { class: 'seq-controls' });
   const boardSlot = h('div', { class: 'seq-plot-card' });
   const tableSlot = h('div', { style: 'margin-top: 10px;' });
-  const laserCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
-  const sqrtCard = h('div', { class: 'seq-check__card', style: 'margin-top: 10px; border-style: dashed;' });
+  const laserCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
+  const sqrtCard = h('div', { class: 'va-readout', style: 'margin-top: 14px;' });
 
   const valA = h('strong', { class: 'eq', style: 'color: var(--pink);' }, fmt(state.a));
   const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
@@ -497,7 +497,9 @@ export function initRadiografiaAbsWidget(container) {
     ),
     boardSlot,
     tableSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     laserCard,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     sqrtCard
   );
 

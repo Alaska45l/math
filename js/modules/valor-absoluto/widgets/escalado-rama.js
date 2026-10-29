@@ -39,8 +39,8 @@ export function initEscaladoRamaWidget(container) {
   ];
 
   const boardSlot = h('div', { class: 'seq-plot-card' });
-  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
-  const comparatorWrap = h('div', { style: 'margin-top: 12px;' });
+  const readoutCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
+  const comparatorWrap = h('div', { style: 'margin-top: 8px;' });
 
   const valA = h('strong', { class: 'eq', style: 'color: var(--pink); display: inline-flex; align-items: center; margin: 0 4px;' });
   const sliderA = h('input', {
@@ -191,41 +191,40 @@ export function initEscaladoRamaWidget(container) {
 
     mount(
       comparatorWrap,
-      h('div', { class: 'seq-check__card', style: 'border-style: dashed;' },
-        h('div', { style: 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;' },
-          h('strong', { style: 'color: var(--yellow); font-family: var(--font-hand); font-size: 1.25rem;' },
-            'Comparador de Signos: «Menos Adentro |−x|» vs. «Menos Afuera −|x|»'
+      h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
+      h('div', { class: 'va-machine-header' },
+        h('strong', { class: 'va-machine-title' },
+          'Comparador de Signos: «Menos Adentro |−x|» vs. «Menos Afuera −|x|»'
+        ),
+        h('label', { class: 'field__label' },
+          'Probar con x = ',
+          valSampleX,
+          sliderSampleX
+        )
+      ),
+      h('div', { class: 'va-comparator-grid' },
+        h('div', { class: 'va-comparator-col' },
+          h('strong', { class: 'eq', style: 'color: var(--teal); font-size: 1.15rem; display: block; margin-bottom: 4px;' },
+            'Caso A: Menos ADENTRO  g(x) = |−x|'
           ),
-          h('label', { class: 'field__label' },
-            'Probar con x = ',
-            valSampleX,
-            sliderSampleX
+          h('p', { class: 'eq', style: 'margin: 4px 0;' },
+            `g(${fmt(sxVal)}) = |−(${fmt(sxVal)})| = |${fmt(-sxVal)}| = `,
+            h('strong', { style: 'color: var(--green); font-size: 1.2rem;' }, fmt(insideMinusVal))
+          ),
+          h('p', { class: 'small muted', style: 'margin: 0;' },
+            'Las barras absorben el signo menos interno: |−x| = |x| ≥ 0 para todo x. ¡La «V» sigue abriendo hacia arriba!'
           )
         ),
-        h('div', { class: 'va-comparator-grid' },
-          h('div', { class: 'va-comparator-col', style: 'border-color: rgba(148, 226, 213, 0.35);' },
-            h('strong', { class: 'eq', style: 'color: var(--teal); font-size: 1.1rem; display: block; margin-bottom: 4px;' },
-              'Caso A: Menos ADENTRO  g(x) = |−x|'
-            ),
-            h('p', { class: 'eq', style: 'margin: 4px 0;' },
-              `g(${fmt(sxVal)}) = |−(${fmt(sxVal)})| = |${fmt(-sxVal)}| = `,
-              h('strong', { style: 'color: var(--green); font-size: 1.15rem;' }, fmt(insideMinusVal))
-            ),
-            h('p', { class: 'small muted', style: 'margin: 0;' },
-              'Las barras absorben el signo menos interno: |−x| = |x| ≥ 0 para todo x. ¡La «V» sigue abriendo hacia arriba!'
-            )
+        h('div', { class: 'va-comparator-col' },
+          h('strong', { class: 'eq', style: 'color: var(--pink); font-size: 1.15rem; display: block; margin-bottom: 4px;' },
+            'Caso B: Menos AFUERA  h(x) = −|x|'
           ),
-          h('div', { class: 'va-comparator-col', style: 'border-color: rgba(242, 143, 173, 0.35);' },
-            h('strong', { class: 'eq', style: 'color: var(--pink); font-size: 1.1rem; display: block; margin-bottom: 4px;' },
-              'Caso B: Menos AFUERA  h(x) = −|x|'
-            ),
-            h('p', { class: 'eq', style: 'margin: 4px 0;' },
-              `h(${fmt(sxVal)}) = −|${fmt(sxVal)}| = −(${fmt(Math.abs(sxVal))}) = `,
-              h('strong', { style: 'color: var(--pink); font-size: 1.15rem;' }, fmt(outsideMinusVal))
-            ),
-            h('p', { class: 'small muted', style: 'margin: 0;' },
-              'El menos está afuera esperando el resultado positivo de las barras y lo invierte hacia abajo: −|x| ≤ 0 (forma ∧).'
-            )
+          h('p', { class: 'eq', style: 'margin: 4px 0;' },
+            `h(${fmt(sxVal)}) = −|${fmt(sxVal)}| = −(${fmt(Math.abs(sxVal))}) = `,
+            h('strong', { style: 'color: var(--pink); font-size: 1.2rem;' }, fmt(outsideMinusVal))
+          ),
+          h('p', { class: 'small muted', style: 'margin: 0;' },
+            'El menos está afuera esperando el resultado positivo de las barras y lo invierte hacia abajo: −|x| ≤ 0 (forma ∧).'
           )
         )
       )
@@ -243,6 +242,7 @@ export function initEscaladoRamaWidget(container) {
       ...presetBtns
     ),
     boardSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     readoutCard,
     comparatorWrap
   );

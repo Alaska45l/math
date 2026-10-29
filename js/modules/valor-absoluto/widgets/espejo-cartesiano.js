@@ -18,7 +18,7 @@ export function initEspejoCartesianoWidget(container) {
 
   const boardSlot = h('div', { class: 'seq-plot-card' });
   const braceSlot = h('div', { style: 'margin-top: 8px;' });
-  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const readoutCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const btnMirrorOn = h('button', {
     type: 'button',
@@ -322,6 +322,7 @@ export function initEspejoCartesianoWidget(container) {
       )
     ),
     boardSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     braceSlot,
     readoutCard
   );

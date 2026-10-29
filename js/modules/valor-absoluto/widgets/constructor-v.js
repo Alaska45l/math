@@ -41,7 +41,7 @@ export function initConstructorVWidget(container) {
   const exploreWrap = h('div');
   const exploreBoardSlot = h('div', { class: 'seq-plot-card' });
   const exploreFormulaSlot = h('div', { style: 'margin-top: 8px;' });
-  const exploreStepsCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
+  const exploreStepsCard = h('div', { class: 'va-readout', style: 'margin-top: 10px;' });
 
   const valH = h('strong', { class: 'eq', style: 'color: var(--teal);' }, fmt(state.h));
   const valK = h('strong', { class: 'eq', style: 'color: var(--yellow);' }, fmt(state.k));
@@ -155,6 +155,7 @@ export function initConstructorVWidget(container) {
       h('label', { class: 'field__label' }, 'Apertura a = ', valA, sliderA)
     ),
     exploreBoardSlot,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     exploreFormulaSlot,
     exploreStepsCard
   );
@@ -334,7 +335,7 @@ export function initConstructorVWidget(container) {
     );
   }
 
-  const invFormCard = h('div', { class: 'seq-check__card', style: 'flex: 1; min-width: 260px;' },
+  const invFormCard = h('div', { class: 'va-readout', style: 'flex: 1; min-width: 260px;' },
     invPromptText,
     h('div', { style: 'margin-bottom: 8px;' },
       h('strong', { class: 'small' }, 'Paso 1 · Coordenadas del vértice (h; k):'),

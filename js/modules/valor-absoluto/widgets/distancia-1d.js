@@ -106,8 +106,8 @@ export function initDistancia1DWidget(container) {
   );
 
   const controlsSlot = h('div', { class: 'seq-controls' });
-  const readoutCard = h('div', { class: 'seq-check__card', style: 'margin-top: 8px;' });
-  const signMachineWrap = h('div', { style: 'margin-top: 12px;' });
+  const readoutCard = h('div', { class: 'va-readout' });
+  const signMachineWrap = h('div', { style: 'margin-top: 8px;' });
 
   sliderX.addEventListener('input', (e) => {
     state.x = parseFloat(e.target.value);
@@ -591,43 +591,42 @@ export function initDistancia1DWidget(container) {
       );
     }
 
-    // Máquina Inversora del Signo Menos (3 cajas conectadas)
+    // Máquina Inversora del Signo Menos (flujo pedagógico sobre pizarrón)
     mount(
       signMachineWrap,
-      h('div', { class: 'seq-check__card', style: 'border-style: dashed;' },
-        h('div', { style: 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 6px;' },
-          h('strong', { style: 'color: var(--yellow); font-family: var(--font-hand); font-size: 1.25rem;' },
-            'La Máquina Inversora del Signo Menos: ¿por qué |u| = −u cuando u < 0?'
-          ),
-          h('span', { class: 'small muted' }, '¡El signo «−» adelante NO significa negativo, significa OPUESTO!')
+      h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
+      h('div', { class: 'va-machine-header' },
+        h('strong', { class: 'va-machine-title' },
+          'La Máquina Inversora del Signo Menos: ¿por qué |u| = −u cuando u < 0?'
         ),
-        h('div', { class: 'va-sign-machine' },
-          h('div', { class: 'va-sign-step' },
-            h('span', { class: 'va-sign-step__label' }, '1. Interior u = x − h'),
-            h('span', {
-              class: 'va-sign-step__val',
-              style: `color: ${isNeg ? 'var(--pink)' : 'var(--teal)'};`,
-            }, `u = ${fmt(diff)}`),
-            h('span', { class: 'small muted' }, isNeg ? 'Negativo (u < 0)' : 'No negativo (u ≥ 0)')
-          ),
-          h('span', { class: 'va-sign-arrow', 'aria-hidden': 'true' }, '⟶'),
-          h('div', { class: ['va-sign-step', isNeg ? 'va-sign-step--active' : ''] },
-            h('span', { class: 'va-sign-step__label' }, isNeg ? '2. Se activa inversor −(u)' : '2. Pasa directo +(u)'),
-            h('span', {
-              class: 'va-sign-step__val',
-              style: 'color: var(--yellow);',
-            }, isNeg ? `−(${fmt(diff)})` : `+${fmt(diff)}`),
-            h('span', { class: 'small muted' }, isNeg ? 'Menos por menos = más' : 'No requiere inversión')
-          ),
-          h('span', { class: 'va-sign-arrow', 'aria-hidden': 'true' }, '⟶'),
-          h('div', { class: 'va-sign-step' },
-            h('span', { class: 'va-sign-step__label' }, '3. Distancia final |x − h|'),
-            h('span', {
-              class: 'va-sign-step__val',
-              style: 'color: var(--green);',
-            }, `+${fmt(dist)}`),
-            h('span', { class: 'small muted' }, 'Siempre ≥ 0')
-          )
+        h('span', { class: 'va-machine-subtitle' }, '¡El signo «−» adelante NO significa negativo, significa OPUESTO!')
+      ),
+      h('div', { class: 'va-sign-machine' },
+        h('div', { class: 'va-sign-step' },
+          h('span', { class: 'va-sign-step__label' }, '1. Interior u = x − h'),
+          h('span', {
+            class: 'va-sign-step__val',
+            style: `color: ${isNeg ? 'var(--pink)' : 'var(--teal)'};`,
+          }, `u = ${fmt(diff)}`),
+          h('span', { class: 'small muted' }, isNeg ? 'Negativo (u < 0)' : 'No negativo (u ≥ 0)')
+        ),
+        h('span', { class: 'va-sign-arrow', 'aria-hidden': 'true' }, '⟶'),
+        h('div', { class: ['va-sign-step', isNeg ? 'va-sign-step--active' : ''] },
+          h('span', { class: 'va-sign-step__label' }, isNeg ? '2. Se activa inversor −(u)' : '2. Pasa directo +(u)'),
+          h('span', {
+            class: 'va-sign-step__val',
+            style: 'color: var(--yellow);',
+          }, isNeg ? `−(${fmt(diff)})` : `+${fmt(diff)}`),
+          h('span', { class: 'small muted' }, isNeg ? 'Menos por menos = más' : 'No requiere inversión')
+        ),
+        h('span', { class: 'va-sign-arrow', 'aria-hidden': 'true' }, '⟶'),
+        h('div', { class: 'va-sign-step' },
+          h('span', { class: 'va-sign-step__label' }, '3. Distancia final |x − h|'),
+          h('span', {
+            class: 'va-sign-step__val',
+            style: 'color: var(--green);',
+          }, `+${fmt(dist)}`),
+          h('span', { class: 'small muted' }, 'Siempre ≥ 0')
         )
       )
     );
@@ -638,6 +637,7 @@ export function initDistancia1DWidget(container) {
     h('div', { class: 'seq-controls' }, btnModeExplore, btnModeSym),
     controlsSlot,
     svg,
+    h('div', { class: 'chalk-stroke', 'aria-hidden': 'true' }),
     readoutCard,
     signMachineWrap
   );
