@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e2622">
+  <meta name="description" content="Laboratorio interactivo de Valor Absoluto y Funciones Definidas por Partes: distancia en la recta, espejo cartesiano, transformaciones f(x)=a|x-h|+k, apertura de barras, aduana por tramos y funciones escalonadas.">
+  <title>Laboratorio de Valor Absoluto y Funciones por Partes — Álgebra 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules/valor-absoluto.css">
+  <link rel="preload" as="image" href="assets/vn/base.webp">
+  <link rel="preload" as="image" href="assets/vn/orgullosa.webp">
+  <link rel="preload" as="image" href="assets/vn/colapso.webp">
+  <link rel="preload" as="image" href="assets/vn/enojada.webp">
+  <link rel="preload" as="image" href="assets/vn/feliz.webp">
+  <script type="module" src="js/modules/valor-absoluto/index.js"></script>
+</head>
+<body data-page="valor-absoluto">
+  <header data-site-nav="valor-absoluto"></header>
+
+  <main class="page page--wide">
+    <header class="page-header">
+      <h1>Valor Absoluto y Funciones Definidas por Partes</h1>
+      <p class="intro">De la distancia en la recta y el espejo cartesiano a las transformaciones f(x) = a|x − h| + k, fronteras ○ vs ● y escalones.</p>
+    </header>
+
+    <div class="seq-layout">
+    <!-- ============================================================
+         SIDEBAR DE NAVEGACIÓN Y PROGRESO
+         ============================================================ -->
+    <aside class="seq-sidebar" aria-label="Índice de la lección">
+      <h1 class="seq-sidebar__title">Valor Absoluto y Partes</h1>
+      <div class="seq-sidebar__progress">
+        <span id="seq-progress-text" class="small muted">Progreso: 0/10</span>
+        <div class="seq-sidebar__progress-bar" aria-hidden="true">
+          <div id="seq-progress-fill" class="seq-sidebar__progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="seq-sidebar__chapter">Cap. 1 · Distancia y Espejo</div>
+      <ul class="seq-sidebar__list">
+        <li>
+          <a href="#sec-1" class="seq-sidebar__link is-active" data-sec="sec-1">
+            <span>1. Distancia |x − h| en 1D</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-2" class="seq-sidebar__link" data-sec="sec-2">
+            <span>2. Espejo cartesiano y |x|</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-3" class="seq-sidebar__link" data-sec="sec-3">
+            <span>3. Traslaciones y vértice (h, k)</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="seq-sidebar__chapter">Cap. 2 · Transformaciones a|x − h| + k</div>
+      <ul class="seq-sidebar__list">
+        <li>
+          <a href="#sec-4" class="seq-sidebar__link" data-sec="sec-4">
+            <span>4. Pendiente y apertura a</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-5" class="seq-sidebar__link" data-sec="sec-5">
+            <span>5. Laboratorio a|x − h| + k</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-6" class="seq-sidebar__link" data-sec="sec-6">
+            <span>6. Abriendo las barras</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-7" class="seq-sidebar__link" data-sec="sec-7">
+            <span>7. Radiografía Exactas</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="seq-sidebar__chapter">Cap. 3 · Funciones por Partes</div>
+      <ul class="seq-sidebar__list">
+        <li>
+          <a href="#sec-8" class="seq-sidebar__link" data-sec="sec-8">
+            <span>8. La aduana de dominios</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-9" class="seq-sidebar__link" data-sec="sec-9">
+            <span>9. Fronteras ○ vs ● y unicidad</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-10" class="seq-sidebar__link" data-sec="sec-10">
+            <span>10. Piso ⌊x⌋ y techo ⌈x⌉</span>
+            <span class="seq-sidebar__status"></span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="seq-sidebar__chapter">Cap. 4 · Práctica y Repaso</div>
+      <ul class="seq-sidebar__list">
+        <li>
+          <a href="#sec-retos" class="seq-sidebar__link" data-sec="sec-retos">
+            <span>Entrenador y Deflector V</span>
+          </a>
+        </li>
+        <li>
+          <a href="#sec-repaso" class="seq-sidebar__link" data-sec="sec-repaso">
+            <span>Hoja de Repaso (PDF)</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ============================================================
+         CONTENIDO LINEAL DE LA LECCIÓN
+         ============================================================ -->
+    <div class="seq-content">
+
+      <!-- ============================================================
+           CAPÍTULO 1 · EL ORIGEN FÍSICO: DISTANCIA Y ESPEJO
+           ============================================================ -->
+      <div class="seq-chapter-banner">
+        <span class="seq-chapter-banner__tag">Capítulo 1</span>
+        <h2 class="seq-chapter-banner__title">El Origen Físico: Distancia en 1D y Espejo Cartesiano</h2>
+        <p class="muted">Antes de memorizar reglas de signos, entendamos qué mide físicamente el valor absoluto en una recta y cómo pliega el plano cartesiano como un espejo sobre el eje X.</p>
+      </div>
+
+      <!-- SECCIÓN 1 -->
+      <section id="sec-1" class="seq-section" aria-labelledby="title-sec-1">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 1</span>
+            <h3 id="title-sec-1" class="seq-section__title">Distancia en la recta numérica: |x − h|</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec1-distancia" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">El valor absoluto <strong>|x − h|</strong> no es un truco para «borrar el signo menos»: es la <strong>distancia geométrica</strong> en pasos sobre la recta numérica entre tu posición <strong>x</strong> y un punto de referencia o ancla <strong>h</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Si el centro o ancla está en <code>h = 2</code> y caminás hasta <code>x = −3</code>, la resta con signo da <code>x − h = (−3) − 2 = −5</code> (el signo menos indica que fuiste hacia la izquierda). Pero una cinta métrica nunca mide distancias negativas: hay exactamente <code>|−3 − 2| = |−5| = 5</code> unidades de separación. Cuando coincidís con el ancla (<code>x = h</code>), la distancia es el neutro aditivo <strong style="color:var(--green)">|0| = 0</strong>.</p>
+          <p>Por eso la ecuación <code>|x − 2| = 5</code> pregunta: <em>«¿Qué puntos de la recta están a 5 pasos del 2?»</em>. Hay dos respuestas simétricas: caminando 5 a la derecha (<code>2 + 5 = 7</code>) y caminando 5 a la izquierda (<code>2 − 5 = −3</code>).</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="distancia-1d"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>No leas <code>|x + 4|</code> como «distancia al +4». Reescribilo siempre como una resta respecto al ancla: <code>|x − (−4)|</code> mide la distancia desde <code>x</code> hasta el centro negativo <strong>h = −4</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-1"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 2 -->
+      <section id="sec-2" class="seq-section" aria-labelledby="title-sec-2">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 2</span>
+            <h3 id="title-sec-2" class="seq-section__title">El espejo cartesiano y la función madre f(x) = |x|</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec2-espejo" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Al pasar de 1D al plano 2D, las barras de <strong>f(x) = |x|</strong> actúan como un <strong>espejo sobre el eje X</strong>: la parte de la recta identidad <code>y = x</code> que cae bajo tierra (<code>y &lt; 0</code>) se pliega hacia arriba formando una «V» con vértice en <strong>(0, 0)</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Para cualquier <code>x ≥ 0</code> (a la derecha del origen), la recta <code>y = x</code> ya tiene altura positiva o cero, así que queda intacta con pendiente <code>+1</code>. Pero para <code>x &lt; 0</code> (a la izquierda del origen), la recta original tendría alturas negativas como <code>(−3, −3)</code>; el valor absoluto multiplica esas alturas por <code>−1</code> y las rebota a <code>(−3, +3)</code> sobre la semirrecta <code>y = −x</code> de pendiente <code>−1</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="espejo-cartesiano"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>No confundas la «V» de <code>f(x) = |x|</code> con la «U» suave de una parábola <code>x²</code>. En el valor absoluto las dos ramas son <strong>semirrectas perfectamente rectas</strong> de pendiente constante (<code>−1</code> y <code>+1</code>) que chocan en ángulo vivo en el vértice <code>(0, 0)</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-2"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 3 -->
+      <section id="sec-3" class="seq-section" aria-labelledby="title-sec-3">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 3</span>
+            <h3 id="title-sec-3" class="seq-section__title">Traslaciones rígidas y el misterio del signo en (h, k)</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec3-vertice" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">En <strong>f(x) = |x − h| + k</strong>, el vértice se traslada al punto <strong>V(h, k)</strong>: el número <strong>h</strong> es el valor de <code>x</code> que hace cero el interior de las barras (movimiento horizontal) y <strong>k</strong> es la altura exterior en ese punto (movimiento vertical).</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Mirá por qué el signo horizontal parece «al revés» y el vertical «al derecho»: la punta de la V ocurre siempre cuando el interior de las barras vale <strong style="color:var(--green)">|0| = 0</strong>. En <code>f(x) = |x − 4| − 2</code>, para que <code>x − 4 = 0</code> necesitamos poner <code>x = +4</code> (el vértice se corrió 4 a la derecha). En ese instante queda <code>f(4) = |0| − 2 = −2</code> (el vértice bajó 2 unidades). Tocá cada pieza de la fórmula:</p>
+          <div id="annotated-sec-3"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="traslacion-vh"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>El error número uno en exámenes es ver <code>|x + 3| − 5</code> y decir que el vértice es <code>(3, −5)</code>. Preguntate siempre: <em>«¿Qué valor de x anula x + 3 = 0?»</em>. La respuesta es <code>h = −3</code>, por lo que el vértice real es <strong>(−3, −5)</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-3"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 2 · TRANSFORMACIONES DINÁMICAS f(x) = a|x - h| + k
+           ============================================================ -->
+      <div class="seq-chapter-banner">
+        <span class="seq-chapter-banner__tag">Capítulo 2</span>
+        <h2 class="seq-chapter-banner__title">Transformaciones Dinámicas y Apertura de Barras</h2>
+        <p class="muted">Dominá el coeficiente de apertura y reflexión <code>a</code>, reconstruí ecuaciones desde el gráfico, desarmá las barras sin trucos mágicos y realizá la radiografía completa de nivel Exactas.</p>
+      </div>
+
+      <!-- SECCIÓN 4 -->
+      <section id="sec-4" class="seq-section" aria-labelledby="title-sec-4">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 4</span>
+            <h3 id="title-sec-4" class="seq-section__title">Pendiente de las ramas, apertura y reflexión: el parámetro a</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec4-escalado" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">El coeficiente <strong>a</strong> adelante de las barras es exactamente la <strong>pendiente de la rama derecha</strong> (y <strong>−a</strong> es la de la rama izquierda): su signo decide si la V abre hacia arriba (<code>a &gt; 0</code>) o hacia abajo (<code>a &lt; 0</code>), y su tamaño <code>|a|</code> controla cuán cerrada o ancha es.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Si desde el vértice caminás <code>Δx = +1</code> unidad hacia la derecha, la rama sube o baja exactamente <code>Δy = a</code> unidades:</p>
+          <ul>
+            <li>Si <strong>|a| &gt; 1</strong> (ej. <code>a = 2</code> o <code>a = −3</code>): estiramiento vertical, la V es más <strong>cerrada y empinada</strong> que <code>|x|</code>.</li>
+            <li>Si <strong>0 &lt; |a| &lt; 1</strong> (ej. <code>a = 1/2</code>): compresión vertical, la V es más <strong>ancha y achatada</strong>.</li>
+            <li>Si <strong>a &lt; 0</strong>: reflexión respecto a la horizontal del vértice; la V se invierte como un techo <strong>∧</strong> y alcanza un máximo absoluto en <code>y = k</code>.</li>
+          </ul>
+          <div id="annotated-sec-4"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="escalado-rama"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Al calcular la pendiente <code>a</code> desde dos puntos del gráfico, recordá que es <strong>variación vertical sobre variación horizontal</strong>: <code>a = Δy / Δx</code> (medido sobre la rama derecha). No inviertas la fracción poniendo <code>Δx / Δy</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-4"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 5 -->
+      <section id="sec-5" class="seq-section" aria-labelledby="title-sec-5">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 5</span>
+            <h3 id="title-sec-5" class="seq-section__title">Laboratorio maestro: f(x) = a|x − h| + k de punta a punta</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec5-lab" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Cualquier gráfica en forma de V queda determinada de manera única por su vértice <strong>V(h, k)</strong> y un segundo punto de paso <strong>P(x₁, y₁)</strong>, de donde se despeja <code>a = (y₁ − k) / |x₁ − h|</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Supongamos que ves una gráfica cuyo vértice está en <code>V(3, 4)</code> y cuyas ramas pasan por <code>P(5, 0)</code>. En dos pasos hallás su ecuación canónica:</p>
+          <ol>
+            <li>Con el vértice <code>(h, k) = (3, 4)</code> armás el esqueleto: <code>f(x) = a|x − 3| + 4</code>.</li>
+            <li>Sustituís el punto <code>(5, 0)</code>: <code>0 = a|5 − 3| + 4 ⇒ 2a = −4 ⇒ a = −2</code>. Resultado: <strong>f(x) = −2|x − 3| + 4</strong>.</li>
+          </ol>
+          <div id="annotated-sec-5"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="constructor-v"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Nunca confundas las coordenadas del vértice <code>(h, k)</code> entre sí: el primer número del par ordenado siempre va adentro de las barras con signo cambiado (<code>x − h</code>) y el segundo número siempre suma afuera (<code>+ k</code>).</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-5"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 6 -->
+      <section id="sec-6" class="seq-section" aria-labelledby="title-sec-6">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 6</span>
+            <h3 id="title-sec-6" class="seq-section__title">Abriendo las barras: de valor absoluto a función por partes</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec6-partes" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Por definición algebraica, <strong>|u| = u si u ≥ 0</strong> y <strong>|u| = −u si u &lt; 0</strong>; aplicar esta regla en el punto de quiebre <code>u = 0</code> permite reescribir cualquier función con valor absoluto como dos rectas pegadas por partes.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Para abrir las barras de <code>f(x) = |x − 3| + 2</code>, primero buscamos dónde cambia de signo el interior: <code>x − 3 = 0 ⇒ x = 3</code>. Eso divide la recta en dos zonas:</p>
+          <div id="brace-sec-6"></div>
+          <p>Además, si dentro de las barras aparece un coeficiente multiplicando a <code>x</code> como en <code>f(x) = |2x − 6| + 1</code>, factorizalo antes de leer el vértice: <code>|2(x − 3)| + 1 = |2|·|x − 3| + 1 = 2|x − 3| + 1</code>. El vértice está en <strong>h = 3</strong>, ¡no en 6!</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="desarmador-barras"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>En la rama donde el interior es negativo (<code>u &lt; 0</code>), el signo menos delante de <code>−(u)</code> afecta a <strong>todo el paréntesis interior</strong>: en <code>−(x − 3) + 2</code> debés distribuir ambos signos para obtener <code>−x + 3 + 2 = −x + 5</code> (no escribas <code>−x − 3 + 2</code>).</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-6"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 7 -->
+      <section id="sec-7" class="seq-section" aria-labelledby="title-sec-7">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 7</span>
+            <h3 id="title-sec-7" class="seq-section__title">Radiografía completa (Nivel Exactas): Imagen, C⁰, C⁺, C⁻ y Monotonía</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec7-exactas" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">En el análisis completo de <strong>f(x) = a|x − h| + k</strong>, el <strong>Conjunto Imagen</strong> se lee verticalmente en el eje Y a partir de <strong>k</strong>, mientras que el <strong>Crecimiento, Decrecimiento, Ceros (C⁰), Positividad (C⁺) y Negatividad (C⁻)</strong> se leen siempre horizontalmente en el eje X.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Analicemos <code>f(x) = |x − 2| − 3</code> (con vértice en <code>(2, −3)</code> y <code>a = 1 &gt; 0</code>):</p>
+          <ul>
+            <li><strong>Dominio:</strong> <code>Dom(f) = ℝ</code> (podemos evaluar cualquier <code>x</code> real).</li>
+            <li><strong>Imagen (eje Y):</strong> Como el piso está en <code>k = −3</code> y abre hacia arriba, <code>Im(f) = [−3, +∞)</code>.</li>
+            <li><strong>Monotonía (eje X):</strong> Baja hasta la abscisa del vértice <code>h = 2</code> y sube después: <code>I↓ = (−∞, 2)</code> e <code>I↑ = (2, +∞)</code>.</li>
+            <li><strong>Ceros C⁰ (f(x) = 0):</strong> <code>|x − 2| − 3 = 0 ⇒ |x − 2| = 3 ⇒ x = −1</code> y <code>x = 5</code>.</li>
+            <li><strong>Positividad C⁺ y Negatividad C⁻:</strong> La V se hunde bajo el eje X entre sus dos raíces, por lo que <code>C⁻ = (−1, 5)</code> y <code>C⁺ = (−∞, −1) ∪ (5, +∞)</code>.</li>
+          </ul>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="radiografia-abs"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Trampa clásica de parcial universitario: poner <code>k</code> en el intervalo de crecimiento o poner <code>h</code> en la imagen. Repetí como mantra: <strong>«Imagen mira alturas Y (usa k); Crecimiento, C⁺ y C⁻ miran abscisas X (usan h y las raíces)»</strong>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-7"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 3 · FUNCIONES DEFINIDAS POR PARTES Y ESCALONES
+           ============================================================ -->
+      <div class="seq-chapter-banner">
+        <span class="seq-chapter-banner__tag">Capítulo 3</span>
+        <h2 class="seq-chapter-banner__title">Funciones Definidas por Partes, Fronteras y Escalones</h2>
+        <p class="muted">El valor absoluto fue nuestro primer ejemplo de función con dos reglas. Ahora generalizamos a funciones con múltiples tramos, fronteras abiertas ○ vs cerradas ●, pegado continuo y funciones parte entera.</p>
+      </div>
+
+      <!-- SECCIÓN 8 -->
+      <section id="sec-8" class="seq-section" aria-labelledby="title-sec-8">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 8</span>
+            <h3 id="title-sec-8" class="seq-section__title">La aduana de dominios: cómo evaluar y leer funciones por partes</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec8-aduana" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Una función definida por partes aplica distintas fórmulas en distintos subintervalos del dominio: para calcular <strong>f(x)</strong>, primero mirás en la columna derecha (la «aduana») <strong>qué única desigualdad cumple x</strong> y recién después evaluás esa fila.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>Mirá esta función de tres tramos. Si querés calcular <code>f(0)</code>, no reemplazás el <code>0</code> en los tres renglones: te fijás que <code>−1 ≤ 0 &lt; 2</code> se cumple únicamente en el segundo renglón, y evaluás <code>f(0) = −(0) + 1 = 1</code>:</p>
+          <div id="brace-sec-8"></div>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="aduana-partes"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Cuando te piden evaluar justo en un borde como <code>f(−1)</code> o <code>f(2)</code>, buscá con lupa cuál de las dos ramas vecinas tiene el signo <strong>«≤» o «≥»</strong> (en el gráfico, el <strong>punto relleno ●</strong>). La rama con <code>&lt;</code> o <code>&gt;</code> tiene un círculo abierto ○ y no es dueña del borde.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-8"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 9 -->
+      <section id="sec-9" class="seq-section" aria-labelledby="title-sec-9">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 9</span>
+            <h3 id="title-sec-9" class="seq-section__title">Fronteras ○ vs ●, prueba de la recta vertical y pegado continuo</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec9-frontera" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Para que un gráfico por partes represente una <strong>función válida</strong>, toda recta vertical debe tocar como máximo <strong>un único punto lleno ●</strong>; y para que no tenga un salto en la frontera <code>x = c</code>, las alturas laterales de ambas ramas deben coincidir.</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En una frontera <code>x = c</code> donde se encuentran dos tramos con distinta altura pueden ocurrir tres situaciones:</p>
+          <ul>
+            <li><strong>Un ● y un ○ (Función válida con salto):</strong> Exactamente una rama incluye a <code>c</code>. Cumple unicidad y <code>c</code> pertenece al dominio.</li>
+            <li><strong>Dos ○ abiertos (Función con hueco en el dominio):</strong> Ninguna rama incluye a <code>c</code>. Sigue siendo función, pero <code>Dom(f) = ℝ − {c}</code>.</li>
+            <li><strong>Dos ● cerrados a distinta altura (NO es función):</strong> La recta vertical <code>x = c</code> corta dos veces a la gráfica. Viola la definición de función.</li>
+          </ul>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="editor-tramos"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>Si ambos tramos tienen punto lleno ● en <code>x = c</code> pero justo <strong>empataron en la misma altura</strong> (por ejemplo ambos dan <code>y = 4</code>), los dos puntos se superponen en un único punto <code>(c, 4)</code>: en ese caso especial sí es función y además es continua en <code>x = c</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-9"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN 10 -->
+      <section id="sec-10" class="seq-section" aria-labelledby="title-sec-10">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Sección 10</span>
+            <h3 id="title-sec-10" class="seq-section__title">Funciones escalonadas: parte entera piso ⌊x⌋ y techo ⌈x⌉</h3>
+          </div>
+          <button type="button" class="vn-trigger" data-vn-script="sec10-escalon" aria-label="Explicación con Alaska">
+            <span class="vn-trigger__icon">🐾</span>
+            <span>Explicame, Alaska</span>
+          </button>
+        </header>
+
+        <div class="seq-block seq-block--phrase">
+          <span class="seq-block__label">En una frase</span>
+          <p class="seq-phrase-text">Las funciones escalonadas son funciones constantes por tramos: la función <strong>piso ⌊x⌋</strong> devuelve el mayor entero menor o igual que <code>x</code> (mira a la izquierda), mientras que la función <strong>techo ⌈x⌉</strong> devuelve el menor entero mayor o igual que <code>x</code> (mira a la derecha).</p>
+        </div>
+
+        <div class="seq-block seq-block--visual">
+          <span class="seq-block__label">Cómo se ve</span>
+          <p>En <code>f(x) = ⌊x⌋</code>, para todo número en el intervalo semiabierto <code>[2, 3)</code> (como <code>2</code>, <code>2,4</code> o <code>2,99</code>), la salida vale constantemente <code>2</code>. Eso dibuja un escalón horizontal con <strong>punto lleno ● a la izquierda</strong> en <code>(2, 2)</code> y <strong>círculo abierto ○ a la derecha</strong> en <code>(3, 2)</code>. En los enteros exactos, piso y techo coinciden: <code>⌊3⌋ = ⌈3⌉ = 3</code>.</p>
+        </div>
+
+        <div class="seq-block seq-block--try">
+          <span class="seq-block__label">Probalo</span>
+          <div data-widget="escalonada-paso"></div>
+        </div>
+
+        <div class="seq-block seq-block--caution">
+          <span class="seq-block__label">Cuidado con</span>
+          <p>¡Atención con los números negativos! <strong>⌊−1,3⌋ NO es −1</strong>. En la recta numérica, <code>−1,3</code> está entre <code>−2</code> (a su izquierda, menor) y <code>−1</code> (a su derecha, mayor). Como el piso busca el entero <em>menor o igual</em>, siempre apunta hacia la izquierda: <strong>⌊−1,3⌋ = −2</strong> (y su techo es <strong>⌈−1,3⌉ = −1</strong>).</p>
+        </div>
+
+        <div class="seq-block seq-block--check">
+          <span class="seq-block__label">Chequeo de comprensión</span>
+          <div data-check="sec-10"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CAPÍTULO 4 · ENTRENADOR, TRAMPAS Y ESCUDO DEFLECTOR V
+           ============================================================ -->
+      <section id="sec-retos" class="seq-section" aria-labelledby="title-sec-retos">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Capítulo 4</span>
+            <h2 id="title-sec-retos" class="seq-section__title">Entrenador de Semillas, 5 Trampas y Modo Deflector V</h2>
+          </div>
+        </header>
+        <p>Practicá con ejercicios infinitos reproducibles por semilla, desactivá las 5 trampas clásicas de examen y superá las 3 rondas del <strong>Escudo Deflector V</strong> posicionando el espejo en el plano cartesiano.</p>
+        <div data-widget="retos-abs"></div>
+      </section>
+
+      <!-- ============================================================
+           HOJA DE REPASO IMPRIMIBLE
+           ============================================================ -->
+      <section id="sec-repaso" class="seq-section" aria-labelledby="title-sec-repaso">
+        <header class="seq-section__header">
+          <div>
+            <span class="seq-section__num">Resumen de Unidad</span>
+            <h2 id="title-sec-repaso" class="seq-section__title">Hoja de Repaso: Valor Absoluto y Funciones por Partes</h2>
+          </div>
+        </header>
+        <p>Cuadros de síntesis para consultar rápido o imprimir/guardar en PDF antes de un parcial de Álgebra o ingreso a Exactas.</p>
+        <div style="margin: 12px 0;">
+          <button type="button" class="btn btn-print" onclick="window.print()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right: 6px; vertical-align: -2px;">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            <span>Imprimir / Guardar en PDF</span>
+          </button>
+        </div>
+
+        <h3 style="font-family:var(--font-hand);color:var(--yellow);font-size:1.5rem;margin-top:20px;">1. Anatomía y Radiografía de f(x) = a|x − h| + k</h3>
+        <div class="seq-table-wrap">
+          <table class="seq-summary-table">
+            <thead>
+              <tr>
+                <th>Propiedad</th>
+                <th>Caso a &gt; 0 (Abre hacia arriba ∨)</th>
+                <th>Caso a &lt; 0 (Abre hacia abajo ∧)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Vértice y Eje de simetría</strong></td>
+                <td>Mínimo absoluto en <code>V(h, k)</code> · Eje vertical <code>x = h</code></td>
+                <td>Máximo absoluto en <code>V(h, k)</code> · Eje vertical <code>x = h</code></td>
+              </tr>
+              <tr>
+                <td><strong>Pendientes de las ramas</strong></td>
+                <td>Izquierda (<code>x &lt; h</code>): <code>−a &lt; 0</code> (baja)<br>Derecha (<code>x &gt; h</code>): <code>+a &gt; 0</code> (sube)</td>
+                <td>Izquierda (<code>x &lt; h</code>): <code>−a &gt; 0</code> (sube)<br>Derecha (<code>x &gt; h</code>): <code>+a &lt; 0</code> (baja)</td>
+              </tr>
+              <tr>
+                <td><strong>Apertura según |a|</strong></td>
+                <td colspan="2">Si <code>|a| &gt; 1</code>: más cerrada/empinada · Si <code>0 &lt; |a| &lt; 1</code>: más ancha/achatada · Si <code>|a| = 1</code>: ramas a 45°</td>
+              </tr>
+              <tr>
+                <td><strong>Dominio e Imagen</strong></td>
+                <td><code>Dom(f) = ℝ</code><br><code>Im(f) = [k, +∞)</code> (se lee en el eje Y)</td>
+                <td><code>Dom(f) = ℝ</code><br><code>Im(f) = (−∞, k]</code> (se lee en el eje Y)</td>
+              </tr>
+              <tr>
+                <td><strong>Crecimiento y Decrecimiento</strong></td>
+                <td><code>I↓ = (−∞, h)</code><br><code>I↑ = (h, +∞)</code> (se leen en el eje X)</td>
+                <td><code>I↑ = (−∞, h)</code><br><code>I↓ = (h, +∞)</code> (se leen en el eje X)</td>
+              </tr>
+              <tr>
+                <td><strong>Apertura en función por partes</strong></td>
+                <td colspan="2">
+                  Para <code>x &lt; h</code>: <code>f(x) = −a(x − h) + k = −ax + (ah + k)</code><br>
+                  Para <code>x ≥ h</code>: <code>f(x) = a(x − h) + k = ax + (−ah + k)</code>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Factor interno |bx − c|</strong></td>
+                <td colspan="2">Sacar siempre factor común antes de leer el vértice: <code>|bx − c| = |b| · |x − c/b|</code> ⇒ el vértice está en <code>h = c/b</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style="font-family:var(--font-hand);color:var(--yellow);font-size:1.5rem;margin-top:24px;">2. Reglas de Oro: Funciones por Partes y Escalonadas</h3>
+        <div class="seq-table-wrap">
+          <table class="seq-summary-table">
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>Regla Algebraica</th>
+                <th>Lectura en el Gráfico Cartesiano</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Evaluar f(x₀) por partes</strong></td>
+                <td>Chequear primero qué condición cumple <code>x₀</code> y evaluar <strong>solo esa fila</strong>.</td>
+                <td>Subir o bajar verticalmente desde <code>x = x₀</code> hasta chocar con el tramo activo.</td>
+              </tr>
+              <tr>
+                <td><strong>Frontera estricta (&lt; ó &gt;) vs inclusiva (≤ ó ≥)</strong></td>
+                <td>Solo la rama con <code>≤</code> o <code>≥</code> es dueña del valor en el borde <code>x = c</code>.</td>
+                <td><code>&lt;, &gt;</code> se dibujan con <strong>círculo abierto ○</strong>.<br><code>≤, ≥</code> se dibujan con <strong>punto lleno ●</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>Prueba de unicidad (¿Es función?)</strong></td>
+                <td>Un mismo <code>x = c</code> no puede tener dos signos de igual con resultados distintos.</td>
+                <td>Ninguna recta vertical puede cortar a <strong>dos puntos llenos ●</strong> a distinta altura.</td>
+              </tr>
+              <tr>
+                <td><strong>Pegado continuo en x = c</strong></td>
+                <td>Igualar los límites laterales en la frontera: <code>f_izq(c) = f_der(c)</code>.</td>
+                <td>El punto lleno ● de una rama encaja exactamente dentro del círculo abierto ○ de la otra (sin salto).</td>
+              </tr>
+              <tr>
+                <td><strong>Piso ⌊x⌋ vs Techo ⌈x⌉</strong></td>
+                <td><code>⌊x⌋</code>: mayor entero <code>≤ x</code> (ej. <code>⌊−1,2⌋ = −2</code>).<br><code>⌈x⌉</code>: menor entero <code>≥ x</code> (ej. <code>⌈−1,2⌉ = −1</code>).</td>
+                <td>Escalones horizontales de largo 1: <code>⌊x⌋</code> tiene ● a la izquierda y ○ a la derecha; <code>⌈x⌉</code> tiene ○ a la izquierda y ● a la derecha.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  </main>
+</body>
+</html>

@@ -5,7 +5,7 @@ import { spawn } from 'node:child_process';
 
 const ROOT_DIR = path.resolve('.');
 const PORT = 3456;
-const PAGES = ['index.html', 'desigualdades.html', 'unidades.html', 'funciones.html', 'sucesiones.html'];
+const PAGES = ['index.html', 'desigualdades.html', 'unidades.html', 'funciones.html', 'sucesiones.html', 'valor-absoluto.html'];
 
 const MIME_MAP = {
   '.html': 'text/html; charset=utf-8',
@@ -213,7 +213,27 @@ for (const pageName of PAGES) {
     };
   })()`);
 
-  // 2. Verificar desktop
+  // 2. Verificar mobile pequeño 320px
+  await client.send('Emulation.setDeviceMetricsOverride', {
+    width: 320,
+    height: 568,
+    deviceScaleFactor: 2,
+    mobile: true,
+  });
+  await new Promise((r) => setTimeout(r, 150));
+
+  const evalMobile320 = await client.eval(`(() => {
+    const docScrollWidth = document.documentElement.scrollWidth;
+    const bodyScrollWidth = document.body.scrollWidth;
+    const innerWidth = window.innerWidth;
+    return {
+      innerWidth,
+      docScrollWidth,
+      overflow320: docScrollWidth > innerWidth + 1 || bodyScrollWidth > innerWidth + 1,
+    };
+  })()`);
+
+  // 3. Verificar desktop
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: 1280,
     height: 800,
@@ -242,6 +262,7 @@ for (const pageName of PAGES) {
     evalMobile.restoredAria === 'true' &&
     evalMobile.restoredStorage === 'true' &&
     !evalMobile.hasHorizontalOverflow &&
+    !evalMobile320.overflow320 &&
     !evalDesktop.overflow;
 
   if (!pageOk) allPassed = false;
@@ -252,6 +273,7 @@ for (const pageName of PAGES) {
   console.log(`  Estado inicial: aria-pressed="${evalMobile.initialAria}", texto="${evalMobile.initialText}"`);
   console.log(`  Conmutado: aria-pressed="${evalMobile.toggledAria}", texto="${evalMobile.toggledText}", localStorage="${evalMobile.toggledStorage}"`);
   console.log(`  Restaurado: aria-pressed="${evalMobile.restoredAria}", texto="${evalMobile.restoredText}", localStorage="${evalMobile.restoredStorage}"`);
+  console.log(`  Mobile 320px width: innerWidth=${evalMobile320.innerWidth}, scrollWidth=${evalMobile320.docScrollWidth}, desborde=${evalMobile320.overflow320}`);
   console.log(`  Mobile 375px width: innerWidth=${evalMobile.innerWidth}, scrollWidth=${evalMobile.docScrollWidth}, desborde=${evalMobile.hasHorizontalOverflow}`);
   console.log(`  Desktop 1280px desborde: ${evalDesktop.overflow}`);
   console.log(`  Resultado página: ${pageOk ? 'PASÓ ✅' : 'FALLÓ ❌'}`);
@@ -264,7 +286,7 @@ chromeProc.kill();
 server.close();
 
 console.log('\n========================================');
-console.log(`RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? 'TODAS LAS PÁGINAS PASARON (5/5) ✅' : 'ALGUNA PÁGINA FALLÓ ❌'}`);
+console.log(`RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? `TODAS LAS PÁGINAS PASARON (${PAGES.length}/${PAGES.length}) ✅` : 'ALGUNA PÁGINA FALLÓ ❌'}`);
 console.log('========================================');
 
 if (!allPassed) {

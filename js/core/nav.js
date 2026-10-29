@@ -10,6 +10,7 @@ export const PAGES = [
   { id: 'unidades', href: 'unidades.html', label: 'Unidades' },
   { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
   { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
+  { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
 ];
 
 /**

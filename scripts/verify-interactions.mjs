@@ -187,8 +187,93 @@ const interactionResults = await client.eval(`(async () => {
   return report;
 })()`);
 
-console.log('Resultados de interacción en navegador:', JSON.stringify(interactionResults, null, 2));
+console.log('Resultados de interacción en sucesiones.html:', JSON.stringify(interactionResults, null, 2));
+
+await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/valor-absoluto.html` });
+await new Promise((r) => setTimeout(r, 1200));
+
+const absResults = await client.eval(`(async () => {
+  const widgets = Array.from(document.querySelectorAll('[data-widget]'));
+  const populatedWidgets = widgets.filter((el) => el.children.length > 0).map((el) => el.dataset.widget);
+
+  const checks = Array.from(document.querySelectorAll('[data-check]'));
+  const populatedChecks = checks.filter((el) => el.children.length > 0).map((el) => el.dataset.check);
+
+  // Probar un botón de VN trigger
+  const firstVnBtn = document.querySelector('.vn-trigger[data-vn-script="sec1-distancia"]');
+  if (firstVnBtn) firstVnBtn.click();
+  await new Promise((r) => setTimeout(r, 100));
+  const vnOverlayActive = Boolean(document.querySelector('.vn-overlay, .vn-stage, [class*="vn"]'));
+
+  // Probar cambio de pestaña en Retos al Escudo Deflector V
+  const retoTabs = Array.from(document.querySelectorAll('[data-widget="retos-abs"] button.chip'));
+  const bossTab = retoTabs.find((b) => b.textContent.includes('Escudo Deflector'));
+  if (bossTab) bossTab.click();
+  await new Promise((r) => setTimeout(r, 100));
+  const bossBoardMounted = Boolean(document.querySelector('[data-widget="retos-abs"] svg.abs-board-svg'));
+
+  // Probar respuesta en sec-1 (número) y diagnóstico en sec-3 (vértice invertido)
+  const sec1Input = document.querySelector('[data-check="sec-1"] input[type="number"]');
+  const sec1Btn = document.querySelector('[data-check="sec-1"] button.btn--check');
+  if (sec1Input && sec1Btn) {
+    sec1Input.value = '9';
+    sec1Btn.click();
+  }
+  const sec1FirstCardResolved = Boolean(document.querySelector('[data-check="sec-1"] .seq-check__card.is-resolved'));
+
+  // Probar controles de teclado sobre los nodos SVG enfocados (vértice, pendiente y láser)
+  const sec7VertexHandle = document.querySelector('[data-widget="radiografia-abs"] [data-handle="vertex"]');
+  const sec7BeforeLabel = sec7VertexHandle ? sec7VertexHandle.getAttribute('aria-label') : '';
+  if (sec7VertexHandle) {
+    sec7VertexHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  }
+  const sec7VertexAfter = document.querySelector('[data-widget="radiografia-abs"] [data-handle="vertex"]');
+  const sec7AfterLabel = sec7VertexAfter ? sec7VertexAfter.getAttribute('aria-label') : '';
+  const keyboardVertexWorks = Boolean(sec7BeforeLabel && sec7AfterLabel && sec7BeforeLabel !== sec7AfterLabel);
+
+  const sec7LaserHandle = document.querySelector('[data-widget="radiografia-abs"] [data-handle="laser"]');
+  const laserBefore = sec7LaserHandle ? sec7LaserHandle.getAttribute('aria-valuenow') : '';
+  if (sec7LaserHandle) {
+    sec7LaserHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+  }
+  const sec7LaserAfter = document.querySelector('[data-widget="radiografia-abs"] [data-handle="laser"]');
+  const laserAfter = sec7LaserAfter ? sec7LaserAfter.getAttribute('aria-valuenow') : '';
+  const keyboardLaserWorks = Boolean(laserBefore && laserAfter && laserBefore !== laserAfter);
+
+  return {
+    totalWidgets: widgets.length,
+    populatedWidgetsCount: populatedWidgets.length,
+    populatedWidgets,
+    totalChecks: checks.length,
+    populatedChecksCount: populatedChecks.length,
+    vnOverlayActive,
+    bossBoardMounted,
+    sec1FirstCardResolved,
+    keyboardVertexWorks,
+    keyboardLaserWorks,
+  };
+})()`);
+
+console.log('Resultados de interacción en valor-absoluto.html:', JSON.stringify(absResults, null, 2));
+
+const allOk =
+  interactionResults.sliderThrottlingWorks &&
+  interactionResults.soundDisabledWorks &&
+  interactionResults.audioCallsPassed &&
+  interactionResults.vnReactTriggered &&
+  absResults.populatedWidgetsCount === 11 &&
+  absResults.populatedChecksCount === 10 &&
+  absResults.bossBoardMounted &&
+  absResults.sec1FirstCardResolved &&
+  absResults.keyboardVertexWorks &&
+  absResults.keyboardLaserWorks;
 
 client.close();
 chromeProc.kill();
 server.close();
+
+if (!allOk) {
+  console.error('Falló alguna verificación interactiva.');
+  process.exit(1);
+}
+
