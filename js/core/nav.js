@@ -3,6 +3,7 @@
  */
 import { h, s, mount, qsa, on } from './dom.js';
 import { isSoundEnabled, toggleSound, playClick, initGlobalSoundUI } from './sound.js';
+import { initScratchpad } from './scratchpad.js';
 
 export const PAGES = [
   { id: 'inicio', href: 'index.html', label: 'Inicio' },
@@ -312,6 +313,7 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
 
   renderChalkSill();
   initGlobalSoundUI();
+  initScratchpad();
 }
 
 /** Renderiza la repisa inferior de pizarra con un trozo de tiza SVG (solo visible >= 820px). */

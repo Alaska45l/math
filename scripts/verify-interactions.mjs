@@ -90,8 +90,19 @@ class CdpClient {
   }
 }
 
-const targetRes = await fetch('http://127.0.0.1:9334/json/new', { method: 'PUT' });
-const targetData = await targetRes.json();
+let targetData = null;
+for (let i = 0; i < 20; i++) {
+  try {
+    const targetRes = await fetch('http://127.0.0.1:9334/json/new', { method: 'PUT' });
+    if (targetRes.ok) {
+      targetData = await targetRes.json();
+      break;
+    }
+  } catch (_e) {
+    await new Promise((r) => setTimeout(r, 150));
+  }
+}
+if (!targetData) throw new Error('No se pudo conectar con Chromium');
 const client = new CdpClient(targetData.webSocketDebuggerUrl);
 await client.ready;
 
@@ -382,6 +393,37 @@ const absResults = await client.eval(`(async () => {
   const laserAfter = sec7LaserAfter ? sec7LaserAfter.getAttribute('aria-valuenow') : '';
   const keyboardLaserWorks = Boolean(laserBefore && laserAfter && laserBefore !== laserAfter);
 
+  // 7. Probar pizarrón borrador flotante (lápiz y goma con trazo inteligente)
+  const spToggle = document.querySelector('.scratchpad-toggle-btn');
+  const spCanvas = document.querySelector('.scratchpad-canvas');
+  let scratchpadWorks = false;
+  if (spToggle && spCanvas) {
+    spToggle.click();
+    await new Promise((r) => setTimeout(r, 60));
+    const spToolbar = document.querySelector('.scratchpad-toolbar');
+    const toolbarOpen = spToolbar && !spToolbar.hidden;
+    const canvasActive = spCanvas.classList.contains('is-active');
+
+    // Simular un trazo inteligente de lápiz
+    spCanvas.dispatchEvent(new PointerEvent('pointerdown', { clientX: 100, clientY: 100, bubbles: true }));
+    spCanvas.dispatchEvent(new PointerEvent('pointermove', { clientX: 120, clientY: 110, bubbles: true }));
+    spCanvas.dispatchEvent(new PointerEvent('pointermove', { clientX: 140, clientY: 130, bubbles: true }));
+    spCanvas.dispatchEvent(new PointerEvent('pointerup', { clientX: 140, clientY: 130, bubbles: true }));
+
+    // Cambiar a goma
+    const eraserBtn = document.querySelector('.scratchpad-btn[title*="Goma"]');
+    if (eraserBtn) eraserBtn.click();
+    const isEraser = spCanvas.classList.contains('is-eraser');
+
+    // Deshacer
+    const undoBtn = document.querySelector('.scratchpad-btn[title*="Deshacer"]');
+    if (undoBtn) undoBtn.click();
+
+    // Cerrar barra
+    spToggle.click();
+    scratchpadWorks = Boolean(toolbarOpen && canvasActive && isEraser);
+  }
+
   return {
     totalWidgets: widgets.length,
     populatedWidgetsCount: populatedWidgets.length,
@@ -395,6 +437,7 @@ const absResults = await client.eval(`(async () => {
     doubtBtnWorks,
     vertexBtnWorks,
     sec7HelpBtnWorks,
+    scratchpadWorks,
     vnOverlayActive,
     vnTagSvgPresent,
     bossBoardMounted,
@@ -423,6 +466,7 @@ const allOk =
   absResults.doubtBtnWorks &&
   absResults.vertexBtnWorks &&
   absResults.sec7HelpBtnWorks &&
+  absResults.scratchpadWorks &&
   absResults.vnOverlayActive &&
   absResults.vnTagSvgPresent &&
   absResults.bossBoardMounted &&
