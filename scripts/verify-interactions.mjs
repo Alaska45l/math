@@ -319,6 +319,18 @@ const absResults = await client.eval(`(async () => {
     await new Promise((r) => setTimeout(r, 60));
   }
 
+  const sec7HelpBtn = document.querySelector('.seq-doubt-btn[data-vn-script="sec7-ayuda-analisis"]');
+  let sec7HelpBtnWorks = false;
+  if (sec7HelpBtn) {
+    sec7HelpBtn.click();
+    await new Promise((r) => setTimeout(r, 100));
+    const tag = document.querySelector('.vn-tag');
+    if (tag && tag.textContent.includes('rescate')) sec7HelpBtnWorks = true;
+    const vnClose = document.querySelector('.vn-close');
+    if (vnClose) vnClose.click();
+    await new Promise((r) => setTimeout(r, 60));
+  }
+
   const firstBasicBtn = basicTriggerBtns[0];
   if (firstBasicBtn) firstBasicBtn.click();
   await new Promise((r) => setTimeout(r, 100));
@@ -382,6 +394,7 @@ const absResults = await client.eval(`(async () => {
     basicTriggerBtnsCount: basicTriggerBtns.length,
     doubtBtnWorks,
     vertexBtnWorks,
+    sec7HelpBtnWorks,
     vnOverlayActive,
     vnTagSvgPresent,
     bossBoardMounted,
@@ -409,6 +422,7 @@ const allOk =
   absResults.basicTriggerBtnsCount === 10 &&
   absResults.doubtBtnWorks &&
   absResults.vertexBtnWorks &&
+  absResults.sec7HelpBtnWorks &&
   absResults.vnOverlayActive &&
   absResults.vnTagSvgPresent &&
   absResults.bossBoardMounted &&

@@ -454,6 +454,39 @@ export const VN_SCRIPTS = {
     },
   ],
 
+  'sec7-ayuda-analisis': [
+    {
+      pose: 'feliz',
+      tag: '¡Cero drama! Guía de rescate',
+      html: '¡Tranqui, que acá nadie nació sabiendo Análisis Matemático! Si hace años que no tocás funciones o en la secundaria te daban reglas de memoria que ya te olvidaste, vamos a reconstruir el mapa mental desde cero absoluto. Analizar una función no es más que <strong>hacerle 5 preguntas lógicas a su gráfica</strong>. Y la primera clave de oro es: <em>¿a qué eje del mapa le preguntamos cada cosa?</em>',
+    },
+    {
+      pose: 'base',
+      tag: '1. Dominio vs. Imagen (Entradas vs. Alturas)',
+      html: '• <strong>Dominio <span class="eq">Dom(f)</span>:</strong> son todas las <span class="eq">x</span> que podés enchufar sin romper la matemática. Como el valor absoluto no tiene divisiones por cero ni raíces negativas, podés meter cualquier número real: <span class="eq">Dom(f) = ℝ = (−∞; +∞)</span>.<br>• <strong>Imagen <span class="eq">Im(f)</span>:</strong> es la proyección de sombras sobre el <strong>Eje Y</strong> (las alturas posibles). Si la «V» abre hacia arriba, el punto más bajo es el piso <span class="eq">k</span> del vértice: arranca con corchete <span class="eq">[k; +∞)</span> porque la altura <span class="eq">k</span> sí se toca. Si abre hacia abajo, el techo es <span class="eq">k</span>: <span class="eq">(−∞; k]</span>. ¡El infinito siempre lleva paréntesis!',
+    },
+    {
+      pose: 'enojada',
+      tag: '2. Monotonía (¡Siempre se lee en X!)',
+      html: 'Acá cometen el 90% de los errores en los exámenes: <strong>Crecimiento e Intervalos se leen SIEMPRE sobre el Eje X</strong>, mirando de izquierda a derecha.<br>• <strong>Decrecimiento <span class="eq">I↓</span>:</strong> el tramo donde vas esquiando colina abajo. En <span class="eq">f(x) = |x − 2| − 3</span>, venís bajando desde <span class="eq">−∞</span> hasta que chocás con la pared del vértice en <span class="eq">x = 2</span>: <span class="eq">I↓ = (−∞; 2)</span>.<br>• <strong>Crecimiento <span class="eq">I↑</span>:</strong> el tramo donde vas escalando colina arriba: desde el vértice <span class="eq">x = 2</span> en adelante: <span class="eq">I↑ = (2; +∞)</span>.<br>¡Jamás pongas la altura <span class="eq">−3</span> en el crecimiento! La pregunta es <em>«¿en qué tramo de x sube?»</em>, no <em>«¿a qué altura llegó?»</em>.',
+    },
+    {
+      pose: 'base',
+      tag: '3. Ceros C₀ (Puntos entre llaves)',
+      html: '• <strong>Ceros o Raíces <span class="eq">C₀</span>:</strong> son los valores de <span class="eq">x</span> donde la gráfica corta exactamente a la línea de flotación (<span class="eq">y = 0</span>). Para hallarlos, igualás la fórmula a cero: <span class="eq">|x − 2| − 3 = 0 ⟹ |x − 2| = 3</span>, dando <span class="eq">x = −1</span> y <span class="eq">x = 5</span>.<br><strong>¡Atención con los símbolos!</strong> Como son puntos aislados y no un intervalo continuo de números, en la facultad se escriben obligatoriamente <strong>entre llaves</strong>: <span class="eq">C₀ = {−1; 5}</span>. Si pusieras paréntesis <span class="eq">(−1; 5)</span> parecería un intervalo o un punto cartesiano, y si pusieras corchetes <span class="eq">[−1; 5]</span> incluirías al <span class="eq">0, 1, 2, 3, 4</span> que no son raíces.',
+    },
+    {
+      pose: 'colapso',
+      tag: '4. Positividad C⁺ y Negatividad C⁻',
+      html: 'Imaginá que el eje X es la superficie del agua del mar:<br>• <strong>Positividad <span class="eq">C⁺</span>:</strong> son los intervalos de <span class="eq">x</span> donde la gráfica está <strong>por arriba del agua</strong> (<span class="eq">f(x) &gt; 0</span>).<br>• <strong>Negatividad <span class="eq">C⁻</span>:</strong> los intervalos de <span class="eq">x</span> donde la gráfica está <strong>sumergida bajo el agua</strong> (<span class="eq">f(x) &lt; 0</span>).<br>¿Quién marca la frontera entre estar sumergido o en el aire? ¡Exacto, los Ceros <span class="eq">C₀</span>! En nuestro ejemplo, la punta de la V se hunde entre las dos raíces: <span class="eq">C⁻ = (−1; 5)</span>. Las dos alas que quedan flotando afuera forman <span class="eq">C⁺ = (−∞; −1) ∪ (5; +∞)</span>.<br>Siempre llevan <strong>paréntesis</strong> porque en las raíces exactas la altura es cero (ni positivo ni negativo).',
+    },
+    {
+      pose: 'orgullosa',
+      tag: '5. La regla mnemotécnica de oro',
+      html: 'Guardate esta chuleta mental para no dudar nunca más en una hoja de parcial:<br>1. <strong>La Imagen <span class="eq">Im(f)</span> es la única que mira el Eje Y</strong> (arranca o frena en la altura <span class="eq">k</span> con corchete).<br>2. <strong>La Monotonía (<span class="eq">I↑ / I↓</span>) mira el Eje X</strong> y siempre se corta en la abscisa del vértice <span class="eq">h</span>.<br>3. <strong>Los signos (<span class="eq">C⁺ / C⁻</span>) miran el Eje X</strong> y siempre se cortan en las raíces <span class="eq">C₀</span>.<br>4. <span class="eq">∪</span> significa «unión» (pegar dos intervalos separados).<br>¡Ahora activá las 4 Lentes en el pizarrón interactivo de abajo para ver brillar cada conjunto sobre los ejes!',
+    },
+  ],
+
   // =========================================================================
   // SECCIÓN 8 · LA ADUANA DE DOMINIOS: EVALUAR POR PARTES
   // =========================================================================
