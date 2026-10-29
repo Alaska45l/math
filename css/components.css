@@ -20,9 +20,9 @@
   --chalk-border-active: var(--chalk-border-1-pressed);
 }
 
-button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.btn:not(.seq-check__opt-btn),
+button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.button:not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
 .fn-reveal,
 input[type="number"],
 input[type="text"] {
@@ -46,23 +46,23 @@ input[type="text"] {
 }
 
 /* Asignación de 3 variantes de bordes dibujados a mano */
-button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.btn:nth-of-type(3n+1):not(.seq-check__opt-btn),
+button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.button:nth-of-type(3n+1):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:nth-of-type(3n+1):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
 select:nth-of-type(3n+1) {
   border-image: var(--chalk-border-1);
 }
 
-button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.btn:nth-of-type(3n+2):not(.seq-check__opt-btn),
+button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.button:nth-of-type(3n+2):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:nth-of-type(3n+2):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
 select:nth-of-type(3n+2) {
   border-image: var(--chalk-border-2);
 }
 
-button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn),
-.btn:nth-of-type(3n):not(.seq-check__opt-btn),
+button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.button:nth-of-type(3n):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:nth-of-type(3n):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
 select:nth-of-type(3n) {
   border-image: var(--chalk-border-3);
 }
@@ -108,25 +108,25 @@ select optgroup {
 }
 
 @media (hover: hover) {
-  button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .btn:hover:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn),
+  button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .button:hover:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .btn:hover:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
   select:hover:nth-of-type(3n+1) {
     color: var(--yellow);
     border-image: var(--chalk-border-1-hover);
   }
 
-  button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .btn:hover:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn),
+  button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .button:hover:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .btn:hover:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
   select:hover:nth-of-type(3n+2) {
     color: var(--yellow);
     border-image: var(--chalk-border-2-hover);
   }
 
-  button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-  .btn:hover:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn),
+  button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .button:hover:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+  .btn:hover:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
   select:hover:nth-of-type(3n) {
     color: var(--yellow);
     border-image: var(--chalk-border-3-hover);
@@ -144,13 +144,13 @@ select optgroup {
 }
 
 /* Estado presionado persistente (aria-pressed="true", botones de lentes y filtros) */
-button[aria-pressed="true"],
+button[aria-pressed="true"]:not(.tab):not(.chip):not(.site-nav__sound-btn):not(.abs-token):not(.af-token),
 .btn[aria-pressed="true"],
 .btn--on {
   color: var(--yellow);
 }
 
-button[aria-pressed="true"],
+button[aria-pressed="true"]:not(.tab):not(.chip):not(.site-nav__sound-btn):not(.abs-token):not(.af-token),
 .button[aria-pressed="true"],
 .btn[aria-pressed="true"] {
   border-width: 7px;
@@ -158,46 +158,46 @@ button[aria-pressed="true"],
   color: var(--yellow);
 }
 
-button[aria-pressed="true"]:nth-of-type(3n+1),
+button[aria-pressed="true"]:nth-of-type(3n+1):not(.tab):not(.chip):not(.site-nav__sound-btn):not(.abs-token):not(.af-token),
 .btn[aria-pressed="true"]:nth-of-type(3n+1) {
   border-image: var(--chalk-border-1-pressed);
   transform: rotate(-0.6deg);
 }
 
-button[aria-pressed="true"]:nth-of-type(3n+2),
+button[aria-pressed="true"]:nth-of-type(3n+2):not(.tab):not(.chip):not(.site-nav__sound-btn):not(.abs-token):not(.af-token),
 .btn[aria-pressed="true"]:nth-of-type(3n+2) {
   border-image: var(--chalk-border-2-pressed);
   transform: rotate(0.6deg);
 }
 
-button[aria-pressed="true"]:nth-of-type(3n),
+button[aria-pressed="true"]:nth-of-type(3n):not(.tab):not(.chip):not(.site-nav__sound-btn):not(.abs-token):not(.af-token),
 .btn[aria-pressed="true"]:nth-of-type(3n) {
   border-image: var(--chalk-border-3-pressed);
   transform: rotate(-0.4deg);
 }
 
 /* Estado :active momentáneo */
-button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-.button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-.btn:active:not(:disabled):not(.seq-check__opt-btn),
+button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.button:active:not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:active:not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
 .fn-reveal:active {
   color: var(--yellow);
 }
 
-button:active:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-.btn:active:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn) {
+button:active:nth-of-type(3n+1):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:active:nth-of-type(3n+1):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn) {
   border-image: var(--chalk-border-1-pressed);
   transform: rotate(-0.6deg) scale(0.98);
 }
 
-button:active:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-.btn:active:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn) {
+button:active:nth-of-type(3n+2):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:active:nth-of-type(3n+2):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn) {
   border-image: var(--chalk-border-2-pressed);
   transform: rotate(0.6deg) scale(0.98);
 }
 
-button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn),
-.btn:active:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn) {
+button:active:nth-of-type(3n):not(:disabled):not(.tab):not(.fn-quiz-btn):not([data-answer]):not(.seq-check__opt-btn):not(.vn-ctrl-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn),
+.btn:active:nth-of-type(3n):not(:disabled):not(.seq-check__opt-btn):not(.vn-trigger):not(.chip):not(.vn-fab):not(.af-token):not(.abs-token):not(.seq-token):not(.vn-btn-next):not(.site-nav__sound-btn) {
   border-image: var(--chalk-border-3-pressed);
   transform: rotate(-0.4deg) scale(0.98);
 }
@@ -416,15 +416,71 @@ output {
   font-weight: 400;
 }
 
-/* Chips (presets): min-height 44px */
+/* Chips (presets y botones de modo compactos): min-height 44px para accesibilidad */
 .chip {
   min-height: 44px;
-  font-size: 1rem;
-  padding: 8px 12px;
-  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius, 6px);
+  padding: 6px 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: var(--yellow);
+}
+
+.chip--ghost {
+  background: transparent;
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+/* Divisor de tiza dibujada a mano (.chalk-stroke) */
+.chalk-stroke {
+  display: block;
+  position: relative;
+  width: calc(100% + 18px);
+  margin-left: -9px;
+  height: 2px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+  transform: rotate(-0.35deg);
+  transform-origin: left center;
+  background: linear-gradient(
+    92deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.42) 25%,
+    rgba(255, 255, 255, 0.35) 60%,
+    rgba(255, 255, 255, 0.12) 88%,
+    transparent 100%
+  );
+  border: none;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.chalk-stroke--alt {
+  width: calc(100% + 14px);
+  margin-left: -6px;
+  transform: rotate(0.3deg);
+  background: linear-gradient(
+    88deg,
+    rgba(255, 255, 255, 0.52) 0%,
+    rgba(255, 255, 255, 0.38) 35%,
+    rgba(255, 255, 255, 0.18) 80%,
+    transparent 100%
+  );
 }
 
 /* Subrayado ondeado de tiza para frases clave */
@@ -992,7 +1048,7 @@ svg text[fill="var(--yellow)"] {
   border-radius: 12px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 28px rgba(0, 0, 0, 0.25);
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   min-height: 250px;
   position: relative;
   overflow: visible;
@@ -1062,13 +1118,11 @@ svg text[fill="var(--yellow)"] {
 .vn-box__inner {
   flex: 1;
   align-self: stretch;
-  height: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-width: 0;
-  padding: 14px 18px 12px 12px;
+  padding: 14px 18px 14px 12px;
   cursor: default;
 }
 
@@ -1078,6 +1132,7 @@ svg text[fill="var(--yellow)"] {
   align-items: flex-start;
   gap: 10px;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .vn-nameplate {
@@ -1159,7 +1214,8 @@ button.vn-ctrl-btn:hover,
   font-size: 1.12rem;
   line-height: 1.6;
   color: var(--ink);
-  min-height: 6.2em;
+  flex: 1;
+  min-height: 0;
   margin-bottom: 8px;
 }
 
@@ -1177,8 +1233,28 @@ button.vn-ctrl-btn:hover,
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.14);
+  padding-top: 8px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vn-box__footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -6px;
+  width: calc(100% + 12px);
+  height: 2px;
+  transform: rotate(-0.25deg);
+  transform-origin: left center;
+  background: linear-gradient(
+    92deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.06) 90%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .vn-counter {
@@ -1190,10 +1266,28 @@ button.vn-ctrl-btn:hover,
 .vn-btn-next {
   min-height: 34px;
   padding: 4px 16px;
+  font-family: inherit;
   font-size: 0.92rem;
   font-weight: 600;
-  border-width: 2px;
+  color: var(--yellow);
+  background: rgba(230, 211, 138, 0.12);
+  border: 1px solid rgba(230, 211, 138, 0.35);
+  border-radius: 6px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.vn-btn-next:hover {
+  background: rgba(230, 211, 138, 0.22);
+  border-color: var(--yellow);
+  transform: translateY(-1px);
+}
+
+.vn-btn-next:active {
+  transform: translateY(0);
 }
 
 /* Fila de botones disparadores de Alaska (.vn-trigger-row) */
@@ -1296,7 +1390,8 @@ button.vn-ctrl-btn:hover,
 
   .vn-text {
     font-size: 1.04rem;
-    min-height: 5.4em;
+    flex: 1;
+    min-height: 0;
   }
 }
 
@@ -1312,7 +1407,7 @@ button.vn-ctrl-btn:hover,
 
   .vn-box {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: stretch;
     min-height: 140px;
     border-radius: 8px;
   }
@@ -1337,13 +1432,13 @@ button.vn-ctrl-btn:hover,
 
   .vn-box__inner {
     align-self: stretch;
-    height: 100%;
     padding: 8px 10px 8px 6px;
   }
 
   .vn-text {
     font-size: 0.94rem;
-    min-height: 4.8em;
+    flex: 1;
+    min-height: 0;
     line-height: 1.45;
   }
 

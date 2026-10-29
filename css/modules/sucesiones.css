@@ -479,12 +479,31 @@
 }
 
 .seq-annotated__note-box {
-  min-height: 44px;
+  min-height: 82px;
   display: flex;
-  align-items: center;
-  padding: 4px 0;
+  align-items: flex-start;
+  padding: 6px 0;
+  box-sizing: border-box;
   background-color: transparent;
   border: none;
+}
+
+.seq-annotated__hint-text {
+  margin: 0;
+  padding: 6px 10px;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+@keyframes note-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .seq-annotated__note {
@@ -495,11 +514,19 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 4px 8px;
   transform: rotate(-1deg);
+  animation: note-fade-in 0.16s ease-out;
 }
 
 .seq-annotated__note:nth-of-type(even) {
   transform: rotate(1deg);
+}
+
+@media (max-width: 600px) {
+  .seq-annotated__note-box {
+    min-height: 96px;
+  }
 }
 
 .seq-annotated__brace-box {
@@ -533,15 +560,20 @@
 }
 
 .seq-check__card {
-  padding: 16px;
-  border: 2px solid transparent;
-  border-image: var(--chalk-border-2);
-  background-color: transparent;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 8px);
+  background: rgba(255, 255, 255, 0.02);
   box-sizing: border-box;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.seq-check__card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .seq-check__card.is-resolved {
-  border-image: var(--chalk-border-1);
+  border: 1px solid rgba(142, 226, 175, 0.35);
   background-color: color-mix(in srgb, var(--green) 4%, transparent);
 }
 
