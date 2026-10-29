@@ -9,7 +9,7 @@
 import { h, s, mount, chalkIcon } from '../../core/dom.js';
 import { fmt, frac, MINUS } from '../../core/math-format.js';
 import { createPlane, bindSvgDrag, snapTo } from '../../core/plot.js';
-import { react } from '../../core/vn.js';
+import { react, playScript } from '../../core/vn.js';
 import { playSuccess, playError, playSliderTick } from '../../core/sound.js';
 import { tryParseExpr, toDisplay, equivalentFx } from './expr.js';
 import {
@@ -19,7 +19,7 @@ import {
   diagnoseAbs,
   formatCanonicalAbs,
 } from './logic.js';
-import { DIAGNOSE_REACTIONS } from './vn-scripts.js';
+import { DIAGNOSE_REACTIONS, getSec7Q2Script } from './vn-scripts.js';
 
 const PROGRESS_KEY = 'valor_absoluto:progreso:v1';
 
@@ -931,6 +931,18 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
   function triggerVnReaction(q, qState, isOk, diagId = null) {
     if (isOk) {
       playSuccess('normal');
+      if (typeof q.onSuccessScript === 'function') {
+        playScript(q.onSuccessScript());
+        return;
+      }
+      if (Array.isArray(q.onSuccessScript)) {
+        playScript(q.onSuccessScript);
+        return;
+      }
+      if (q.id === 'sec7-q2') {
+        playScript(getSec7Q2Script(true));
+        return;
+      }
       if (diagId === 'unfactored_inner_coeff' && DIAGNOSE_REACTIONS.unfactored_inner_coeff) {
         react(DIAGNOSE_REACTIONS.unfactored_inner_coeff);
         return;
@@ -967,6 +979,21 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
     qState.failCount = (qState.failCount || 0) + 1;
     playError(qState.failCount);
+
+    if (qState.failCount > 1) {
+      if (typeof q.onFailStreakScript === 'function') {
+        playScript(q.onFailStreakScript());
+        return;
+      }
+      if (Array.isArray(q.onFailStreakScript)) {
+        playScript(q.onFailStreakScript);
+        return;
+      }
+      if (q.id === 'sec7-q2') {
+        playScript(getSec7Q2Script(false));
+        return;
+      }
+    }
 
     if (diagId && DIAGNOSE_REACTIONS[diagId]) {
       react(DIAGNOSE_REACTIONS[diagId]);
@@ -1461,6 +1488,19 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           }
         });
         toolsRow.append(btnSol);
+      }
+
+      if (q.id === 'sec7-q2' || q.showExplainButton) {
+        const btnExplain = h('button', {
+          type: 'button',
+          class: 'chip chip--alaska',
+          title: 'Ver explicación de Alaska sobre por qué −3 se mantiene con signo negativo',
+        }, chalkIcon('glasses'), ' ¿Por qué no cambia de signo el −3?');
+
+        btnExplain.addEventListener('click', () => {
+          playScript(getSec7Q2Script(qState.ok));
+        });
+        toolsRow.append(btnExplain);
       }
 
       let hintsDisplay = null;

@@ -342,6 +342,76 @@ const absResults = await client.eval(`(async () => {
     await new Promise((r) => setTimeout(r, 60));
   }
 
+  // 3b. Probar explicación de Alaska en sec7-q2 (tanto por botón, como al fallar >1 vez y al completar)
+  const sec7Block = document.querySelector('[data-section="sec-7"]');
+  const sec7Cards = sec7Block ? sec7Block.querySelectorAll('.seq-check__card') : [];
+  const sec7Q2Card = sec7Cards[1];
+  let sec7Q2ExplanationWorks = false;
+  let chipWorks = false;
+  let failStreakWorks = false;
+  let successWorks = false;
+  if (sec7Q2Card) {
+    const chipAlaska = sec7Q2Card.querySelector('.chip--alaska');
+    if (chipAlaska) {
+      chipAlaska.click();
+      await new Promise((r) => setTimeout(r, 80));
+      const tag = document.querySelector('.vn-tag');
+      if (tag && (tag.textContent.includes('signo') || tag.textContent.includes('Frená') || tag.textContent.includes('Ceros'))) {
+        chipWorks = true;
+      }
+      const vnClose = document.querySelector('.vn-close');
+      if (vnClose) vnClose.click();
+      await new Promise((r) => setTimeout(r, 50));
+    }
+
+    // Probar fallar más de 1 vez
+    const inputs = sec7Q2Card.querySelectorAll('input');
+    const btnCheck = sec7Q2Card.querySelector('button.btn--check');
+    if (inputs.length === 2 && btnCheck) {
+      inputs[0].value = '1';
+      inputs[1].value = '2';
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+      inputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+      btnCheck.click(); // Intento 1 fallido
+      await new Promise((r) => setTimeout(r, 50));
+      const vnClose1 = document.querySelector('.vn-close');
+      if (vnClose1) vnClose1.click();
+      await new Promise((r) => setTimeout(r, 50));
+
+      btnCheck.click(); // Intento 2 fallido (failCount > 1)
+      await new Promise((r) => setTimeout(r, 80));
+      const tagFail = document.querySelector('.vn-tag');
+      if (tagFail && (tagFail.textContent.includes('signo') || tagFail.textContent.includes('Frená'))) {
+        failStreakWorks = true;
+      }
+      const vnClose2 = document.querySelector('.vn-close');
+      if (vnClose2) vnClose2.click();
+      await new Promise((r) => setTimeout(r, 50));
+
+      // Probar completar correctamente (x1 = 0, x2 = 6)
+      const sec7Q2CardUpdated = document.querySelector('[data-section="sec-7"]').querySelectorAll('.seq-check__card')[1];
+      const freshInputs = sec7Q2CardUpdated.querySelectorAll('input');
+      const freshBtnCheck = sec7Q2CardUpdated.querySelector('button.btn--check');
+      freshInputs[0].value = '0';
+      freshInputs[1].value = '6';
+      freshInputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+      freshInputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+      freshBtnCheck.click(); // Intento exitoso
+      await new Promise((r) => setTimeout(r, 80));
+      const tagSuccess = document.querySelector('.vn-tag');
+      const resolvedCard = document.querySelector('[data-section="sec-7"]').querySelectorAll('.seq-check__card')[1];
+      const isCardResolved = resolvedCard.classList.contains('is-resolved');
+      if (tagSuccess && (tagSuccess.textContent.includes('Ceros') || tagSuccess.textContent.includes('truco')) && isCardResolved) {
+        successWorks = true;
+      }
+      const vnClose3 = document.querySelector('.vn-close');
+      if (vnClose3) vnClose3.click();
+      await new Promise((r) => setTimeout(r, 50));
+
+      sec7Q2ExplanationWorks = Boolean(chipWorks && failStreakWorks && successWorks);
+    }
+  }
+
   const firstBasicBtn = basicTriggerBtns[0];
   if (firstBasicBtn) firstBasicBtn.click();
   await new Promise((r) => setTimeout(r, 100));
@@ -437,6 +507,7 @@ const absResults = await client.eval(`(async () => {
     doubtBtnWorks,
     vertexBtnWorks,
     sec7HelpBtnWorks,
+    sec7Q2ExplanationWorks,
     scratchpadWorks,
     vnOverlayActive,
     vnTagSvgPresent,
@@ -466,6 +537,7 @@ const allOk =
   absResults.doubtBtnWorks &&
   absResults.vertexBtnWorks &&
   absResults.sec7HelpBtnWorks &&
+  absResults.sec7Q2ExplanationWorks &&
   absResults.scratchpadWorks &&
   absResults.vnOverlayActive &&
   absResults.vnTagSvgPresent &&

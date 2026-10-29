@@ -487,6 +487,39 @@ export const VN_SCRIPTS = {
     },
   ],
 
+  'sec7-q2-signo-despeje': [
+    {
+      pose: 'colapso',
+      tag: '¡Frená un segundo! Analicemos el signo',
+      html: '¡No te desanimes ni tires números al azar! Sé con certeza qué te está haciendo ruido acá: al ver <span class="eq">−2|x − 3| + 6 = 0</span> pensás: <em>«si los términos cambiaron de signo, ¿por qué el −3 de adentro no se volvió +3?»</em>. Vamos a desarmar el paso completo para que lo veas con total claridad.',
+    },
+    {
+      pose: 'base',
+      tag: 'Las barras son un paquete blindado',
+      html: 'En álgebra, las barras de valor absoluto <span class="eq">|x − 3|</span> actúan como un <strong>bloque sellado</strong>. Llamémoslo temporalmente <span class="eq">A</span>, donde <span class="eq">A = |x − 3|</span>. Mirá cómo queda la ecuación:<br><span class="eq">−2 · A + 6 = 0</span>.<br>El coeficiente <span class="eq">−2</span> multiplica al <em>resultado completo</em> del paquete <span class="eq">A</span>, <strong>no distribuye</strong> adentro de los términos de la resta.',
+    },
+    {
+      pose: 'orgullosa',
+      tag: 'Camino 1 · Pasar sumando el término entero',
+      html: 'La forma más directa y segura de despejar es por pasaje de términos. El término <span class="eq">−2 · A</span> está restando a la izquierda; lo pasamos sumando a la derecha:<br><span class="eq">6 = +2 · A ⟹ 2 · A = 6 ⟹ 2|x − 3| = 6</span>.<br>¡Fijate qué pasó! El paquete <span class="eq">A = |x − 3|</span> viajó entero hacia el otro lado. Lo que estaba adentro (<span class="eq">x − 3</span>) no se tocó porque nadie operó dentro de la caja.',
+    },
+    {
+      pose: 'colapso',
+      tag: 'Camino 2 · ¿Y si multiplicamos por −1?',
+      html: 'Muchos dicen: <em>«¡Pero Alaska, yo multipliqué toda la ecuación por −1!»</em>. ¡Perfecto! Miremos qué hace exactamente ese <span class="eq">−1</span>:<br><span class="eq">(−1) · [−2 · |x − 3| + 6] = (−1) · 0</span>.<br>Por propiedad distributiva respecto a la suma:<br><span class="eq">(−1) · (−2 · |x − 3|) + (−1) · (+6) = 0</span>.<br>El segundo término da <span class="eq">−6</span>. Pero en el primer término tenés un producto de factores: <span class="eq">(−1) · (−2) · |x − 3|</span>.',
+    },
+    {
+      pose: 'enojada',
+      tag: '¡Regla de oro del producto en Exactas!',
+      html: '¡Grabate esto a fuego! En un producto <span class="eq">k · (a · b)</span>, la constante <span class="eq">k</span> multiplica a <strong>un solo factor</strong>, no a los dos: <span class="eq">(−1) · (−2) = +2</span>. Te queda <span class="eq">+2 · |x − 3| − 6 = 0</span>.<br>Si además le cambiaras el signo al interior (<span class="eq">|−x + 3|</span> o <span class="eq">|x + 3|</span>), ¡estarías multiplicando por <span class="eq">−1</span> <strong>dos veces</strong>! Eso sería multiplicar por <span class="eq">(−1) · (−1) = +1</span>, alterando la ecuación.',
+    },
+    {
+      pose: 'feliz',
+      tag: 'El paso final hacia las dos raíces',
+      html: 'Con <span class="eq">2|x − 3| = 6</span>, dividimos ambos miembros por 2:<br><span class="eq">|x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> <span class="eq">x − 3 = −3 ⟹ x₁ = −3 + 3 = 0</span>.<br>• <strong>Rama derecha:</strong> <span class="eq">x − 3 = +3 ⟹ x₂ = 3 + 3 = 6</span>.<br>Por eso las dos raíces son <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>.',
+    },
+  ],
+
   // =========================================================================
   // SECCIÓN 8 · LA ADUANA DE DOMINIOS: EVALUAR POR PARTES
   // =========================================================================
@@ -695,3 +728,32 @@ export const DIAGNOSE_REACTIONS = {
     html: `¡Acabás de romper la definición de función! Si dejás punto cerrado ${DOT_CLOSED} en ambos tramos sobre la misma vertical <span class="eq">x = 1</span> a distinta altura, una misma entrada tiene dos salidas. ¡Abrí uno de los dos extremos como ${DOT_OPEN}!`,
   },
 };
+
+/**
+ * Guión detallado de Alaska para el ejercicio sec7-q2:
+ * Explica por qué en −2|x − 3| + 6 = 0 ⇒ 2|x − 3| = 6 ⇒ |x − 3| = 3
+ * el −3 dentro de las barras no cambia de signo.
+ * isSuccess = true adapta el primer mensaje como felicitación + profundización.
+ * isSuccess = false adapta el primer mensaje como rescate ante error reiterado.
+ */
+export function getSec7Q2Script(isSuccess = true) {
+  const opening = isSuccess
+    ? {
+        pose: 'feliz',
+        tag: '¡Ceros clavados! Pero analicemos el truco',
+        html: '¡Excelente! Sacaste impecables las dos raíces: <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>. Pero detengámonos un minuto acá, porque este paso esconde una duda que hace dudar a casi todos: ¿por qué al pasar de <span class="eq">−2|x − 3| + 6 = 0</span> a <span class="eq">2|x − 3| = 6</span>, el <span class="eq">−3</span> adentro del módulo no cambió a <span class="eq">+3</span>? ¡Veámoslo con lupa!',
+      }
+    : {
+        pose: 'colapso',
+        tag: '¡Frená un segundo! Analicemos el signo',
+        html: '¡No te desanimes ni tires números al azar! Sé con certeza qué te está haciendo ruido acá: al ver <span class="eq">−2|x − 3| + 6 = 0</span> pensás: <em>«si los términos cambiaron de signo, ¿por qué el −3 de adentro no se volvió +3?»</em>. Vamos a desarmar el paso completo para que lo veas con total claridad.',
+      };
+
+  return [
+    opening,
+    ...VN_SCRIPTS['sec7-q2-signo-despeje'].slice(1),
+  ];
+}
+
+export const SEC7_Q2_EXPLANATION = VN_SCRIPTS['sec7-q2-signo-despeje'];
+

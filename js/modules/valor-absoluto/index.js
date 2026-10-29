@@ -367,6 +367,7 @@ const CHECKS_DATA = {
       hints: [
         'Igualá a cero: −2|x − 3| + 6 = 0 ⇒ 2|x − 3| = 6 ⇒ |x − 3| = 3.',
         '¿Qué dos números están a 3 unidades de distancia del 3?',
+        '¿Duda con los signos? Tocá el botón «¿Por qué no cambia de signo el −3?» para que Alaska te muestre el paso a paso.',
       ],
       solution: 'Despejando |x − 3| = 6 / 2 = 3 obtenemos x − 3 = −3 ⇒ <strong>x₁ = 0</strong> y x − 3 = 3 ⇒ <strong>x₂ = 6</strong>.',
     },
