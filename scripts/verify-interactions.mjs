@@ -307,6 +307,18 @@ const absResults = await client.eval(`(async () => {
     await new Promise((r) => setTimeout(r, 60));
   }
 
+  const vertexBtn = document.querySelector('.seq-doubt-btn[data-vn-script="sec3-que-es-vertice"]');
+  let vertexBtnWorks = false;
+  if (vertexBtn) {
+    vertexBtn.click();
+    await new Promise((r) => setTimeout(r, 100));
+    const tag = document.querySelector('.vn-tag');
+    if (tag && tag.textContent.includes('vértice')) vertexBtnWorks = true;
+    const vnClose = document.querySelector('.vn-close');
+    if (vnClose) vnClose.click();
+    await new Promise((r) => setTimeout(r, 60));
+  }
+
   const firstBasicBtn = basicTriggerBtns[0];
   if (firstBasicBtn) firstBasicBtn.click();
   await new Promise((r) => setTimeout(r, 100));
@@ -369,6 +381,7 @@ const absResults = await client.eval(`(async () => {
     mainTriggerBtnsCount: mainTriggerBtns.length,
     basicTriggerBtnsCount: basicTriggerBtns.length,
     doubtBtnWorks,
+    vertexBtnWorks,
     vnOverlayActive,
     vnTagSvgPresent,
     bossBoardMounted,
@@ -395,6 +408,7 @@ const allOk =
   absResults.mainTriggerBtnsCount === 20 &&
   absResults.basicTriggerBtnsCount === 10 &&
   absResults.doubtBtnWorks &&
+  absResults.vertexBtnWorks &&
   absResults.vnOverlayActive &&
   absResults.vnTagSvgPresent &&
   absResults.bossBoardMounted &&

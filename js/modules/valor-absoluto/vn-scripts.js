@@ -205,6 +205,39 @@ export const VN_SCRIPTS = {
     },
   ],
 
+  'sec3-que-es-vertice': [
+    {
+      pose: 'feliz',
+      tag: '¿Qué es un vértice?',
+      html: '¡Qué buena pregunta! En matemática los profes suelen decir: <em>«Bueno, acá está el vértice V(h, k) y se mueve a la derecha…»</em> ¡y nadie se frena a explicar qué cuernos es un vértice! Empecemos desde cero total: la palabra <strong>vértice</strong> viene del latín y significa «giro» o «punta». Es exactamente la esquina o el pico donde dos caminos rectos se encuentran.',
+    },
+    {
+      pose: 'base',
+      tag: 'El choque de dos rectas',
+      html: 'Pensalo así: si dibujás una recta común, sigue de largo para siempre sin doblar nunca. Pero una función con valor absoluto no es una sola recta: ¡son <strong>dos semirrectas distintas pegadas</strong>! Una rama viene bajando desde la izquierda y otra sale subiendo hacia la derecha. El punto exacto donde se dan la mano y quiebran en punta es el <strong>vértice</strong>.',
+    },
+    {
+      pose: 'orgullosa',
+      tag: 'Físicamente: distancia cero',
+      html: '¿Por qué se produce ese quiebre justo ahí? Porque el módulo mide distancia a un ancla <span class="eq">h</span>. A medida que te acercás a <span class="eq">h</span>, la distancia se va achicando: <span class="eq">3, 2, 1…</span> hasta que tocás el ancla (<span class="eq">x = h</span>) y la distancia llega a su piso absoluto: <strong style="color:var(--green)">|0| = 0</strong>. ¡Menos de cero no puede dar! Al pasar de largo, la distancia vuelve a crecer. El vértice es el <strong>punto de distancia cero</strong>.',
+    },
+    {
+      pose: 'base',
+      tag: 'Las coordenadas V(h, k)',
+      html: 'Ese punto necesita dos datos para ubicarse en el mapa cartesiano, como una coordenada GPS: <span class="eq">V(h; k)</span>.<br>• La primera es <span class="eq">h</span> (en el eje X horizontal): te dice en qué número se apagan las barras a cero (<span class="eq">x − h = 0</span>).<br>• La segunda es <span class="eq">k</span> (en el eje Y vertical): te dice a qué altura queda el pico cuando las barras valen cero (<span class="eq">f(h) = 0 + k = k</span>).',
+    },
+    {
+      pose: 'colapso',
+      tag: '¿Piso o techo?',
+      html: 'Si la «V» apunta hacia arriba (como una copa, cuando <span class="eq">a &gt; 0</span>), el vértice es el <strong>piso o mínimo absoluto</strong>: la función nunca va a bajar más de <span class="eq">k</span>. Pero si la «V» está invertida hacia abajo (como un techo, cuando <span class="eq">a &lt; 0</span>), el vértice es el <strong>techo o máximo absoluto</strong>: jamás subirá más arriba de <span class="eq">k</span>.',
+    },
+    {
+      pose: 'orgullosa',
+      tag: 'Nivel Exactas: punto anguloso',
+      html: 'Y un secreto universitario para cuando curses Análisis I: a este pico se lo llama <strong>punto anguloso</strong>. A diferencia de una parábola suave, acá hay un quiebre filoso: la pendiente pasa de golpe de bajar a subir sin ninguna transición redonda. ¡Por eso en el vértice no existe derivada! Ahora que sabés qué es, ¡arrastralo por toda la pizarra!',
+    },
+  ],
+
   // =========================================================================
   // SECCIÓN 4 · ESCALAR Y REFLEJAR: EL FACTOR a
   // =========================================================================
