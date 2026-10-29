@@ -16,3 +16,4 @@
 # Dependencias locales y temporales
 /node_modules/
 *.log
+/agent
