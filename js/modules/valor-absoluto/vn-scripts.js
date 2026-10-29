@@ -500,8 +500,8 @@ export const VN_SCRIPTS = {
     },
     {
       pose: 'orgullosa',
-      tag: 'Camino 1 · Propiedad uniforme (sin magia de «pasar»)',
-      html: '¡Desterremos la frase escolar de «pasa sumando»! Las expresiones no tienen piernas ni cruzan el signo igual por arte de magia. En matemática rigurosa usamos la <strong>propiedad uniforme</strong>: sumamos el opuesto aditivo <span class="eq">+2 · A</span> en ambos miembros de la ecuación:<br><span class="eq">(−2 · A + 6) + 2 · A = 0 + 2 · A</span>.<br>A la izquierda, <span class="eq">−2 · A + 2 · A = 0</span> (se cancelan) y sobrevive únicamente el <span class="eq">6</span>. A la derecha queda <span class="eq">2 · A</span>:<br><span class="eq">6 = 2 · A ⟹ 2 · A = 6 ⟹ 2|x − 3| = 6</span>.<br>¡Fijate en la estructura real! Le agregamos la misma cantidad <span class="eq">2 · A</span> a los dos platillos de la balanza. Lo que estaba adentro de las barras (<span class="eq">x − 3</span>) jamás se alteró porque el bloque <span class="eq">A</span> operó completo como una unidad indivisible.',
+      tag: 'Camino 1 · Propiedad uniforme y neutro aditivo',
+      html: '¡Nada de «pasa sumando» ni de decir que «se cancelan» como si fuera magia! Esa palabrita «cancelar» es la madre de todos los vicios: hace que la gente confunda cuándo queda 0 (en sumas) y cuándo queda 1 (en productos). En álgebra formal aplicamos la <strong>propiedad uniforme</strong> sumando el opuesto aditivo <span class="eq">+2 · A</span> a ambos miembros:<br><span class="eq">(−2 · A + 6) + 2 · A = 0 + 2 · A</span>.<br>Por asociatividad y definición de inverso aditivo, <span class="eq">(−2 · A + 2 · A) = 0</span> (el neutro de la suma). Y por propiedad del neutro aditivo, <span class="eq">0 + 6 = 6</span> y <span class="eq">0 + 2 · A = 2 · A</span>:<br><span class="eq">6 = 2 · A ⟹ 2 · A = 6 ⟹ 2|x − 3| = 6</span>.<br>¡Fijate en la estructura! Operaste con los axiomas de cuerpo sobre ambos miembros. El paquete <span class="eq">A = |x − 3|</span> operó en bloque, por lo que su argumento interior <span class="eq">x − 3</span> jamás fue modificado.',
     },
     {
       pose: 'colapso',
@@ -516,7 +516,7 @@ export const VN_SCRIPTS = {
     {
       pose: 'feliz',
       tag: 'El paso final hacia las dos raíces',
-      html: `Con <span class="eq">2|x − 3| = 6</span>, aplicamos propiedad uniforme multiplicando por el inverso ${FRAC_HALF} (dividir por 2) a ambos miembros:<br><span class="eq">|x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades de distancia del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> sumamos 3 a ambos miembros: <span class="eq">x − 3 + 3 = −3 + 3 ⟹ x₁ = 0</span>.<br>• <strong>Rama derecha:</strong> sumamos 3 a ambos miembros: <span class="eq">x − 3 + 3 = +3 + 3 ⟹ x₂ = 6</span>.<br>Por eso las dos raíces son <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>.`,
+      html: `Con <span class="eq">2|x − 3| = 6</span>, aplicamos propiedad uniforme multiplicando por el inverso multiplicativo ${FRAC_HALF} a ambos miembros. Como <span class="eq">${FRAC_HALF} · 2 = 1</span> (neutro del producto):<br><span class="eq">1 · |x − 3| = ${FRAC_HALF} · 6 ⟹ |x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades de distancia del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> sumamos el opuesto <span class="eq">+3</span> a ambos miembros: <span class="eq">x + (−3 + 3) = −3 + 3 ⟹ x + 0 = 0 ⟹ x₁ = 0</span>.<br>• <strong>Rama derecha:</strong> sumamos el opuesto <span class="eq">+3</span> a ambos miembros: <span class="eq">x + (−3 + 3) = 3 + 3 ⟹ x + 0 = 6 ⟹ x₂ = 6</span>.<br>¡Obtenemos con total rigor formal las dos raíces <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>!`,
     },
   ],
 
