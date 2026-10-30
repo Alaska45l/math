@@ -950,8 +950,8 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       if ((qState.failCount || 0) === 0) {
         const phrases = [
           {
-            pose: 'orgullosa',
-            tag: '¡Clavadísimo!',
+            pose: 'eureka',
+            tag: '¡Eureka total!',
             html: '¡Impecable a la primera! Así se lee la geometría de una función sin memorizar reglitas sueltas.',
           },
           {
@@ -961,8 +961,8 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           },
           {
             pose: 'orgullosa',
-            tag: 'Nivel Exactas',
-            html: 'Je, nada mal. Con ese ojo para los bordes y los signos no te van a poder engañar en el parcial.',
+            tag: '¡Clavadísimo!',
+            html: '¡Brillante deducción! Con ese rigor analítico vas a arrasar en cualquier examen de la facultad.',
           },
         ];
         const pick = phrases[Math.floor(Math.random() * phrases.length)];
@@ -1002,15 +1002,15 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
     if (qState.failCount === 1) {
       react({
-        pose: 'base',
-        tag: 'Revisá el planteo',
-        html: 'Mmm, todavía no coincide. Mirá con cuidado dónde se anula lo de adentro de las barras o cómo están definidos los signos de cada tramo.',
+        pose: 'evaluando',
+        tag: 'Analicemos el planteo',
+        html: 'Mmm, todavía no coincide. Evaluemos con cuidado dónde se anula lo de adentro de las barras o cómo están definidos los signos de cada tramo.',
       });
     } else if (qState.failCount === 2) {
       react({
-        pose: 'enojada',
-        tag: '¡Frená la mano!',
-        html: '¡No me tires coordenadas o fórmulas al azar para ver si embocás! N-no es que me preocupe tu nota, ¿eh?, pero me da una bronca bárbara verte adivinar. ¡Tocá el botón de <strong>Pista</strong> y pensalo geométricamente!',
+        pose: 'sospecha',
+        tag: 'Mmm... sospechoso',
+        html: '¡No me tires coordenadas o fórmulas al azar para ver si embocás! N-no es que me preocupe tu nota, ¿eh?, pero sospecho que estás adivinando. ¡Tocá el botón de <strong>Pista</strong> y pensalo geométricamente!',
       });
     } else {
       react({
@@ -1027,6 +1027,16 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       if (!state.allCompletedReported) {
         state.allCompletedReported = true;
         setTimeout(() => playSuccess('section'), 320);
+        const zeroFails = state.answers.every((a) => (a.failCount || 0) === 0);
+        if (zeroFails) {
+          setTimeout(() => {
+            react({
+              pose: 'sonrojada',
+              tag: 'E-eh... ¡impresionante!',
+              html: 'P-pará... ¿resolviste todos los ejercicios seguidos sin equivocarte ni una sola vez? N-no es que me haya emocionado ni nada, ¿eh?, pero... tenés un futuro brillante en la ciencia.',
+            });
+          }, 450);
+        }
       }
       saveSectionProgress(sectionId);
       onComplete?.(sectionId);
@@ -1461,7 +1471,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             qState.hintIndex++;
             render();
             react({
-              pose: 'base',
+              pose: 'evaluando',
               tag: 'Pista desbloqueada',
               html: `Mirá esta pista: <em>${hintText}</em>`,
             });

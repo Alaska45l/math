@@ -299,7 +299,7 @@ export function playVoiceBlip(char, pose = 'base') {
   let lpFreq = 950;
   let formantGain = 3.2;
 
-  if (pose === 'feliz') {
+  if (pose === 'feliz' || pose === 'eureka') {
     baseFreq = 315 + (Math.random() * 10 - 5);
     duration = 0.036;
     attack = 0.005;
@@ -309,6 +309,11 @@ export function playVoiceBlip(char, pose = 'base') {
     duration = 0.040;
     attack = 0.006;
     pitchBend = 6;
+  } else if (pose === 'sonrojada') {
+    baseFreq = 325 + (Math.random() * 8 - 4);
+    duration = 0.035;
+    attack = 0.006;
+    pitchBend = 8;
   } else if (pose === 'colapso') {
     baseFreq = 235 + (Math.random() * 6 - 3);
     duration = 0.050;
@@ -321,6 +326,21 @@ export function playVoiceBlip(char, pose = 'base') {
     pitchBend = 0;
     lpFreq = 1150; // Más armónicos medios
     formantGain = 4.5;
+  } else if (pose === 'sospecha') {
+    baseFreq = 265 + (Math.random() * 6 - 3);
+    duration = 0.042;
+    attack = 0.006;
+    pitchBend = -6;
+  } else if (pose === 'evaluando') {
+    baseFreq = 280 + (Math.random() * 8 - 4);
+    duration = 0.037;
+    attack = 0.005;
+    pitchBend = 2;
+  } else if (pose === 'explicando') {
+    baseFreq = 290 + (Math.random() * 12 - 6);
+    duration = 0.038;
+    attack = 0.005;
+    pitchBend = 4;
   } else {
     // base (Intelectual)
     baseFreq = 285 + (Math.random() * 24 - 12); // ±12 Hz variación sutil
@@ -485,6 +505,45 @@ export function playPoseEmote(pose) {
     notes.forEach(({ f, t, d }) => {
       playMarimbaVoice(ctx, master, f, now + t, d, 0.13);
     });
+  } else if (pose === 'eureka') {
+    // Chime brillante ascendente tipo revelación (Do5 [523 Hz] → Mi5 [659 Hz] → Sol5 [784 Hz])
+    const notes = [
+      { f: 523.25, t: 0, d: 0.080 },
+      { f: 659.25, t: 0.060, d: 0.090 },
+      { f: 783.99, t: 0.120, d: 0.180 },
+    ];
+    notes.forEach(({ f, t, d }) => {
+      playMarimbaVoice(ctx, master, f, now + t, d, 0.12);
+    });
+  } else if (pose === 'sonrojada') {
+    // Gorjeo tímido suave (Sol4 [392 Hz] → La4 [440 Hz])
+    const notes = [
+      { f: 392.00, t: 0, d: 0.070 },
+      { f: 440.00, t: 0.060, d: 0.120 },
+    ];
+    notes.forEach(({ f, t, d }) => {
+      playMarimbaVoice(ctx, master, f, now + t, d, 0.09);
+    });
+  } else if (pose === 'sospecha') {
+    // Tono inquisitivo sutil descendente (245 Hz → 210 Hz)
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(245, now);
+    osc.frequency.exponentialRampToValueAtTime(210, now + 0.080);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.080);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(now);
+    osc.stop(now + 0.085);
+  } else if (pose === 'evaluando') {
+    // Tono analítico sereno (Mi4 [329.63 Hz])
+    playMarimbaVoice(ctx, master, 329.63, now, 0.090, 0.10);
+  } else if (pose === 'explicando') {
+    // Tono de docencia cálido (Re4 [293.66 Hz] → Fa#4 [369.99 Hz])
+    playMarimbaVoice(ctx, master, 293.66, now, 0.080, 0.11);
   }
 }
 

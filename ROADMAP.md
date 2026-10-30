@@ -4,7 +4,7 @@
 
 ---
 
-## Estado Actual del Proyecto (v1.2 — Commit `310feb7`)
+## Estado Actual del Proyecto (v0.2 — Commit `310feb7`)
 
 | Módulo | Archivo | Estado Pedagógico | Estado UI / Interacción | Deuda Técnica / Pendientes |
 | :--- | :--- | :--- | :--- | :--- |
@@ -16,17 +16,16 @@
 | **5. Valor Absoluto y Partes (Unidad 10)** | `valor-absoluto.html` | Excelente (Cap. 1 a 4) | Buenos widgets y guiones profundos de Alaska | Reemplazar por completo el Boss `mountBossDeflector` (actualmente muy pobre) y aplicar *Split-Workbench*. |
 
 ---
+## Fase 0 · Ideas a desarrollar a futuro.
 
-## Fase 1 · Prioridad Académica (Modo Estudio sin gastar tokens)
+- Una seccion de foro similar al Reddit clasico de hace unos años, donde se puedan subir preguntas con asunto y contenido. El login seria con cuentas usando a un externo como google y la imagen de perfil son pre-cargadas con distintos animales en un arte cute simple.
+- Alaska en su forma chibi sentada en un cojin con su laptop, con interacciones randoms de levantarse salir de la pantalla por derecha para hacerse un cafe y que vuelva dejando el cafe a un costado y tomandolo de a momentos. Asi como si es pasado la medianoche que la pantalla sea mas notoria alumbrandole la cara.
+- Una simulacion de examen de ingreso real donde simule una hoja A4 con preguntas iguales al examen como se encuentran al final de modulo. Al terminar Alaska lo corregi, da la nota y que puntos a mejorar.
+- Mientras Alaska explica un tema, que se posicione la pantalla, ilumine e interaccione con el elemento o widget que hace referencia.
+- Aumentar la cantidad de sprites de Alaska.
 
-Mientras se recargan los tokens, el foco es **estudiar para el examen de ingreso** usando los laboratorios actuales como herramienta activa y tomando nota de fricciones reales:
-- [ ] **Repaso activo de Sucesiones y Valor Absoluto:** Resolver los bloques de `Chequeo`, usar el generador por semilla de `retos.js` y exportar las hojas `#sec-repaso` en PDF.
-- [ ] **Bitácora de «Dudas de Papel»:** Cada vez que un ejercicio del cuadernillo de Exactas o de Khan Academy cueste visualizarse en papel, anotar en qué paso exacto se produce el salto mental para convertirlo luego en un widget o en un diálogo de `Base desde cero` de Alaska.
-- [ ] **Avance del Temario de Ingreso:** Identificar los próximos temas críticos del programa (Función Cuadrática / Parábola y Sistemas de Ecuaciones Lineales / Geometría / Trigonometría).
 
----
-
-## Fase 2 · Rediseño Arquitectónico Desktop: El «Split-Workbench» (Widescreen)
+## Fase 1 · Rediseño Arquitectónico Desktop: El «Split-Workbench» (Widescreen)
 
 **Problema actual:** En monitores de escritorio, las lecciones lineales (`sucesiones.html` y `valor-absoluto.html`) apilan los 5 bloques (`En una frase`, `Cómo se ve`, `Probalo`, `Cuidado con`, `Chequeo`) en una única columna vertical tipo blog. Esto desaprovecha el ancho horizontal del monitor y obliga a hacer scroll hacia arriba y abajo para mirar el gráfico mientras se lee la teoría o se responde el `Chequeo`.
 
@@ -52,9 +51,9 @@ Mientras se recargan los tokens, el foco es **estudiar para el examen de ingreso
 
 ---
 
-## Fase 3 · Motor de Jefes de Verdad (`js/core/boss-engine.js`)
+## Fase 2 · Motor de Jefes de Verdad (`js/core/boss-engine.js`)
 
-**Regla de diseño:** Prohibido hacer «jefes» que sean formularios con sliders y un botón de enviar (eliminar el actual `mountBossDeflector` de `valor-absoluto/retos.js`). Un Boss debe ser un **escenario de juego real a 60 FPS (`requestAnimationFrame`)** donde el jugador manipula objetos matemáticos directamente sobre el lienzo y Alaska actúa como navegadora/co-piloto con sus 5 sprites integrados en el HUD de combate.
+**Regla de diseño:** Prohibido hacer «jefes» que sean formularios con sliders y un botón de enviar (eliminar el actual `mountBossDeflector` de `valor-absoluto/retos.js`). Un Boss debe ser un **escenario de juego real a 60 FPS (`requestAnimationFrame`)** donde el jugador manipula objetos matemáticos directamente sobre el lienzo y Alaska actúa como navegadora/co-piloto con sus sprites integrados en el HUD de combate.
 
 ### Arquitectura de `js/core/boss-engine.js`
 - **Escenario Modal / Pantalla Completa de Combate:**

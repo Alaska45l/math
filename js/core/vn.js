@@ -12,6 +12,11 @@ export const VN_POSES = {
   colapso: 'assets/vn/colapso.webp',
   enojada: 'assets/vn/enojada.webp',
   feliz: 'assets/vn/feliz.webp',
+  sonrojada: 'assets/vn/sonrojada.webp',
+  eureka: 'assets/vn/eureka.webp',
+  sospecha: 'assets/vn/sospecha.webp',
+  evaluando: 'assets/vn/evaluando.webp',
+  explicando: 'assets/vn/explicando.webp',
 };
 
 const POSE_ICONS = {
@@ -20,6 +25,11 @@ const POSE_ICONS = {
   colapso: 'drop',
   enojada: 'anger',
   feliz: 'smile',
+  sonrojada: 'smile',
+  eureka: 'hint',
+  sospecha: 'glasses',
+  evaluando: 'glasses',
+  explicando: 'book',
 };
 
 export const ALASKA_TITLES = [
@@ -46,6 +56,11 @@ const DEFAULT_TAGS = {
   colapso: 'Colapso mental',
   enojada: '¡Frená la mano!',
   feliz: '¡Bien ahí!',
+  sonrojada: 'E-eh... ¡gracias!',
+  eureka: '¡Eureka!',
+  sospecha: 'Mmm... sospechoso',
+  evaluando: 'Analizando con lupa',
+  explicando: 'Paso a paso',
 };
 
 // Precarga inmediata de los 5 sprites
@@ -395,9 +410,9 @@ class VisualNovelController {
       // Forzar reflujo para reiniciar animación si repite pose
       void this.spriteWrapEl.offsetWidth;
 
-      if (pose === 'enojada') {
+      if (pose === 'enojada' || pose === 'sospecha') {
         this.spriteWrapEl.classList.add('vn-shake');
-      } else if (pose === 'orgullosa' || pose === 'feliz') {
+      } else if (pose === 'orgullosa' || pose === 'feliz' || pose === 'eureka' || pose === 'sonrojada') {
         this.spriteWrapEl.classList.add('vn-pop');
       }
     }

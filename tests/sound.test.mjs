@@ -41,6 +41,11 @@ test('sound: safe execution in headless / Node environment (no DOM/WebAudio)', (
     playPoseEmote('orgullosa');
     playPoseEmote('enojada');
     playPoseEmote('feliz');
+    playPoseEmote('eureka');
+    playPoseEmote('sonrojada');
+    playPoseEmote('sospecha');
+    playPoseEmote('evaluando');
+    playPoseEmote('explicando');
     playSuccess('normal');
     playSuccess('section');
     playError(1);
