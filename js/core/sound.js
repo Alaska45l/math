@@ -341,6 +341,13 @@ export function playVoiceBlip(char, pose = 'base') {
     duration = 0.038;
     attack = 0.005;
     pitchBend = 4;
+  } else if (pose === 'panico') {
+    baseFreq = 345 + (Math.random() * 12 - 6);
+    duration = 0.026;
+    attack = 0.002;
+    pitchBend = 12;
+    lpFreq = 1250;
+    formantGain = 4.2;
   } else {
     // base (Intelectual)
     baseFreq = 285 + (Math.random() * 24 - 12); // ±12 Hz variación sutil
@@ -544,6 +551,31 @@ export function playPoseEmote(pose) {
   } else if (pose === 'explicando') {
     // Tono de docencia cálido (Re4 [293.66 Hz] → Fa#4 [369.99 Hz])
     playMarimbaVoice(ctx, master, 293.66, now, 0.080, 0.11);
+  } else if (pose === 'panico') {
+    // Alerta de laboratorio: dos pulsos rápidos de advertencia aguda en staccato (La4 [440Hz] → Re5 [587.33Hz])
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(850, now);
+
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.setValueAtTime(587.33, now + 0.08);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+    gain.gain.setValueAtTime(0.0001, now + 0.08);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.095);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+
+    osc.start(now);
+    osc.stop(now + 0.19);
   }
 }
 

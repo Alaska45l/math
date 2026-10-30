@@ -8,28 +8,30 @@ import { playVoiceBlip, playPoseEmote } from './sound.js';
 
 export const VN_POSES = {
   base: 'assets/vn/base.webp',
+  explicando: 'assets/vn/explicando.webp',
+  evaluando: 'assets/vn/evaluando.webp',
+  feliz: 'assets/vn/feliz.webp',
   orgullosa: 'assets/vn/orgullosa.webp',
+  sospecha: 'assets/vn/sospecha.webp',
+  eureka: 'assets/vn/eureka.webp',
   colapso: 'assets/vn/colapso.webp',
   enojada: 'assets/vn/enojada.webp',
-  feliz: 'assets/vn/feliz.webp',
   sonrojada: 'assets/vn/sonrojada.webp',
-  eureka: 'assets/vn/eureka.webp',
-  sospecha: 'assets/vn/sospecha.webp',
-  evaluando: 'assets/vn/evaluando.webp',
-  explicando: 'assets/vn/explicando.webp',
+  panico: 'assets/vn/panico.webp',
 };
 
 const POSE_ICONS = {
   base: 'glasses',
+  explicando: 'book',
+  evaluando: 'glasses',
+  feliz: 'smile',
   orgullosa: 'smug',
+  sospecha: 'target',
+  eureka: 'star',
   colapso: 'drop',
   enojada: 'anger',
-  feliz: 'smile',
-  sonrojada: 'smile',
-  eureka: 'hint',
-  sospecha: 'glasses',
-  evaluando: 'glasses',
-  explicando: 'book',
+  sonrojada: 'spark',
+  panico: 'anger',
 };
 
 export const ALASKA_TITLES = [
@@ -52,23 +54,44 @@ export const ALASKA_TITLES = [
 
 const DEFAULT_TAGS = {
   base: 'Modo Teoría',
-  orgullosa: 'Te lo advertí',
-  colapso: 'Colapso mental',
-  enojada: '¡Frená la mano!',
-  feliz: '¡Bien ahí!',
-  sonrojada: 'E-eh... ¡gracias!',
-  eureka: '¡Eureka!',
-  sospecha: 'Mmm... sospechoso',
-  evaluando: 'Analizando con lupa',
   explicando: 'Paso a paso',
+  evaluando: 'Analizando...',
+  feliz: '¡Bien ahí!',
+  orgullosa: 'Te lo advertí',
+  sospecha: 'Mmm... mirá bien',
+  eureka: '¡Conexión clave!',
+  colapso: 'Colapso académico',
+  enojada: '¡Frená la mano!',
+  sonrojada: 'N-no te agrandes...',
+  panico: '¡Alerta de Laboratorio!',
 };
 
-// Precarga inmediata de los 5 sprites
+// Precarga inteligente: Tier 1 y 2 inmediato; resto en segundo plano
 if (typeof window !== 'undefined' && typeof Image !== 'undefined') {
-  Object.values(VN_POSES).forEach((src) => {
-    const img = new Image();
-    img.src = src;
+  const TIER_1_2 = ['base', 'explicando', 'evaluando', 'feliz', 'orgullosa', 'sospecha'];
+  const TIER_3_4 = ['eureka', 'colapso', 'enojada', 'sonrojada', 'panico'];
+
+  TIER_1_2.forEach((pose) => {
+    if (VN_POSES[pose]) {
+      const img = new Image();
+      img.src = VN_POSES[pose];
+    }
   });
+
+  const preloadRest = () => {
+    TIER_3_4.forEach((pose) => {
+      if (VN_POSES[pose]) {
+        const img = new Image();
+        img.src = VN_POSES[pose];
+      }
+    });
+  };
+
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(preloadRest);
+  } else {
+    setTimeout(preloadRest, 800);
+  }
 }
 
 /**
@@ -140,14 +163,39 @@ class VisualNovelController {
       h('span', { class: 'vn-fab__label' }, 'Alaska')
     );
 
-    // Sprite de personaje
+    // Sprite de personaje con Easter Egg de 5 clics
     this.spriteEl = h('img', {
       class: 'vn-sprite',
       src: VN_POSES.base,
       alt: 'Alaska',
     });
 
-    this.spriteWrapEl = h('div', { class: 'vn-sprite-wrap' }, this.spriteEl);
+    let spriteClickCount = 0;
+    let spriteClickTimer = null;
+    const triggerSpriteEasterEgg = (e) => {
+      e.stopPropagation();
+      spriteClickCount++;
+      if (spriteClickTimer) clearTimeout(spriteClickTimer);
+      spriteClickTimer = setTimeout(() => {
+        spriteClickCount = 0;
+      }, 2500);
+
+      if (spriteClickCount >= 5) {
+        spriteClickCount = 0;
+        this.react({
+          pose: 'sonrojada',
+          tag: 'N-no te agrandes...',
+          html: '¿P-por qué me tocás tanto? ¡No me vas a desconcentrar de mis demostraciones!... B-bueno, si querés compañía para estudiar te podés quedar, pero no te acostumbres.',
+        });
+      }
+    };
+
+    this.spriteWrapEl = h('div', {
+      class: 'vn-sprite-wrap',
+      on: {
+        click: triggerSpriteEasterEgg,
+      },
+    }, this.spriteEl);
 
     // Placa de nombre y etiqueta de contexto
     this.tagEl = h('span', { class: 'vn-tag' }, DEFAULT_TAGS.base);
@@ -410,7 +458,7 @@ class VisualNovelController {
       // Forzar reflujo para reiniciar animación si repite pose
       void this.spriteWrapEl.offsetWidth;
 
-      if (pose === 'enojada' || pose === 'sospecha') {
+      if (pose === 'enojada' || pose === 'sospecha' || pose === 'panico') {
         this.spriteWrapEl.classList.add('vn-shake');
       } else if (pose === 'orgullosa' || pose === 'feliz' || pose === 'eureka' || pose === 'sonrojada') {
         this.spriteWrapEl.classList.add('vn-pop');
