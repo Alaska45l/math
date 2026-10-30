@@ -30,7 +30,7 @@ export const VN_SCRIPTS = {
       html: 'Acá viene el bloqueo mortal: cuando ven la llave formal <span class="eq">|x| = −x si x &lt; 0</span>, ¡entran en pánico y gritan «¿cómo va a dar −x si el módulo nunca es negativo?»! ¡Respirá hondo! Si <span class="eq">x = −4</span>, la letra <span class="eq">x</span> ya guarda un signo menos adentro de su caja.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'La Máquina Inversora',
       html: 'Ese signo menos que escribimos delante en <span class="eq">−x</span> NO es un cartel de «número negativo»: es una <strong>máquina inversora de signo</strong> (multiplicar por <span class="eq">−1</span>). Cuando entra <span class="eq">x = −4</span>, la máquina hace <span class="eq">−x = −(−4) = +4 &gt; 0</span>. ¡El menos de afuera mata al menos que estaba escondido adentro de <span class="eq">x</span>!',
     },
@@ -76,7 +76,7 @@ export const VN_SCRIPTS = {
       html: 'En geometría, la distancia entre dos posiciones <span class="eq">A</span> y <span class="eq">B</span> en la recta se define siempre con una resta: <span class="eq">|A − B|</span>. Para ver el ancla real, tenés que forzar esa resta. ¿Cómo convertís un <span class="eq">+2</span> en resta? Por regla de signos, <span class="eq">+2 = −(−2)</span>. Por eso <span class="eq">|x + 2|</span> se reescribe como <span class="eq">|x − (−2)|</span>. ¡El ancla o centro NO es 2, sino <span class="eq">h = −2</span>!',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Paso 2 · El truco ninja del cero',
       html: 'Si no te querés acordar de memoria de «cambiarle el signo a <span class="eq">h</span>», te regalo el truco que uso yo: <strong>preguntale al interior de las barras qué número lo anula</strong>. Hacé la cuenta mental: <span class="eq">x + 2 = 0 ⟹ x = −2</span>. ¡Listo! El número que apaga lo de adentro a cero es siempre tu ancla física en la recta.',
     },
@@ -91,7 +91,7 @@ export const VN_SCRIPTS = {
       html: 'El único número que «pasa» (se traslada de miembro) es el <span class="eq">+2</span> que acompañaba a la <span class="eq">x</span>, que pasa restando como <span class="eq">−2</span> a ambos lados: <span class="eq">x = −2 ± 6</span>. Caminando hacia la izquierda: <span class="eq">x₁ = −2 − 6 = −8</span>. Caminando hacia la derecha: <span class="eq">x₂ = −2 + 6 = 4</span>. Ordenadas de menor a mayor: <span class="eq">x₁ = −8</span> y <span class="eq">x₂ = 4</span>.',
     },
     {
-      pose: 'orgullosa',
+      pose: 'feliz',
       tag: 'Paso 5 · Verificación de examen',
       html: 'Para tener 100% de seguridad en un examen, probá ambos números en la ecuación original: con <span class="eq">x = −8</span> tenés <span class="eq">|(−8) + 2| = |−6| = 6</span>. ¡Dio 6! Y con <span class="eq">x = 4</span> tenés <span class="eq">|4 + 2| = |6| = 6</span>. ¡Dio 6 de nuevo! La distancia desde el ancla <span class="eq">−2</span> hasta ambos puntos es de exactamente 6 unidades. ¡Ahora andá al chequeo de comprensión y resolvelo con total seguridad!',
     },
@@ -112,7 +112,7 @@ export const VN_SCRIPTS = {
       html: 'Para los <span class="eq">x</span> negativos, la recta <span class="eq">y = x</span> se hunde bajo tierra en el semiplano inferior (<span class="eq">y &lt; 0</span>). ¡Pero el valor absoluto tiene prohibido devolver alturas negativas! Ningún punto de <span class="eq">y = |x|</span> puede vivir debajo del eje X.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Rebote simétrico',
       html: 'Ponerle las barras <span class="eq">|x|</span> equivale físicamente a apoyar un <strong>espejo horizontal sobre el eje X</strong>. Todo lo que estaba arriba (<span class="eq">x ≥ 0</span>) queda intacto como la semirrecta <span class="eq">y = x</span> de pendiente <span class="eq">+1</span>, pero el tramo subterráneo (<span class="eq">x &lt; 0</span>) rebota hacia arriba como la semirrecta <span class="eq">y = −x</span> de pendiente <span class="eq">−1</span>.',
     },
@@ -166,7 +166,7 @@ export const VN_SCRIPTS = {
       html: 'El antídoto definitivo es pensarlo físicamente: el pico o vértice de la «V» ocurre siempre en el único lugar donde <strong>la distancia dentro de las barras se hace CERO</strong>. Preguntate siempre: <em>«¿Qué valor de x hace que lo de adentro valga 0?»</em>.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Despejando el interior',
       html: 'En <span class="eq">f(x) = |x − 4| − 2</span>, planteás mentalmente <span class="eq">x − 4 = 0 ⟹ x = 4</span>. En cambio, en <span class="eq">g(x) = |x + 3| − 2</span>, planteás <span class="eq">x + 3 = 0 ⟹ x = −3</span>. ¡No es magia ni signo invertido caprichoso: es buscar dónde la cinta métrica marca distancia cero!',
     },
@@ -217,7 +217,7 @@ export const VN_SCRIPTS = {
       html: 'Pensalo así: si dibujás una recta común, sigue de largo para siempre sin doblar nunca. Pero una función con valor absoluto no es una sola recta: ¡son <strong>dos semirrectas distintas pegadas</strong>! Una rama viene bajando desde la izquierda y otra sale subiendo hacia la derecha. El punto exacto donde se dan la mano y quiebran en punta es el <strong>vértice</strong>.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Físicamente: distancia cero',
       html: '¿Por qué se produce ese quiebre justo ahí? Porque el módulo mide distancia a un ancla <span class="eq">h</span>. A medida que te acercás a <span class="eq">h</span>, la distancia se va achicando: <span class="eq">3, 2, 1…</span> hasta que tocás el ancla (<span class="eq">x = h</span>) y la distancia llega a su piso absoluto: <strong style="color:var(--green)">|0| = 0</strong>. ¡Menos de cero no puede dar! Al pasar de largo, la distancia vuelve a crecer. El vértice es el <strong>punto de distancia cero</strong>.',
     },
@@ -258,7 +258,7 @@ export const VN_SCRIPTS = {
       html: '¡Cuidado con la trampa favorita de los parciales! No confundas un signo menos <strong>afuera</strong> de las barras (<span class="eq">−|x|</span>) con un signo menos <strong>adentro</strong> de las barras (<span class="eq">|−x|</span>). Parecen iguales de lejos, pero hacen cosas completamente opuestas.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Por qué |−x| no invierte la V',
       html: 'Adentro de las barras, <span class="eq">|−x| = |−1| · |x| = 1 · |x| = |x|</span>. Las barras se tragan el signo menos interno y la gráfica sigue abriendo hacia arriba (<span class="eq">V</span>). En cambio, en <span class="eq">−|x|</span> el signo menos espera afuera y multiplica por <span class="eq">−1</span> todas las alturas finales, reflejando la gráfica hacia abajo como un techo <span class="eq">Λ</span>.',
     },
@@ -317,7 +317,7 @@ export const VN_SCRIPTS = {
       html: '¿Y si en el parcial te dan el dibujo de la «V» y te piden escribir su fórmula? Hacés el camino inverso: primero leés las coordenadas de la punta <span class="eq">(h; k)</span> y ya armás el esqueleto <span class="eq">f(x) = a|x − h| + k</span>.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Hallar a sin equivocarse',
       html: 'Después elegís cualquier punto claro <span class="eq">(x₁; y₁)</span> de la rama derecha y calculás la pendiente <span class="eq">a = <span class="fr"><span class="num">y₁ − k</span><span class="den">x₁ − h</span></span></span> (o sustituís el punto en la ecuación y despejás <span class="eq">a</span>). ¡Entrenalo con las 6 Gráficas Misteriosas del Modo 2!',
     },
@@ -351,7 +351,7 @@ export const VN_SCRIPTS = {
   // =========================================================================
   'sec6-partes': [
     {
-      pose: 'eureka',
+      pose: 'explicando',
       tag: 'Desenmascarando las barras',
       html: 'En la secundaria suelen dar «Valor Absoluto» en una unidad y «Funciones por Partes» en otra distinta. En Análisis I te revelamos el secreto: <strong>toda función de valor absoluto es una función lineal por partes</strong> escrita de forma compacta.',
     },
@@ -394,7 +394,7 @@ export const VN_SCRIPTS = {
       html: 'Hagámoslo en cámara lenta para <span class="eq">−2(x − 3) + 1</span>:<br>• Primer producto: <span class="eq">(−2) · x = −2x</span>.<br>• Segundo producto: <span class="eq">(−2) · (−3) = +6</span> (menos por menos es más).<br>• Sumamos el término de afuera: <span class="eq">−2x + 6 + 1 = −2x + 7</span>.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Base 6 · Verificá en la frontera',
       html: 'Un truco de oro para saber si distribuiste bien: evaluá ambas rectas (la rama izquierda y la rama derecha) en el vértice <span class="eq">x = h</span>. ¡Las dos rectas te tienen que dar exactamente la misma altura <span class="eq">y = k</span>!',
     },
@@ -415,7 +415,7 @@ export const VN_SCRIPTS = {
       html: 'Si el vértice es <span class="eq">V(3; −2)</span> y abre hacia arriba, la función decrece hasta el vértice y crece después. Como el crecimiento pregunta <em>«para qué valores de x sube»</em>, corta en <span class="eq">h = 3</span>: <span class="eq">I↑ = (3; +∞)</span>. ¡Jamás pongas <span class="eq">k = −2</span> en el intervalo de crecimiento! En cambio, la Imagen sí mira las alturas en Y: <span class="eq">Im(f) = [−2; +∞)</span>.',
     },
     {
-      pose: 'eureka',
+      pose: 'explicando',
       tag: 'El láser horizontal y = c',
       html: 'Activá las 4 Lentes del widget de abajo: cuando cruzás la «V» con el láser horizontal <span class="eq">y = c</span>, estás resolviendo gráficamente <span class="eq">a|x − h| + k = c</span>. Si el láser pasa por encima del piso <span class="eq">k</span> (cuando <span class="eq">a &gt; 0</span>), corta a las dos ramas en dos soluciones simétricas; si toca el vértice hay 1 solución; y si pasa por debajo del vértice el conjunto solución es vacío <span class="eq">∅</span>.',
     },
@@ -476,7 +476,7 @@ export const VN_SCRIPTS = {
       html: '• <strong>Ceros o Raíces <span class="eq">C₀</span>:</strong> son los valores de <span class="eq">x</span> donde la gráfica corta exactamente a la línea de flotación (<span class="eq">y = 0</span>). Para hallarlos, igualás la fórmula a cero: <span class="eq">|x − 2| − 3 = 0 ⟹ |x − 2| = 3</span>, dando <span class="eq">x = −1</span> y <span class="eq">x = 5</span>.<br><strong>¡Atención con los símbolos!</strong> Como son puntos aislados y no un intervalo continuo de números, en la facultad se escriben obligatoriamente <strong>entre llaves</strong>: <span class="eq">C₀ = {−1; 5}</span>. Si pusieras paréntesis <span class="eq">(−1; 5)</span> parecería un intervalo o un punto cartesiano, y si pusieras corchetes <span class="eq">[−1; 5]</span> incluirías al <span class="eq">0, 1, 2, 3, 4</span> que no son raíces.',
     },
     {
-      pose: 'eureka',
+      pose: 'explicando',
       tag: '4. Positividad C⁺ y Negatividad C⁻',
       html: 'Imaginá que el eje X es la superficie del agua del mar:<br>• <strong>Positividad <span class="eq">C⁺</span>:</strong> son los intervalos de <span class="eq">x</span> donde la gráfica está <strong>por arriba del agua</strong> (<span class="eq">f(x) &gt; 0</span>).<br>• <strong>Negatividad <span class="eq">C⁻</span>:</strong> los intervalos de <span class="eq">x</span> donde la gráfica está <strong>sumergida bajo el agua</strong> (<span class="eq">f(x) &lt; 0</span>).<br>¿Quién marca la frontera entre estar sumergido o en el aire? ¡Exacto, los Ceros <span class="eq">C₀</span>! En nuestro ejemplo, la punta de la V se hunde entre las dos raíces: <span class="eq">C⁻ = (−1; 5)</span>. Las dos alas que quedan flotando afuera forman <span class="eq">C⁺ = (−∞; −1) ∪ (5; +∞)</span>.<br>Siempre llevan <strong>paréntesis</strong> porque en las raíces exactas la altura es cero (ni positivo ni negativo).',
     },
@@ -514,7 +514,7 @@ export const VN_SCRIPTS = {
       html: '¡Grabate esto a fuego! En un producto <span class="eq">k · (a · b)</span>, la constante <span class="eq">k</span> multiplica a <strong>un solo factor</strong>, no a los dos: <span class="eq">(−1) · (−2) = +2</span>. Te queda <span class="eq">+2 · |x − 3| − 6 = 0</span>.<br>Si además le cambiaras el signo al interior (<span class="eq">|−x + 3|</span> o <span class="eq">|x + 3|</span>), ¡estarías multiplicando por <span class="eq">−1</span> <strong>dos veces</strong>! Eso sería multiplicar por <span class="eq">(−1) · (−1) = +1</span>, alterando la ecuación.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'El paso final hacia las dos raíces',
       html: `Con <span class="eq">2|x − 3| = 6</span>, aplicamos propiedad uniforme multiplicando por el inverso multiplicativo ${FRAC_HALF} a ambos miembros. Como <span class="eq">${FRAC_HALF} · 2 = 1</span> (neutro del producto):<br><span class="eq">1 · |x − 3| = ${FRAC_HALF} · 6 ⟹ |x − 3| = 3</span>.<br>Esto pregunta geométricamente: <em>«¿qué números están a 3 unidades de distancia del centro 3?»</em>:<br>• <strong>Rama izquierda:</strong> sumamos el opuesto <span class="eq">+3</span> a ambos miembros: <span class="eq">x + (−3 + 3) = −3 + 3 ⟹ x + 0 = 0 ⟹ x₁ = 0</span>.<br>• <strong>Rama derecha:</strong> sumamos el opuesto <span class="eq">+3</span> a ambos miembros: <span class="eq">x + (−3 + 3) = 3 + 3 ⟹ x + 0 = 6 ⟹ x₂ = 6</span>.<br>¡Obtenemos con total rigor formal las dos raíces <span class="eq">x₁ = 0</span> y <span class="eq">x₂ = 6</span>!`,
     },
@@ -563,7 +563,7 @@ export const VN_SCRIPTS = {
       html: 'Cuando ves escrito <span class="eq">−1 ≤ x &lt; 2</span>, significa que <span class="eq">x</span> está atrapado entre <span class="eq">−1</span> y <span class="eq">2</span>: puede valer exactamente <span class="eq">−1</span> (porque tiene <span class="eq">≤</span> a la izquierda), puede valer cualquier número intermedio como <span class="eq">0</span> o <span class="eq">1,5</span>, pero NO puede valer <span class="eq">2</span> (porque a la derecha tiene <span class="eq">&lt;</span> estricto).',
     },
     {
-      pose: 'eureka',
+      pose: 'feliz',
       tag: 'Base 8 · La metáfora del cine o peaje',
       html: 'Pensá una función por partes como la boletería de un cine: «Menores de 12 años pagan $1000; de 12 a 65 años pagan $3000; mayores de 65 pagan $1500». Si tenés 20 años, no pagás las tres tarifas sumadas: mirás en qué categoría cae tu edad y pagás solo esa tarifa.',
     },
@@ -594,7 +594,7 @@ export const VN_SCRIPTS = {
       html: `En cambio, si en <span class="eq">x = 1</span> ambos tramos tienen círculo abierto ${DOT_OPEN} (<span class="eq">x &lt; 1</span> y <span class="eq">x &gt; 1</span>), la recta vertical pasa por los dos agujeros sin tocar ningún punto (0 cortes ≤ 1). ¡Sigue siendo una función totalmente válida, solo que <span class="eq">x = 1</span> queda fuera de su dominio!`,
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Pegado continuo tipo Exactas',
       html: '¿Cuándo dos tramos se pegan sin dar un salto brusco? Cuando al acercarte a la frontera <span class="eq">x = c</span> por la izquierda y por la derecha, ambas fórmulas llegan exactamente a la <strong>misma altura</strong>. En los parciales de Exactas te piden hallar una letra <span class="eq">k</span> igualando ambas ramas en el borde.',
     },
@@ -622,7 +622,7 @@ export const VN_SCRIPTS = {
       html: `Si en la frontera <span class="eq">x = 1</span> el tramo izquierdo termina con punto cerrado ${DOT_CLOSED} en <span class="eq">(1; 2)</span> y el tramo derecho arranca con punto cerrado ${DOT_CLOSED} en <span class="eq">(1; 4)</span>, cuando tu regla vertical pasa por <span class="eq">x = 1</span> toca AMBOS puntos cerrados. Eso significa que <span class="eq">f(1)</span> valdría <span class="eq">2</span> y <span class="eq">4</span> a la vez: ¡imposible!`,
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Base 9 · Cómo arreglar la colisión',
       html: `Para que sea función cuando hay un salto vertical, al menos uno de los dos extremos en <span class="eq">x = 1</span> tiene que ceder el paso y convertirse en círculo abierto ${DOT_OPEN}. ¡Hacé clic sobre uno de los círculos en el gráfico del widget para comprobarlo!`,
     },
@@ -653,7 +653,7 @@ export const VN_SCRIPTS = {
       html: 'Segunda trampa clásica: si una tarifa postal tiene cuatro escalones a alturas <span class="eq">$300, $500, $700</span> y <span class="eq">$900</span>, su Conjunto Imagen (Rango) <strong>NO es el intervalo entre corchetes <span class="eq">[300; 900]</span></strong>, porque el correo jamás te cobra <span class="eq">$412,50</span>.',
     },
     {
-      pose: 'eureka',
+      pose: 'orgullosa',
       tag: 'Sombra discreta entre llaves {…}',
       html: 'Mirá en el widget qué pasa cuando activás la <strong>Proyección de Rango contra el Eje Y</strong>: cada escalón horizontal entero se proyecta de costado en un <strong>único punto aislado brillante</strong> sobre el eje Y. Por eso el rango de toda función escalonada es un conjunto discreto entre llaves: <span class="eq">{300; 500; 700; 900}</span> o <span class="eq">ℤ</span>.',
     },
@@ -713,7 +713,7 @@ export const DIAGNOSE_REACTIONS = {
     html: '¡Te olvidaste las barras de valor absoluto <span class="eq">|...|</span>! Sin las barras escribiste una recta común y corriente que sigue de largo bajo tierra sin rebotar en el vértice.',
   },
   unfactored_inner_coeff: {
-    pose: 'eureka',
+    pose: 'orgullosa',
     tag: 'Equivalente pero escondida',
     html: '¡Bien ahí! Tu fórmula es matemáticamente equivalente y grafica la misma «V». Igual te doy un consejo de Exactas: sacá el factor común afuera de las barras como <span class="eq">a|x − h| + k</span> para leer el vértice <span class="eq">h</span> directo sin tener que dividir mentalmente.',
   },

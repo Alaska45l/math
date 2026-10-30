@@ -35,6 +35,7 @@ export function initConstructorVWidget(container) {
     k: 3,
     challengeIdx: 0,
     invFeedback: null,
+    clearedMysteries: new Set(),
   };
 
   // Persistent DOM for Explore Mode
@@ -251,15 +252,21 @@ export function initConstructorVWidget(container) {
     const okExpr = equivalentFx(parsed.ast, targetExpr);
 
     if (okH && okK && okA && okExpr) {
+      if (!state.clearedMysteries) state.clearedMysteries = new Set();
+      state.clearedMysteries.add(state.challengeIdx);
+      const isAllCleared = state.clearedMysteries.size === MYSTERY_CHALLENGES.length;
+
       state.invFeedback = {
         ok: true,
         msg: `¡Impecable! Vértice (${fmt(target.h)}; ${fmt(target.k)}), apertura a = ${fmt(target.a)} y ecuación f(x) = ${targetExpr}.`,
       };
-      playSuccess('normal');
+      playSuccess(isAllCleared ? 'section' : 'normal');
       react({
-        pose: 'orgullosa',
-        tag: '¡Lectura inversa perfecta!',
-        html: `¡Así se deduce una función mirando el gráfico! Identificaste el vértice en <span class="eq">(${fmt(target.h)}; ${fmt(target.k)})</span> y la pendiente <span class="eq">a = ${fmt(target.a)}</span> sin caer en la trampa de signo.`,
+        pose: 'eureka',
+        tag: isAllCleared ? '¡Eureka total! ¡La rompiste toda!' : '¡Eureka! ¡Rompiste la gráfica misteriosa!',
+        html: isAllCleared
+          ? `¡INCREÍBLE! Descifraste y rompiste todas las gráficas ocultas en el eje de coordenadas. No quedó ni un solo misterio cartesiano en pie: dominás las coordenadas del vértice, la apertura y la reconstrucción analítica con rigor de Exactas.`
+          : `¡Eso es! Desentrañaste los valores ocultos directamente del eje de coordenadas: identificaste el vértice en <span class="eq">(${fmt(target.h)}; ${fmt(target.k)})</span> y la apertura oculta en <span class="eq">a = ${fmt(target.a)}</span>, deduciendo la ecuación exacta <span class="eq">f(x) = ${targetExpr}</span>. ¡Misterio roto!`,
       });
     } else {
       const diags = diagnoseAbs(parsed.ast, target);
@@ -303,13 +310,14 @@ export function initConstructorVWidget(container) {
 
     mount(
       mysteryBtnsRow,
-      ...MYSTERY_CHALLENGES.map((ch, idx) =>
-        h('button', {
+      ...MYSTERY_CHALLENGES.map((ch, idx) => {
+        const isCleared = state.clearedMysteries?.has(idx);
+        return h('button', {
           type: 'button',
           class: ['chip', state.challengeIdx === idx ? 'is-active' : ''],
           on: { click: () => selectMystery(idx) },
-        }, `Misterio ${idx + 1}`)
-      ),
+        }, isCleared ? `Misterio ${idx + 1} (Descifrado)` : `Misterio ${idx + 1}`);
+      }),
       h('button', {
         type: 'button',
         class: 'btn',

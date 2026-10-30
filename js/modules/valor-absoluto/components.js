@@ -950,8 +950,8 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       if ((qState.failCount || 0) === 0) {
         const phrases = [
           {
-            pose: 'eureka',
-            tag: '¡Eureka total!',
+            pose: 'orgullosa',
+            tag: '¡Brillante deducción!',
             html: '¡Impecable a la primera! Así se lee la geometría de una función sin memorizar reglitas sueltas.',
           },
           {
