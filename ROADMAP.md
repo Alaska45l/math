@@ -19,10 +19,28 @@
 ## Fase 0 · Ideas a desarrollar a futuro.
 
 - Una seccion de foro similar al Reddit clasico de hace unos años, donde se puedan subir preguntas con asunto y contenido. El login seria con cuentas usando a un externo como google y la imagen de perfil son pre-cargadas con distintos animales en un arte cute simple.
-- Alaska en su forma chibi sentada en un cojin con su laptop, con interacciones randoms de levantarse salir de la pantalla por derecha para hacerse un cafe y que vuelva dejando el cafe a un costado y tomandolo de a momentos. Asi como si es pasado la medianoche que la pantalla sea mas notoria alumbrandole la cara.
+- Al minimizarse el cuadro, que aparezca en la derecha abajo Alaska en su forma chibi sentada en un cojin con su laptop, con interacciones randoms de levantarse salir de la pantalla por derecha para hacerse un cafe y que vuelva dejando el cafe a un costado y tomandolo de a momentos. Asi como si es pasado la medianoche que la pantalla sea mas notoria alumbrandole la cara. Esto para fomentar el efecto Body Doubling. Imagenes de concepto se encuentran en assets/vm/chibi.
+Ademas, hacer clic en Alaska Chibi abriria un evento para seleccionar lo que no entendés en pantalla (atributo `data-gloss` con un `js/core/glossary.js`?):
+
+1. **Clic 1 (Tocar a Alaska Chibi en el cojín):**
+* Alaska levanta la vista de la laptop, sale un mini-globito arriba de su cabeza que dice: *«¿Qué término o fórmula te está mareando? Tocalo en el pizarrón»* y el cursor del mouse pasa a modo **Lupa / Puntero de Tiza**.
+* Al mismo tiempo, todos los términos matemáticos, símbolos y palabras clave de la sección actual (`abscisa`, `ordenada`, `monotonía`, `Im(f)`, `C⁺`, `C⁻`, `unicidad`, `|x - h|`, `⌊x⌋`, etc.) se iluminan con un **subrayado punteado amarillo suave** indicando que son "clickeables".
+
+
+2. **Clic 2 (Tocar la palabra o fórmula que te cuesta):**
+* Supongamos que en tu captura estás leyendo el primer punto: *"Monotonía (eje X): Baja hasta la abscisa del vértice $h = 2$..."* y decís: *«Pará, ¿qué carajo era "abscisa" y qué era "monotonía"?»*.
+
+
+* Le hacés clic a **`abscisa`** o a **`Monotonía`**, y se despliega Alaska en el cuadro grande explicándote exactamente ese término en criollo y sin vueltas:
+
+
+> **Alaska (`explicando.webp`):** *«"Abscisa" es el nombre elegante que usan en Exactas para decir **la coordenada X (el piso horizontal)**, mientras que "ordenada" es la **coordenada Y (la altura vertical)**. Cuando el apunte dice "hasta la abscisa del vértice $h = 2$", te está diciendo en criollo: "¡Mirá el número $2$ en el piso horizontal, ni se te ocurra mirar el $-3$ de la altura!"»*
+
+
 - Una simulacion de examen de ingreso real donde simule una hoja A4 con preguntas iguales al examen como se encuentran al final de modulo. Al terminar Alaska lo corregi, da la nota y que puntos a mejorar.
 - Mientras Alaska explica un tema, que se posicione la pantalla, ilumine e interaccione con el elemento o widget que hace referencia.
 - Aumentar la cantidad de sprites de Alaska.
+
 
 
 ## Fase 1 · Rediseño Arquitectónico Desktop: El «Split-Workbench» (Widescreen)
