@@ -1,163 +1,227 @@
 # Guía de Dirección de Sprites y Expresiones de Alaska (`js/core/vn.js`)
 
-Este documento define el contrato estricto de uso para los **11 sprites** de **Alaska** en `assets/vn/`. 
+Este documento define el contrato estricto de dirección actoral para los **17 sprites** de **Alaska** en `assets/vn/`.
 
-**Regla de Oro de Dirección Visual:** La naturalidad de una Visual Novel depende del **contraste y la dosificación**. Si Alaska usa expresiones extremas (`panico`, `eureka`, `enojada`, `sonrojada`) todo el tiempo, el personaje pierde credibilidad, satura al estudiante y arruina el impacto de los momentos clave. El **80% del tiempo en pantalla** debe descansar sobre las poses conversacionales de baja intensidad (`base`, `explicando`, `evaluando`, `feliz`).
+**Regla de Oro de Dirección Visual:** La naturalidad de una Visual Novel depende del **contraste, la micro-actuación y la dosificación**. Si Alaska usa expresiones extremas (`panico`, `attack`, `eureka`, `enojada`, `sonrojada`) todo el tiempo, el personaje pierde credibilidad, satura al estudiante y arruina el impacto de los momentos clave. Al menos el **80% del tiempo en pantalla** debe descansar sobre las poses conversacionales y sutiles de **Tier 1** y **Tier 2**.
 
 ---
 
 ## 1. Clasificación por Niveles de Frecuencia (Tiers de Uso)
 
-Los 11 sprites se dividen en **4 Niveles de Frecuencia (Tiers)** que todo guion (`vn-scripts.js`) y sistema de reacciones (`createCheckBlock`, `retos.js`, widgets) debe respetar estrictamente:
+Los 17 sprites se dividen en **4 Niveles de Frecuencia (Tiers)** que todo guion (`vn-scripts.js`), glosario interactivo y sistema de reacciones (`createCheckBlock`, `retos.js`, widgets) debe respetar estrictamente:
 
-| Tier | Categoría | Sprites | Presupuesto de Uso |
+| Tier | Categoría | Sprites (17 en total) | Presupuesto de Uso |
 | :--- | :--- | :--- | :--- |
-| **Tier 1** | **Columna Vertebral (Uso Diario)** | `base.webp`, `explicando.webp`, `evaluando.webp` | **70% – 75%** de todas las líneas de diálogo. |
-| **Tier 2** | **Feedback Estándar y Personalidad** | `feliz.webp`, `orgullosa.webp`, `sospecha.webp` | **15% – 20%** de las líneas (cierres de idea, 1.er intento, advertencias suaves). |
-| **Tier 3** | **Alta Intensidad (Uso Condicionado)** | `colapso.webp`, `enojada.webp`, `eureka.webp` | **Máximo 1 vez** por guion o solo ante condiciones específicas de error/revelación. |
-| **Tier 4** | **Eventos Raros / Easter Eggs** | `sonrojada.webp`, `panico.webp` | **< 2%** (Exclusivos para hitos de perfección, rachas impecables o emergencias críticas). |
+| **Tier 1** | **Columna Vertebral (Uso Diario y Transiciones)** | `base.webp`, `pensativa.webp`, `explicando.webp`, `evaluando.webp` | **65% – 70%** de todas las líneas de diálogo. |
+| **Tier 2** | **Matices Sutiles, Empatía y Feedback Estándar** | `empatia.webp`, `complice.webp`, `feliz.webp`, `orgullosa.webp`, `sospecha.webp` | **20% – 25%** de las líneas (secretos de cátedra, consuelo, 1.er intento). |
+| **Tier 3** | **Alta Intensidad e Ironía (Uso Condicionado)** | `unamused.webp`, `lentes-brillo.webp`, `colapso.webp`, `enojada.webp`, `eureka.webp` | **Máximo 1 vez** por guion o ante errores/trampas específicas. |
+| **Tier 4** | **Eventos Especiales, Bosses y Easter Eggs** | `sonrojada.webp`, `panico.webp`, `attack.webp` | **< 3%** (Exclusivos para rachas perfectas, paradojas críticas y combates de Jefe). |
 
 ---
 
-## 2. Catálogo Detallado de los 11 Sprites: Cuándo Usarlos y Cuándo NO
+## 2. Catálogo Detallado de los 17 Sprites: Cuándo Usarlos y Cuándo NO
 
-### TIER 1 · Columna Vertebral Didáctica (Uso Constante)
+### TIER 1 · Columna Vertebral Didáctica (El Ritmo Natural de la Clase)
+
+La clave para que Alaska parezca viva en los guiones teóricos es rotar orgánicamente entre estas 4 poses: **escuchar/plantear (`base`) → buscar la idea mirando arriba (`pensativa`) → desarrollar hablando (`explicando`) → tomar un sorbo esperando que el alumno piense (`evaluando`)**.
 
 #### 1. `base.webp` (Intelectual / Acomodándose los lentes con boca cerrada)
-* **Gesto:** Pose serena acomodándose los lentes con la libreta en mano, boca cerrada.
+* **Gesto:** Pose serena de frente acomodándose los lentes con la libreta en mano y boca cerrada.
 * **Cuándo usarla:**
-  * En el **primer globo** al abrir una explicación teórica o presentar una definición formal.
+  * En el **primer globo** al abrir una explicación formal o presentar una definición.
   * Al entregar la **Pista Nivel 1** en un ejercicio.
-  * Como estado de reposo inicial cuando se abre una sección.
-* **Cuándo NO usarla:** No dejarla fija durante 4 globos seguidos de explicación hablada (porque tiene la boca cerrada y parece una estatua). Alternar siempre con `explicando.webp`.
+* **Cuándo NO usarla:** Nunca dejarla fija en 3 o más globos seguidos de explicación hablada (tiene la boca cerrada). Alternar enseguida con `pensativa.webp` o `explicando.webp`.
 
-#### 2. `explicando.webp` (Didáctica / Dedo índice arriba y boca abierta)
+#### 2. `pensativa.webp` (Visualizando en el aire / Buscando la metáfora) — **[TRANSICIÓN ESTRELLA]**
+* **Gesto:** Brazo izquierdo cruzado, dedo índice derecho apoyado suavemente en la mejilla, boca apenas entreabierta («hmm...») y **mirada dirigida hacia arriba a un costado**, rompiendo el contacto visual directo con la cámara.
+* **Cuándo usarla:**
+  * Como **puente natural** antes de introducir una intuición visual o cambiar el enfoque de una explicación (*«Pará, dejame pensar cómo mostrarte esto en el gráfico sin hacer cuentas feas... Miralo así:»*).
+  * Cuando Alaska se hace una pregunta en voz alta para guiar el razonamiento del alumno (*«A ver... si adentro de las barras tenemos $x + 3$, ¿qué número tendríamos que meter en $x$ para que esa suma dé cero?»*).
+  * Al entregar la **Pista Nivel 2** (cuando te invita a visualizar la geometría del problema).
+
+#### 3. `explicando.webp` (Didáctica / Dedo índice arriba y boca abierta)
 * **Gesto:** Mano derecha levantada con el dedo índice hacia arriba en gesto docente tranquilo, libreta en el brazo izquierdo, boca abierta hablando con calma.
 * **Cuándo usarla:**
-  * Es el **caballo de batalla** de todos los guiones de teoría (`vn-scripts.js`) y de los botones **`Base desde cero`**.
-  * Usar en todos los globos intermedios (pasos 2, 3 y 4 de una explicación) donde Alaska desglosa una propiedad paso a paso, despeja una ecuación o guía al usuario a mirar una parte del gráfico.
-  * Al entregar la **Pista Nivel 2 y Nivel 3**.
+  * Es el **caballo de batalla** para el desarrollo paso a paso en `vn-scripts.js` y en los guiones de **`Base desde cero`**.
+  * Usar en los globos centrales donde Alaska desarma una ecuación, aplica la propiedad uniforme o explica cómo leer los ejes.
+  * Al entregar la **Pista Nivel 3**.
 
-#### 3. `evaluando.webp` (Tomando café/mate / Observación analítica)
-* **Gesto:** Sosteniendo su taza con ambas manos a la altura del mentón, mirada tranquila, aguda y ligeramente juzgadora por encima de la taza.
+#### 4. `evaluando.webp` (Tomando café/mate / Observación analítica)
+* **Gesto:** Sosteniendo su taza con ambas manos a la altura del mentón, mirada tranquila, aguda y analítica por encima de la taza.
 * **Cuándo usarla:**
-  * Cuando Alaska hace una **pausa reflexiva o lanza una pregunta retórica** para que el usuario piense antes del siguiente paso (*«Ahora pensá dos segundos antes de mover el slider: ¿qué le pasa a la distancia si $x$ coincide exactamente con $h$?»*).
-  * En introducciones de problemas de análisis o lectura de gráficos (Modo Detective, Aduana de funciones por partes, comparación de fórmulas).
-  * Cuando el usuario está a mitad de un ejercicio de múltiples pasos (ej. ya clavó el vértice pero todavía está buscando la pendiente).
+  * Cuando Alaska hace una **pausa deliberada** después de explicar algo y te pasa la pelota para que interactúes con el widget (*«Probá ahora de arrastrar el vértice hacia la izquierda y fijate qué le pasa al signo adentro de las barras. Yo te espero acá con mi café.»*).
+  * En introducciones de modos de inspección (Detective de sucesiones, Aduana de dominios, Escáner vertical).
 
 ---
 
-### TIER 2 · Feedback Estándar y Matices (Uso Moderado)
+### TIER 2 · Matices Sutiles, Calidez y Feedback Estándar
 
-#### 4. `feliz.webp` (Sonrisa cálida y natural)
-* **Gesto:** Pose relajada de frente, sonrisa genuina y cercana.
+#### 5. `empatia.webp` (Suspiro comprensivo / Mano en el pecho)
+* **Gesto:** Ojos suavemente cerrados, cejas inclinadas con calidez, mano derecha apoyada sobre el pecho y media sonrisa comprensiva.
 * **Cuándo usarla:**
-  * Para dar la **bienvenida** al laboratorio en la Sección 1 o cerrar la Hoja de Repaso final.
-  * Cuando el usuario **resuelve bien un ejercicio después de haber fallado antes** (`failStreak >= 1`): transmite alivio y apoyo genuino tras haber corregido el error.
-  * Para invitar amablemente a probar un widget interactivo.
+  * Cuando valida que un tema, notación o enunciado **es genuinamente confuso o pesado** y le quita culpa al estudiante (*«Tranquila, no sos vos: llamar "ordenada" al eje Y y "abscisa" al eje X marea a cualquiera el primer día»* o cuando critica las traducciones robóticas de los libros).
+  * En el arranque de los botones **`Base desde cero: lo que nadie te explica`**, transmitiendo confianza para preguntar lo básico sin vergüenza.
+  * Cuando el usuario falla en un problema difícil pero estuvo muy cerca (ej. acertó todo el planteo y pifió en el último paso).
 
-#### 5. `orgullosa.webp` (Smug / Brazos cruzados con suficiencia)
-* **Gesto:** Brazos cruzados, barbilla alzada, ojos entornados y sonrisa pícara de *«te lo dije»*.
+#### 6. `complice.webp` (Guiño y tiza en mano / Secreto de cátedra)
+* **Gesto:** Ojo izquierdo guiñado con calidez, sonrisa de costado amigable, mano derecha sosteniendo una tiza blanca como quien comparte un atajo confidencial.
 * **Cuándo usarla:**
-  * Cuando el usuario **acierta al primer intento** (`failStreak === 0`) un ejercicio estándar.
-  * Cuando Alaska termina de desarmar una «trampa de parcial» en la que suele caer todo el mundo (*«¿Viste qué fácil era sin memorizar la receta de cambiar el signo?»*).
-* **Restricción:** No usarla en más de 1 globo por guion teórico para que no parezca arrogante todo el tiempo.
+  * Para revelar **«atajos de supervivencia de Exactas»** y trucos visuales que ahorran media hoja de cuentas (ej. *«Te tiro un secreto de corrector: antes de despejar nada, multiplicá todo el renglón por el denominador para limpiar las fracciones de entrada»*, o *«Para leer $k$ sin comerte ningún amague, enchufá $n = 1$ de cabeza»*).
+  * Mucho más cálida y aliada que `orgullosa.webp`: acá Alaska no se burla de vos, sino que te hace cómplice contra el examen.
 
-#### 6. `sospecha.webp` (Mirada de Detective / Escéptica)
-* **Gesto:** Mano en el mentón, cabeza levemente inclinada mirando con ojos entrecerrados de escepticismo puro.
-* **Cuándo usarla (Reemplaza el uso prematuro de `enojada` o `colapso`):**
-  * En el **1.er intento fallido (`failStreak === 1`)** cuando el error es sutil o conceptual: en vez de gritarle al alumno en su primer tropiezo, Alaska lo mira con sospecha (*«Mmm... mirá bien el signo que pusiste adentro de las barras. ¿Seguro que en $x = 3$ eso da cero?»*).
-  * Cuando `diagnose()` devuelve una advertencia de equivalencia no estándar (`not_standard_but_equivalent` / `unfactored_inner_coeff`): *«A ver... técnicamente tu fórmula da los mismos números, pero me escondiste el primer término simplificando así.»*
-  * En los bloques de **Cuidado con** al presentar un caso tramposo (como la tarea de Guillermo, Woo-Jin o Kiran).
+#### 7. `feliz.webp` (Sonrisa cálida y natural)
+* **Gesto:** Pose relajada de frente, mirada luminosa y sonrisa genuina.
+* **Cuándo usarla:**
+  * Para dar la **bienvenida** al módulo o cerrar positivamente la Hoja de Repaso.
+  * Cuando el usuario **resuelve bien un ejercicio después de haber fallado antes (`failStreak >= 1`)**: celebra que hayas entendido y corregido el error.
+
+#### 8. `orgullosa.webp` (Smug / Brazos cruzados con suficiencia)
+* **Gesto:** Brazos cruzados sobre el pecho, cabeza ligeramente ladeada, mirada confiada y sonrisa pícara de *«¿viste que tenía razón?»*.
+* **Cuándo usarla:**
+  * Cuando el usuario **acierta al primer intento (`failStreak === 0`)** un ejercicio individual.
+  * Cuando termina de demostrar por qué su método geométrico le gana por goleada a memorizar fórmulas.
+* **Restricción:** Máximo 1 globo por guion para no saturar.
+
+#### 9. `sospecha.webp` (Mirada de Detective / Escéptica con mano en el mentón)
+* **Gesto:** Mano derecha en el mentón, ojos entrecerrados mirando con escepticismo analítico.
+* **Cuándo usarla:**
+  * En el **1.er intento fallido (`failStreak === 1`)** ante errores de signos o desfasajes (`inverted_h_sign`, `off_by_one`, `sign_of_step`): en lugar de retar al alumno en su primer error, Alaska arquea la ceja y le hace dudar de su respuesta (*«Mmm... mirá el vértice en el gráfico y mirá el signo que pusiste. ¿No te quedó espejado?»*).
+  * Cuando `diagnose()` detecta una fórmula matemáticamente equivalente pero no canónica (`not_standard_but_equivalent`).
 
 ---
 
-### TIER 3 · Alta Intensidad (Máximo 1 aparición justificada por situación)
+### TIER 3 · Alta Intensidad, Ironía y Trampas (Uso Condicionado)
 
-#### 7. `eureka.webp` (¡Ajá! / Entusiasmo científico con destello)
-* **Gesto:** Ojos brillantes bien abiertos, sonrisa entusiasta, índice arriba y dos destellos amarillos de inspiración.
-* **Cuándo usarla (Con moderación):**
-  * **Únicamente en el momento de «Gran Revelación» (clímax conceptual)** donde se conectan dos temas que parecían separados. Ejemplos exactos:
-    * Cuando descubre que dividir por $3$ es multiplicar por el inverso $\frac{1}{3}$ y aparece el neutro multiplicativo $r^0 = 1$.
-    * Cuando se abre la llave de valor absoluto y se revela que toda «V» son dos rectas lineales pegadas en $x = h$.
-    * Cuando se conecta $\sqrt{x^2} = |x|$.
-* **Prohibición:** **Prohibido** usar `eureka.webp` como reemplazo de `explicando.webp` en explicaciones comunes o pasos algebraicos rutinarios. Máximo **2 o 3 apariciones en todo un módulo completo**.
+#### 10. `unamused.webp` (Sarcasmo / Palma levantada «Frená el carro»)
+* **Gesto:** Ojos a media asta con expresión de cansancio infinito (*deadpan*), mano derecha levantada mostrando la palma en señal de *«alto ahí»* y mano izquierda en la cintura.
+* **Cuándo usarla:**
+  * Cuando el estudiante cae en un **vicio clásico de escuela secundaria** o «receta mágica» contra los primeros principios:
+    * Olvidar las barras de valor absoluto (`missing_abs_bars`) escribiendo una recta común.
+    * Decir o intentar aplicar «pasa sumando / se tacha por magia» sin respetar la propiedad uniforme o el neutro.
+    * Confundir el eje X con el eje Y al escribir intervalos de crecimiento o positividad (`confused_x_and_y_in_intervals`, el famoso error de Guillermo).
+* **Diferencia con `enojada.webp`:** `unamused.webp` no grita ni tiembla; es decepción irónica y seca de profesora que ya corrigió 100 parciales iguales.
 
-#### 8. `colapso.webp` (Agobio intelectual / Mano en la frente con gota)
+#### 11. `lentes-brillo.webp` (Modo Jefa de Cátedra / Cristales iluminados)
+* **Gesto:** Empujándose el puente de los lentes con el dedo índice; los cristales reflejan una luz blanca opaca estilo anime con una sonrisa calculadora.
+* **Cuándo usarla:**
+  * Exclusiva para presentar **«Las 5 Trampas Clásicas de Examen»** en `retos.js` y los bloques de **Cuidado con** más picantes (ej. la trampa mortal de simplificar $\sqrt{x^2}$ como $x$ en vez de $|x|$, o la trampa de Woo-Jin y Kiran).
+  * Cuando te advierte con frialdad quirúrgica dónde el 90% de los ingresantes pierde el punto en el parcial.
+
+#### 12. `eureka.webp` (¡Ajá! / Entusiasmo científico con destello)
+* **Gesto:** Ojos brillantes bien abiertos, sonrisa entusiasta, índice arriba y destellos amarillos.
+* **Cuándo usarla (Con moderación estricta):**
+  * **Únicamente en el momento de «Gran Revelación» (clímax conceptual)** donde se conectan dos mundos matemáticos (ej. descubrir que toda función de valor absoluto es una función por partes disfrazada, o que $0$ saltos en geométrica es multiplicar por el neutro $r^0 = 1$).
+* **Restricción:** Prohibido usarla para explicaciones rutinarias. Máximo **2 veces en todo un laboratorio**.
+
+#### 13. `colapso.webp` (Agobio intelectual / Mano en la frente con gota)
 * **Gesto:** Mano en la frente, ojos cerrados de sufrimiento académico y gota de sudor.
 * **Cuándo usarla:**
-  * Cuando el usuario presiona el botón **«¡Estoy atorado! Mostrame la solución»**.
-  * Cuando en el guion se menciona hacer una locura tediosa a mano (como calcular 99 escalones recursivos de uno en uno) o cuando un alumno comete un clásico «dolor de ojos de corrector de Exactas» (como olvidar los paréntesis en una base negativa `-5^(n-1)` o intercambiar $h$ con $k$).
+  * Cuando el usuario presiona **«¡Estoy atorado! Mostrame la solución»**.
+  * Ante errores de jerarquía o distracción pesada (`neg_pow_precedence`, `swapped_h_k`, `swapped_k_step`, `wrong_anchor_a2`), o cuando explica lo absurdo de calcular 99 escalones recursivos a mano.
 
-#### 9. `enojada.webp` (Indignada / Puchero con vena de enojo)
-* **Gesto:** Brazos cruzados, mejillas infladas con rubor, ceño fruncido y símbolo rojo de enojo (acompañada por `.vn-shake`).
+#### 14. `enojada.webp` (Indignada / Puchero con vena de enojo)
+* **Gesto:** Brazos cruzados, mejillas infladas con rubor, ceño fruncido y símbolo rojo de enojo (acompañada por la animación `.vn-shake`).
 * **Cuándo usarla:**
-  * Cuando el usuario acumula **2 o más errores seguidos en la misma pregunta (`failStreak >= 2`)** demostrando que está tirando números al azar sin leer las pistas.
-  * Cuando el usuario comete una **ilegalidad matemática grave** en un guion (como unir los puntos aislados de una sucesión en $\mathbb{N}$ con una línea continua o decir «pasa restando por magia»).
-* **Prohibición:** **Nunca** usar `enojada.webp` en el primer error (`failStreak === 1`) de un ejercicio normal; para el primer error usar siempre `sospecha.webp` o `explicando.webp`.
+  * Cuando el usuario acumula **2 o más errores seguidos en la misma pregunta (`failStreak >= 2`)** tirando valores al azar sin leer las pistas.
+  * Cuando intenta una ilegalidad grave como unir los puntos aislados de una sucesión en $\mathbb{N}$ con una línea continua.
 
 ---
 
-### TIER 4 · Eventos Especiales y Easter Eggs (Uso Ultra Restringido)
+### TIER 4 · Eventos Especiales, Crisis y Combates de Jefe (Uso Ultra Restringido)
 
-#### 10. `sonrojada.webp` (*Tsundere* Avergonzada / Tapándose con la libreta) — **[EASTER EGG]**
-* **Gesto:** Cuerpo girado, cubriéndose parte de la cara con la libreta contra el pecho, mejillas muy sonrojadas, desviando la mirada nerviosa.
-* **Regla estricta de rareza:** Este sprite es un **premio oculto (Easter Egg)**. Si aparece en cada ejercicio bien hecho, pierde toda la gracia.
-* **Únicos 3 momentos donde está permitido activarlo:**
-  1. **Sección o Capítulo Perfecto (*Flawless Run*):** Cuando el usuario completa **todas** las preguntas de un bloque `Chequeo` (o todas las secciones de un Capítulo) al **primer intento (`0` fallos acumulados y `0` pistas pedidas)**.
-     * *Diálogo ejemplo:* «¿Eh? ¿Resolviste todo el bloque de una sin pedirme ni una pista?... B-bueno, tampoco te agrandes, ¿sí? ¡Solo significa que no explico tan mal como pensaba!»
-  2. **Racha Impecable en el Entrenador (`streak === 5`):** Cuando el usuario encadena 5 retos seguidos sin errores en `retos.js`.
-  3. **Easter Egg de Interacción:** Si el usuario hace clic 5 veces seguidas sobre el avatar/sprite de Alaska en el HUD.
+#### 15. `sonrojada.webp` (*Tsundere* Avergonzada / Tapándose con la libreta) — **[EASTER EGG]**
+* **Gesto:** Abrazando la libreta contra el pecho, mejillas muy sonrojadas, mirando hacia un costado nerviosa y tocándose un mechón de pelo.
+* **Regla estricta de rareza:** Es un **trofeo oculto (Easter Egg)**. Prohibido usarla en aciertos individuales normales.
+* **Únicos 3 disparadores permitidos:**
+  1. **Bloque o Capítulo Impecable (*Flawless Run*):** Completar todas las preguntas de un bloque `Chequeo` al **primer intento (`0` fallos y `0` pistas)**.
+  2. **Racha de 5 en el Entrenador (`streak === 5`):** Encadenar 5 retos seguidos sin errores en `retos.js`.
+  3. **Easter Egg del HUD:** Hacer clic 5 veces seguidas sobre el sprite de Alaska.
 
-#### 11. `panico.webp` (Shock / Emergencia de Laboratorio) — **[CRISIS & BOSSES]**
-* **Gesto:** Manos en las mejillas, boca abierta en grito de alarma, pupilas contraídas de shock cómico.
-* **Regla estricta de rareza:** Prohibido usarla en diálogos teóricos normales o por equivocarse en una cuenta común.
-* **Únicos 3 momentos donde está permitido activarla:**
-  1. **Paradojas y Catástrofes Matemáticas en Vivo sobre los Simuladores:**
-     * Cuando en `editor-tramos.js` (Sección 9 de Valor Absoluto) el usuario clava **dos puntos cerrados ($\bullet$) en la misma frontera $x = c$ a distinta altura**, disparando el láser vertical rosa de colisión que rompe la definición de función.
-     * Cuando en `inversa.js` (Funciones) el usuario intenta invertir una recta horizontal con pendiente $m = 0$ (división por cero / recta vertical).
-     * Cuando en `razon.js` (Sucesiones) el usuario fuerza el trazado continuo en $\mathbb{R}$ con base negativa $r < 0$, haciendo explotar el punto $n = 1,5$ con $\sqrt{-5} \notin \mathbb{R}$.
-     * Cuando en `escalera.js` el usuario apaga la segunda ancla de Fibonacci dejando a la máquina ciega.
-  2. **Modo Boss (Emergencia Real):** Cuando el reloj del jefe baja de los últimos segundos críticos o cuando el escudo del laboratorio recibe daño directo.
+#### 16. `panico.webp` (Shock / Emergencia de Laboratorio) — **[CRISIS & PARADOJAS]**
+* **Gesto:** Ambas manos en la cabeza sosteniendo la libreta arriba, sombra azul de terror cómico sobre los ojos, pupilas contraídas y grito de alarma.
+* **Únicos disparadores permitidos:**
+  1. **Rupturas y Paradojas Matemáticas en Vivo sobre los Simuladores:**
+     * Clavar **dos puntos cerrados ($\bullet$) en la misma frontera $x = c$** en `editor-tramos.js` (disparando el láser vertical rosa de colisión que destruye la unicidad de función).
+     * Intentar invertir una recta horizontal con pendiente $m = 0$ en `inversa.js` (división por cero).
+     * Forzar la curva continua en $\mathbb{R}$ con razón negativa $r < 0$ en `razon.js` (haciendo aparecer $\sqrt{-5} \notin \mathbb{R}$).
+  2. **Peligro Crítico en un Boss:** Cuando la integridad del laboratorio está en el último punto de vida o quedan menos de 5 segundos en la bomba.
+
+#### 17. `attack.webp` (Modo Comandante / «¡Rompele el Escudo!») — **[EXCLUSIVA DE BOSSES Y DESAFÍOS]**
+* **Gesto:** Pose dinámica de acción apuntando con el dedo índice directo hacia adelante (estilo *Ace Attorney / Persona All-Out Attack*), guardapolvo blanco al viento y mirada feroz decidida.
+* **Regla estricta de rareza:** Prohibido usarla en secciones teóricas tranquilas.
+* **Únicos disparadores permitidos:**
+  1. **Inicio y Contraataque en los Modos Boss (`boss-engine.js` / Deflector / Keep Calculating / Undertale / Persona):**
+     * Al declarar el inicio del combate contra un jefe o al ejecutar un contraataque exitoso (como reflejar el escudo con $f^{-1}$ o desviar el rayo láser hacia el núcleo).
+  2. **Modo «Desafío Inverso» o Cierre de Racha Épica:** Cuando el usuario acepta un desafío cronometrado o resuelve el problema más difícil del módulo.
 
 ---
 
-## 3. Reglas de Ritmo y Transición entre Globos (Pacing)
+## 3. Contrato Técnico para `js/core/vn.js` y `js/core/sound.js`
 
-1. **Prohibido el efecto «camaleón»:** En un guion de 5 mensajes (`playScript`), **no cambies el sprite en todos los mensajes** si la emoción no cambió. Está perfecto (y se siente mucho más natural) que dos globos consecutivos mantengan `explicando.webp` mientras desarrolla una idea.
-2. **Patrón clásico para un guion de 5 mensajes (`secX-...`):**
-   * **Mensaje 1 (`base` o `evaluando`):** Plantea el problema o pregunta inicial.
-   * **Mensaje 2 (`explicando`):** Desarma el concepto paso a paso.
-   * **Mensaje 3 (`explicando` o `sospecha`):** Señala el punto crítico o la trampa donde todos suelen fallar.
-   * **Mensaje 4 (`eureka` —solo si hay gran revelación— o `orgullosa`):** Muestra el puente visual definitivo.
-   * **Mensaje 5 (`feliz` o `explicando`):** Invita a probar la herramienta con las manos en el widget.
-3. **Configuración en `js/core/vn.js` y `js/core/sound.js`:**
-   * Registrar las 11 poses en `VN_POSES`:
-     ```js
-     export const VN_POSES = {
-       base: 'assets/vn/base.webp',
-       explicando: 'assets/vn/explicando.webp',
-       evaluando: 'assets/vn/evaluando.webp',
-       feliz: 'assets/vn/feliz.webp',
-       orgullosa: 'assets/vn/orgullosa.webp',
-       sospecha: 'assets/vn/sospecha.webp',
-       eureka: 'assets/vn/eureka.webp',
-       colapso: 'assets/vn/colapso.webp',
-       enojada: 'assets/vn/enojada.webp',
-       sonrojada: 'assets/vn/sonrojada.webp',
-       panico: 'assets/vn/panico.webp'
-     };
-     ```
-   * Etiquetas por defecto (`DEFAULT_TAGS`, **sin emojis**, usando `chalkIcon`):
-     * `base`: `'Modo Teoría'` (`icon: 'glasses'`)
-     * `explicando`: `'Paso a paso'` (`icon: 'book'`)
-     * `evaluando`: `'Analizando...'` (`icon: 'glasses'`)
-     * `feliz`: `'¡Bien ahí!'` (`icon: 'smile'`)
-     * `orgullosa`: `'Te lo advertí'` (`icon: 'smug'`)
-     * `sospecha`: `'Mmm... mirá bien'` (`icon: 'target'`)
-     * `eureka`: `'¡Conexión clave!'` (`icon: 'star'`)
-     * `colapso`: `'Colapso académico'` (`icon: 'drop'`)
-     * `enojada`: `'¡Frená la mano!'` (`icon: 'anger'`)
-     * `sonrojada`: `'N-no te agrandes...'` (`icon: 'spark'`)
-     * `panico`: `'¡Alerta de Laboratorio!'` (`icon: 'anger'`)
-   * **Precarga Inteligente:** Precargar de inmediato el Tier 1 y Tier 2 (`base`, `explicando`, `evaluando`, `feliz`, `orgullosa`, `sospecha`) al iniciar `initVN()`, y precargar el resto en segundo plano (`requestIdleCallback` o `setTimeout(..., 800)`) para no bloquear el primer renderizado.
+### 3.1 Registro de las 17 Poses en `VN_POSES` (`js/core/vn.js`)
+```js
+export const VN_POSES = {
+  // Tier 1: Columna vertebral
+  base: 'assets/vn/base.webp',
+  pensativa: 'assets/vn/pensativa.webp',
+  explicando: 'assets/vn/explicando.webp',
+  evaluando: 'assets/vn/evaluando.webp',
+
+  // Tier 2: Matices sutiles y feedback estándar
+  empatia: 'assets/vn/empatia.webp',
+  complice: 'assets/vn/complice.webp',
+  feliz: 'assets/vn/feliz.webp',
+  orgullosa: 'assets/vn/orgullosa.webp',
+  sospecha: 'assets/vn/sospecha.webp',
+
+  // Tier 3: Alta intensidad e ironía
+  unamused: 'assets/vn/unamused.webp',
+  'lentes-brillo': 'assets/vn/lentes-brillo.webp',
+  eureka: 'assets/vn/eureka.webp',
+  colapso: 'assets/vn/colapso.webp',
+  enojada: 'assets/vn/enojada.webp',
+
+  // Tier 4: Eventos raros, crisis y Bosses
+  sonrojada: 'assets/vn/sonrojada.webp',
+  panico: 'assets/vn/panico.webp',
+  attack: 'assets/vn/attack.webp'
+};
+
+```
+
+### 3.2 Etiquetas por Defecto (`DEFAULT_TAGS`) e Íconos de Tiza (Cero Emojis)
+
+```js
+const DEFAULT_TAGS = {
+  base:            { text: 'Modo Teoría',            icon: 'glasses' },
+  pensativa:       { text: 'Pensando en voz alta...', icon: 'spark' },
+  explicando:      { text: 'Paso a paso',            icon: 'book' },
+  evaluando:       { text: 'Tu turno de probar',     icon: 'glasses' },
+  empatia:         { text: 'Tranquila, paso a paso', icon: 'smile' },
+  complice:        { text: 'Secreto de cátedra',     icon: 'star' },
+  feliz:           { text: '¡Bien ahí!',             icon: 'smile' },
+  orgullosa:       { text: 'Te lo advertí',          icon: 'smug' },
+  sospecha:        { text: 'Mmm... mirá bien',       icon: 'target' },
+  unamused:        { text: 'Sin recetas mágicas',    icon: 'glasses' },
+  'lentes-brillo': { text: 'Trampa de Parcial',      icon: 'glasses' },
+  eureka:          { text: '¡Conexión clave!',       icon: 'star' },
+  colapso:         { text: 'Colapso académico',      icon: 'drop' },
+  enojada:         { text: '¡Frená la mano!',        icon: 'anger' },
+  sonrojada:       { text: 'N-no te agrandes...',    icon: 'spark' },
+  panico:          { text: '¡Alerta de Laboratorio!', icon: 'anger' },
+  attack:          { text: '¡Contraataque!',         icon: 'shield' }
+};
+
+```
+
+### 3.3 Animaciones de Entrada y Síntesis de Voz por Pose
+
+* **Animaciones CSS en `.vn-sprite-wrap`:**
+* `enojada` y `panico`: aplican `.vn-shake` (sacudida rápida).
+* `orgullosa`, `feliz`, `eureka`, `complice` y `attack`: aplican `.vn-pop` (rebote dinámico suave).
+* `pensativa`, `empatia`, `evaluando` y `unamused`: transición suave de opacidad/desplazamiento sin sacudidas bruscas.
+
+
+* **Precarga en 2 etapas (`initVN`):**
+* **Etapa 1 (Inmediata):** Precargar los 9 sprites de Tier 1 y Tier 2.
+* **Etapa 2 (Diferida en `requestIdleCallback`):** Precargar los 8 sprites de Tier 3 y Tier 4 para no penalizar el tiempo de carga inicial de la página.
