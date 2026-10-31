@@ -1,0 +1,1457 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e2622" />
+    <meta
+      name="description"
+      content="Laboratorio interactivo de potencias, raíces, simplificación de radicales y restricciones en los reales."
+    />
+    <title>Potenciación y radicación · Alaska Math Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/valor-absoluto.css" />
+    <link rel="stylesheet" href="css/modules/potencias-raices.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/empatia.webp" />
+    <script type="module" src="js/modules/potencias-raices/index.js"></script>
+  </head>
+  <body data-page="potencias-raices">
+    <header data-site-nav="potencias-raices"></header>
+    <main class="page page--wide pr-page">
+      <header class="page-header">
+        <h1>Potenciación, radicación y los mundos que las sostienen</h1>
+        <p class="intro">
+          Unidad 11 · Del neutro multiplicativo a la raíz principal, con cada
+          regla construida desde sus factores y su dominio en ℝ.
+        </p>
+      </header>
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de la lección">
+          <h2 class="seq-sidebar__title">Potencias y raíces</h2>
+          <div class="seq-sidebar__progress">
+            <span id="seq-progress-text" class="small muted"
+              >Progreso: 0/10</span
+            >
+            <div class="seq-progress-bar" aria-hidden="true">
+              <div id="seq-progress-fill" class="seq-progress-fill"></div>
+            </div>
+          </div>
+          <div class="seq-sidebar__chapter">Capítulo 1 · Dos mundos</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a
+                href="#sec-1"
+                class="seq-sidebar__link is-active"
+                data-sec="sec-1"
+                ><span>1. Aditivo y multiplicativo</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-2" class="seq-sidebar__link" data-sec="sec-2"
+                ><span>2. Exponentes negativos</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-3" class="seq-sidebar__link" data-sec="sec-3"
+                ><span>3. Cocientes y neutro 1</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+          </ul>
+          <div class="seq-sidebar__chapter">Capítulo 2 · Raíces</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a href="#sec-4" class="seq-sidebar__link" data-sec="sec-4"
+                ><span>4. Exponentes racionales</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-5" class="seq-sidebar__link" data-sec="sec-5"
+                ><span>5. Geometría dimensional</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-6" class="seq-sidebar__link" data-sec="sec-6"
+                ><span>6. Árbol de factores</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-7" class="seq-sidebar__link" data-sec="sec-7"
+                ><span>7. Simplificar radicales</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+          </ul>
+          <div class="seq-sidebar__chapter">
+            Capítulo 3 · Restricciones en ℝ
+          </div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a href="#sec-8" class="seq-sidebar__link" data-sec="sec-8"
+                ><span>8. Binomios y geometría</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-9" class="seq-sidebar__link" data-sec="sec-9"
+                ><span>9. Raíces y dominio</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+            <li>
+              <a href="#sec-10" class="seq-sidebar__link" data-sec="sec-10"
+                ><span>10. Paradojas y paréntesis</span
+                ><span class="seq-sidebar__status"></span
+              ></a>
+            </li>
+          </ul>
+          <div class="seq-sidebar__chapter">Capítulo 4 · Práctica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a
+                href="#sec-retos"
+                class="seq-sidebar__link"
+                data-sec="sec-retos"
+                ><span>Entrenador y Forja</span></a
+              >
+            </li>
+            <li>
+              <a
+                href="#sec-repaso"
+                class="seq-sidebar__link"
+                data-sec="sec-repaso"
+                ><span>Hoja de repaso</span></a
+              >
+            </li>
+          </ul>
+        </aside>
+        <div class="seq-content">
+          <header class="pr-hero">
+            <p class="pr-kicker">ALASKA MATH LAB · UNIDAD 11</p>
+            <h2>De repetir factores a entender restricciones</h2>
+            <p>
+              Leé la teoría junto al laboratorio: los controles permanecen a
+              mano mientras resolvés cada chequeo.
+            </p>
+            <p class="pr-progress" data-progress>Chequeos resueltos: 0/30</p>
+          </header>
+
+          <div class="seq-chapter-banner">
+            <span class="seq-chapter-banner__tag">Capítulo 1</span>
+            <h2 class="seq-chapter-banner__title">
+              Capítulo 1 · Dos mundos, dos reglas
+            </h2>
+            <p class="muted">
+              De sumar pasos a contar factores: cada operación tiene su propio
+              origen.
+            </p>
+          </div>
+          <section
+            id="sec-1"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-1"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 1 · SECCIÓN 1</span>
+              <h2 id="title-sec-1" class="seq-section__title">
+                Dos universos paralelos: el origen 0 y el origen 1
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    La suma cuenta saltos desde cero; la potencia cuenta cambios
+                    de escala desde uno.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Cuando caminás por la vereda, cada cuadra te aleja del punto donde empezaste: si todavía no saliste, seguís en el metro cero. Ahora cambiá de escena: una receta que rinde cinco porciones sigue rindiendo cinco si la repetís una vez, <span class="eq">5 · 1 = 5</span>; si la repetís cero veces, no hay porciones, <span class="eq">5 · 0 = 0</span>. Esa diferencia física separa los dos orígenes.
+                  </p>
+                  <p>
+                    En el
+                    <span class="gloss-term" data-gloss="campo_multiplicativo"
+                      >campo multiplicativo</span
+                    >
+                    cada paso escala lo anterior. El punto de partida es el
+                    <span class="gloss-term" data-gloss="neutro_multiplicativo"
+                      >neutro multiplicativo</span
+                    >
+                    1, porque multiplicar por 1 conserva la escala. Así,
+                    <span class="eq">1 · 3 · 3 · 3 · 3 = 3⁴ = 81</span>: el
+                    exponente cuenta factores.
+                  </p>
+                  <p>
+                    Por eso <span class="eq">a⁰ = 1</span> no es un decreto:
+                    cero pasos multiplicativos te dejan en el origen 1. En
+                    cambio, cero saltos aditivos desde 0 terminan en 0. Dos
+                    mundos, dos neutros; las recetas que los mezclan fallan.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Caminar cuadras / tocar zoom sin cambiar la foto</td><td>0 + a · n frente a 1 · aⁿ</td><td>Usar el mismo origen y contador para suma y potencia</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Si todavía no tocaste el zoom de una foto, ¿la escala es 0 o 1? Y si no caminaste ninguna cuadra desde la puerta, ¿tu desplazamiento es 0 o 1?</p></aside><p class="pr-forward-link">Este contador multiplicativo es el primer boceto de aˣ: más adelante lo vas a leer como crecimiento o decaimiento exponencial.</p>
+                <div class="pr-annotated-host"></div>
+                <div data-worlds-comparison></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No intercambies el contador aditivo a · n con el exponente
+                    n. En 4 · 2ⁿ, el factor 4 es 2², por lo que el resultado se
+                    escribe 2ⁿ⁺²; no se multiplican las bases para fabricar 8ⁿ.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 1</span>
+                  <div data-check="sec-1"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="dos-mundos"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-2"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-2"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 1 · SECCIÓN 2</span>
+              <h2 id="title-sec-2" class="seq-section__title">
+                La máquina del tiempo multiplicativa: exponentes negativos
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    Un exponente negativo invierte el cambio de escala; no
+                    vuelve negativo el resultado.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Doblá una hoja por la mitad una y otra vez: queda cada vez más pequeña, aunque siempre ocupa una parte positiva de la mesa. Cada pliegue deshace una duplicación anterior; no fabrica un tamaño negativo. Esa escena concreta es la que representa un exponente negativo de base positiva.
+                  </p>
+                  <p>
+                    La división repetida muestra la intuición. Para poder
+                    reagrupar sin ambigüedad, reemplazamos cada división por una
+                    multiplicación por el
+                    <span class="gloss-term" data-gloss="inverso_multiplicativo"
+                      >inverso multiplicativo</span
+                    >:
+                    <span class="eq"
+                      >1 ·
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >
+                      ·
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >
+                      ·
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >
+                      ·
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >
+                      = (<span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >)⁴ =
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">16</span></span
+                      ></span
+                    >. El inverso de a sólo existe si a ≠ 0.
+                   El <span class="gloss-term" data-gloss="inverso_multiplicativo">inverso multiplicativo</span> deshace una escala sin cambiar su signo.</p>
+                  <p>
+                    Si la base es una fracción, se invierte la fracción
+                    completa:
+                    <span class="eq"
+                      >(<span class="fr"
+                        ><span class="top">2</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">3</span></span
+                      >)⁻² = (<span class="fr"
+                        ><span class="top">3</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">2</span></span
+                      >)² =
+                      <span class="fr"
+                        ><span class="top">9</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">4</span></span
+                      ></span
+                    >. Dividir una cantidad positiva por otra positiva no cruza
+                    el cero; cada paso queda a la derecha de cero.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Girar Zoom Out o doblar una hoja repetidamente</td><td>a⁻ⁿ = 1 dividido por aⁿ</td><td>Interpretar el menos como signo negativo del resultado</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Si doblás una hoja por la mitad cuatro veces, ¿el resultado queda del lado negativo de la recta o sigue siendo una fracción positiva del tamaño original?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    La expresión 0⁻¹ pediría dividir por cero y no está
+                    definida. El menos del exponente no es un signo pegado al
+                    resultado: revisá qué operación se invierte antes de asignar
+                    signo.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 2</span>
+                  <div data-check="sec-2"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="cinta-negativa"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-3"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-3"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 1 · SECCIÓN 3</span>
+              <h2 id="title-sec-3" class="seq-section__title">
+                Prohibido decir «se cancela»: cocientes y neutro
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    Los factores iguales no se evaporan: cada pareja forma
+                    exactamente el neutro multiplicativo 1.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Seguro viste a alguien frente al pizarrón tachando doses o treses mientras dice «se cancela». El problema aparece cuando mirás los huecos y, en un parcial, alguien escribe cero arriba: parece que los factores se evaporaron, aunque en realidad dejaron un uno en cada pareja.
+                  </p>
+                  <p>
+                    La
+                    <span class="gloss-term" data-gloss="factor_primo"
+                      >factorización en factores primos</span
+                    >
+                    enseña a mirar las piezas, no tachar símbolos. Las potencias
+                    reúnen esos factores: al concatenar
+                    <span class="eq">aᵐ · aⁿ</span>, el contador total es m+n;
+                    al dividir, las parejas dejan unos y resulta
+                    <span class="eq"
+                      ><span class="fr"
+                        ><span class="top">aᵐ</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">aⁿ</span></span
+                      >
+                      = aᵐ⁻ⁿ</span
+                    >, con a ≠ 0.
+                   Cada pareja deja el <span class="gloss-term" data-gloss="neutro_multiplicativo">neutro multiplicativo</span> 1, nunca un cero.</p>
+                  <p>
+                    Cuatro unos multiplicados siguen dando uno. Escribir
+                    <span class="fr"
+                      ><span class="top">4</span
+                      ><span class="bar" aria-hidden="true"
+                        ><svg
+                          class="fr__bar-svg"
+                          viewBox="0 0 100 4"
+                          preserveAspectRatio="none"
+                        >
+                          <path
+                            d="M 0 2 Q 50 3.5, 100 2"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            vector-effect="non-scaling-stroke"
+                          ></path></svg></span
+                      ><span class="bot">3</span></span
+                    >⁶ supondría que sumaste
+                    <span class="eq">1 + 1 + 1 + 1</span>, una operación
+                    distinta a la multiplicación original.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Emparejar fichas iguales y conservar cada pareja</td><td>a/a = 1; los unos restantes se multiplican</td><td>Convertir las parejas en cero o sumarlas</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Al emparejar cuatro factores iguales de arriba y abajo, ¿cuántos factores quedan arriba: cero, cuatro unos sumados, o cuatro unos multiplicados?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No uses «se cancela» como si el factor desapareciera. Anotá
+                    qué valor toma cada pareja:
+                    <span class="fr"
+                      ><span class="top">a</span
+                      ><span class="bar" aria-hidden="true"
+                        ><svg
+                          class="fr__bar-svg"
+                          viewBox="0 0 100 4"
+                          preserveAspectRatio="none"
+                        >
+                          <path
+                            d="M 0 2 Q 50 3.5, 100 2"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            vector-effect="non-scaling-stroke"
+                          ></path></svg></span
+                      ><span class="bot">a</span></span
+                    >
+                    = 1. La diferencia entre cero y uno decide el resultado.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 3</span>
+                  <div data-check="sec-3"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="neutro-cancelacion"></div>
+              </aside>
+            </div>
+          </section>
+          <div class="seq-chapter-banner">
+            <span class="seq-chapter-banner__tag">Capítulo 2</span>
+            <h2 class="seq-chapter-banner__title">
+              Capítulo 2 · La mitad multiplicativa, geometría y radicales
+            </h2>
+            <p class="muted">
+              Una raíz reconstruye etapas multiplicativas y también devuelve
+              dimensiones.
+            </p>
+          </div>
+          <section
+            id="sec-4"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-4"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 2 · SECCIÓN 4</span>
+              <h2 id="title-sec-4" class="seq-section__title">
+                La gran revelación: mitad aditiva y mitad multiplicativa
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    La misma fracción pregunta cosas distintas si multiplica a x
+                    o si aparece en su exponente.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Partir una barra de chocolate entre dos personas deja media barra para cada una: si el total representaba 36 porciones, cada parte vale 18. Ahora imaginá una lupa de zoom: buscamos un aumento que, aplicado dos veces seguidas, transforme la escala inicial en 36; ese aumento es 6.
+                  </p>
+                  <p>
+                    Ese factor es la raíz cuadrada. Más generalmente,
+                    <span class="eq"
+                      >x^<span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">n</span></span
+                      >
+                      = ⁿ√x</span
+                    >
+                    busca n etapas multiplicativas iguales; el
+                    <span class="gloss-term" data-gloss="indice_raiz"
+                      >índice de la raíz</span
+                    >
+                    n cuenta cuántas veces repetís el factor. Para 64, tres
+                    saltos por 4 alcanzan 64, así que
+                    <span class="eq"
+                      >64^(<span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">3</span></span
+                      >) = ∛64 = 4</span
+                    >.
+                   El exponente fraccionario organiza etapas dentro del <span class="gloss-term" data-gloss="campo_multiplicativo">campo multiplicativo</span>.</p>
+                  <p>
+                    El numerador m repite m veces esa etapa:
+                    <span class="eq"
+                      >a^(<span class="fr"
+                        ><span class="top">m</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">n</span></span
+                      >) = ⁿ√(aᵐ) = (ⁿ√a)ᵐ</span
+                    >
+                    cuando la expresión está definida en ℝ. Por ejemplo,
+                    <span class="eq"
+                      >16^(<span class="fr"
+                        ><span class="top">3</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">4</span></span
+                      >) = (⁴√16)³ = 2³ = 8</span
+                    >.
+                  </p>
+                <table class="pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés con las manos / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Repartir chocolate en partes / componer aumentos iguales</td>
+                      <td>
+                        x · <span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">n</span></span>
+                        frente a x<sup><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">n</span></span></sup> = ⁿ√x
+                      </td>
+                      <td>Confundir mitad de una cantidad con mitad de una escala</td>
+                    </tr>
+                  </tbody>
+                </table>
+                </div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular">
+                  <strong>Poné a prueba tu intuición antes de calcular</strong>
+                  <p>Entre 1 y 36, ¿qué número sirve como escala intermedia aplicada dos veces: 18, porque es la mitad aditiva, o 6, porque 6 · 6 reconstruye 36?</p>
+                </aside>
+                <p class="pr-forward-link">La raíz como escala inversa prepara el terreno para despejar potencias y entender los vértices y cortes de las funciones cuadráticas.</p>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No leas 100 ·
+                    <span class="fr"
+                      ><span class="top">1</span
+                      ><span class="bar" aria-hidden="true"
+                        ><svg
+                          class="fr__bar-svg"
+                          viewBox="0 0 100 4"
+                          preserveAspectRatio="none"
+                        >
+                          <path
+                            d="M 0 2 Q 50 3.5, 100 2"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            vector-effect="non-scaling-stroke"
+                          ></path></svg></span
+                      ><span class="bot">2</span></span
+                    >
+                    como 100^(<span class="fr"
+                      ><span class="top">1</span
+                      ><span class="bar" aria-hidden="true"
+                        ><svg
+                          class="fr__bar-svg"
+                          viewBox="0 0 100 4"
+                          preserveAspectRatio="none"
+                        >
+                          <path
+                            d="M 0 2 Q 50 3.5, 100 2"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            vector-effect="non-scaling-stroke"
+                          ></path></svg></span
+                      ><span class="bot">2</span></span
+                    >). La primera operación da 50; la segunda busca el factor
+                    que al cuadrado reconstruye 100 y da 10.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 4</span>
+                  <div data-check="sec-4"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="mitad-mundos"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-5"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-5"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 2 · SECCIÓN 5</span>
+              <h2 id="title-sec-5" class="seq-section__title">
+                El salto dimensional: longitud, área y volumen
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    La potencia cuenta cuántas dimensiones de una medida
+                    multiplicás; la raíz recorre esa construcción al revés.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Para pintar una pared comprás pintura según los metros cuadrados; para llenar una pecera cúbica calculás metros cúbicos. En el dibujo, cada vez que repetís el lado en una dirección perpendicular aparece una baldosa nueva; al agregar una tercera dirección, aparecen capas de cubitos.
+                  </p>
+                  <p>
+                    Repetir el cuadrado en una tercera dirección agrega capas y
+                    forma un cubo:
+                    <span class="eq">L · L · L = L³</span> cubitos. Si L = 4,
+                    hay 64 bloques y el volumen se mide en u³. La potencia
+                    refleja una dimensión por cada factor L.
+                  </p>
+                  <p>
+                    El
+                    <span class="gloss-term" data-gloss="indice_raiz"
+                      >índice de raíz</span
+                    >
+                    señala cuántas dimensiones reconstruimos. La raíz deshace el
+                    conteo: <span class="eq">√36 = 6</span> recupera el lado de
+                    un área de 36; <span class="eq">∛27 = 3</span> recupera la
+                    arista de un volumen de 27. La
+                    <span class="gloss-term" data-gloss="raiz_principal"
+                      >raíz principal</span
+                    >
+                    cuadrada elige el lado no negativo.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Pintar baldosas / apilar capas de cubitos</td><td>L, L² y L³ miden longitud, área y volumen</td><td>Sumar medidas de dimensiones distintas</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Una pared de 4 m por 4 m tiene 8 m² porque sumaste los lados, o 16 m² porque contaste cuatro filas de cuatro baldosas?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No confundas la medida de longitud con el número de baldosas
+                    o cubitos. cm, cm² y cm³ describen objetos distintos; la
+                    unidad es una pista sobre qué operación modelaste.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 5</span>
+                  <div data-check="sec-5"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="geometria-raices"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-6"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-6"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 2 · SECCIÓN 6</span>
+              <h2 id="title-sec-6" class="seq-section__title">
+                Raíces de orden superior: un árbol y n cajas
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    Descomponer en primos transforma una raíz desconocida en un
+                    reparto de factores idénticos.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    En un examen sin calculadora, ¿cómo decidís si la raíz quinta de 243 o la séptima de 128 es exacta? En vez de probar números a ciegas, abrimos cada cantidad como un set de LEGO: separamos sus piezas pequeñas hasta encontrar los ladrillos primos.
+                  </p>
+                  <p>
+                    Un
+                    <span class="gloss-term" data-gloss="factor_primo"
+                      >factor primo</span
+                    >
+                    aparece como una hoja del árbol. Para hallar una raíz de
+                    índice n, repartí los factores en n cajas multiplicativas
+                    idénticas. En <span class="eq">√36</span>, dos canastas
+                    reciben cada una un 2 y un 3; cada producto vale 6, y
+                    <span class="eq">6² = 36</span>. Para
+                    <span class="eq">∛64</span>, las seis copias de 2 se
+                    distribuyen como dos doses en cada una de tres cajas, así
+                    cada caja vale 4.
+                  </p>
+                  <p>
+                    El radicando no tiene que ser familiar de memoria:
+                    <span class="gloss-term" data-gloss="radicando"
+                      >radicando</span
+                    >
+                    es el valor bajo la raíz y el índice determina la cantidad
+                    de cajas. Si todos los productos de caja coinciden, esa
+                    cantidad es la raíz entera buscada.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Separar un set en ladrillos primos y repartirlos</td><td>N factores en n cajas idénticas</td><td>Adivinar la raíz sin comprobar el producto</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Sin probar raíces de memoria, ¿qué patrón de ladrillos primos esperás encontrar en 243 para repartirlos en cinco cajas iguales?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    Si un primo no se puede repartir de forma idéntica entre las
+                    cajas, no inventes una raíz entera. Ese factor queda sin
+                    pareja y permanecerá dentro del radical al simplificar.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 6</span>
+                  <div data-check="sec-6"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="arbol-factores"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-7"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-7"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 2 · SECCIÓN 7</span>
+              <h2 id="title-sec-7" class="seq-section__title">
+                Simplificación de radicales: la aduana de factores
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    Un factor cruza la raíz sólo cuando integra un paquete
+                    completo del tamaño indicado por el índice.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Imaginá una aduana con un molinete que sólo deja cruzar parejas para una raíz cuadrada y ternas para una raíz cúbica. Las fichas que completan el grupo salen juntas; la que queda impar espera bajo el techo del radical, sin perderse ni desaparecer.
+                  </p>
+                  <p>
+                    Con variables hacemos lo mismo contando copias. En
+                    <span class="eq">√(54x⁷)</span>, separá
+                    <span class="eq">54 = 3² · 6</span> y
+                    <span class="eq">x⁷ = (x³)² · x</span>. Salen 3 y x³;
+                    permanecen 6 y x. Para x ≥ 0, el resultado es
+                    <span class="eq">3x³√(6x)</span>.
+                  </p>
+                  <p>
+                    La
+                    <span class="gloss-term" data-gloss="racionalizar"
+                      >racionalización</span
+                    >
+                    es otra transformación de radicales: reescribe una fracción
+                    equivalente para quitar raíces del denominador multiplicando
+                    arriba y abajo por el mismo factor no nulo.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Dejar cruzar sólo paquetes completos por el molinete</td><td>Cada n factores iguales sale de ⁿ√(·)</td><td>Sacar un resto que no completa pareja o terna</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>En √12 = √(4 · 3), ¿qué grupo puede cruzar la aduana y qué factor queda bajo el techo del radical?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    El
+                    <span class="gloss-term" data-gloss="factor_primo"
+                      >factor primo</span
+                    >
+                    sólo sale si completa un paquete. Para índices pares, revisá
+                    el dominio y el signo al extraer potencias variables. Sin
+                    una condición como x ≥ 0, √(x²) se simplifica a |x|, no a x.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 7</span>
+                  <div data-check="sec-7"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="simplificador-radical"></div>
+              </aside>
+            </div>
+          </section>
+          <div class="seq-chapter-banner">
+            <span class="seq-chapter-banner__tag">Capítulo 3</span>
+            <h2 class="seq-chapter-banner__title">
+              Capítulo 3 · Cuando los mundos chocan y ℝ pone condiciones
+            </h2>
+            <p class="muted">
+              Una identidad debe conservar áreas, orden de operaciones y dominio
+              real.
+            </p>
+          </div>
+          <section
+            id="sec-8"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-8"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 3 · SECCIÓN 8</span>
+              <h2 id="title-sec-8" class="seq-section__title">
+                Cuando los mundos chocan: binomios, áreas y Pitágoras
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    La potencia respeta productos; al elevar una suma aparecen
+                    regiones cruzadas que no podés borrar.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Pensá en agrandar una habitación cuadrada y ponerle piso nuevo. Si aumentás el ancho y el largo en la misma cantidad, aparecen dos franjas rectangulares además de las esquinas; si olvidás esas franjas, te falta material para cubrir el piso real.
+                  </p>
+                  <p>
+                    El
+                    <span class="gloss-term" data-gloss="campo_aditivo"
+                      >campo aditivo</span
+                    >
+                    trata la resta como suma del opuesto:
+                    <span class="eq">(a−b)² = [a+(−b)]² = a² − 2ab + b²</span>.
+                    El término cruzado cambia de signo; no desaparece. El
+                    mosaico permite ver lo que la distributiva falsa se come.
+                   Elevar un producto pertenece al <span class="gloss-term" data-gloss="campo_multiplicativo">campo multiplicativo</span>; la suma requiere contar sus piezas.</p>
+                  <p>
+                    La raíz tampoco se reparte en sumas: con catetos 3 y 4,
+                    <span class="eq">√(3²+4²) = √25 = 5</span>, mientras que
+                    <span class="eq">3+4 = 7</span>. La raíz mide la hipotenusa,
+                    un atajo geométrico entre los extremos.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Ampliar un patio y contar las franjas que aparecen</td><td>(a+b)² = a² + 2ab + b²</td><td>Repartir la potencia sobre una suma</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Si el lado de un patio pasa de a a a + b, ¿alcanza sumar las dos esquinas a² y b², o aparecen regiones rectangulares que también ocupan piso?</p></aside><p class="pr-forward-link">El mosaico de (x+b)² anticipa la expansión de polinomios y te da una herramienta visual para resolver ecuaciones cuadráticas.</p>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No distribuyas una potencia sobre + o −. Expandí como
+                    producto de binomios o contá las regiones; ambos métodos
+                    recuperan los dos términos cruzados.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 8</span>
+                  <div data-check="sec-8"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="choque-mundos"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-9"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-9"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 3 · SECCIÓN 9</span>
+              <h2 id="title-sec-9" class="seq-section__title">
+                Las fórmulas memorizadas bajo custodia de ℝ
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    El orden de las operaciones y el dominio importan: una
+                    coincidencia de resultados no prueba que dos expresiones
+                    sean iguales.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Venimos del laboratorio de Valor Absoluto: dos fórmulas pueden parecer gemelas y, sin embargo, recorrer tuberías distintas. En una primero elevás y después sacás la raíz; en la otra intentás sacar la raíz antes de elevar, y ese primer paso puede bloquearse.
+                  </p>
+                  <p>
+                    El
+                    <span class="gloss-term" data-gloss="indice_raiz"
+                      >índice de la raíz</span
+                    >
+                    par obliga a revisar el dominio. La raíz de un producto
+                    puede separarse sólo si cada raíz par tiene radicando no
+                    negativo. <span class="eq">√[(-1)(-4)] = √4 = 2</span>, pero
+                    √−1 y √−4 no son reales. Multiplicar primero es legal;
+                    distribuir en esos factores cruza el dominio.
+                   La raíz que devuelve el resultado no negativo se llama <span class="gloss-term" data-gloss="raiz_principal">raíz principal</span>.</p>
+                  <p>
+                    Todo número real al cuadrado es no negativo: si x es
+                    positivo, x² ≥ 0; si es negativo, ambos factores negativos
+                    producen positivo. Por eso no hay un real cuyo cuadrado sea
+                    −4.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Seguir dos tuberías que aplican operaciones en orden distinto</td><td>√(x²)=|x|; (√x)² sólo si x≥0</td><td>Cancelar índice y exponente sin revisar el dominio</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>Para x = −4, ¿qué tubería se bloquea primero: elevar x al cuadrado y luego sacar raíz, o intentar √x antes de elevar?</p></aside><p class="pr-forward-link">La identidad √(x²)=|x| vuelve cuando despejemos parábolas: el módulo protege el dominio y evita perder soluciones al tomar raíces.</p>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    Mismo resultado cuando x ≥ 0 no significa mismo dominio.
+                    Para x = −4, √(x²) = 4 existe, mientras que (√x)² se bloquea
+                    en el primer paso.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 9</span>
+                  <div data-check="sec-9"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="espejo-dominio-real"></div>
+              </aside>
+            </div>
+          </section>
+          <section
+            id="sec-10"
+            class="seq-section pr-section"
+            aria-labelledby="title-sec-10"
+          >
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 3 · SECCIÓN 10</span>
+              <h2 id="title-sec-10" class="seq-section__title">
+                La paradoja −2 = 2 y la jerarquía de paréntesis
+              </h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="vn-trigger" data-tutor="why">
+                  <span
+                    >¿Por qué pasa esto? · Explicación de Alaska</span
+                  ></button
+                ><button
+                  type="button"
+                  class="vn-trigger vn-trigger--base"
+                  data-tutor="base"
+                >
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+            <div class="pr-workbench">
+              <div class="pr-theory-column">
+                <div class="seq-block seq-block--phrase">
+                  <span class="seq-block__label">En una frase</span>
+                  <blockquote class="seq-phrase-text">
+                    Cada paso de una cadena debe existir en ℝ y respetar la base
+                    completa que está elevada.
+                  </blockquote>
+                </div>
+                <div class="seq-block seq-block--visual">
+                  <span class="seq-block__label">Cómo se ve</span>
+                  <p>
+                    Imaginá a alguien en el recreo de Pabellón I que te muestra una servilleta y afirma haber demostrado que menos dos es igual a dos. No le creas ni lo descartes por intuición: hagamos de detectives, sigamos cada igualdad y encontremos en qué paso se metió el perro.
+                  </p>
+                  <p>
+                    Los paréntesis también fijan la base:
+                    <span class="eq">−4² = −(4²) = −16</span>, pero
+                    <span class="eq">(−4)² = 16</span>. En la primera expresión
+                    el exponente afecta al 4 y el signo queda afuera.
+                   El <span class="gloss-term" data-gloss="indice_raiz">índice de la raíz</span> decide si un radicando negativo puede existir en ℝ.</p>
+                  <p>
+                    El
+                    <span class="gloss-term" data-gloss="indice_raiz"
+                      >índice de raíz</span
+                    >
+                    impar admite radicandos negativos. La raíz cúbica admite
+                    radicandos negativos. Por eso
+                    <span class="eq">∛(−4³) = ∛[(−1)·4³] = −4</span>: índice
+                    impar, pasos reales y signo conservado.
+                  </p>
+                <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Auditar una igualdad de servilleta y marcar cada operación</td><td>−aⁿ y (−a)ⁿ tienen bases diferentes</td><td>Ignorar paréntesis, prioridad y existencia en ℝ</td></tr></tbody></table></div>
+                <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>En −4², ¿el exponente alcanza al signo menos o solamente al 4? ¿Qué cambia cuando escribimos (−4)² con paréntesis?</p></aside>
+                <div class="pr-annotated-host"></div>
+                <div class="seq-block seq-block--caution">
+                  <span class="seq-block__label">Cuidado con</span>
+                  <p>
+                    No taches el índice con el exponente sin revisar paréntesis
+                    y dominio. Las reglas de potencia de potencia tienen
+                    condiciones cuando la base es negativa y aparece una raíz
+                    par.
+                  </p>
+                </div>
+                <div class="seq-block seq-block--check">
+                  <span class="seq-block__label">Chequeo 10</span>
+                  <div data-check="sec-10"></div>
+                </div>
+              </div>
+              <aside class="pr-probe seq-block seq-block--try">
+                <span class="seq-block__label">Probalo</span>
+                <div data-widget="inspector-paradojas"></div>
+              </aside>
+            </div>
+          </section>
+          <div class="seq-chapter-banner">
+            <span class="seq-chapter-banner__tag">Capítulo 4</span>
+            <h2 class="seq-chapter-banner__title">
+              Entrenamiento, trampas de examen y la Forja Dimensional
+            </h2>
+            <p class="muted">
+              Practicá con una semilla reproducible, defendé una idea y llevá
+              los factores al núcleo.
+            </p>
+          </div>
+          <section id="sec-retos" class="seq-section pr-challenge-section">
+            <header class="seq-section__header">
+              <span class="seq-section__tag">CAPÍTULO 4 · ENTRENAMIENTO</span>
+              <h2>Entrenador infinito, cinco trampas y Modo Boss</h2>
+            </header>
+            <div id="pr-challenges"></div>
+          </section>
+          <section id="sec-repaso" class="seq-section pr-review">
+            <header class="seq-section__header">
+              <span class="seq-section__tag">HOJA IMPRIMIBLE</span>
+              <h2>Hoja de repaso · Potencias y radicales</h2>
+            </header>
+            <p>
+              Resumen de leyes, restricciones en ℝ y caminos de simplificación.
+              Usá el botón para imprimir esta página.
+            </p>
+            <button type="button" class="btn" onclick="window.print()">
+              Imprimir hoja de repaso
+            </button>
+            <div class="pr-table-wrap">
+              <table class="pr-table">
+                <thead>
+                  <tr>
+                    <th>Idea</th>
+                    <th>Relación</th>
+                    <th>Condición</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Neutros</th>
+                    <td>Mundo aditivo: 0 · Mundo multiplicativo: 1</td>
+                    <td>a⁰ = 1; cero pasos desde el neutro multiplicativo</td>
+                  </tr>
+                  <tr>
+                    <th>Producto de potencias</th>
+                    <td>aᵐ · aⁿ = aᵐ⁺ⁿ</td>
+                    <td>Misma base; concatenar factores</td>
+                  </tr>
+                  <tr>
+                    <th>Cociente de potencias</th>
+                    <td>
+                      <span class="fr"
+                        ><span class="top">aᵐ</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">aⁿ</span></span
+                      >
+                      = aᵐ⁻ⁿ
+                    </td>
+                    <td>a ≠ 0</td>
+                  </tr>
+                  <tr>
+                    <th>Exponente negativo</th>
+                    <td>
+                      a⁻ⁿ =
+                      <span class="fr"
+                        ><span class="top">1</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">aⁿ</span></span
+                      >
+                    </td>
+                    <td>a ≠ 0</td>
+                  </tr>
+                  <tr>
+                    <th>Exponente racional</th>
+                    <td>
+                      a^(<span class="fr"
+                        ><span class="top">m</span
+                        ><span class="bar" aria-hidden="true"
+                          ><svg
+                            class="fr__bar-svg"
+                            viewBox="0 0 100 4"
+                            preserveAspectRatio="none"
+                          >
+                            <path
+                              d="M 0 2 Q 50 3.5, 100 2"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              vector-effect="non-scaling-stroke"
+                            ></path></svg></span
+                        ><span class="bot">n</span></span
+                      >) = ⁿ√(aᵐ)
+                    </td>
+                    <td>Índice par exige radicando no negativo en ℝ</td>
+                  </tr>
+                  <tr>
+                    <th>Raíz de cuadrado</th>
+                    <td>√(x²) = |x|</td>
+                    <td>Todo x real</td>
+                  </tr>
+                  <tr>
+                    <th>Cuadrado de raíz</th>
+                    <td>(√x)² = x</td>
+                    <td>Definido sólo si x ≥ 0</td>
+                  </tr>
+                  <tr>
+                    <th>Binomio</th>
+                    <td>(a ± b)² = a² ± 2ab + b²</td>
+                    <td>La potencia no se distribuye sobre suma</td>
+                  </tr>
+                  <tr>
+                    <th>Radical</th>
+                    <td>Agrupar primos en paquetes de tamaño n</td>
+                    <td>Completo sale; resto queda bajo la raíz</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,26 +1,26 @@
-import http from 'node:http';
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawn } from 'node:child_process';
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import { spawn } from "node:child_process";
 
-const ROOT_DIR = path.resolve('.');
+const ROOT_DIR = path.resolve(".");
 const PORT = 3457;
 
 const MIME_MAP = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.mjs': 'application/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.webp': 'image/webp',
-  '.png': 'image/png',
-  '.json': 'application/json',
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  ".png": "image/png",
+  ".json": "application/json",
 };
 
 const server = http.createServer((req, res) => {
-  const urlPath = req.url.split('?')[0];
-  let safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
-  if (safePath === '/' || safePath === '') safePath = '/sucesiones.html';
+  const urlPath = req.url.split("?")[0];
+  let safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, "");
+  if (safePath === "/" || safePath === "") safePath = "/sucesiones.html";
   const filePath = path.join(ROOT_DIR, safePath);
 
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
@@ -30,20 +30,20 @@ const server = http.createServer((req, res) => {
   }
 
   const ext = path.extname(filePath).toLowerCase();
-  const mime = MIME_MAP[ext] || 'application/octet-stream';
-  res.writeHead(200, { 'Content-Type': mime });
+  const mime = MIME_MAP[ext] || "application/octet-stream";
+  res.writeHead(200, { "Content-Type": mime });
   res.end(fs.readFileSync(filePath));
 });
 
-await new Promise((resolve) => server.listen(PORT, '127.0.0.1', resolve));
+await new Promise((resolve) => server.listen(PORT, "127.0.0.1", resolve));
 
-const chromeProc = spawn('/usr/bin/chromium', [
-  '--headless=new',
-  '--disable-gpu',
-  '--no-sandbox',
-  '--remote-debugging-port=9334',
-  '--autoplay-policy=no-user-gesture-required',
-  'about:blank',
+const chromeProc = spawn("/usr/bin/chromium", [
+  "--headless=new",
+  "--disable-gpu",
+  "--no-sandbox",
+  "--remote-debugging-port=9334",
+  "--autoplay-policy=no-user-gesture-required",
+  "about:blank",
 ]);
 
 await new Promise((resolve) => setTimeout(resolve, 800));
@@ -53,6 +53,7 @@ class CdpClient {
     this.ws = new WebSocket(wsUrl);
     this.id = 0;
     this.callbacks = new Map();
+    this.listeners = new Map();
     this.ready = new Promise((resolve, reject) => {
       this.ws.onopen = () => resolve();
       this.ws.onerror = (e) => reject(e);
@@ -64,8 +65,16 @@ class CdpClient {
         this.callbacks.delete(msg.id);
         if (msg.error) reject(new Error(msg.error.message));
         else resolve(msg.result);
+      } else if (msg.method) {
+        (this.listeners.get(msg.method) || []).forEach((listener) =>
+          listener(msg.params),
+        );
       }
     };
+  }
+  on(method, listener) {
+    if (!this.listeners.has(method)) this.listeners.set(method, []);
+    this.listeners.get(method).push(listener);
   }
   send(method, params = {}) {
     const id = ++this.id;
@@ -75,13 +84,17 @@ class CdpClient {
     });
   }
   async eval(expr) {
-    const res = await this.send('Runtime.evaluate', {
+    const res = await this.send("Runtime.evaluate", {
       expression: expr,
       returnByValue: true,
       awaitPromise: true,
     });
     if (res.exceptionDetails) {
-      throw new Error(res.exceptionDetails.text || 'Eval exception: ' + JSON.stringify(res.exceptionDetails));
+      throw new Error(
+        res.exceptionDetails.exception?.description ||
+          res.exceptionDetails.text ||
+          "Eval exception: " + JSON.stringify(res.exceptionDetails),
+      );
     }
     return res.result?.value;
   }
@@ -93,7 +106,9 @@ class CdpClient {
 let targetData = null;
 for (let i = 0; i < 20; i++) {
   try {
-    const targetRes = await fetch('http://127.0.0.1:9334/json/new', { method: 'PUT' });
+    const targetRes = await fetch("http://127.0.0.1:9334/json/new", {
+      method: "PUT",
+    });
     if (targetRes.ok) {
       targetData = await targetRes.json();
       break;
@@ -102,20 +117,22 @@ for (let i = 0; i < 20; i++) {
     await new Promise((r) => setTimeout(r, 150));
   }
 }
-if (!targetData) throw new Error('No se pudo conectar con Chromium');
+if (!targetData) throw new Error("No se pudo conectar con Chromium");
 const client = new CdpClient(targetData.webSocketDebuggerUrl);
 await client.ready;
 
-await client.send('Runtime.enable');
-await client.send('Page.enable');
-await client.send('Emulation.setDeviceMetricsOverride', {
+await client.send("Runtime.enable");
+await client.send("Page.enable");
+await client.send("Emulation.setDeviceMetricsOverride", {
   width: 1440,
   height: 900,
   deviceScaleFactor: 1,
   mobile: false,
 });
 
-await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/sucesiones.html` });
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/sucesiones.html`,
+});
 await new Promise((r) => setTimeout(r, 1200));
 
 const interactionResults = await client.eval(`(async () => {
@@ -227,9 +244,14 @@ const interactionResults = await client.eval(`(async () => {
   return report;
 })()`);
 
-console.log('Resultados de interacción en sucesiones.html:', JSON.stringify(interactionResults, null, 2));
+console.log(
+  "Resultados de interacción en sucesiones.html:",
+  JSON.stringify(interactionResults, null, 2),
+);
 
-await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/valor-absoluto.html` });
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/valor-absoluto.html`,
+});
 await new Promise((r) => setTimeout(r, 1200));
 
 const absResults = await client.eval(`(async () => {
@@ -518,7 +540,176 @@ const absResults = await client.eval(`(async () => {
   };
 })()`);
 
-console.log('Resultados de interacción en valor-absoluto.html:', JSON.stringify(absResults, null, 2));
+console.log(
+  "Resultados de interacción en valor-absoluto.html:",
+  JSON.stringify(absResults, null, 2),
+);
+
+const powRadConsoleErrors = [];
+client.on("Runtime.consoleAPICalled", (params) => {
+  if (params.type === "error")
+    powRadConsoleErrors.push(
+      params.args?.map((item) => item.value || item.description).join(" "),
+    );
+});
+client.on("Runtime.exceptionThrown", (params) => {
+  powRadConsoleErrors.push(
+    params.exceptionDetails?.exception?.description ||
+      params.exceptionDetails?.text ||
+      "Exception",
+  );
+});
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/potencias-raices.html`,
+});
+await new Promise((r) => setTimeout(r, 1100));
+const powRadResults = await client.eval(`(async () => {
+  const sections = [...document.querySelectorAll('.pr-section')];
+  const widgets = [...document.querySelectorAll('[data-widget]')];
+  const ranges = [...document.querySelectorAll('[data-widget] input[type="range"]')];
+  let stable = ranges.length > 0;
+  for (const range of ranges) {
+    const ref = range;
+    for (const value of [Number(range.min), Number(range.max), Number(range.min)]) {
+      range.value = String(value);
+      range.dispatchEvent(new Event('input', { bubbles: true }));
+      stable &&= range.isConnected && range === ref && [...range.closest('[data-widget]').querySelectorAll('input[type="range"]')].includes(ref);
+    }
+  }
+  const interactiveWidgetSvgs = widgets.every((host) => {
+    const svg = host.querySelector('svg');
+    return Boolean(svg && host.querySelector('input,select,button') && svg.querySelector('path,circle,rect,text'));
+  });
+  const checkBlocks = [...document.querySelectorAll('.pr-section .pr-check')];
+  const allCheckAffordances = checkBlocks.length === 10 && checkBlocks.every((block) =>
+    block.querySelectorAll('button').length >= 3 && block.querySelector('.pr-check__hint') && block.querySelector('.pr-check__solution')
+  );
+  const firstCheck = document.querySelector('#sec-1 .pr-check__item');
+  const previewInput = firstCheck?.querySelector('input');
+  const preview = firstCheck?.querySelector('.pr-check__preview');
+  if (previewInput && preview) {
+    previewInput.value = 'sqrt(36)';
+    previewInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  const livePreviewWorks = Boolean(preview && !preview.textContent.endsWith('—'));
+  const hintButton = firstCheck?.querySelector('.pr-check__actions button:nth-child(2)');
+  for (let i = 0; i < 3; i++) hintButton?.click();
+  const progressiveHintsWork = Boolean(
+    firstCheck?.querySelector('.pr-check__hint')?.textContent.includes('Pista 3/3')
+  );
+  firstCheck?.querySelector('.pr-check__actions button:nth-child(3)')?.click();
+  const solution = firstCheck?.querySelector('.pr-check__solution');
+  const stepByStepSolutionWorks = Boolean(
+    solution && !solution.hidden && solution.querySelectorAll('ol li').length >= 3
+  );
+  const cancellationWidget = document.querySelector('[data-widget="neutro-cancelacion"]');
+  const factorButton = cancellationWidget?.querySelector('g[role="button"]');
+  factorButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  const factorPairingWorks = Boolean(
+    cancellationWidget?.querySelector('.pr-readout')?.textContent.includes('1 parejas')
+  );
+  const factorTree = document.querySelector('[data-widget="arbol-factores"] .pr-board-svg');
+  const factorTreeDrawn = Boolean(
+    factorTree?.querySelectorAll('circle[visibility="visible"]').length > 1 &&
+    factorTree?.querySelectorAll('path[visibility="visible"]').length > 0
+  );
+  const worlds = document.querySelector('[data-widget="dos-mundos"]');
+  const worldsRange = worlds?.querySelector('input[type="range"]');
+  if (worldsRange) {
+    worldsRange.value = worldsRange.max;
+    worldsRange.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  const additiveArcsDrawn = Boolean(
+    worlds?.querySelectorAll('svg path[d*="Q"][visibility="visible"]').length >= 5
+  );
+  const negativeTape = document.querySelector('[data-widget="cinta-negativa"]');
+  const negativeRange = negativeTape?.querySelector('input[type="range"]');
+  if (negativeRange) {
+    negativeRange.value = negativeRange.min;
+    negativeRange.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  const negativeZoomWorks = negativeTape?.querySelector('svg circle[visibility="visible"]');
+  const answer = document.querySelector('#sec-1 .pr-check__item input');
+  const submit = document.querySelector('#sec-1 .pr-check__item .pr-check__actions button:first-child');
+  if (answer && submit) { answer.value = '12'; submit.click(); }
+  const stored = JSON.parse(localStorage.getItem('potencias_raices:progreso:v1') || '{}');
+  const explain = document.querySelector('#sec-4 [data-tutor="why"]');
+  if (explain) explain.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const tutorHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const tutorImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const tutorImageValid = Boolean(tutorImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--close')?.click();
+  const gloss = document.querySelector('#sec-1 [data-gloss]');
+  if (gloss) gloss.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const glossHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const glossImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const glossImageValid = Boolean(glossImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--close')?.click();
+  document.querySelector('.pr-boss__controls .btn')?.click();
+  await new Promise((resolve) => setTimeout(resolve, 850));
+  return {
+    sections: sections.length,
+    widgets: widgets.length,
+    checks: document.querySelectorAll('.pr-check__item').length,
+    tutorButtons: document.querySelectorAll('.vn-trigger[data-tutor]').length,
+    glossaryTerms: document.querySelectorAll('span.gloss-term[data-gloss]').length,
+    interactiveWidgetSvgs,
+    checkBlocks: checkBlocks.length,
+    allCheckAffordances,
+    livePreviewWorks,
+    progressiveHintsWork,
+    stepByStepSolutionWorks,
+    factorPairingWorks,
+    factorTreeDrawn,
+    additiveArcsDrawn,
+    negativeZoomWorks: Boolean(negativeZoomWorks),
+    stableControls: stable,
+    progressSaved: Boolean(stored['sec-1:0']),
+    bossCanvas: Boolean(document.querySelector('.pr-boss__canvas')),
+    bossStarted: ['INTRO','WAVE_ANNOUNCEMENT','ACTIVE_PHASE'].includes(document.querySelector('.pr-boss__canvas')?.dataset.state),
+    trainerPrompt: Boolean(document.querySelector('.pr-challenge__prompt')),
+    tutorHud: Boolean(tutorHud),
+    tutorImageValid,
+    glossHud: Boolean(glossHud),
+    glossImageValid,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="potencias-raices.html"]')),
+    splitWorkbench: getComputedStyle(document.querySelector('#sec-1 .pr-workbench')).gridTemplateColumns,
+    overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  };
+})()`);
+
+const potenciasWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  potenciasWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+powRadResults.viewportWidths = potenciasWidths;
+powRadResults.viewportOverflowFree = potenciasWidths.every(
+  (item) => !item.overflow,
+);
+powRadResults.consoleErrors = powRadConsoleErrors;
+console.log(
+  "Resultados de interacción en potencias-raices.html:",
+  JSON.stringify(powRadResults, null, 2),
+);
 
 const allOk =
   interactionResults.sliderThrottlingWorks &&
@@ -546,11 +737,42 @@ const allOk =
   absResults.keyboardVertexWorks &&
   absResults.keyboardLaserWorks;
 
+const powRadOk =
+  powRadResults.sections === 10 &&
+  powRadResults.widgets === 10 &&
+  powRadResults.checks === 30 &&
+  powRadResults.tutorButtons === 20 &&
+  powRadResults.glossaryTerms >= 20 &&
+  powRadResults.stableControls &&
+  powRadResults.interactiveWidgetSvgs &&
+  powRadResults.checkBlocks === 10 &&
+  powRadResults.allCheckAffordances &&
+  powRadResults.livePreviewWorks &&
+  powRadResults.progressiveHintsWork &&
+  powRadResults.stepByStepSolutionWorks &&
+  powRadResults.factorPairingWorks &&
+  powRadResults.factorTreeDrawn &&
+  powRadResults.additiveArcsDrawn &&
+  powRadResults.negativeZoomWorks &&
+  powRadResults.progressSaved &&
+  powRadResults.bossCanvas &&
+  powRadResults.trainerPrompt &&
+  powRadResults.hasNavLink &&
+  powRadResults.tutorHud &&
+  powRadResults.tutorImageValid &&
+  powRadResults.glossHud &&
+  powRadResults.glossImageValid &&
+  powRadResults.viewportOverflowFree &&
+  powRadResults.consoleErrors.length === 0 &&
+  powRadResults.bossStarted &&
+  !powRadResults.overflow;
+const allResultsOk = allOk && powRadOk;
+
 client.close();
 chromeProc.kill();
 server.close();
 
-if (!allOk) {
-  console.error('Falló alguna verificación interactiva.');
+if (!allResultsOk) {
+  console.error("Falló alguna verificación interactiva.");
   process.exit(1);
 }

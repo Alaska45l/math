@@ -1,54 +1,62 @@
-import http from 'node:http';
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawn } from 'node:child_process';
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import { spawn } from "node:child_process";
 
-const ROOT_DIR = path.resolve('.');
+const ROOT_DIR = path.resolve(".");
 const PORT = 3456;
-const PAGES = ['index.html', 'desigualdades.html', 'unidades.html', 'funciones.html', 'sucesiones.html', 'valor-absoluto.html'];
+const PAGES = [
+  "index.html",
+  "desigualdades.html",
+  "unidades.html",
+  "funciones.html",
+  "sucesiones.html",
+  "valor-absoluto.html",
+  "potencias-raices.html",
+];
 
 const MIME_MAP = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.mjs': 'application/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.webp': 'image/webp',
-  '.png': 'image/png',
-  '.json': 'application/json',
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  ".png": "image/png",
+  ".json": "application/json",
 };
 
 // 1. Servidor HTTP estático
 const server = http.createServer((req, res) => {
-  const urlPath = req.url.split('?')[0];
-  let safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
-  if (safePath === '/' || safePath === '') safePath = '/index.html';
+  const urlPath = req.url.split("?")[0];
+  let safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, "");
+  if (safePath === "/" || safePath === "") safePath = "/index.html";
   const filePath = path.join(ROOT_DIR, safePath);
 
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not found");
     return;
   }
 
   const ext = path.extname(filePath).toLowerCase();
-  const mime = MIME_MAP[ext] || 'application/octet-stream';
+  const mime = MIME_MAP[ext] || "application/octet-stream";
   const data = fs.readFileSync(filePath);
-  res.writeHead(200, { 'Content-Type': mime });
+  res.writeHead(200, { "Content-Type": mime });
   res.end(data);
 });
 
-await new Promise((resolve) => server.listen(PORT, '127.0.0.1', resolve));
+await new Promise((resolve) => server.listen(PORT, "127.0.0.1", resolve));
 console.log(`Servidor de prueba iniciado en http://127.0.0.1:${PORT}`);
 
 // 2. Iniciar Chromium en modo headless con CDP
-const chromeProc = spawn('/usr/bin/chromium', [
-  '--headless=new',
-  '--disable-gpu',
-  '--no-sandbox',
-  '--remote-debugging-port=9333',
-  '--autoplay-policy=no-user-gesture-required',
-  'about:blank',
+const chromeProc = spawn("/usr/bin/chromium", [
+  "--headless=new",
+  "--disable-gpu",
+  "--no-sandbox",
+  "--remote-debugging-port=9333",
+  "--autoplay-policy=no-user-gesture-required",
+  "about:blank",
 ]);
 
 // Esperar a que CDP esté listo
@@ -94,13 +102,13 @@ class CdpClient {
   }
 
   async eval(expr) {
-    const res = await this.send('Runtime.evaluate', {
+    const res = await this.send("Runtime.evaluate", {
       expression: expr,
       returnByValue: true,
       awaitPromise: true,
     });
     if (res.exceptionDetails) {
-      throw new Error(res.exceptionDetails.text || 'Eval exception');
+      throw new Error(res.exceptionDetails.text || "Eval exception");
     }
     return res.result?.value;
   }
@@ -114,7 +122,9 @@ class CdpClient {
 let targetData = null;
 for (let attempt = 0; attempt < 25; attempt++) {
   try {
-    const newTargetRes = await fetch('http://127.0.0.1:9333/json/new', { method: 'PUT' });
+    const newTargetRes = await fetch("http://127.0.0.1:9333/json/new", {
+      method: "PUT",
+    });
     if (newTargetRes.ok) {
       targetData = await newTargetRes.json();
       break;
@@ -124,13 +134,14 @@ for (let attempt = 0; attempt < 25; attempt++) {
   }
   await new Promise((resolve) => setTimeout(resolve, 200));
 }
-if (!targetData) throw new Error('No se pudo conectar a Chromium CDP en 127.0.0.1:9333');
+if (!targetData)
+  throw new Error("No se pudo conectar a Chromium CDP en 127.0.0.1:9333");
 const client = new CdpClient(targetData.webSocketDebuggerUrl);
 await client.ready;
 
-await client.send('Runtime.enable');
-await client.send('Page.enable');
-await client.send('Network.enable');
+await client.send("Runtime.enable");
+await client.send("Page.enable");
+await client.send("Network.enable");
 
 const results = [];
 let allPassed = true;
@@ -141,12 +152,19 @@ for (const pageName of PAGES) {
   const networkResponses = [];
 
   const consoleListener = (params) => {
-    if (params.type === 'error') {
-      consoleErrors.push(params.args?.map((a) => a.value || a.description).join(' '));
+    if (params.type === "error") {
+      const frame = params.stackTrace?.callFrames?.[0];
+      consoleErrors.push(
+        `${params.args?.map((a) => a.value || a.description).join(" ")}${frame ? ` at ${frame.url}:${frame.lineNumber + 1}:${frame.columnNumber + 1}` : ""}`,
+      );
     }
   };
   const exceptionListener = (params) => {
-    consoleErrors.push(params.exceptionDetails?.text || 'Exception');
+    const details = params.exceptionDetails;
+    const frame = details?.stackTrace?.callFrames?.[0];
+    consoleErrors.push(
+      `${details?.exception?.description || details?.text || "Exception"}${frame ? ` at ${frame.url}:${frame.lineNumber + 1}:${frame.columnNumber + 1}` : ""}`,
+    );
   };
   const responseListener = (params) => {
     if (params.response?.url?.includes(pageName)) {
@@ -154,12 +172,12 @@ for (const pageName of PAGES) {
     }
   };
 
-  client.on('Runtime.consoleAPICalled', consoleListener);
-  client.on('Runtime.exceptionThrown', exceptionListener);
-  client.on('Network.responseReceived', responseListener);
+  client.on("Runtime.consoleAPICalled", consoleListener);
+  client.on("Runtime.exceptionThrown", exceptionListener);
+  client.on("Network.responseReceived", responseListener);
 
   // 1. Simular viewport mobile 375px
-  await client.send('Emulation.setDeviceMetricsOverride', {
+  await client.send("Emulation.setDeviceMetricsOverride", {
     width: 375,
     height: 667,
     deviceScaleFactor: 2,
@@ -167,14 +185,16 @@ for (const pageName of PAGES) {
   });
 
   // Limpiar localStorage antes de navegar para probar estado por defecto
-  await client.send('Page.navigate', { url: `http://127.0.0.1:${PORT}/${pageName}` });
+  await client.send("Page.navigate", {
+    url: `http://127.0.0.1:${PORT}/${pageName}`,
+  });
 
   // Esperar carga
   await new Promise((resolve) => {
     const onNav = (p) => {
       setTimeout(resolve, 600);
     };
-    client.on('Page.loadEventFired', onNav);
+    client.on("Page.loadEventFired", onNav);
   });
 
   // Verificar status HTTP 200
@@ -226,7 +246,7 @@ for (const pageName of PAGES) {
   })()`);
 
   // 2. Verificar mobile pequeño 320px
-  await client.send('Emulation.setDeviceMetricsOverride', {
+  await client.send("Emulation.setDeviceMetricsOverride", {
     width: 320,
     height: 568,
     deviceScaleFactor: 2,
@@ -246,7 +266,7 @@ for (const pageName of PAGES) {
   })()`);
 
   // 3. Verificar desktop
-  await client.send('Emulation.setDeviceMetricsOverride', {
+  await client.send("Emulation.setDeviceMetricsOverride", {
     width: 1280,
     height: 800,
     deviceScaleFactor: 1,
@@ -264,42 +284,97 @@ for (const pageName of PAGES) {
     };
   })()`);
 
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 1440,
+    height: 900,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await new Promise((r) => setTimeout(r, 100));
+  const evalWide = await client.eval(`(() => ({
+    innerWidth: window.innerWidth,
+    docScrollWidth: document.documentElement.scrollWidth,
+    overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  }))()`);
+
+  const intermediateWidths = [];
+  for (const width of [768, 1024]) {
+    await client.send("Emulation.setDeviceMetricsOverride", {
+      width,
+      height: 900,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await new Promise((r) => setTimeout(r, 120));
+    intermediateWidths.push(
+      await client.eval(`(() => ({
+      width: window.innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    }))()`),
+    );
+  }
+
   const pageOk =
     httpStatus === 200 &&
     consoleErrors.length === 0 &&
     evalMobile.hasBtn &&
-    evalMobile.initialAria === 'true' &&
-    evalMobile.toggledAria === 'false' &&
-    evalMobile.toggledStorage === 'false' &&
-    evalMobile.restoredAria === 'true' &&
-    evalMobile.restoredStorage === 'true' &&
+    evalMobile.initialAria === "true" &&
+    evalMobile.toggledAria === "false" &&
+    evalMobile.toggledStorage === "false" &&
+    evalMobile.restoredAria === "true" &&
+    evalMobile.restoredStorage === "true" &&
     !evalMobile.hasHorizontalOverflow &&
     !evalMobile320.overflow320 &&
-    !evalDesktop.overflow;
+    !evalDesktop.overflow &&
+    !evalWide.overflow &&
+    intermediateWidths.every((item) => !item.overflow);
 
   if (!pageOk) allPassed = false;
 
   console.log(`  HTTP status: ${httpStatus}`);
-  console.log(`  Console errors: ${consoleErrors.length === 0 ? '0' : JSON.stringify(consoleErrors)}`);
+  console.log(
+    `  Console errors: ${consoleErrors.length === 0 ? "0" : JSON.stringify(consoleErrors)}`,
+  );
   console.log(`  Botón sonido presente: ${evalMobile.hasBtn}`);
-  console.log(`  Estado inicial: aria-pressed="${evalMobile.initialAria}", texto="${evalMobile.initialText}"`);
-  console.log(`  Conmutado: aria-pressed="${evalMobile.toggledAria}", texto="${evalMobile.toggledText}", localStorage="${evalMobile.toggledStorage}"`);
-  console.log(`  Restaurado: aria-pressed="${evalMobile.restoredAria}", texto="${evalMobile.restoredText}", localStorage="${evalMobile.restoredStorage}"`);
-  console.log(`  Mobile 320px width: innerWidth=${evalMobile320.innerWidth}, scrollWidth=${evalMobile320.docScrollWidth}, desborde=${evalMobile320.overflow320}`);
-  console.log(`  Mobile 375px width: innerWidth=${evalMobile.innerWidth}, scrollWidth=${evalMobile.docScrollWidth}, desborde=${evalMobile.hasHorizontalOverflow}`);
+  console.log(
+    `  Estado inicial: aria-pressed="${evalMobile.initialAria}", texto="${evalMobile.initialText}"`,
+  );
+  console.log(
+    `  Conmutado: aria-pressed="${evalMobile.toggledAria}", texto="${evalMobile.toggledText}", localStorage="${evalMobile.toggledStorage}"`,
+  );
+  console.log(
+    `  Restaurado: aria-pressed="${evalMobile.restoredAria}", texto="${evalMobile.restoredText}", localStorage="${evalMobile.restoredStorage}"`,
+  );
+  console.log(
+    `  Mobile 320px width: innerWidth=${evalMobile320.innerWidth}, scrollWidth=${evalMobile320.docScrollWidth}, desborde=${evalMobile320.overflow320}`,
+  );
+  console.log(
+    `  Mobile 375px width: innerWidth=${evalMobile.innerWidth}, scrollWidth=${evalMobile.docScrollWidth}, desborde=${evalMobile.hasHorizontalOverflow}`,
+  );
   console.log(`  Desktop 1280px desborde: ${evalDesktop.overflow}`);
-  console.log(`  Resultado página: ${pageOk ? 'PASÓ [OK]' : 'FALLÓ [ERROR]'}`);
+  console.log(`  Desktop 1440px desborde: ${evalWide.overflow}`);
+  for (const item of intermediateWidths)
+    console.log(`  Ancho ${item.width}px desborde: ${item.overflow}`);
+  console.log(`  Resultado página: ${pageOk ? "PASÓ [OK]" : "FALLÓ [ERROR]"}`);
 
-  results.push({ page: pageName, passed: pageOk, details: evalMobile, errors: consoleErrors });
+  results.push({
+    page: pageName,
+    passed: pageOk,
+    details: evalMobile,
+    errors: consoleErrors,
+  });
 }
 
 client.close();
 chromeProc.kill();
 server.close();
 
-console.log('\n========================================');
-console.log(`RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? `TODAS LAS PÁGINAS PASARON (${PAGES.length}/${PAGES.length}) [OK]` : 'ALGUNA PÁGINA FALLÓ [ERROR]'}`);
-console.log('========================================');
+console.log("\n========================================");
+console.log(
+  `RESUMEN VERIFICACIÓN CHROMIUM: ${allPassed ? `TODAS LAS PÁGINAS PASARON (${PAGES.length}/${PAGES.length}) [OK]` : "ALGUNA PÁGINA FALLÓ [ERROR]"}`,
+);
+console.log("========================================");
 
 if (!allPassed) {
   process.exit(1);

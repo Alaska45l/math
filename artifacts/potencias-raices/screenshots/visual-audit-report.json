@@ -1,0 +1,842 @@
+{
+  "screenshots": [
+    "desktop-cap4-boss.png",
+    "desktop-cap4-entrenador.png",
+    "desktop-cap4-trampas.png",
+    "desktop-sec1-dos-mundos-alaska.png",
+    "desktop-sec10-inspector-paradojas.png",
+    "desktop-sec4-mitad-mundos.png",
+    "desktop-sec5-geometria-2d.png",
+    "desktop-sec5-geometria-3d.png",
+    "desktop-sec6-arbol-factores.png",
+    "desktop-sec7-simplificador.png",
+    "desktop-sec9-espejo-dominio.png",
+    "mobile-cap4-boss.png",
+    "mobile-cap4-entrenador.png",
+    "mobile-cap4-trampas.png",
+    "mobile-sec1-dos-mundos-alaska.png",
+    "mobile-sec10-inspector-paradojas.png",
+    "mobile-sec4-mitad-mundos.png",
+    "mobile-sec5-geometria-2d.png",
+    "mobile-sec5-geometria-3d.png",
+    "mobile-sec6-arbol-factores.png",
+    "mobile-sec7-simplificador.png",
+    "mobile-sec9-espejo-dominio.png",
+    "visual-audit-report.json"
+  ],
+  "structural": {
+    "widgetAudit": [
+      {
+        "name": "dos-mundos",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "cinta-negativa",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "neutro-cancelacion",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "mitad-mundos",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "geometria-raices",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "arbol-factores",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "simplificador-radical",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "choque-mundos",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "espejo-dominio-real",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      },
+      {
+        "name": "inspector-paradojas",
+        "svg": true,
+        "interactive": true,
+        "scene": true
+      }
+    ],
+    "checkAudit": [
+      {
+        "id": "sec-1",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-2",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-3",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-4",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-5",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-6",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-7",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-8",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-9",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      },
+      {
+        "id": "sec-10",
+        "hint": true,
+        "solution": true,
+        "steps": 3
+      }
+    ],
+    "iconAudit": [
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--check"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--book"
+      },
+      {
+        "w": 18,
+        "h": 18,
+        "cls": "chalk-icon chalk-icon--reset"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--target"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--target"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--target"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--target"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--hint"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--target"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--play"
+      },
+      {
+        "w": 0,
+        "h": 0,
+        "cls": "chalk-icon chalk-icon--shield"
+      },
+      {
+        "w": 14,
+        "h": 14,
+        "cls": "chalk-icon chalk-icon--cross"
+      }
+    ],
+    "stable": true,
+    "overflow": false,
+    "glossTypes": [
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN",
+      "SPAN"
+    ],
+    "glossCount": 20,
+    "theoryWidth": 525.59375,
+    "geometryLabels": [
+      "1D · SEGMENTO L",
+      "2D · CUADRADO L²",
+      "3D · CUBO L³"
+    ],
+    "fourSideTiles": 17,
+    "sixSideTiles": 37,
+    "geometryScales": false,
+    "sec7Correct": true,
+    "simplifierHasBadPower": false
+  },
+  "headingAudits": [
+    {
+      "id": "sec-1",
+      "titleTop": 202.203125,
+      "titleBottom": 252.125,
+      "phraseTop": 413.34375,
+      "toolbarBottom": 140.234375,
+      "titleClear": true,
+      "phraseClear": true
+    },
+    {
+      "id": "sec-2",
+      "titleTop": 201.9375,
+      "titleBottom": 251.859375,
+      "phraseTop": 413.078125,
+      "toolbarBottom": 140.234375,
+      "titleClear": true,
+      "phraseClear": true
+    },
+    {
+      "id": "sec-3",
+      "titleTop": 201.734375,
+      "titleBottom": 251.65625,
+      "phraseTop": 412.875,
+      "toolbarBottom": 140.234375,
+      "titleClear": true,
+      "phraseClear": true
+    },
+    {
+      "id": "sec-4",
+      "titleTop": 202.09375,
+      "titleBottom": 252.015625,
+      "phraseTop": 413.234375,
+      "toolbarBottom": 140.234375,
+      "titleClear": true,
+      "phraseClear": true
+    },
+    {
+      "id": "sec-5",
+      "titleTop": 201.796875,
+      "titleBottom": 251.71875,
+      "phraseTop": 412.9375,
+      "toolbarBottom": 140.234375,
+      "titleClear": true,
+      "phraseClear": true
+    }
+  ],
+  "tutorHud": {
+    "visible": 1,
+    "valid": true
+  },
+  "glossHud": {
+    "visible": 1,
+    "valid": true,
+    "card": 0
+  },
+  "widths": [
+    {
+      "width": 321,
+      "scrollWidth": 321,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "scrollWidth": 375,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "scrollWidth": 753,
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "scrollWidth": 1009,
+      "overflow": false
+    },
+    {
+      "width": 1240,
+      "scrollWidth": 1225,
+      "overflow": false
+    },
+    {
+      "width": 1279,
+      "scrollWidth": 1264,
+      "overflow": false
+    },
+    {
+      "width": 1280,
+      "scrollWidth": 1265,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "scrollWidth": 1425,
+      "overflow": false
+    }
+  ],
+  "widgetLines": {
+    "dos-mundos": 177,
+    "cinta-negativa": 220,
+    "neutro-cancelacion": 276,
+    "mitad-mundos": 277,
+    "geometria-raices": 385,
+    "arbol-factores": 292,
+    "simplificador-radical": 324,
+    "choque-mundos": 280,
+    "espejo-dominio-real": 192,
+    "inspector-paradojas": 225
+  },
+  "consoleErrors": []
+}

@@ -3,73 +3,110 @@
  * Reutilizable, sin dependencias externas, accesible y con estética de pizarra de tiza.
  */
 
-import { h, mount, chalkIcon } from './dom.js';
-import { playVoiceBlip, playPoseEmote } from './sound.js';
+import { h, mount, chalkIcon } from "./dom.js";
+import { playVoiceBlip, playPoseEmote } from "./sound.js";
 
 export const VN_POSES = {
-  base: 'assets/vn/base.webp',
-  explicando: 'assets/vn/explicando.webp',
-  evaluando: 'assets/vn/evaluando.webp',
-  feliz: 'assets/vn/feliz.webp',
-  orgullosa: 'assets/vn/orgullosa.webp',
-  sospecha: 'assets/vn/sospecha.webp',
-  eureka: 'assets/vn/eureka.webp',
-  colapso: 'assets/vn/colapso.webp',
-  enojada: 'assets/vn/enojada.webp',
-  sonrojada: 'assets/vn/sonrojada.webp',
-  panico: 'assets/vn/panico.webp',
+  pensativa: "assets/vn/pensativa.webp",
+  base: "assets/vn/base.webp",
+  explicando: "assets/vn/explicando.webp",
+  evaluando: "assets/vn/evaluando.webp",
+  empatia: "assets/vn/empatia.webp",
+  complice: "assets/vn/complice.webp",
+  feliz: "assets/vn/feliz.webp",
+  orgullosa: "assets/vn/orgullosa.webp",
+  sospecha: "assets/vn/sospecha.webp",
+  unamused: "assets/vn/unamused.webp",
+  "lentes-brillo": "assets/vn/lentes-brillo.webp",
+  eureka: "assets/vn/eureka.webp",
+  colapso: "assets/vn/colapso.webp",
+  enojada: "assets/vn/enojada.webp",
+  sonrojada: "assets/vn/sonrojada.webp",
+  panico: "assets/vn/panico.webp",
+  attack: "assets/vn/attack.webp",
 };
 
-const POSE_ICONS = {
-  base: 'glasses',
-  explicando: 'book',
-  evaluando: 'glasses',
-  feliz: 'smile',
-  orgullosa: 'smug',
-  sospecha: 'target',
-  eureka: 'star',
-  colapso: 'drop',
-  enojada: 'anger',
-  sonrojada: 'spark',
-  panico: 'anger',
+export const POSE_ICONS = {
+  pensativa: "spark",
+  base: "glasses",
+  explicando: "book",
+  evaluando: "glasses",
+  empatia: "smile",
+  complice: "star",
+  feliz: "smile",
+  orgullosa: "smug",
+  sospecha: "target",
+  unamused: "glasses",
+  "lentes-brillo": "glasses",
+  eureka: "star",
+  colapso: "drop",
+  enojada: "anger",
+  sonrojada: "spark",
+  panico: "anger",
+  attack: "shield",
 };
 
 export const ALASKA_TITLES = [
-  'Loca de la ciencia',
-  'Mulita científica',
-  'Fanática del rigor',
-  'Nerd de guardia',
-  'Domadora de sucesiones',
-  'Terror de los límites',
-  'Cazadora de desfasajes',
-  'Calculadora humana',
-  'Adicta a las demostraciones',
-  'Detective discreta',
-  'Veterana del CBC',
-  'Pizarrón andante',
-  'Doctora en café y teoremas',
-  'Francotiradora de trampas',
-  'Pesadilla de la intuición floja',
+  "Loca de la ciencia",
+  "Mulita científica",
+  "Fanática del rigor",
+  "Nerd de guardia",
+  "Domadora de sucesiones",
+  "Terror de los límites",
+  "Cazadora de desfasajes",
+  "Calculadora humana",
+  "Adicta a las demostraciones",
+  "Detective discreta",
+  "Veterana del CBC",
+  "Pizarrón andante",
+  "Doctora en café y teoremas",
+  "Francotiradora de trampas",
+  "Pesadilla de la intuición floja",
 ];
 
-const DEFAULT_TAGS = {
-  base: 'Modo Teoría',
-  explicando: 'Paso a paso',
-  evaluando: 'Analizando...',
-  feliz: '¡Bien ahí!',
-  orgullosa: 'Te lo advertí',
-  sospecha: 'Mmm... mirá bien',
-  eureka: '¡Conexión clave!',
-  colapso: 'Colapso académico',
-  enojada: '¡Frená la mano!',
-  sonrojada: 'N-no te agrandes...',
-  panico: '¡Alerta de Laboratorio!',
+export const DEFAULT_TAGS = {
+  pensativa: "Pensando en voz alta...",
+  base: "Modo Teoría",
+  explicando: "Paso a paso",
+  evaluando: "Analizando...",
+  empatia: "Tranquila, paso a paso",
+  complice: "Secreto de cátedra",
+  feliz: "¡Bien ahí!",
+  orgullosa: "Te lo advertí",
+  sospecha: "Mmm... mirá bien",
+  unamused: "Sin recetas mágicas",
+  "lentes-brillo": "Trampa de Parcial",
+  eureka: "¡Conexión clave!",
+  colapso: "Colapso académico",
+  enojada: "¡Frená la mano!",
+  sonrojada: "N-no te agrandes...",
+  panico: "¡Alerta de Laboratorio!",
+  attack: "¡Contraataque!",
 };
 
 // Precarga inteligente: Tier 1 y 2 inmediato; resto en segundo plano
-if (typeof window !== 'undefined' && typeof Image !== 'undefined') {
-  const TIER_1_2 = ['base', 'explicando', 'evaluando', 'feliz', 'orgullosa', 'sospecha'];
-  const TIER_3_4 = ['eureka', 'colapso', 'enojada', 'sonrojada', 'panico'];
+if (typeof window !== "undefined" && typeof Image !== "undefined") {
+  const TIER_1_2 = [
+    "base",
+    "pensativa",
+    "explicando",
+    "evaluando",
+    "empatia",
+    "complice",
+    "feliz",
+    "orgullosa",
+    "sospecha",
+  ];
+  const TIER_3_4 = [
+    "unamused",
+    "lentes-brillo",
+    "eureka",
+    "colapso",
+    "enojada",
+    "sonrojada",
+    "panico",
+    "attack",
+  ];
 
   TIER_1_2.forEach((pose) => {
     if (VN_POSES[pose]) {
@@ -87,7 +124,7 @@ if (typeof window !== 'undefined' && typeof Image !== 'undefined') {
     });
   };
 
-  if (typeof window.requestIdleCallback === 'function') {
+  if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(preloadRest);
   } else {
     setTimeout(preloadRest, 800);
@@ -116,7 +153,7 @@ class VisualNovelController {
 
     this.isTyping = false;
     this.typewriterTimer = null;
-    this.currentFullHtml = '';
+    this.currentFullHtml = "";
     this.currentTextNodes = [];
     this.typingNodeIndex = 0;
     this.typingCharIndex = 0;
@@ -124,9 +161,9 @@ class VisualNovelController {
     this.isOpen = false;
     this.isMinimized = false;
 
-    if (typeof document !== 'undefined') {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => this.initDOM());
+    if (typeof document !== "undefined") {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.initDOM());
       } else {
         this.initDOM();
       }
@@ -134,40 +171,46 @@ class VisualNovelController {
   }
 
   initDOM() {
-    if (this.hudEl || typeof document === 'undefined') return;
+    if (this.hudEl || typeof document === "undefined") return;
 
     // Botón flotante minimizado [ Alaska ]
-    this.fabEl = h('button', {
-      type: 'button',
-      class: 'vn-fab',
-      'aria-label': 'Abrir diálogo de Alaska',
-      title: 'Consultar a Alaska',
-      on: {
-        click: () => this.restore(),
+    this.fabEl = h(
+      "button",
+      {
+        type: "button",
+        class: "vn-fab",
+        "aria-label": "Abrir diálogo de Alaska",
+        title: "Consultar a Alaska",
+        on: {
+          click: () => this.restore(),
+        },
       },
-    },
-      h('svg', {
-        class: 'vn-fab__icon',
-        viewBox: '0 0 24 24',
-        width: '16',
-        height: '16',
-        fill: 'none',
-        stroke: 'currentColor',
-        'stroke-width': '2',
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
-        'aria-hidden': 'true',
-      },
-        h('path', { d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' })
+      h(
+        "svg",
+        {
+          class: "vn-fab__icon",
+          viewBox: "0 0 24 24",
+          width: "16",
+          height: "16",
+          fill: "none",
+          stroke: "currentColor",
+          "stroke-width": "2",
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round",
+          "aria-hidden": "true",
+        },
+        h("path", {
+          d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+        }),
       ),
-      h('span', { class: 'vn-fab__label' }, 'Alaska')
+      h("span", { class: "vn-fab__label" }, "Alaska"),
     );
 
     // Sprite de personaje con Easter Egg de 5 clics
-    this.spriteEl = h('img', {
-      class: 'vn-sprite',
+    this.spriteEl = h("img", {
+      class: "vn-sprite",
       src: VN_POSES.base,
-      alt: 'Alaska',
+      alt: "Alaska",
     });
 
     let spriteClickCount = 0;
@@ -183,116 +226,143 @@ class VisualNovelController {
       if (spriteClickCount >= 5) {
         spriteClickCount = 0;
         this.react({
-          pose: 'sonrojada',
-          tag: 'N-no te agrandes...',
-          html: '¿P-por qué me tocás tanto? ¡No me vas a desconcentrar de mis demostraciones!... B-bueno, si querés compañía para estudiar te podés quedar, pero no te acostumbres.',
+          pose: "sonrojada",
+          tag: "N-no te agrandes...",
+          html: "¿P-por qué me tocás tanto? ¡No me vas a desconcentrar de mis demostraciones!... B-bueno, si querés compañía para estudiar te podés quedar, pero no te acostumbres.",
         });
       }
     };
 
-    this.spriteWrapEl = h('div', {
-      class: 'vn-sprite-wrap',
-      on: {
-        click: triggerSpriteEasterEgg,
+    this.spriteWrapEl = h(
+      "div",
+      {
+        class: "vn-sprite-wrap",
+        on: {
+          click: triggerSpriteEasterEgg,
+        },
       },
-    }, this.spriteEl);
+      this.spriteEl,
+    );
 
     // Placa de nombre y etiqueta de contexto
-    this.tagEl = h('span', { class: 'vn-tag' }, DEFAULT_TAGS.base);
-    const nameplateEl = h('div', { class: 'vn-nameplate' },
-      h('strong', { class: 'vn-name' }, 'Alaska'),
-      this.tagEl
+    this.tagEl = h("span", { class: "vn-tag" }, DEFAULT_TAGS.base);
+    const nameplateEl = h(
+      "div",
+      { class: "vn-nameplate" },
+      h("strong", { class: "vn-name" }, "Alaska"),
+      this.tagEl,
     );
 
     // Controles de ventana
-    const btnMin = h('button', {
-      type: 'button',
-      class: 'vn-ctrl-btn vn-ctrl-btn--min',
-      'aria-label': 'Minimizar diálogo',
-      title: 'Minimizar diálogo a la esquina',
-      on: {
-        click: (e) => {
-          e.stopPropagation();
-          this.minimize();
+    const btnMin = h(
+      "button",
+      {
+        type: "button",
+        class: "vn-ctrl-btn vn-ctrl-btn--min",
+        "aria-label": "Minimizar diálogo",
+        title: "Minimizar diálogo a la esquina",
+        on: {
+          click: (e) => {
+            e.stopPropagation();
+            this.minimize();
+          },
         },
       },
-    }, '—');
+      "—",
+    );
 
-    const btnClose = h('button', {
-      type: 'button',
-      class: 'vn-ctrl-btn vn-ctrl-btn--close',
-      'aria-label': 'Cerrar diálogo',
-      title: 'Cerrar diálogo (Esc)',
-      on: {
-        click: (e) => {
-          e.stopPropagation();
-          this.close();
+    const btnClose = h(
+      "button",
+      {
+        type: "button",
+        class: "vn-ctrl-btn vn-ctrl-btn--close",
+        "aria-label": "Cerrar diálogo",
+        title: "Cerrar diálogo (Esc)",
+        on: {
+          click: (e) => {
+            e.stopPropagation();
+            this.close();
+          },
         },
       },
-    }, chalkIcon('cross', { width: 14, height: 14 }));
+      chalkIcon("cross", { width: 14, height: 14 }),
+    );
 
-    const headerEl = h('div', { class: 'vn-box__header' },
+    const headerEl = h(
+      "div",
+      { class: "vn-box__header" },
       nameplateEl,
-      h('div', { class: 'vn-box__controls' }, btnMin, btnClose)
+      h("div", { class: "vn-box__controls" }, btnMin, btnClose),
     );
 
     // Cuerpo de texto
-    this.textEl = h('div', { class: 'vn-text', 'aria-live': 'polite' });
+    this.textEl = h("div", { class: "vn-text", "aria-live": "polite" });
 
     // Footer con contador y botón siguiente
-    this.counterEl = h('span', { class: 'vn-counter small muted' }, '');
-    this.btnNext = h('button', {
-      type: 'button',
-      class: 'btn btn--sm vn-btn-next',
-      on: {
-        click: (e) => {
-          e.stopPropagation();
-          this.advance();
+    this.counterEl = h("span", { class: "vn-counter small muted" }, "");
+    this.btnNext = h(
+      "button",
+      {
+        type: "button",
+        class: "btn btn--sm vn-btn-next",
+        on: {
+          click: (e) => {
+            e.stopPropagation();
+            this.advance();
+          },
         },
       },
-    }, 'Siguiente ▸');
+      "Siguiente ▸",
+    );
 
-    const footerEl = h('div', { class: 'vn-box__footer' },
+    const footerEl = h(
+      "div",
+      { class: "vn-box__footer" },
       this.counterEl,
-      this.btnNext
+      this.btnNext,
     );
 
     // Cuadro principal
-    this.boxEl = h('div', {
-      class: 'vn-box',
-      role: 'dialog',
-      'aria-label': 'Explicación de Alaska',
-      on: {
-        click: () => this.handleBoxClick(),
+    this.boxEl = h(
+      "div",
+      {
+        class: "vn-box",
+        role: "dialog",
+        "aria-label": "Explicación de Alaska",
+        on: {
+          click: () => this.handleBoxClick(),
+        },
       },
-    },
       this.spriteWrapEl,
-      h('div', { class: 'vn-box__inner' },
-        headerEl,
-        this.textEl,
-        footerEl
-      )
+      h("div", { class: "vn-box__inner" }, headerEl, this.textEl, footerEl),
     );
 
     // Contenedor HUD global
-    this.hudEl = h('div', { class: 'vn-hud', 'aria-hidden': 'true' },
+    this.hudEl = h(
+      "div",
+      { class: "vn-hud", "aria-hidden": "true" },
       this.fabEl,
-      this.boxEl
+      this.boxEl,
     );
 
     document.body.append(this.hudEl);
 
     // Atajos de teclado globales
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener("keydown", (e) => {
       if (!this.isOpen || this.isMinimized) return;
 
-      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      const isInput = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+      const activeTag = document.activeElement
+        ? document.activeElement.tagName.toLowerCase()
+        : "";
+      const isInput =
+        activeTag === "input" ||
+        activeTag === "textarea" ||
+        activeTag === "select";
 
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         this.close();
-      } else if ((e.key === ' ' || e.key === 'Enter') && !isInput) {
+      } else if ((e.key === " " || e.key === "Enter") && !isInput) {
         e.preventDefault();
         this.advance();
       }
@@ -357,15 +427,19 @@ class VisualNovelController {
     this.textEl.innerHTML = html;
 
     // Recolectar todos los nodos de texto manteniendo la estructura de elementos HTML
-    const walker = document.createTreeWalker(this.textEl, NodeFilter.SHOW_TEXT, null);
+    const walker = document.createTreeWalker(
+      this.textEl,
+      NodeFilter.SHOW_TEXT,
+      null,
+    );
     this.currentTextNodes = [];
     let textNode;
     while ((textNode = walker.nextNode())) {
       this.currentTextNodes.push({
         node: textNode,
-        fullText: textNode.nodeValue || '',
+        fullText: textNode.nodeValue || "",
       });
-      textNode.nodeValue = '';
+      textNode.nodeValue = "";
     }
 
     this.typingNodeIndex = 0;
@@ -386,12 +460,15 @@ class VisualNovelController {
         // Revelar 1 carácter
         const char = currentItem.fullText[this.typingCharIndex];
         this.typingCharIndex++;
-        currentItem.node.nodeValue = currentItem.fullText.slice(0, this.typingCharIndex);
+        currentItem.node.nodeValue = currentItem.fullText.slice(
+          0,
+          this.typingCharIndex,
+        );
 
         if (char && !/[\s\.,!?;:—\-–'"«»`()¿¡…\[\]{}<>\/\\*+=%]/.test(char)) {
           this.voiceCharCount = (this.voiceCharCount || 0) + 1;
           if (this.voiceCharCount % 2 === 1) {
-            playVoiceBlip(char, this.currentPose || 'base');
+            playVoiceBlip(char, this.currentPose || "base");
           }
         }
 
@@ -416,11 +493,13 @@ class VisualNovelController {
     const isLast = current >= total;
 
     if (this.counterEl) {
-      this.counterEl.textContent = total > 1 ? `[${current}/${total}]` : '';
+      this.counterEl.textContent = total > 1 ? `[${current}/${total}]` : "";
     }
 
     if (this.btnNext) {
-      this.btnNext.textContent = isLast ? 'Cerrar ×' : `Siguiente [${current}/${total}] ▸`;
+      this.btnNext.textContent = isLast
+        ? "Cerrar ×"
+        : `Siguiente [${current}/${total}] ▸`;
     }
   }
 
@@ -431,11 +510,11 @@ class VisualNovelController {
     const line = this.currentScript[this.currentIndex];
     if (!line) return;
 
-    const pose = line.pose || 'base';
-    const tag = line.tag || DEFAULT_TAGS[pose] || 'Alaska';
-    const html = line.html || '';
+    const pose = line.pose || "base";
+    const tag = line.tag || DEFAULT_TAGS[pose] || "Alaska";
+    const html = line.html || "";
 
-    const shouldEmote = this.isFirstLineOfScript || (this.currentPose !== pose);
+    const shouldEmote = this.isFirstLineOfScript || this.currentPose !== pose;
     this.isFirstLineOfScript = false;
     this.currentPose = pose;
 
@@ -446,32 +525,39 @@ class VisualNovelController {
     // Actualizar sprite y animaciones
     if (this.spriteEl) {
       this.spriteEl.src = VN_POSES[pose] || VN_POSES.base;
-      this.spriteEl.alt = 'Alaska';
+      this.spriteEl.alt = "Alaska";
     }
 
     if (this.fabEl) {
-      this.fabEl.title = 'Consultar a Alaska';
+      this.fabEl.title = "Consultar a Alaska";
     }
 
     if (this.spriteWrapEl) {
-      this.spriteWrapEl.classList.remove('vn-shake', 'vn-pop');
+      this.spriteWrapEl.classList.remove("vn-shake", "vn-pop");
       // Forzar reflujo para reiniciar animación si repite pose
       void this.spriteWrapEl.offsetWidth;
 
-      if (pose === 'enojada' || pose === 'sospecha' || pose === 'panico') {
-        this.spriteWrapEl.classList.add('vn-shake');
-      } else if (pose === 'orgullosa' || pose === 'feliz' || pose === 'eureka' || pose === 'sonrojada') {
-        this.spriteWrapEl.classList.add('vn-pop');
+      if (pose === "enojada" || pose === "sospecha" || pose === "panico") {
+        this.spriteWrapEl.classList.add("vn-shake");
+      } else if (
+        pose === "orgullosa" ||
+        pose === "feliz" ||
+        pose === "eureka" ||
+        pose === "sonrojada" ||
+        pose === "complice" ||
+        pose === "attack"
+      ) {
+        this.spriteWrapEl.classList.add("vn-pop");
       }
     }
 
     // Actualizar tag con icono vectorial de pose
     if (this.tagEl) {
-      const iconType = POSE_ICONS[pose] || 'glasses';
+      const iconType = POSE_ICONS[pose] || "glasses";
       mount(
         this.tagEl,
-        chalkIcon(iconType, { width: 15, height: 15, class: 'vn-tag__icon' }),
-        h('span', { class: 'vn-tag__text' }, tag)
+        chalkIcon(iconType, { width: 15, height: 15, class: "vn-tag__icon" }),
+        h("span", { class: "vn-tag__text" }, tag),
       );
     }
 
@@ -498,9 +584,9 @@ class VisualNovelController {
 
     this.isOpen = true;
     this.isMinimized = false;
-    this.hudEl.classList.add('is-visible');
-    this.hudEl.classList.remove('is-minimized');
-    this.hudEl.setAttribute('aria-hidden', 'false');
+    this.hudEl.classList.add("is-visible");
+    this.hudEl.classList.remove("is-minimized");
+    this.hudEl.setAttribute("aria-hidden", "false");
 
     this.renderCurrentLine();
   }
@@ -508,7 +594,7 @@ class VisualNovelController {
   /**
    * Dispara una reacción rápida de 1 o 2 líneas
    */
-  react({ pose = 'base', tag, html = '', autoHideMs = 0 } = {}) {
+  react({ pose = "base", tag, html = "", autoHideMs = 0 } = {}) {
     if (!this.hudEl) this.initDOM();
 
     this.playScript([{ pose, tag, html }], {
@@ -530,7 +616,7 @@ class VisualNovelController {
   minimize() {
     if (!this.hudEl) return;
     this.isMinimized = true;
-    this.hudEl.classList.add('is-minimized');
+    this.hudEl.classList.add("is-minimized");
   }
 
   /**
@@ -539,7 +625,7 @@ class VisualNovelController {
   restore() {
     if (!this.hudEl) return;
     this.isMinimized = false;
-    this.hudEl.classList.remove('is-minimized');
+    this.hudEl.classList.remove("is-minimized");
   }
 
   /**
@@ -561,13 +647,13 @@ class VisualNovelController {
     this.currentPose = null;
 
     if (this.hudEl) {
-      this.hudEl.classList.remove('is-visible', 'is-minimized');
-      this.hudEl.setAttribute('aria-hidden', 'true');
+      this.hudEl.classList.remove("is-visible", "is-minimized");
+      this.hudEl.setAttribute("aria-hidden", "true");
     }
 
     const cb = this.onFinishCallback;
     this.onFinishCallback = null;
-    if (typeof cb === 'function') {
+    if (typeof cb === "function") {
       try {
         cb();
       } catch (_) {}
