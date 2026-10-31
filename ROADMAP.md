@@ -12,7 +12,7 @@
 | **1. Desigualdades Compuestas** | `desigualdades.html` | Simulador puro | Bueno, pero sin lección teórica previa ni Alaska VN | Migrar al formato de Lección Lineal + Alaska + Boss *Keep Calculating*. |
 | **2. Unidades y Análisis Dimensional** | `unidades.html` | Simulador puro | Muy buen sistema de conectores y neutro $=1$ | Agregar paso intermedio conmutativo, forma física pin/hueco y Alaska VN. |
 | **3. Funciones (Unidad 8)** | `funciones.html` | 4 Simuladores en Tabs | Muy completo ($C^+, C^-$, Secante, Inversa) | Unificar con lección teórica guiada por Alaska y Boss estilo *Undertale / Persona*. |
-| **4. Sucesiones (Unidad 9)** | `sucesiones.html` | Excelente (Cap. 1 a 4) | Lección lineal + Alaska VN + Sliders corregidos | Pasar de «tubo vertical» a *Split-Workbench* en Desktop; sumar Boss final. |
+| **4. Sucesiones (Unidad 9)** | `sucesiones.html` | Bueno (Cap. 1 a 4) | Lección lineal + Alaska VN + Sliders corregidos | Pasar de «tubo vertical» a *Split-Workbench* en Desktop; sumar Boss final. |
 | **5. Valor Absoluto y Partes (Unidad 10)** | `valor-absoluto.html` | Excelente (Cap. 1 a 4) | Buenos widgets y guiones profundos de Alaska | Reemplazar por completo el Boss `mountBossDeflector` (actualmente muy pobre) y aplicar *Split-Workbench*. |
 
 ---
@@ -85,7 +85,7 @@ Ademas, hacer clic en Alaska Chibi abriria un evento para seleccionar lo que no 
 2. **Boss 2 (`unidades.html`) · *«Sobrecarga en la Cafetera Centrífuga»*:**
    - Cinta transportadora de fichas con conectores físicos **Pin Macho (Numerador)** y **Hueco Hembra (Denominador)**. El jugador debe rotarlas y encastrarlas en la tubería antes de que suba la presión para formar escudos verdes del **Neutro Multiplicativo $= 1$**, evitando crear monstruos dimensionales como $\text{min}^2$.
 3. **Boss 3 (`funciones.html`) · *«Anomalía Cartesiana (Combate Undertale + Mazos Persona)»*:**
-   - **Fase Esquive (*Undertale*):** El jugador mueve un nodo $(x, y)$ dentro de la caja cartesiana. El jefe anuncia: *«¡Descarga en el Conjunto de Negatividad $C^-$!»* o *«¡Láser en la asíntota vertical de $\frac{1}{x - 2}$!»*. Hay 3 segundos para deducir mentalmente la gráfica y correr a la zona segura antes de que se materialice el rayo.
+   - **Fase Esquive (*Undertale*):** El jugador mueve un nodo $(x, y)$ dentro de la caja cartesiana. Alaska usando el necronomicon anuncia: *«¡Descarga en el Conjunto de Negatividad $C^-$!»* o *«¡Láser en la asíntota vertical de $\frac{1}{x - 2}$!»*. Hay 3 segundos para deducir mentalmente la gráfica y correr a la zona segura antes de que se materialice el rayo.
    - **Fase Contraataque (*Persona*):** El jefe levanta un escudo con una función $f(x)$. El jugador elige de su mazo de 4 cartas visuales la curva que es el **reflejo exacto sobre el espejo $y = x$ ($f^{-1}$)** para colapsar el escudo en la identidad.
 4. **Boss 4 (`sucesiones.html`) · *«El Enjambre Alternante $(-r)^{n-1}$»*:**
    - El piso continuo desaparece (si pisás entre dos enteros, caés al vacío $\notin \mathbb{N}$). Una plaga geométrica con razón negativa salta alternando signos entre el techo ($C^+$) y el subsuelo ($C^-$); el jugador debe calibrar el teletransportador $(n - 1)$ para interceptar en qué poste exacto va a materializarse.
