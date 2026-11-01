@@ -1029,7 +1029,6 @@
 }
 
 header[data-site-nav] {
-  position: relative;
   z-index: 30;
   background: var(--bg);
 }
