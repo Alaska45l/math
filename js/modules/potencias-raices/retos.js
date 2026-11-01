@@ -30,23 +30,6 @@ export function mulberry32(seed) {
 const int = (rng, low, high) => low + Math.floor(rng() * (high - low + 1));
 const perfectPower = (n, degree) => n ** degree;
 
-const COACH_OPENINGS = [
-  "Alaska apoya la tiza y te pregunta qué operación manda antes de calcular. No adivines todavía:",
-  "Ahora sí, seguí una sola transformación verificable y contame qué conserva. La pista es:",
-  "Última lupa de Exactas: comprobá el resultado reconstruyendo la expresión original. Prestá atención:",
-];
-const COACH_CLOSINGS = [
-  "Probá esa idea en tu hoja antes de escribir una respuesta definitiva.",
-  "Si aparece un signo extraño, volvé al neutro o al dominio real correspondiente.",
-  "N-no te lo regalo por capricho: justificá ese último paso y el reto ya es tuyo.",
-];
-
-function coachHints(hints) {
-  return hints.map(
-    (hint, index) => `${COACH_OPENINGS[index]} ${hint} ${COACH_CLOSINGS[index]}`,
-  );
-}
-
 function inlineMathNodes(text) {
   const nodes = [];
   const marker = /\[\[frac:([^|\]]+)\|([^\]]+)\]\]/g;
@@ -82,9 +65,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `root(${n}, ${x})`,
         displayAnswer: fmt(root),
         hints: [
-          "El exponente fraccionario pregunta por un factor repetido, no por una parte aditiva.",
-          `Buscá un número que, multiplicado por sí mismo ${n} veces, reconstruya ${fmt(x)}.`,
-          `Comprobá ${fmt(root)} elevado a ${fmt(n)}: obtenés ${fmt(x)}.`,
+          `El ${fmt(1)}/${fmt(n)} está en el exponente, así que no repartas ${fmt(x)} en partes aditivas. Buscá un factor que repita una misma escala ${fmt(n)} veces.`,
+          `Desde el neutro uno, preguntate qué número multiplicado por sí mismo ${fmt(n)} veces llega a ${fmt(x)}. Escribí una cadena corta de productos, no una división.`,
+          `Probá el candidato ${fmt(root)}: ${fmt(root)}^${fmt(n)} reconstruye ${fmt(x)}. Ésa es la verificación de la raíz y también el valor que tenés que responder.`,
         ],
         solution: [
           `La parte aditiva sería ${fmt(x)} dividido en ${fmt(n)} partes iguales; esa pregunta empieza en cero.`,
@@ -105,13 +88,13 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `${a}^${power}`,
         displayAnswer: fmt(value, 6),
         hints: [
-          "El exponente cuenta pasos desde el neutro multiplicativo.",
+          "Mirá el exponente antes que la base: cuenta pasos desde el neutro multiplicativo. Decidí si el reto pide quedarte en uno o retroceder mediante divisiones.",
           power === 0
-            ? "Cero pasos te dejan en el neutro uno."
-            : `Con exponente negativo, dividí desde uno ${fmt(exponent)} veces por ${fmt(a)}.`,
+            ? "Con cero pasos no se multiplica ni se divide nada: seguís exactamente en el neutro uno. No confundas ese origen multiplicativo con el cero aditivo."
+            : `Con exponente negativo, salí de uno y dividí por ${fmt(a)} exactamente ${fmt(exponent)} veces. Cada parada debe seguir siendo positiva.`,
           power === 0
-            ? "La respuesta debe conservar la escala inicial."
-            : `El resultado es el inverso de ${fmt(a ** exponent)}; su signo sigue siendo positivo.`,
+            ? `La escala inicial se conserva, así que escribí ${fmt(a)}⁰ = 1 y comprobá que multiplicar por uno no cambia ningún número.`
+            : `El resultado es el inverso de ${fmt(a ** exponent)}: escribilo como una fracción con 1 arriba y comprobá que su signo sigue positivo.`,
         ],
         solution:
           power === 0
@@ -140,9 +123,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `${base}^${m}*${base}^${p}/${base}^${n}`,
         displayAnswer: fmt(value, 6),
         hints: [
-          "Primero juntá las potencias que tienen la misma base.",
-          "Al dividir, restá el contador del denominador al contador total del numerador.",
-          `El exponente final es ${fmt(m)} + ${fmt(p)} − ${fmt(n)} = ${fmt(exponent)}.`,
+          `Las tres potencias comparten base ${fmt(base)}. Primero contá los factores del numerador; todavía no calcules el valor decimal ni taches nada.`,
+          `El numerador junta ${fmt(m)} y ${fmt(p)} pasos; después el denominador retira ${fmt(n)} factores formando pares que valen uno.`,
+          `El contador final es ${fmt(m)} + ${fmt(p)} − ${fmt(n)} = ${fmt(exponent)}. Evaluá ${fmt(base)}^${fmt(exponent)} y, si es negativo, escribilo como inverso.`,
         ],
         solution: [
           `En el numerador se suman contadores: ${fmt(m)} + ${fmt(p)} = ${fmt(m + p)}.`,
@@ -162,9 +145,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `root(${n},${radicand})`,
         displayAnswer: fmt(root),
         hints: [
-          "Descomponé el radicando en factores primos.",
-          `Repartí los factores en ${fmt(n)} cajas idénticas.`,
-          `Cada caja debe contener ${fmt(root)}; comprobá que ${fmt(root)}^${fmt(n)} reconstruya el radicando.`,
+          `El índice ${fmt(n)} pide ${fmt(n)} cajas idénticas. En vez de adivinar, desarmá ${fmt(radicand)} en sus factores primos para ver qué fichas se pueden repartir.`,
+          `Repartí los ladrillos de la factorización para que ninguna caja tenga ventaja. Cada caja debe contener el mismo producto, o la raíz no será exacta.`,
+          `En este caso cada caja forma ${fmt(root)}; verificá ${fmt(root)}^${fmt(n)} = ${fmt(radicand)} antes de escribir la raíz. La multiplicación de regreso es tu control.`,
         ],
         solution: [
           `${radicand} = ${root}^${n}.`,
@@ -186,9 +169,9 @@ export function makeChallenge(seed, requestedType = null) {
         vars: { x },
         displayAnswer: fmt(value, 6),
         hints: [
-          "Separá las potencias de x en parejas completas y factores sueltos.",
-          "Las parejas salen de la raíz; el residuo numérico queda adentro.",
-          `Sustituí x = ${fmt(x)} al final para obtener el valor.`,
+          `La raíz es cuadrada: buscá parejas de x y parejas entre los factores del número ${fmt(inside)}. No reemplaces x por ${fmt(x)} antes de entender qué paquetes salen.`,
+          `De ${fmt(exponent)} letras x, cada pareja completa cruza como una x; si sobra una, queda bajo el radical junto al resto numérico. Escribí primero la forma simplificada.`,
+          `Ahora sí sustituí x = ${fmt(x)} en tu expresión y evaluá. Comparala con √(${fmt(inside)}·${fmt(x)}^${fmt(exponent)}) para verificar el valor numérico.`,
         ],
         solution: [
           `Agrupá ${fmt(exponent)} factores x de a dos; sale x^${fmt(Math.floor(exponent / 2))}.`,
@@ -208,9 +191,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `${a}*sqrt(${d})*${c}*sqrt(${k})`,
         displayAnswer: fmt(value, 6),
         hints: [
-          "Multiplicá los coeficientes que están fuera de las raíces.",
-          "Uní las raíces como una raíz del producto cuando ambos radicandos son no negativos.",
-          `Calculá ${fmt(a * c)} por la raíz de ${fmt(d * k)}.`,
+          `Separá lo visible: ${fmt(a)} y ${fmt(c)} son coeficientes fuera de raíz; ${fmt(d)} y ${fmt(k)} son radicandos no negativos que sí pueden compartir techo.`,
+          `Multiplicá primero ${fmt(a)} · ${fmt(c)} y, por otro lado, usá √${fmt(d)} · √${fmt(k)} = √(${fmt(d)} · ${fmt(k)}). No distribuyas la raíz sobre sumas: acá sólo hay producto.`,
+          `Te queda ${fmt(a * c)}√${fmt(d * k)}. Calculá esa raíz y multiplicá por ${fmt(a * c)} para obtener el valor final del reto.`,
         ],
         solution: [
           `Los coeficientes producen ${fmt(a)} · ${fmt(c)} = ${fmt(a * c)}.`,
@@ -230,9 +213,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `(${a}${sign > 0 ? "+" : "-"}${b})^2`,
         displayAnswer: fmt(value),
         hints: [
-          "Primero resolvé la suma o resta que forma la base completa.",
-          "Después elevá al cuadrado el resultado de esa operación.",
-          `La base completa vale ${fmt(a + sign * b)}.`,
+          "Los paréntesis encierran la base completa; no repartas el cuadrado sobre la suma o resta. Primero decidí cuánto vale ese único número interior.",
+          `${fmt(a)} ${sign > 0 ? "+" : "−"} ${fmt(b)} forma una sola base antes de elevar. Resolvé esa operación y recién después multiplicá el resultado por sí mismo.`,
+          `La base completa vale ${fmt(a + sign * b)}. Cuadrala para completar (${fmt(a)} ${sign > 0 ? "+" : "−"} ${fmt(b)})² y verificá que no faltó ningún término.`,
         ],
         solution: [
           `La base entre paréntesis vale ${fmt(a + sign * b)}.`,
@@ -250,9 +233,9 @@ export function makeChallenge(seed, requestedType = null) {
         expression: `sqrt((${fmt(-x)})^2)`,
         displayAnswer: fmt(x),
         hints: [
-          "Calculá primero el cuadrado del número negativo.",
-          "La raíz cuadrada principal devuelve el resultado no negativo.",
-          `El cuadrado vale ${fmt(x * x)}; tomá su raíz principal.`,
+          `Seguí el orden de los paréntesis: primero se eleva −${fmt(x)} al cuadrado y recién después se aplica la raíz. ¿Qué signo tiene el producto de dos negativos?`,
+          `El cuadrado transforma −${fmt(x)} en ${fmt(x * x)}, un radicando permitido. La raíz principal devuelve el valor no negativo, igual que el módulo de la entrada.`,
+          `Tomá la raíz principal de ${fmt(x * x)} y escribí ${fmt(x)}. Comprobá que √((−${fmt(x)})²) = |−${fmt(x)}|, nunca −${fmt(x)}.`,
         ],
         solution: [
           `Elevar −${fmt(x)} al cuadrado da ${fmt(x * x)}.`,
@@ -264,9 +247,7 @@ export function makeChallenge(seed, requestedType = null) {
   };
   const build = cases[type];
   if (!build) throw new RangeError(`Tipo de reto desconocido: ${type}`);
-  const challenge = build();
-  challenge.hints = coachHints(challenge.hints);
-  return challenge;
+  return build();
 }
 
 const TRAPS = [

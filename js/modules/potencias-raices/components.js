@@ -157,6 +157,24 @@ export function annotatedPowFormula(root, config = {}) {
         " = ",
         frac("1", h("span", null, base(), h("sup", null, exponent()))),
       );
+    if (section === "sec-3")
+      return h(
+        "span",
+        { class: "seq-annotated__equation" },
+        frac(
+          h("span", null, base(), h("sup", null, exponent("m"))),
+          h("span", null, base(), h("sup", null, exponent("n"))),
+        ),
+        " = ",
+        base(),
+        h("sup", null, h("span", { class: "eq" }, "m − n")),
+        " = ",
+        frac(
+          neutral(),
+          h("span", null, base(), h("sup", null, exponent("n − m"))),
+        ),
+        "   (a ≠ 0)",
+      );
     if (section === "sec-4")
       return h(
         "span",
@@ -175,7 +193,7 @@ export function annotatedPowFormula(root, config = {}) {
           ),
         ),
         " = ",
-        index("n"),
+        h("sup", { class: "pr-root-index" }, index("n")),
         "√",
         radicand("x"),
         h("sup", null, exponent("m")),
@@ -184,7 +202,7 @@ export function annotatedPowFormula(root, config = {}) {
       return h(
         "span",
         { class: "seq-annotated__equation" },
-        index("n"),
+        h("sup", { class: "pr-root-index" }, index("n")),
         "√(",
         base("a"),
         h("sup", null, exponent("n")),
@@ -193,7 +211,7 @@ export function annotatedPowFormula(root, config = {}) {
         ") = ",
         base("a"),
         " · ",
-        index("n"),
+        h("sup", { class: "pr-root-index" }, index("n")),
         "√",
         radicand("b"),
       );
@@ -203,16 +221,19 @@ export function annotatedPowFormula(root, config = {}) {
         { class: "seq-annotated__equation" },
         base("L"),
         "² = área; ",
-        index("2"),
         "√",
         radicand("A"),
-        " = lado",
+        " = lado; ",
+        h("sup", { class: "pr-root-index" }, index("3")),
+        "√",
+        radicand("V"),
+        " = arista",
       );
     if (section === "sec-6")
       return h(
         "span",
         { class: "seq-annotated__equation" },
-        index("n"),
+        h("sup", { class: "pr-root-index" }, index("n")),
         "√",
         radicand("N"),
         " = producto de una caja idéntica",

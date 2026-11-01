@@ -27,9 +27,9 @@ export const CHECKS_DATA = {
       prompt: "Cuatro saltos aditivos de tamaño 3: calculá 3 · 4.",
       spec: { value: 12, context: "producto repetido 3 por 4" },
       hints: [
-        "El 4 cuenta cuántas veces se suma el 3.",
-        "Escribí 3 + 3 + 3 + 3 antes de abreviar.",
-        "La suma repetida vale 12; no eleves 3 a 4 en este ítem.",
+        "Frená, que acá el 4 está abajo y cuenta saltos aditivos: ¿cuántas veces vas a sumar el mismo 3 desde el cero? No es una potencia.",
+        "Escribí los cuatro saltos completos: 3 + 3 + 3 + 3. Agrupá primero dos parejas para que la suma se vea, en vez de apretar teclas por reflejo.",
+        "Las dos primeras fichas dan 6 y las dos últimas también dan 6. Completá 6 + 6 y verificá que no aparecieron factores multiplicándose.",
       ],
       solution: [
         "3 · 4 significa cuatro sumandos iguales.",
@@ -42,9 +42,9 @@ export const CHECKS_DATA = {
       prompt: "Sin multiplicar factores: ¿cuánto vale 7⁰?",
       spec: { value: 1, context: "7^0 exponente cero" },
       hints: [
-        "El exponente cuenta cambios de escala desde el origen multiplicativo.",
-        "Con cero cambios te quedás en el neutro de la multiplicación.",
-        "El neutro multiplicativo es 1.",
+        "Antes de responder, ubicá el mundo: el cero está en un exponente, así que cuenta cambios de escala desde el neutro multiplicativo, no sumandos.",
+        "Imaginá que empezás en 1 y todavía no multiplicaste por 7 ninguna vez. ¿Qué número quedó intacto cuando no hubo pasos?",
+        "La comprobación es breve: el número que no modifica una multiplicación es 1. Por eso completá 7⁰ = 1, aunque 7 · 0 sí dé 0.",
       ],
       solution: [
         "Toda potencia se interpreta desde la escala inicial 1.",
@@ -65,9 +65,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "El 4 no es otro factor 2ⁿ: primero escribilo como 2² y recién entonces combiná potencias de la misma base.",
       hints: [
-        "La base de la potencia variable es 2.",
-        "Reescribí el factor 4 como una potencia de base 2.",
-        "2² · 2ⁿ suma exponentes y da 2ⁿ⁺².",
+        "No multipliques las bases de entrada: la potencia variable ya tiene base 2. Preguntate cómo expresar el 4 usando exactamente esa misma base.",
+        "Como 4 = 2², la expresión pasa a ser 2² · 2ⁿ. Recién ahora hay factores de la misma base y podés usar la ley de exponentes.",
+        "Al juntar dos doses y n doses, el contador total es n + 2. Elegí la opción que conserve base 2 y escriba 2ⁿ⁺².",
       ],
       solution: [
         "4 = 2².",
@@ -82,9 +82,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá 2⁻³ como una fracción positiva.",
       spec: { value: 0.125, context: "2^-3 exponente negativo" },
       hints: [
-        "El signo menos invierte el recorrido multiplicativo.",
-        "Desde 1 dividí por 2 tres veces.",
-        "La fracción final es 1/8, que vale 0,125.",
+        "El menos está en el exponente, no delante de la base: indica retroceder en el mundo multiplicativo. ¿Cuál es el punto de partida de ese recorrido?",
+        "Salí de 1 y dividí por 2 una vez, otra vez y una tercera vez: 1 : 2 : 2 : 2. Anotá cada parada antes de saltar al final.",
+        "Las paradas son un medio, un cuarto y un octavo. Escribí la última como fracción positiva y, si querés, comprobá que su decimal es 0,125.",
       ],
       solution: [
         "2⁻³ = 1 : 2 : 2 : 2.",
@@ -97,9 +97,9 @@ export const CHECKS_DATA = {
       prompt: "Evaluá (2/3)⁻².",
       spec: { value: 2.25, context: "(2/3)^-2 exponente negativo fracción" },
       hints: [
-        "Invertí la escala completa antes de elevar.",
-        "El recíproco de 2/3 es 3/2.",
-        "Elevá 3/2 al cuadrado: 9/4.",
+        "El exponente negativo no invierte sólo el 2 ni sólo el 3: te pide el inverso de la fracción completa. ¿Qué fracción multiplicada por 2/3 devuelve 1?",
+        "Intercambiá numerador y denominador: 2/3 se vuelve 3/2. Ahora sí tenés dos factores iguales de 3/2 para multiplicar.",
+        "Multiplicá numeradores entre sí y denominadores entre sí: 3² sobre 2². Terminá la fracción 9/4 y comprobá que vale 2,25.",
       ],
       solution: [
         "Un exponente negativo usa el inverso multiplicativo de la base.",
@@ -120,9 +120,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "El menos del exponente invierte la operación multiplicativa. No cambia el signo de la base positiva.",
       hints: [
-        "Diferenciá el signo de la base del signo del exponente.",
-        "Retrocedé desde el neutro 1 dividiendo por 2.",
-        "Tres divisiones producen 1/8, no −8.",
+        "Mirá dónde está el signo menos: no pertenece a la base 2. En una potencia negativa el signo avisa operación inversa, no resultado negativo.",
+        "Retrocedé desde el neutro 1: al dividir por 2 obtenés 1/2, luego 1/4 y después 1/8. ¿En qué paso aparecería un número negativo?",
+        "Como todos los números de ese recorrido son positivos, elegí la explicación que termina en 1/8. El −8 sería confundir exponente negativo con base negativa.",
       ],
       solution: [
         "2³ avanza desde 1 multiplicando tres veces por 2.",
@@ -140,9 +140,9 @@ export const CHECKS_DATA = {
         context: "3^4 dividido 3^10 cociente cancelación",
       },
       hints: [
-        "Emparejá los cuatro factores 3 del numerador.",
-        "Cada pareja 3/3 vale el neutro 1; quedan seis treses abajo.",
-        "Escribí el residuo como 1/3⁶ o como 3⁻⁶.",
+        "No digas «se cancela» todavía: expandí mentalmente los cuatro treses de arriba y los diez de abajo. ¿Cuántas parejas verticales iguales podés formar?",
+        "Cada pareja se escribe 3/3 y vale 1, el neutro multiplicativo. Después de usar los cuatro de arriba, contá los treses que siguen sobrando abajo.",
+        "Quedan seis treses en el denominador, acompañados por 1 · 1 · 1 · 1. Escribí 1/3⁶ o 3⁻⁶ y verificá que no apareció ni un cero ni un cuatro.",
       ],
       solution: [
         "Hay cuatro factores que forman cuatro cocientes 3/3 = 1.",
@@ -155,9 +155,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá 2³ · 2⁴.",
       spec: { value: 128, context: "producto misma base potencias" },
       hints: [
-        "Expansión: tres doses por cuatro doses más.",
-        "En total hay siete factores 2.",
-        "2⁷ = 128.",
+        "Ambas potencias viven en el mundo multiplicativo y tienen base 2. Antes de calcular, preguntate cuántos factores dos aporta cada una.",
+        "2³ aporta tres doses y 2⁴ aporta cuatro más; al unir los productos no cambiaste de base, sólo alargaste la fila de factores.",
+        "La fila completa tiene siete doses, así que escribí 2⁷ y calculá su valor. Podés chequearlo duplicando sucesivamente desde 1.",
       ],
       solution: [
         "2³ aporta tres factores 2 y 2⁴ aporta cuatro.",
@@ -178,9 +178,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "La pareja no desaparece: 5/5 vale exactamente 1. Ese neutro mantiene intacto el producto restante.",
       hints: [
-        "Preguntate qué número multiplicado por 5 devuelve 5.",
-        "Un número no nulo dividido por sí mismo vale el neutro multiplicativo.",
-        "5/5 = 1.",
+        "Preguntate cuántas veces cabe cinco dentro de cinco, o qué factor multiplicado por 5 lo deja igual. Esa pregunta revela el neutro correcto.",
+        "Como 5 no es cero, 5/5 forma una pareja de factores idénticos. Una división así vale el neutro multiplicativo; no vale cero por haberla tachado.",
+        "Completá 5/5 = 1. Si hubiera varias parejas, se multiplicarían como 1 · 1 · …, y por eso el producto restante no se altera.",
       ],
       solution: [
         "5/5 pregunta cuántas veces cabe cinco en cinco.",
@@ -198,9 +198,9 @@ export const CHECKS_DATA = {
       secondLabel: "raíz cuadrada",
       expected: [18, 6],
       hints: [
-        "La primera pregunta parte 36 en dos sumandos iguales.",
-        "La segunda busca un factor que se repita dos veces.",
-        "18 + 18 = 36; 6 · 6 = 36.",
+        "Hay dos preguntas distintas escondidas en el mismo 36: la primera reparte una cantidad desde cero; la segunda busca una escala que se repite desde uno.",
+        "Para la mitad aditiva pedí dos sumandos iguales; para la raíz pedí dos factores iguales. Escribí ambas ecuaciones antes de anotar respuestas.",
+        "Verificá 18 + 18 = 36 y, por separado, 6 · 6 = 36. Colocá 18 en el primer casillero y 6 en el segundo, respetando el orden.",
       ],
       solution: [
         "36 · 1/2 = 36 ÷ 2 = 18.",
@@ -213,9 +213,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá 27^(1/3).",
       spec: { value: 3, context: "27^(1/3) raíz cúbica" },
       hints: [
-        "Buscá tres factores iguales cuyo producto sea 27.",
-        "Probá 3 · 3 · 3.",
-        "La raíz cúbica de 27 es 3.",
+        "El denominador 3 del exponente fraccionario pide tres etapas multiplicativas iguales. No dividas 27 por tres como si la pregunta fuera aditiva.",
+        "Probá factores pequeños repetidos: 3 · 3 da 9, y una tercera vez por 3 llega a 27. Ése es el recorrido desde el neutro 1.",
+        "Como 3³ reconstruye 27, completá 27^(1/3) = 3. La prueba siempre es elevar de nuevo el candidato al índice de la raíz.",
       ],
       solution: [
         "El denominador 3 indica tres factores iguales.",
@@ -228,9 +228,9 @@ export const CHECKS_DATA = {
       prompt: "Evaluá 16^(3/4).",
       spec: { value: 8, context: "16^(3/4) exponente racional raíz" },
       hints: [
-        "El denominador 4 busca una raíz cuarta.",
-        "La raíz cuarta de 16 es 2; después elevá al cubo.",
-        "2³ = 8.",
+        "Leé primero el denominador: el 4 pide una raíz cuarta, mientras que el 3 del numerador recién actúa después. No multipliques 16 por una fracción.",
+        "Buscá el factor que repetido cuatro veces da 16: 2 · 2 · 2 · 2. Así convertís 16^(3/4) en (⁴√16)³.",
+        "La raíz cuarta vale 2; repetí ahora ese factor tres veces. Completá 2³ y verificá que llegás a 8.",
       ],
       solution: ["16^(3/4) = (⁴√16)³.", "⁴√16 = 2 porque 2⁴ = 16.", "2³ = 8."],
     },
@@ -241,9 +241,9 @@ export const CHECKS_DATA = {
       prompt: "¿Cuántas baldosas de una unidad cubren un cuadrado de lado 8?",
       spec: { value: 64, context: "área cuadrado lado 8" },
       hints: [
-        "Contá ocho filas con ocho baldosas cada una.",
-        "El área es lado por lado.",
-        "8² = 64 baldosas cuadradas.",
+        "Imaginá el piso antes de poner una cuenta: una fila tiene ocho baldosas y hay ocho filas. ¿Estás contando una longitud o una superficie?",
+        "El área junta dos direcciones perpendiculares, largo por ancho. Escribí 8 · 8 en vez de sumar 8 + 8, que todavía mediría una línea.",
+        "Ocho filas de ocho completan 64 baldosas. Escribí 8² = 64 y conservá la unidad cuadrada, porque estás cubriendo superficie.",
       ],
       solution: [
         "Un cuadrado tiene dos dimensiones: largo y ancho.",
@@ -256,9 +256,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá la arista de un cubo cuyo volumen es 27 u³.",
       spec: { value: 3, context: "raíz cúbica volumen 27" },
       hints: [
-        "La arista aparece tres veces en el volumen.",
-        "Buscá L tal que L · L · L = 27.",
-        "3³ = 27.",
+        "Un volumen de cubo usa la misma arista en largo, ancho y altura. El índice tres te avisa que necesitás un factor repetido tres veces.",
+        "Llamá L a la arista y planteá L · L · L = 27. Probá cuántos cubitos van por borde sin mezclar ese dato con el volumen total.",
+        "Tres capas de 3 por 3 cubitos dan 27, es decir 3³ = 27. Concluí que la arista mide 3 unidades.",
       ],
       solution: [
         "Volumen = L³.",
@@ -276,9 +276,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "El área multiplica dos longitudes: cm · cm produce cm².",
       hints: [
-        "Pensá cuántas direcciones mide una superficie.",
-        "El área multiplica dos lados.",
-        "Dos factores cm producen cm².",
+        "Una superficie se extiende en dos direcciones: largo y ancho. Antes de elegir, preguntate qué unidad tendría una sola baldosita de un centímetro por lado.",
+        "Al calcular área multiplicás cm por cm. No son dos centímetros puestos uno detrás de otro; son dos direcciones formando una región plana.",
+        "El producto de las unidades se escribe cm². Elegí esa opción: cm sería longitud y cm³ correspondería a un volumen con una tercera dimensión.",
       ],
       solution: [
         "Una longitud lleva unidades cm.",
@@ -293,9 +293,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá la raíz cuarta de 81 por agrupación prima.",
       spec: { value: 3, context: "raíz cuarta 81 factores primos" },
       hints: [
-        "81 = 3 · 3 · 3 · 3.",
-        "Repartí los cuatro factores en cuatro cajas iguales.",
-        "Cada caja contiene un 3.",
+        "El índice cuatro pide cuatro cajas idénticas. Primero preguntate qué ladrillo primo se repite al desarmar 81, sin intentar adivinar la raíz de memoria.",
+        "81 = 3 · 3 · 3 · 3: repartí un 3 en cada una de las cuatro cajas. Así cada caja tiene exactamente el mismo producto.",
+        "El producto de una caja es 3 y, al repetirla cuatro veces, 3⁴ recupera 81. Completá ⁴√81 = 3.",
       ],
       solution: [
         "Descomponemos 81 = 3⁴.",
@@ -308,9 +308,9 @@ export const CHECKS_DATA = {
       prompt: "¿Cuánto vale la raíz quinta de 243?",
       spec: { value: 3, context: "raíz quinta 243" },
       hints: [
-        "243 es una potencia de 3.",
-        "Multiplicá 3 por sí mismo cinco veces.",
-        "3⁵ = 243.",
+        "El índice cinco pide encontrar un bloque que se repita cinco veces. Empezá desarmando 243 en primos, sin aproximar con decimales.",
+        "La descomposición contiene cinco factores 3: 3 · 3 · 3 · 3 · 3. Imaginá que cada una de las cinco cajas recibe un solo 3.",
+        "Cada caja vale 3 y cinco cajas idénticas reconstruyen 243 como 3⁵. Por eso la raíz quinta que buscás es 3.",
       ],
       solution: [
         "La raíz quinta pregunta qué factor aparece cinco veces.",
@@ -323,9 +323,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá la raíz séptima de 128.",
       spec: { value: 2, context: "raíz séptima 128" },
       hints: [
-        "Descomponé 128 dividiendo sucesivamente por 2.",
-        "128 = 2⁷.",
-        "Cada una de las siete cajas recibe un 2.",
+        "No hace falta tener 128 memorizado: dividilo por 2 una y otra vez hasta llegar a 1. Contá cuántos doses aparecen en esa escalera.",
+        "La escalera escribe 128 = 2⁷, es decir siete doses. El índice siete pide justamente repartir un dos en cada caja idéntica.",
+        "Cada caja contiene 2 y siete cajas multiplicadas dan 2⁷ = 128. Cerrá la cuenta con ⁷√128 = 2.",
       ],
       solution: [
         "128 = 2 · 2 · 2 · 2 · 2 · 2 · 2.",
@@ -343,9 +343,9 @@ export const CHECKS_DATA = {
         context: "simplificar radical raíz cuadrada",
       },
       hints: [
-        "Factorizá 12 como 4 · 3.",
-        "La raíz de 4 sale como 2.",
-        "El factor 3 queda bajo la raíz: 2√3.",
+        "En una raíz cuadrada sólo salen paquetes de dos factores iguales. Buscá dentro de 12 un cuadrado perfecto antes de intentar calcular la raíz entera.",
+        "Escribí 12 = 4 · 3 = 2 · 2 · 3. La pareja de doses cruza junta la raíz; el 3 queda solo y no puede salir.",
+        "Aplicá √4 = 2 y conservá √3 bajo el radical. La forma final 2√3 se controla al cuadrarla: recupera 4 · 3.",
       ],
       solution: [
         "12 = 2² · 3.",
@@ -364,9 +364,9 @@ export const CHECKS_DATA = {
         context: "simplificar radical variables raíz cuadrada",
       },
       hints: [
-        "Separá 20 = 4 · 5 y x⁸ = (x⁴)².",
-        "El 4 sale como 2 y x⁴ también sale como un factor.",
-        "Resultado: 2x⁴√5.",
+        "El índice es dos, así que buscá parejas tanto en el número como en las ocho x. La condición x ≥ 0 te autoriza a sacar una potencia par sin cambiar el signo.",
+        "Separá 20 = 4 · 5 y x⁸ = (x⁴)². Identificá los dos cuadrados completos: 4 y (x⁴)²; el 5 no completa ningún paquete.",
+        "√4 aporta 2 y √((x⁴)²) aporta x⁴. Escribí 2x⁴√5 y comprobá, por ejemplo con x = 2, que ambos lados dan el mismo valor.",
       ],
       solution: [
         "√(20x⁸) = √(4 · 5 · x⁸).",
@@ -383,9 +383,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "Los paquetes completos de 3 y de x salen; adentro permanecen 6 y una x.",
       hints: [
-        "Factorizá 54 = 3² · 6.",
-        "Separá x⁷ = x⁶ · x = (x³)² · x.",
-        "El resto bajo la raíz es 6x.",
+        "Tratemos al número y a la letra como fichas: en una raíz cuadrada salen parejas. Desarmá 54 y contá las siete x antes de decidir qué queda adentro.",
+        "54 = 2 · 3 · 3 · 3: una pareja de treses forma 3² y el 2 · 3 restante es 6. De las siete x, seis forman (x³)² y sobra una x.",
+        "Los paquetes 3² y (x³)² salen como 3x³; bajo el techo quedan 6x. Elegí la opción 6x y verificá 3x³√(6x) al elevar al cuadrado.",
       ],
       solution: [
         "54x⁷ = 3² · 6 · (x³)² · x.",
@@ -404,9 +404,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "Faltó el término cruzado. El mosaico del cuadrado contiene dos rectángulos de área −6x.",
       hints: [
-        "Escribí (2 − 3x)(2 − 3x).",
-        "Distribuí cada término del primer paréntesis por los dos del segundo.",
-        "Los términos cruzados suman −6x − 6x = −12x.",
+        "El cuadrado afecta al binomio completo, así que abrí dos copias del mismo paréntesis. ¿Qué cuatro productos aparecen al multiplicarlas?",
+        "Distribuí 2 y −3x sobre 2 y −3x: anotá 4, −6x, −6x y 9x². Los dos productos cruzados son piezas reales del mosaico.",
+        "Sumá los términos semejantes del medio: −6x − 6x = −12x. Elegí el desarrollo que conserva 4, −12x y 9x².",
       ],
       solution: [
         "(2 − 3x)² = (2 − 3x)(2 − 3x).",
@@ -419,9 +419,9 @@ export const CHECKS_DATA = {
       prompt: "Calculá (x − √3)(x + √3) para x = 5.",
       spec: { value: 22, context: "diferencia de cuadrados conjugados" },
       hints: [
-        "Son binomios conjugados.",
-        "Usá (u − v)(u + v) = u² − v².",
-        "Con x = 5: 25 − 3.",
+        "Los paréntesis difieren sólo en el signo central: son conjugados. Eso hace que los dos términos cruzados se anulen al multiplicar, no por magia sino por ser opuestos.",
+        "Tomá u = x y v = √3: el producto queda u² − v², o sea x² − (√3)². Recién después reemplazá x por 5.",
+        "Con x = 5 obtenés 25 − 3. Completá esa resta para llegar al valor pedido y comprobá que los radicales ya desaparecieron legalmente.",
       ],
       solution: [
         "Tomamos u = x y v = √3.",
@@ -439,9 +439,9 @@ export const CHECKS_DATA = {
         context: "sumar radicales cúbicos semejantes",
       },
       hints: [
-        "Buscá cubos perfectos dentro de 54 y 16.",
-        "54 = 27 · 2 y 16 = 8 · 2.",
-        "Extraé 3 y 2; luego sumá coeficientes.",
+        "Para sumar raíces cúbicas primero necesitás que ambas tengan el mismo radical, como cuando juntás términos semejantes. Buscá cubos perfectos dentro de 54 y 16.",
+        "Separá 54 = 27 · 2 y 16 = 8 · 2. Como ∛27 = 3 y ∛8 = 2, ambas expresiones quedarán acompañando a ∛2.",
+        "Transformá la suma en 3∛2 + 2∛2 y juntá los coeficientes. Completá 5∛2, sin dejar los cubos perfectos escondidos adentro.",
       ],
       solution: [
         "∛54 = ∛(27 · 2) = 3∛2.",
@@ -456,9 +456,9 @@ export const CHECKS_DATA = {
       prompt: "Evaluá √((-5)²).",
       spec: { value: 5, context: "sqrt(x^2) raíz cuadrada valor absoluto" },
       hints: [
-        "Primero resolvé el cuadrado dentro de la raíz.",
-        "(−5)² = 25.",
-        "La raíz principal de 25 es no negativa.",
+        "Leé la tubería de adentro hacia afuera: los paréntesis obligan a elevar −5 al cuadrado antes de pedir la raíz. No intentes una raíz de negativo.",
+        "Multiplicá −5 por −5: dos signos negativos producen 25. Ahora el radicando ya es no negativo y la raíz cuadrada real tiene permiso para existir.",
+        "La raíz principal de 25 es el valor no negativo 5. Terminá √((-5)²) = 5 y recordá que ese resultado coincide con |−5|.",
       ],
       solution: [
         "El orden escrito pide elevar primero: (−5)² = 25.",
@@ -475,9 +475,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "La primera operación es √x, que en los reales requiere x ≥ 0.",
       hints: [
-        "Mirá cuál operación ocurre primero.",
-        "La raíz cuadrada principal necesita radicando no negativo.",
-        "El dominio es x ≥ 0.",
+        "No mires todavía el cuadrado exterior: en (√x)² la primera puerta que hay que atravesar es √x. Preguntate para qué x esa raíz es real.",
+        "Una raíz cuadrada principal en ℝ sólo acepta un radicando mayor o igual que cero. El cuadrado posterior no puede rescatar una operación que ya se bloqueó.",
+        "Por eso el permiso es x ≥ 0. Elegí esa opción y separala de √(x²), cuyo orden sí permite empezar con cualquier real.",
       ],
       solution: [
         "Antes de elevar al cuadrado hay que calcular √x.",
@@ -498,9 +498,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "El producto es 4 y su raíz existe. Las dos raíces separadas tienen radicandos negativos y no pertenecen a ℝ.",
       hints: [
-        "Calculá primero el producto dentro del radical.",
-        "(−1)(−4) es positivo.",
-        "La raíz del producto es 2; las raíces de −1 y −4 no son reales.",
+        "Antes de distribuir una raíz par, comprobá que cada raíz nueva exista. Acá conviene hacer primero la multiplicación que ya está dentro del único radical.",
+        "(−1)(−4) = 4, así que √4 sí existe y vale 2. Pero separar crearías √(−1) y √(−4), dos puertas bloqueadas en ℝ.",
+        "Elegí la explicación que distingue producto interior legal de raíces separadas ilegales. La regla de producto necesita radicandos individuales no negativos.",
       ],
       solution: [
         "El lado izquierdo es √4 = 2.",
@@ -515,9 +515,9 @@ export const CHECKS_DATA = {
       prompt: "Evaluá −4² respetando la prioridad de operaciones.",
       spec: { value: -16, context: "precedencia paréntesis -4^2" },
       hints: [
-        "El signo menos no está dentro de paréntesis.",
-        "Primero calculá 4².",
-        "Después aplicá el signo externo.",
+        "Marcá con el dedo la base de la potencia: en −4² no hay paréntesis alrededor del menos, así que el exponente sólo alcanza al 4.",
+        "Respetá la prioridad: calculá primero 4² = 16. El signo menos sigue esperando afuera como el opuesto del resultado de esa potencia.",
+        "Aplicá finalmente ese signo externo y escribí −16. Comparalo con (−4)² para comprobar por qué los paréntesis cambian toda la base.",
       ],
       solution: [
         "La potencia tiene prioridad sobre el signo menos suelto.",
@@ -538,9 +538,9 @@ export const CHECKS_DATA = {
       diagnosisMessage:
         "La potencia de potencia se aplicó fuera de sus condiciones: al invertir el orden aparece la raíz par de un negativo.",
       hints: [
-        "Inspeccioná la reagrupación que introduce exponente 1/2.",
-        "Una base negativa elevada a 1/2 requiere raíz cuadrada real.",
-        "√(−2) no existe en ℝ: ahí está el paso ilegal.",
+        "No alcanza con multiplicar 2 por 1/2: auditá qué operación intermedia exige esa reagrupación sobre la base negativa −2.",
+        "Al invertir el orden aparece (−2)^(1/2), que significa √(−2). Una raíz cuadrada real necesita un radicando no negativo y acá no lo tiene.",
+        "Elegí la opción que señala √(−2) como el bloqueo. La base negativa no prohíbe todas las potencias; prohíbe esta raíz par dentro de ℝ.",
       ],
       solution: [
         "La expresión inicial (−2)¹ sí vale −2.",
@@ -555,9 +555,9 @@ export const CHECKS_DATA = {
       secondLabel: "(−4)²",
       expected: [-16, 16],
       hints: [
-        "En la primera expresión los paréntesis no incluyen el signo.",
-        "En la segunda, el signo sí forma parte de la base.",
-        "Calculá −(4²) y (−4)(−4).",
+        "Compará primero las bases, no los signos finales: en la primera sólo está elevado el 4; en la segunda el paquete completo entre paréntesis es −4.",
+        "Escribí la primera como −(4²) y la segunda como (−4)(−4). Esa traducción hace visible qué operación toma prioridad en cada caso.",
+        "Calculá −16 para la primera y +16 para la segunda. Ingresalos en ese orden: el orden de los casilleros también forma parte de la respuesta.",
       ],
       solution: [
         "−4² = −(4²) porque la potencia precede al signo suelto.",
@@ -567,29 +567,6 @@ export const CHECKS_DATA = {
     },
   ],
 };
-
-/* Las pistas llegan de a una: cada una formula una pregunta y deja una acción
-   concreta, para que Alaska acompañe el razonamiento sin regalar el resultado
-   en el primer clic. El contenido final de cada pista sigue siendo propio de
-   su ejercicio; esta envoltura conserva una voz estable en los treinta chequeos. */
-const HINT_OPENINGS = [
-  "Frená un segundo, che: antes de buscar un número, mirá qué operación está contando el ejercicio. Alaska te propone este primer paso:",
-  "Bien, ahora acerquemos la lupa sin saltear nada. Preguntate qué cambia y qué conserva la operación antes de hacer cuentas:",
-  "Ya estás muy cerca; verificá el camino completo en lugar de confiar en una receta apurada. La pista decisiva es ésta:",
-];
-const HINT_CLOSINGS = [
-  "Decilo con tus propias palabras y recién después escribí el resultado.",
-  "Si algo parece raro, volvé al neutro correspondiente: ahí se ve el error.",
-  "N-no te apures: una línea bien justificada vale más que acertar de casualidad.",
-];
-
-Object.values(CHECKS_DATA).forEach((questions) => {
-  questions.forEach((question) => {
-    question.hints = question.hints.map(
-      (hint, index) => `${HINT_OPENINGS[index]} ${hint} ${HINT_CLOSINGS[index]}`,
-    );
-  });
-});
 
 export const LESSON_SECTIONS = [
   {
@@ -684,6 +661,12 @@ export function initBlackboardController() {
   const page = document.querySelector(".pr-page");
   const sidebar = document.querySelector(".seq-sidebar");
   if (!content) return;
+  const menuGlyph = String.fromCodePoint(0x2630);
+  const closeGlyph = String.fromCodePoint(0x2715);
+  document.querySelectorAll(".pr-workbench").forEach((workbench) => {
+    const probe = workbench.querySelector(":scope > .pr-probe");
+    if (probe) workbench.insertBefore(probe, workbench.firstElementChild);
+  });
   const badge = h("span", {
     class: "seq-blackboard-toolbar__badge",
     id: "seq-board-badge",
@@ -697,29 +680,42 @@ export function initBlackboardController() {
   const toolbar = h(
     "div",
     { class: "seq-blackboard-toolbar", id: "seq-board-toolbar" },
+    h(
+      "button",
+      {
+        type: "button",
+        class: "chip pr-sidebar-toggle",
+        "data-sidebar-toggle": "true",
+        "aria-controls": "pr-sidebar-index",
+      },
+      "Índice",
+    ),
     h("div", { class: "seq-blackboard-toolbar__info" }, badge, title),
     h("div", { class: "seq-blackboard-toolbar__actions" }, toggle),
   );
   content.prepend(toolbar);
-  const sidebarToggle = h(
+  const sidebarToggle = toolbar.querySelector("[data-sidebar-toggle]");
+  const sidebarClose = h(
     "button",
     {
       type: "button",
-      class: "pr-sidebar-toggle",
-      "data-sidebar-toggle": "true",
-      "aria-controls": "pr-sidebar-index",
+      class: "pr-sidebar-close",
+      "data-sidebar-close": "true",
+      "aria-label": "Cerrar índice",
     },
-    "Índice",
+    closeGlyph,
   );
   if (sidebar) {
     sidebar.id = "pr-sidebar-index";
-    page?.append(sidebarToggle);
+    sidebar.prepend(sidebarClose);
   }
   const sidebarKey = "potencias_raices:sidebar:v1";
   const setSidebar = (collapsed, persist = true) => {
     page?.classList.toggle("is-sidebar-collapsed", collapsed);
     sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
-    sidebarToggle.textContent = collapsed ? "Abrir índice" : "Plegar índice";
+    sidebarToggle.textContent = collapsed
+      ? `${menuGlyph} Índice`
+      : "◀ Ocultar índice";
     if (persist) localStorage.setItem(sidebarKey, collapsed ? "collapsed" : "open");
   };
   const savedSidebar = localStorage.getItem(sidebarKey);
@@ -730,6 +726,7 @@ export function initBlackboardController() {
   sidebarToggle.addEventListener("click", () =>
     setSidebar(!page?.classList.contains("is-sidebar-collapsed")),
   );
+  sidebarClose.addEventListener("click", () => setSidebar(true));
   let focused = true;
   let current = "sec-1";
   const activate = (id, scroll = true) => {
@@ -748,7 +745,6 @@ export function initBlackboardController() {
     badge.textContent = `Pizarrón ${index + 1} de ${LESSON_SECTIONS.length}`;
     title.textContent = `${LESSON_SECTIONS[index].chapter} · ${LESSON_SECTIONS[index].title}`;
     if (scroll) {
-      page?.classList.add("is-board-navigated");
       /* El toolbar se queda sticky debajo de la navegación. Desplazamos la
          sección, no el toolbar: así su encabezado no queda escondido detrás
          de la barra ni de los banners de capítulos anteriores. */

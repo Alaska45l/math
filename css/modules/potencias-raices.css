@@ -141,10 +141,8 @@
 }
 
 .pr-workbench {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
+  display: block;
+  overflow: visible;
 }
 
 .pr-theory-column {
@@ -185,7 +183,6 @@
 }
 
 .pr-table {
-  width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
@@ -762,16 +759,6 @@
     vertical-align: top;
   }
 
-  .pr-workbench {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .pr-probe {
-    position: static;
-    grid-row: 1;
-    max-height: none;
-  }
-
   .pr-table {
     min-width: 0;
     table-layout: fixed;
@@ -1026,19 +1013,6 @@
   }
 }
 
-@media (min-width: 1120px) {
-  .pr-workbench {
-    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
-  }
-
-  .pr-probe {
-    position: sticky;
-    top: 76px;
-    max-height: calc(100vh - 96px);
-    overflow: auto;
-  }
-}
-
 @media print {
   header[data-site-nav],
   .pr-sidebar,
@@ -1128,6 +1102,8 @@
 .pr-page .seq-blackboard-toolbar__info {
   display: grid;
   gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .pr-page .seq-blackboard-toolbar__badge {
@@ -1226,15 +1202,7 @@
   outline-offset: 2px;
 }
 
-.pr-page .pr-workbench {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
-}
-
-.pr-page .pr-theory-column,
-.pr-page .pr-probe {
+.pr-page .pr-theory-column {
   min-width: 0;
 }
 
@@ -1247,6 +1215,35 @@
   max-width: 100%;
   height: auto;
   min-height: 180px;
+  max-height: 280px;
+}
+
+.pr-page .pr-probe .pr-widget__controls {
+  gap: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.pr-page .pr-root-index {
+  display: inline-block;
+  margin-right: -0.08em;
+  font-size: 0.48em;
+  line-height: 1;
+  vertical-align: top;
+}
+
+.pr-page .pr-root-index .af-token {
+  min-width: 26px;
+  min-height: 28px;
+  padding: 2px 4px;
+  gap: 1px;
+}
+
+.pr-page .pr-root-index .af-token__main {
+  font-size: 1rem;
+}
+
+.pr-page .pr-root-index .af-token__sub {
+  font-size: 0.46rem;
 }
 
 .pr-page button svg.chalk-icon,
@@ -1284,7 +1281,6 @@
 }
 
 .pr-page .pr-table-wrap {
-  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -1292,19 +1288,6 @@
   margin: 28px 0 12px;
   padding: 18px;
   background: var(--surface, var(--bg));
-}
-
-@media (min-width: 1120px) {
-  .pr-page .pr-workbench {
-    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
-  }
-
-  .pr-page .pr-probe {
-    position: sticky;
-    top: 82px;
-    max-height: calc(100vh - 98px);
-    overflow: auto;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1440,7 +1423,6 @@
 }
 
 .pr-page .pr-learning-table {
-  width: 100%;
   margin: 16px 0 4px;
   border-collapse: collapse;
   font-size: 0.91rem;
@@ -1463,35 +1445,6 @@
   padding-left: 12px;
   color: var(--muted);
   font-style: italic;
-}
-
-@media (min-width: 1280px) {
-  .pr-page .seq-layout {
-    grid-template-columns: 230px minmax(0, 1fr);
-    gap: 28px;
-  }
-
-  .pr-page .pr-workbench {
-    grid-template-columns: minmax(460px, 48fr) minmax(440px, 52fr);
-    gap: 32px;
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1279px) {
-  .pr-page .seq-layout {
-    grid-template-columns: 210px minmax(0, 1fr);
-    width: min(96vw, 1210px);
-  }
-
-  .pr-page .pr-workbench {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .pr-page .pr-probe {
-    position: static;
-    max-height: none;
-    overflow: visible;
-  }
 }
 
 /* Navegación del laboratorio: el documento conserva el único scroll de lectura.
@@ -1539,19 +1492,25 @@
 }
 
 .pr-page .pr-sidebar-toggle {
-  position: fixed;
-  z-index: 9;
-  top: calc(var(--pr-nav-h) + 12px);
-  left: calc(var(--pr-sidebar-w) - 8px);
+  position: static;
+  flex: 0 0 auto;
   min-height: 36px;
   padding: 6px 10px;
   border: 1px solid var(--line, var(--border));
-  border-radius: 0 8px 8px 0;
+  border-radius: 8px;
   background: var(--surface, var(--bg));
   color: var(--yellow);
   font: 700 0.82rem var(--font-hand);
   cursor: pointer;
-  transition: left 220ms ease, background 160ms ease;
+  transition: background 160ms ease;
+}
+
+.pr-page .seq-blackboard-toolbar__actions {
+  flex: 0 0 auto;
+}
+
+.pr-page .seq-sidebar .pr-sidebar-close {
+  display: none !important;
 }
 
 .pr-page.is-sidebar-collapsed .seq-layout {
@@ -1560,10 +1519,6 @@
 
 .pr-page.is-sidebar-collapsed .seq-sidebar {
   transform: translateX(calc(-1 * var(--pr-sidebar-w)));
-}
-
-.pr-page.is-sidebar-collapsed .pr-sidebar-toggle {
-  left: 0;
 }
 
 .pr-page .seq-blackboard-toolbar {
@@ -1578,19 +1533,54 @@
   padding-top: 20px;
 }
 
-.pr-page .pr-probe {
-  position: static;
-  max-height: none;
-  overflow: visible;
+@media (min-width: 1120px) {
+  .pr-page .pr-workbench::after {
+    display: table;
+    clear: both;
+    content: "";
+  }
+
+  .pr-page .pr-probe {
+    float: right;
+    width: clamp(360px, 42%, 500px);
+    margin: 0 0 24px 28px;
+    padding: 14px 16px;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .pr-page .seq-block--check {
+    clear: both;
+  }
+
 }
 
-.pr-page.is-board-navigated .pr-hero {
-  display: none;
-}
+@media (max-width: 1119px) {
+  .pr-page .pr-probe {
+    float: none;
+    width: 100%;
+    margin: 16px 0;
+    box-sizing: border-box;
+  }
 
-@media (min-width: 1280px) {
-  .pr-page .pr-workbench {
-    grid-template-columns: minmax(440px, 48fr) minmax(440px, 52fr);
+  .pr-page .seq-sidebar .pr-sidebar-close {
+    display: grid !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0 0 12px auto;
+    padding: 0 !important;
+    place-items: center;
+    border: 1px solid var(--line, var(--border));
+    border-radius: 50%;
+    background: var(--surface, var(--bg));
+    color: var(--ink);
+    font: 700 0.9rem var(--font-body);
+    cursor: pointer;
   }
 }
 
@@ -1605,16 +1595,12 @@
     transform: translateX(-100%);
   }
 
+  .pr-page.is-sidebar-collapsed .seq-sidebar {
+    transform: translateX(-100%);
+  }
+
   .pr-page:not(.is-sidebar-collapsed) .seq-sidebar {
     transform: translateX(0);
   }
 
-  .pr-page .pr-sidebar-toggle,
-  .pr-page.is-sidebar-collapsed .pr-sidebar-toggle {
-    left: 0;
-  }
-
-  .pr-page .pr-workbench {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }

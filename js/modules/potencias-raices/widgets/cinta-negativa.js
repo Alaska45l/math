@@ -95,9 +95,9 @@ export function initCintaNegativaWidget(host) {
     const y = 184 + step * 31;
     barLabels.push(svgText(board.drawing, 22, y + 16, ""));
     const bar = s("rect", {
-      x: 115,
+      x: 105,
       y,
-      width: 420,
+      width: 410,
       height: 20,
       rx: 4,
       fill: step === 0 ? "var(--green)" : "var(--yellow)",
@@ -139,12 +139,12 @@ export function initCintaNegativaWidget(host) {
       setVisible(bar, visible);
       setVisible(barLabels[index], visible);
       setVisible(barValues[index], visible);
-      const width = Math.max(6, 420 / a ** index);
+      const width = Math.max(6, 410 / a ** index);
       bar.setAttribute("width", String(width));
       setText(barValues[index], visible ? fmt(a ** -index, 6) : "");
       setText(
         barLabels[index],
-        index === 0 ? "1" : `÷ ${fmt(a)} · ${fmt(index)} veces`,
+        ["Inicio (1)", "Paso 1", "Paso 2", "Paso 3", "Paso 4"][index],
       );
     });
     setVisible(lens, n < 0);

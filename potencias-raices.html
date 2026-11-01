@@ -653,7 +653,16 @@
                     Partir una barra de chocolate entre dos personas deja media barra para cada una: si el total representaba 36 porciones, cada parte vale 18. Ahora imaginá una lupa de zoom: buscamos un aumento que, aplicado dos veces seguidas, transforme la escala inicial en 36; ese aumento es 6.
                   </p>
                   <p>
-                    Ese factor es la raíz cuadrada. Más generalmente,
+                    Ahora viene el porqué formal, sin decreto: queremos que la
+                    regla de sumar exponentes siga funcionando también con
+                    fracciones. Entonces
+                    <span class="eq">x<sup><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">2</span></span></sup> · x<sup><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">2</span></span></sup> = x<sup><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">2</span></span> + <span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">2</span></span></sup> = x¹ = x</span>.
+                    Por lo tanto, <span class="eq">x<sup><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">2</span></span></sup></span> debe ser
+                    el único número no negativo que, multiplicado por sí mismo,
+                    devuelve x. Esa es exactamente la definición de
+                    <span class="eq">√x</span>: no es una receta nueva, sino la
+                    única forma de que las leyes de exponentes sigan siendo
+                    coherentes. Más generalmente,
                     <span class="eq"
                       >x^<span class="fr"
                         ><span class="top">1</span
@@ -1023,21 +1032,31 @@
                     Imaginá una aduana con un molinete que sólo deja cruzar parejas para una raíz cuadrada y ternas para una raíz cúbica. Las fichas que completan el grupo salen juntas; la que queda impar espera bajo el techo del radical, sin perderse ni desaparecer.
                   </p>
                   <p>
-                    Con variables hacemos lo mismo contando copias. En
-                    <span class="eq">√(54x⁷)</span>, separá
-                    <span class="eq">54 = 3² · 6</span> y
-                    <span class="eq">x⁷ = (x³)² · x</span>. Salen 3 y x³;
-                    permanecen 6 y x. Para x ≥ 0, el resultado es
-                    <span class="eq">3x³√(6x)</span>.
+                    Con variables hacemos lo mismo contando copias, pero sin
+                    saltear el armado de los paquetes. En
+                    <span class="eq">√(54x⁷)</span> buscamos grupos de dos:
+                    <span class="eq">54 = 2 · 3 · 3 · 3</span> contiene una pareja
+                    <span class="eq">3²</span> y deja el resto
+                    <span class="eq">2 · 3 = 6</span>. Las siete letras x son siete
+                    factores multiplicándose: seis forman tres parejas,
+                    <span class="eq">x⁶ = (x³)²</span>, y queda una x sola. Por eso
+                    <span class="eq">√(54x⁷) = √[3² · 6 · (x³)² · x] = 3x³√(6x)</span>
+                    para <span class="eq">x ≥ 0</span>: los paquetes cuadrados
+                    cruzan la raíz y los restos 6 y x permanecen adentro.
                   </p>
                   <p>
                     La
                     <span class="gloss-term" data-gloss="racionalizar"
                       >racionalización</span
                     >
-                    es otra transformación de radicales: reescribe una fracción
-                    equivalente para quitar raíces del denominador multiplicando
-                    arriba y abajo por el mismo factor no nulo.
+                    no es un truco separado: vuelve a usar el neutro
+                    multiplicativo 1. Para transformar
+                    <span class="eq"><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">√3</span></span></span>, multiplicamos arriba y abajo por
+                    <span class="eq"><span class="fr"><span class="top">√3</span><span class="bar" aria-hidden="true"></span><span class="bot">√3</span></span></span>, que vale 1 y no cambia la
+                    fracción. Así
+                    <span class="eq"><span class="fr"><span class="top">1</span><span class="bar" aria-hidden="true"></span><span class="bot">√3</span></span> · <span class="fr"><span class="top">√3</span><span class="bar" aria-hidden="true"></span><span class="bot">√3</span></span> = <span class="fr"><span class="top">√3</span><span class="bar" aria-hidden="true"></span><span class="bot">(√3)²</span></span> = <span class="fr"><span class="top">√3</span><span class="bar" aria-hidden="true"></span><span class="bot">3</span></span></span>.
+                    La raíz sale del denominador porque el producto de las dos
+                    raíces iguales reconstruye 3.
                   </p>
                 <table class="pr-learning-table"><thead><tr><th>Lo que hacés con las manos / ves</th><th>Cómo se escribe en álgebra</th><th>El error mecánico que evitás</th></tr></thead><tbody><tr><td>Dejar cruzar sólo paquetes completos por el molinete</td><td>Cada n factores iguales sale de ⁿ√(·)</td><td>Sacar un resto que no completa pareja o terna</td></tr></tbody></table></div>
                 <aside class="pr-aha-box" aria-label="Predicción antes de calcular"><strong>Poné a prueba tu intuición antes de calcular</strong><p>En √12 = √(4 · 3), ¿qué grupo puede cruzar la aduana y qué factor queda bajo el techo del radical?</p></aside>
@@ -1265,7 +1284,12 @@
                 <div class="seq-block seq-block--visual">
                   <span class="seq-block__label">Cómo se ve</span>
                   <p>
-                    Imaginá a alguien en el recreo de Pabellón I que te muestra una servilleta y afirma haber demostrado que menos dos es igual a dos. No le creas ni lo descartes por intuición: hagamos de detectives, sigamos cada igualdad y encontremos en qué paso se metió el perro.
+                    Imaginá que, repasando con un compañero en una mesa de
+                    estudio antes del parcial, alguien te muestra una servilleta
+                    y afirma haber demostrado que menos dos es igual a dos. No
+                    le creas ni lo descartes por intuición: hagamos de
+                    detectives, sigamos cada igualdad y encontremos en qué paso
+                    se metió el perro.
                   </p>
                   <p>
                     Los paréntesis también fijan la base:

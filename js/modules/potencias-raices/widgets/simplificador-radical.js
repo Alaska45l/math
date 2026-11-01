@@ -52,7 +52,7 @@ export function initSimplificadorRadicalWidget(host) {
   const board = createBoard(
     host,
     "Aduana de factores para simplificar radicales",
-    "0 0 640 380",
+    "0 0 640 310",
   );
   const state = createStore({
     preset: "54x7",
@@ -129,11 +129,11 @@ export function initSimplificadorRadicalWidget(host) {
     fill: "var(--yellow)",
     "font-weight": "bold",
   });
-  svgText(board.drawing, 18, 178, "2 · ADUANA DE GRUPOS COMPLETOS", {
+  svgText(board.drawing, 18, 164, "2 · ADUANA DE GRUPOS COMPLETOS", {
     fill: "var(--green)",
     "font-weight": "bold",
   });
-  svgText(board.drawing, 18, 270, "3 · RESULTADO FUERA Y DENTRO DEL RADICAL", {
+  svgText(board.drawing, 18, 230, "3 · RESULTADO FUERA Y DENTRO DEL RADICAL", {
     fill: "var(--pink)",
     "font-weight": "bold",
   });
@@ -182,22 +182,22 @@ export function initSimplificadorRadicalWidget(host) {
     });
     xTokens.push({ rect, label });
   }
-  const roof = svgPath(board.drawing, "M70 214 H560", {
+  const roof = svgPath(board.drawing, "M70 190 H560", {
     stroke: "var(--yellow)",
     "stroke-width": 5,
   });
   const door = s("path", {
-    d: "M304 200 V236 M336 200 V236",
+    d: "M304 176 V212 M336 176 V212",
     fill: "none",
     stroke: "var(--green)",
     "stroke-width": 4,
   });
   board.drawing.append(door);
-  const outsideResult = svgText(board.drawing, 70, 318, "", {
+  const outsideResult = svgText(board.drawing, 70, 278, "", {
     fill: "var(--green)",
     "font-weight": "bold",
   });
-  const insideResult = svgText(board.drawing, 358, 318, "", {
+  const insideResult = svgText(board.drawing, 358, 278, "", {
     fill: "var(--pink)",
     "font-weight": "bold",
   });
