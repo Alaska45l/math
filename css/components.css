@@ -698,6 +698,7 @@ output {
   line-height: 0;
   overflow: visible;
   opacity: .9;
+  background: var(--ink);
 }
 
 .fr__bar-svg {
