@@ -120,7 +120,7 @@ export const VN_SCRIPTS = {
     line("complice", "Construí el árbol", `Elegí una raíz, seguí las ramas hasta las hojas primas y repartilas en canastas. Al final multiplicá el contenido de una caja tantas veces como marque el índice. N-no acepto «me pareció que era 3»: quiero la comprobación.`),
   ],
   "sec7-simplificar": [
-    line("complice", "La aduana VIP del radical", `Bienvenida a la Aduana VIP: el molinete de una raíz cuadrada deja cruzar parejas tomadas de la mano; el de una cúbica, ternas. Si alguien queda impar, espera bajo el techo del radical tomando mate. No lo expulses a la fuerza, que Exactas te ve.`),
+    line("complice", "La aduana VIP del radical", `Bienvenida a la Aduana VIP: el molinete de una raíz cuadrada deja cruzar parejas tomadas de la mano; el de una cúbica, tríos. Si alguien queda impar, espera bajo el techo del radical tomando mate. No lo expulses a la fuerza, que Exactas te ve.`),
     line(
       "pensativa",
       "Desarmá 54x⁷",
@@ -342,7 +342,7 @@ export const VN_SCRIPTS = {
     line(
       "empatia",
       "Una raíz es una aduana",
-      `Imaginá que cada factor primo es una ficha que quiere cruzar una puerta. La raíz cuadrada deja salir fichas de a pares; la cúbica, de a ternas. Si una ficha queda sola, no completa el tamaño del paquete y permanece adentro.`,
+      `Imaginá que cada factor primo es una ficha que quiere cruzar una puerta. La raíz cuadrada deja salir fichas de a pares; la cúbica, de a tríos. Si una ficha queda sola, no completa el tamaño del paquete y permanece adentro.`,
     ),
     line(
       "explicando",
@@ -357,7 +357,7 @@ export const VN_SCRIPTS = {
     line(
       "explicando",
       "Revisá los restos",
-      `Con índice tres necesitás ternas; con índice dos, parejas. Anotá por separado cuántas fichas salieron y cuáles quedaron. Si el radicando exige x no negativa, escribilo también: simplificar no permite olvidarse del dominio.`,
+      `Con índice tres necesitás tríos; con índice dos, parejas. Anotá por separado cuántas fichas salieron y cuáles quedaron. Si el radicando exige x no negativa, escribilo también: simplificar no permite olvidarse del dominio.`,
     ),
     line("complice", "Dejá entrar sólo paquetes completos", `Probá <span class="eq">√12</span>: el dos y el dos cruzan juntos; el tres espera adentro. Después volvé a elevar <span class="eq">2√3</span> al cuadrado para comprobar que recuperás doce. La aduana no inventa factores, solamente reordena paquetes permitidos.`),
   ],
