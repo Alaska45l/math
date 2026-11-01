@@ -1029,7 +1029,7 @@
 }
 
 header[data-site-nav] {
-  z-index: 30;
+  z-index: 40;
   background: var(--bg);
 }
 

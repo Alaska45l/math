@@ -117,8 +117,8 @@ export function initGeometriaRaicesWidget(host) {
       const tile = s("rect", {
         x: 250,
         y: 68,
-        width: 22,
-        height: 22,
+        width: 24,
+        height: 24,
         rx: 2,
         fill: "var(--yellow)",
         "fill-opacity": ".7",
@@ -166,7 +166,7 @@ export function initGeometriaRaicesWidget(host) {
     rulerTicks.forEach((tick, index) => setVisible(tick, index <= side));
     rulerLabels.forEach((label, index) => setVisible(label, index <= side));
     rulerEnd.setAttribute("cx", String(40 + side * 24));
-    const tileSize = 22;
+    const tileSize = 24;
     const squareSide = side * tileSize;
     const squareStart = 320 - squareSide / 2;
     gridTiles.forEach(({ tile, row, column }) => {
@@ -179,8 +179,8 @@ export function initGeometriaRaicesWidget(host) {
       "d",
       `M${squareStart} 68 H${squareStart + squareSide} V${68 + squareSide} H${squareStart} Z`,
     );
-    const size = side * 15;
-    const A = { x: 478, y: 224 };
+    const size = side * 20;
+    const A = { x: 460, y: 232 };
     const B = { x: A.x + size, y: A.y };
     const C = { x: B.x + size * 0.42, y: B.y - size * 0.28 };
     const D = { x: A.x + size * 0.42, y: A.y - size * 0.28 };

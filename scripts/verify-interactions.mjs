@@ -672,7 +672,7 @@ const powRadResults = await client.eval(`(async () => {
     stableControls: stable,
     progressSaved: Boolean(stored['sec-1:0']),
     practiceTabs: document.querySelectorAll('.pr-chapter-tab').length,
-    bossRemoved: !document.querySelector('#pr-boss-panel, .pr-boss__canvas, .pr-boss'),
+    practicePanels: document.querySelectorAll('.pr-challenge-panel').length,
     trainerPrompt: Boolean(document.querySelector('.pr-challenge__prompt')),
     tutorHud: Boolean(tutorHud),
     tutorImageValid,
@@ -754,7 +754,7 @@ const powRadOk =
   powRadResults.negativeZoomWorks &&
   powRadResults.progressSaved &&
   powRadResults.practiceTabs === 2 &&
-  powRadResults.bossRemoved &&
+  powRadResults.practicePanels === 2 &&
   powRadResults.trainerPrompt &&
   powRadResults.hasNavLink &&
   powRadResults.tutorHud &&

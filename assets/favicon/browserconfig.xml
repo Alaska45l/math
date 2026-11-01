@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Windows tiles - made with ConvertICO.com -->
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square150x150logo src="mstile-150x150.png"/>
+            <TileColor>#26352d</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig>

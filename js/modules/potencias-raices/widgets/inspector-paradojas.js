@@ -168,6 +168,8 @@ export function initInspectorParadojasWidget(host) {
     chain.hidden = mode !== 0;
     scan.hidden = mode !== 0;
     precedence.hidden = mode !== 1;
+    /* Reservamos siempre el alto del lienzo: al alternar entre Detective y
+       Quirófano no se desplaza el resto del pizarrón. */
     board.svg.hidden = false;
     board.svg.style.visibility = mode === 1 ? "visible" : "hidden";
     equalityButtons.forEach((button, position) =>

@@ -745,6 +745,8 @@ export function initBlackboardController() {
     badge.textContent = `Pizarrón ${index + 1} de ${LESSON_SECTIONS.length}`;
     title.textContent = `${LESSON_SECTIONS[index].chapter} · ${LESSON_SECTIONS[index].title}`;
     if (scroll) {
+      /* En modo pizarrón apuntamos a la columna completa para conservar a la
+         vista la barra de contexto, el título y la frase guía. */
       const target = focused ? content : activeSection;
       if (target) {
         const top = target.getBoundingClientRect().top + window.scrollY - 70;
