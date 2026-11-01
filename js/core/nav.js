@@ -1,7 +1,7 @@
 /**
  * nav.js — Barra de navegación global y gestor de pestañas accesible.
  */
-import { h, s, mount, qsa, on } from './dom.js';
+import { h, s, mount, qsa, on, chalkIcon } from './dom.js';
 import { isSoundEnabled, toggleSound, playClick, initGlobalSoundUI } from './sound.js';
 import { initScratchpad } from './scratchpad.js';
 
@@ -9,10 +9,92 @@ export const PAGES = [
   { id: 'inicio', href: 'index.html', label: 'Inicio' },
   { id: 'desigualdades', href: 'desigualdades.html', label: 'Desigualdades' },
   { id: 'unidades', href: 'unidades.html', label: 'Unidades' },
-  { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
-  { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
-  { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
   { id: 'potencias-raices', href: 'potencias-raices.html', label: 'Potencias y Raíces' },
+  { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
+  { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
+  { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
+];
+
+export const CURRICULUM_UNITS = [
+  {
+    number: 1,
+    title: 'Números reales',
+    status: 'active',
+    subtitle: 'Conjuntos en ℝ, potencias, radicales, intervalos, módulo y unidades',
+    items: [
+      { id: 'potencias-raices', href: 'potencias-raices.html', label: 'Potencias y Raíces', detail: 'Dos mundos (+0 vs ×1), exponentes, radicales y dominio en ℝ' },
+      { id: 'valor-absoluto-1d', href: 'valor-absoluto.html#sec-1', pageId: 'valor-absoluto', label: 'Valor Absoluto y Distancia', detail: 'Distancia en la recta real, propiedades y despeje con barras' },
+      { id: 'desigualdades', href: 'desigualdades.html', label: 'Inecuaciones e Intervalos', detail: 'Compuertas lógicas AND (∩) / OR (∪) y notación de intervalos' },
+      { id: 'unidades', href: 'unidades.html', label: 'Análisis Dimensional', detail: 'Conversión de unidades mediante el neutro multiplicativo 1' },
+    ],
+  },
+  {
+    number: 2,
+    title: 'Funciones',
+    status: 'active',
+    subtitle: 'Unicidad, dominio, imagen, positividad, partes y sucesiones',
+    items: [
+      { id: 'funciones', href: 'funciones.html', label: 'Introducción a Funciones', detail: 'Escáner de unicidad, Dom/Im, C₀/C⁺/C⁻, monotonía, secante e inversa' },
+      { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto y Partes', detail: 'Transformaciones a|x − h| + k, funciones por tramos y escalonadas' },
+      { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones (Dominio en ℕ)', detail: 'Fórmulas recursivas y explícitas como funciones discretas' },
+    ],
+  },
+  {
+    number: 3,
+    title: 'Función lineal',
+    status: 'soon',
+    subtitle: 'Pendiente m = tg(α), ordenada al origen, formas de la recta, paralelismo y perpendicularidad',
+    concepts: ['Pendiente y ángulo', 'Ordenada al origen', 'Paralelismo y perpendicularidad'],
+    items: [],
+  },
+  {
+    number: 4,
+    title: 'Sistemas de ecuaciones',
+    status: 'soon',
+    subtitle: 'Sistemas lineales 2×2, clasificación geométrica (SCD, SCI, SI) y problemas de modelado',
+    concepts: ['Sistemas lineales 2×2', 'Clasificación geométrica', 'Problemas de modelado'],
+    items: [],
+  },
+  {
+    number: 5,
+    title: 'Función cuadrática',
+    status: 'soon',
+    subtitle: 'Parábola, formas polinómica, canónica y factorizada, vértice, simetría y discriminante Δ',
+    concepts: ['Parábola y vértice', 'Formas de la cuadrática', 'Simetría y discriminante Δ'],
+    items: [],
+  },
+  {
+    number: 6,
+    title: 'Polinomios',
+    status: 'soon',
+    subtitle: 'Grado, operaciones, algoritmo de división, Regla de Ruffini, Teorema del Resto y Gauss',
+    concepts: ['Grado y operaciones', 'División y Ruffini', 'Teorema del Resto y Gauss'],
+    items: [],
+  },
+  {
+    number: 7,
+    title: 'Función racional e irracional',
+    status: 'soon',
+    subtitle: 'Expresiones algebraicas racionales, dominio de validez, asíntotas, agujeros y radicales',
+    concepts: ['Expresiones racionales', 'Dominio y asíntotas', 'Agujeros y radicales'],
+    items: [],
+  },
+  {
+    number: 8,
+    title: 'Función exponencial',
+    status: 'soon',
+    subtitle: 'Crecimiento y decaimiento exponencial f(x) = k·aˣ, base natural e y asíntota horizontal',
+    concepts: ['Crecimiento y decaimiento', 'Base natural e', 'Asíntota horizontal'],
+    items: [],
+  },
+  {
+    number: 9,
+    title: 'Función logarítmica',
+    status: 'soon',
+    subtitle: 'Definición logₐ(x), propiedades operativas, cambio de base e inversa de la exponencial',
+    concepts: ['Definición y propiedades', 'Cambio de base', 'Inversa de la exponencial'],
+    items: [],
+  },
 ];
 
 /**
@@ -254,63 +336,202 @@ function updateSoundBtn(btn, enabled) {
   btn.replaceChildren(...createSoundBtnContent(enabled));
 }
 
+function resolveCurrentUnit(current) {
+  if (current === 'valor-absoluto' && location.hash === '#sec-1') {
+    return { unit: 1, itemId: 'valor-absoluto-1d' };
+  }
+  if (['potencias-raices', 'valor-absoluto-1d', 'desigualdades', 'unidades'].includes(current)) {
+    const itemId = current === 'valor-absoluto-1d' ? current : current;
+    return { unit: 1, itemId };
+  }
+  if (['funciones', 'valor-absoluto', 'sucesiones'].includes(current)) {
+    return { unit: 2, itemId: current };
+  }
+  return { unit: null, itemId: null };
+}
+
+function makeCurriculumCard(unit, { activeItemId = null } = {}) {
+  const active = unit.status === 'active';
+  const links = active
+    ? h(
+        'ul',
+        { class: 'curriculum-card__links' },
+        unit.items.map((item) => {
+          const selected = item.id === activeItemId;
+          return h(
+            'li',
+            null,
+            h(
+              'a',
+              {
+                class: `curriculum-card__link${selected ? ' is-active' : ''}`,
+                href: item.href,
+                'aria-current': selected ? 'page' : null,
+              },
+              h(
+                'span',
+                { class: 'curriculum-card__link-heading' },
+                h('strong', null, item.label),
+                selected ? h('span', { class: 'curriculum-card__here' }, '← Estás acá') : null,
+              ),
+              h('span', { class: 'curriculum-card__detail' }, item.detail),
+            ),
+          );
+        }),
+      )
+    : h(
+        'ul',
+        { class: 'curriculum-card__concepts' },
+        (unit.concepts || []).map((concept) => h('li', null, concept)),
+      );
+
+  return h(
+    'article',
+    { class: `curriculum-card${active ? '' : ' curriculum-card--soon'}` },
+    h(
+      'div',
+      { class: 'curriculum-card__eyebrow' },
+      h('span', { class: 'curriculum-card__number' }, `UNIDAD ${String(unit.number).padStart(2, '0')}`),
+      h(
+        'span',
+        { class: `curriculum-card__status${active ? ' is-available' : ' is-soon'}` },
+        active ? 'Disponible' : 'Próximamente',
+      ),
+    ),
+    h('h3', { class: 'curriculum-card__title' }, unit.title),
+    h('p', { class: 'curriculum-card__subtitle' }, unit.subtitle),
+    links,
+  );
+}
+
 export function renderNav(root = document.querySelector('[data-site-nav]')) {
   if (!root) return;
-  const current = root.dataset.siteNav;
+  const current = root.dataset.siteNav || PAGES.find((page) => location.pathname.endsWith(page.href))?.id;
+  const currentContext = resolveCurrentUnit(current);
+  const currentUnit = CURRICULUM_UNITS.find((unit) => unit.number === currentContext.unit);
   root.classList.add('site-nav');
+  root._navAbortController?.abort();
+  root._navBackdrop?.remove();
+  root._navAbortController = new AbortController();
+  const { signal } = root._navAbortController;
 
-  // Determinista por página para respetar la regla sin Math.random()
-  const pageIdx = Math.max(0, PAGES.findIndex((p) => p.id === current));
-  const lawIdx = current === 'inicio' ? 21 : (pageIdx * 5 + 3) % FUNDAMENTAL_LAWS.length;
-  const law = FUNDAMENTAL_LAWS[lawIdx];
+  const brandLink = h(
+    'a',
+    {
+      class: 'site-nav__brand',
+      href: 'index.html',
+      title: 'Volver al inicio',
+      'aria-label': 'c igual a uno sobre raíz de mu cero épsilon cero. Volver al inicio.',
+    },
+    'c = 1 / √(μ₀ε₀)',
+  );
 
-  const brandLink = h('a', {
-    class: 'site-nav__brand',
-    href: 'index.html',
-    title: `${law.name} · Ir al Inicio`,
-    'aria-label': `${law.ariaLabel}. Ir al inicio.`,
-  });
-  brandLink.innerHTML = law.html;
+  const exploreButton = h(
+    'button',
+    {
+      type: 'button',
+      class: 'site-nav__explore',
+      'aria-expanded': 'false',
+      'aria-controls': 'site-curriculum-drawer',
+    },
+    chalkIcon('book', { width: 17, height: 17, class: 'site-nav__explore-icon' }),
+    h('span', null, 'Temario (9 unidades)'),
+    h('span', { class: 'site-nav__explore-caret', 'aria-hidden': 'true' }, '▾'),
+  );
+
+  const center = h(
+    'div',
+    { class: 'site-nav__center' },
+    currentUnit
+      ? h('span', { class: 'site-nav__context' }, `U${currentUnit.number} · ${currentUnit.title}`)
+      : null,
+  );
 
   const soundEnabled = isSoundEnabled();
-  const soundBtn = h('button', {
-    type: 'button',
-    class: 'site-nav__sound-btn',
-    'aria-pressed': soundEnabled ? 'true' : 'false',
-    title: soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos',
-  }, ...createSoundBtnContent(soundEnabled));
-
+  const soundBtn = h(
+    'button',
+    {
+      type: 'button',
+      class: 'site-nav__sound-btn',
+      'aria-pressed': soundEnabled ? 'true' : 'false',
+      title: soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos',
+    },
+    ...createSoundBtnContent(soundEnabled),
+  );
   soundBtn.addEventListener('click', () => {
     const next = toggleSound();
     updateSoundBtn(soundBtn, next);
     if (next) playClick();
   });
 
-  const navHeader = h('div', { class: 'site-nav__header' },
-    brandLink,
-    soundBtn,
+  const drawer = h(
+    'section',
+    {
+      id: 'site-curriculum-drawer',
+      class: 'site-nav__drawer',
+      'aria-label': 'Mapa curricular de las nueve unidades',
+      'aria-hidden': 'true',
+      inert: true,
+    },
+    h(
+      'div',
+      { class: 'site-nav__drawer-header' },
+      h(
+        'div',
+        null,
+        h('p', { class: 'site-nav__drawer-kicker' }, 'Mapa curricular · 9 unidades'),
+        h('h2', null, 'Ruta de Aprendizaje · Ingreso de UNMDP Exactas'),
+      ),
+      h('p', { class: 'site-nav__drawer-count' }, '2 unidades con laboratorios activos · 7 unidades en construcción'),
+    ),
+    h(
+      'div',
+      { class: 'curriculum-grid' },
+      CURRICULUM_UNITS.map((unit) => makeCurriculumCard(unit, {
+        activeItemId: currentContext.unit === unit.number ? currentContext.itemId : null,
+      })),
+    ),
   );
+  const backdrop = h('button', {
+    type: 'button',
+    class: 'site-nav__backdrop',
+    'aria-label': 'Cerrar temario',
+    tabindex: '-1',
+  });
+  const setDrawerOpen = (open, restoreFocus = false) => {
+    root.classList.toggle('is-drawer-open', open);
+    backdrop.classList.toggle('is-visible', open);
+    exploreButton.setAttribute('aria-expanded', String(open));
+    drawer.setAttribute('aria-hidden', String(!open));
+    drawer.inert = !open;
+    if (restoreFocus) exploreButton.focus();
+  };
+  exploreButton.addEventListener('click', () => {
+    setDrawerOpen(exploreButton.getAttribute('aria-expanded') !== 'true');
+  });
+  backdrop.addEventListener('click', () => setDrawerOpen(false));
+  drawer.addEventListener('click', (event) => {
+    if (event.target.closest('a')) setDrawerOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && root.classList.contains('is-drawer-open')) {
+      setDrawerOpen(false, true);
+    }
+  }, { signal });
 
   mount(
     root,
-    h('nav', { class: 'site-nav__inner', 'aria-label': 'Laboratorios' },
-      navHeader,
-      h('ul', { class: 'site-nav__list' },
-        PAGES.map((p) => h('li', null,
-          h('a', {
-            class: 'site-nav__link',
-            href: p.href,
-            'aria-current': p.id === current ? 'page' : null,
-          }, p.label),
-        )),
-      ),
+    h(
+      'div',
+      { class: 'site-nav__bar' },
+      h('div', { class: 'site-nav__left' }, brandLink, exploreButton),
+      center,
+      h('div', { class: 'site-nav__right' }, soundBtn),
     ),
+    drawer,
   );
-
-  const activeLink = root.querySelector('.site-nav__link[aria-current="page"]');
-  if (activeLink && typeof activeLink.scrollIntoView === 'function') {
-    activeLink.scrollIntoView({ inline: 'center', block: 'nearest' });
-  }
+  document.body.append(backdrop);
+  root._navBackdrop = backdrop;
 
   renderChalkSill();
   initGlobalSoundUI();

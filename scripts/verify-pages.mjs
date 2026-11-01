@@ -205,6 +205,21 @@ for (const pageName of PAGES) {
     const btn = document.querySelector('.site-nav__sound-btn');
     if (!btn) return { error: 'No se encontró el botón .site-nav__sound-btn' };
 
+    const explore = document.querySelector('.site-nav__explore');
+    const drawer = document.querySelector('#site-curriculum-drawer');
+    const backdrop = document.querySelector('.site-nav__backdrop');
+    if (!explore || !drawer || !backdrop) return { error: 'No se montó el mega menú curricular' };
+    explore.click();
+    const drawerOpens = explore.getAttribute('aria-expanded') === 'true' &&
+      drawer.getAttribute('aria-hidden') === 'false' &&
+      drawer.querySelectorAll('.curriculum-card').length === 9;
+    backdrop.click();
+    const backdropCloses = explore.getAttribute('aria-expanded') === 'false';
+    explore.click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const escapeCloses = explore.getAttribute('aria-expanded') === 'false' &&
+      drawer.getAttribute('aria-hidden') === 'true';
+
     const initialText = btn.textContent.trim();
     const initialAria = btn.getAttribute('aria-pressed');
     const initialStorage = localStorage.getItem('math:sound:enabled');
@@ -238,6 +253,10 @@ for (const pageName of PAGES) {
       restoredText,
       restoredAria,
       restoredStorage,
+      drawerOpens,
+      backdropCloses,
+      escapeCloses,
+      hubCurriculumRemoved: !document.querySelector('.hub-curriculum, #hub-curriculum-map'),
       innerWidth,
       docScrollWidth,
       bodyScrollWidth,
@@ -264,6 +283,19 @@ for (const pageName of PAGES) {
       overflow320: docScrollWidth > innerWidth + 1 || bodyScrollWidth > innerWidth + 1,
     };
   })()`);
+
+  await client.send('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 2,
+    mobile: true,
+  });
+  await new Promise((r) => setTimeout(r, 120));
+  const evalMobile390 = await client.eval(`(() => ({
+    innerWidth: window.innerWidth,
+    docScrollWidth: document.documentElement.scrollWidth,
+    overflow390: document.documentElement.scrollWidth > window.innerWidth + 1,
+  }))()`);
 
   // 3. Verificar desktop
   await client.send("Emulation.setDeviceMetricsOverride", {
@@ -295,6 +327,7 @@ for (const pageName of PAGES) {
     innerWidth: window.innerWidth,
     docScrollWidth: document.documentElement.scrollWidth,
     overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    menuHasNineUnits: document.querySelectorAll('#site-curriculum-drawer .curriculum-card').length === 9,
   }))()`);
 
   const intermediateWidths = [];
@@ -324,9 +357,15 @@ for (const pageName of PAGES) {
     evalMobile.toggledStorage === "false" &&
     evalMobile.restoredAria === "true" &&
     evalMobile.restoredStorage === "true" &&
+    evalMobile.drawerOpens &&
+    evalMobile.backdropCloses &&
+    evalMobile.escapeCloses &&
+    evalMobile.hubCurriculumRemoved &&
     !evalMobile.hasHorizontalOverflow &&
     !evalMobile320.overflow320 &&
+    !evalMobile390.overflow390 &&
     !evalDesktop.overflow &&
+    evalWide.menuHasNineUnits &&
     !evalWide.overflow &&
     intermediateWidths.every((item) => !item.overflow);
 
@@ -350,10 +389,14 @@ for (const pageName of PAGES) {
     `  Mobile 320px width: innerWidth=${evalMobile320.innerWidth}, scrollWidth=${evalMobile320.docScrollWidth}, desborde=${evalMobile320.overflow320}`,
   );
   console.log(
+    `  Mobile 390px width: innerWidth=${evalMobile390.innerWidth}, scrollWidth=${evalMobile390.docScrollWidth}, desborde=${evalMobile390.overflow390}`,
+  );
+  console.log(
     `  Mobile 375px width: innerWidth=${evalMobile.innerWidth}, scrollWidth=${evalMobile.docScrollWidth}, desborde=${evalMobile.hasHorizontalOverflow}`,
   );
   console.log(`  Desktop 1280px desborde: ${evalDesktop.overflow}`);
   console.log(`  Desktop 1440px desborde: ${evalWide.overflow}`);
+  console.log(`  Mega menú: abre=${evalMobile.drawerOpens}, backdrop=${evalMobile.backdropCloses}, Escape=${evalMobile.escapeCloses}, 9 unidades=${evalWide.menuHasNineUnits}`);
   for (const item of intermediateWidths)
     console.log(`  Ancho ${item.width}px desborde: ${item.overflow}`);
   console.log(`  Resultado página: ${pageOk ? "PASÓ [OK]" : "FALLÓ [ERROR]"}`);
