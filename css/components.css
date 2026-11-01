@@ -992,55 +992,60 @@ svg text[fill="var(--yellow)"] {
   width: calc(100vw - 4rem);
   box-sizing: border-box;
   pointer-events: none;
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vn-hud.is-visible {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0);
+  pointer-events: none;
 }
 
-/* Botón flotante minimizado [ Alaska ] */
+/* Acceso persistente al diálogo: un Chibi en lugar de un rótulo de texto. */
 .vn-fab {
-  display: none;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: rgba(14, 23, 18, 0.96);
+  display: grid;
+  position: fixed;
+  right: 2rem;
+  bottom: 1.5rem;
+  z-index: 10000;
+  width: 80px;
+  padding: 10px;
+  overflow: hidden;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 2px solid var(--ink);
-  color: var(--ink);
-  padding: 6px 16px;
-  border-radius: 9999px;
-  font-family: var(--font-hand);
-  font-size: 1.05rem;
-  align-items: center;
-  gap: 8px;
+  border: 2px solid var(--yellow);
+  border-radius: 15%;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  transition: transform 0.15s, border-color 0.15s;
+  pointer-events: auto;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.vn-fab__icon {
-  flex-shrink: 0;
-  color: var(--yellow);
+.vn-fab__avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  transform: scale(1.18);
+  pointer-events: none;
 }
 
 .vn-fab:hover {
-  transform: scale(1.05);
-  border-color: var(--yellow);
+  transform: scale(1.08);
+  border-color: var(--ink);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
 }
 
-.vn-hud.is-minimized .vn-box {
+.vn-fab.is-hidden {
+  display: none;
+}
+
+.vn-box {
   display: none !important;
 }
 
-.vn-hud.is-minimized .vn-fab {
-  display: inline-flex !important;
+.vn-hud.is-visible:not(.is-minimized) .vn-box {
+  display: flex !important;
   pointer-events: auto;
 }
 
@@ -1379,6 +1384,11 @@ button.vn-ctrl-btn:hover,
     width: calc(100vw - 2rem);
   }
 
+  .vn-fab {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
   .vn-box {
     min-height: 220px;
   }
@@ -1408,6 +1418,13 @@ button.vn-ctrl-btn:hover,
     bottom: 0.5rem;
     width: auto;
     max-width: calc(100vw - 1rem);
+  }
+
+  .vn-fab {
+    right: 0.65rem;
+    bottom: 0.65rem;
+    width: 58px;
+    height: 58px;
   }
 
   .vn-box {

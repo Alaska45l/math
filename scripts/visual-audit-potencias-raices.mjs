@@ -186,7 +186,7 @@ try {
     await pause(6000);
     await centerWidget("sec-1");
     await capture(`${label}-sec1-dos-mundos-alaska.png`);
-    await evaluate(`document.querySelector('.vn-ctrl-btn--close')?.click();`);
+    await evaluate(`document.querySelector('.vn-ctrl-btn--min')?.click();`);
     await gotoSection("sec-4");
     await centerWidget("sec-4");
     await capture(`${label}-sec4-mitad-mundos.png`);
@@ -274,7 +274,7 @@ try {
     `return ({visible:[...document.querySelectorAll('.vn-hud')].filter((node)=>node.getAttribute('aria-hidden')==='false').length,valid:document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite')?.naturalWidth>0})`,
   );
   await evaluate(
-    `document.querySelector('.vn-ctrl-btn--close')?.click(); document.querySelector('#sec-1 [data-gloss]')?.click();`,
+    `document.querySelector('.vn-ctrl-btn--min')?.click(); document.querySelector('#sec-1 [data-gloss]')?.click();`,
   );
   await pause(180);
   const glossHud = await evaluate(

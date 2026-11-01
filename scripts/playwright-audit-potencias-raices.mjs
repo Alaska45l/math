@@ -114,7 +114,17 @@ try {
   await page.locator("#sec-1 [data-tutor='why']").click();
   await page.waitForTimeout(260);
   assert.equal(await page.locator(".vn-hud[aria-hidden='false']").count(), 1, "La explicación abrió más de un HUD.");
-  await page.locator(".vn-ctrl-btn--close").click();
+  await page.locator(".vn-ctrl-btn--min").click();
+  const chibiFab = page.locator(".vn-fab");
+  assert.equal(await chibiFab.count(), 1, "Falta el acceso persistente de Alaska.");
+  assert.equal(await chibiFab.isVisible(), true, "El Chibi no quedó disponible al minimizar.");
+  assert.equal(
+    await chibiFab.locator(".vn-fab__avatar").evaluate((image) => image.naturalWidth > 0),
+    true,
+    "El Chibi persistente no cargó su imagen.",
+  );
+  assert.equal(await page.locator(".vn-ctrl-btn--close").count(), 0, "El HUD todavía muestra un botón de cierre.");
+  await page.screenshot({ path: path.join(output, "desktop-vn-chibi-minimizado.png") });
   await page.locator("#sec-1 [data-gloss]").first().click();
   await page.waitForTimeout(260);
   assert.equal(await page.locator(".vn-hud[aria-hidden='false']").count(), 1, "El glosario abrió más de un HUD.");

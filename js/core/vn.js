@@ -173,7 +173,7 @@ class VisualNovelController {
   initDOM() {
     if (this.hudEl || typeof document === "undefined") return;
 
-    // Botón flotante minimizado [ Alaska ]
+    // Acceso persistente: al minimizar, Alaska queda disponible como Chibi.
     this.fabEl = h(
       "button",
       {
@@ -185,25 +185,12 @@ class VisualNovelController {
           click: () => this.restore(),
         },
       },
-      h(
-        "svg",
-        {
-          class: "vn-fab__icon",
-          viewBox: "0 0 24 24",
-          width: "16",
-          height: "16",
-          fill: "none",
-          stroke: "currentColor",
-          "stroke-width": "2",
-          "stroke-linecap": "round",
-          "stroke-linejoin": "round",
-          "aria-hidden": "true",
-        },
-        h("path", {
-          d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
-        }),
-      ),
-      h("span", { class: "vn-fab__label" }, "Alaska"),
+      h("img", {
+        class: "vn-fab__avatar",
+        src: "assets/vn/chibi/alaskachibi.webp",
+        alt: "",
+        "aria-hidden": "true",
+      }),
     );
 
     // Sprite de personaje con Easter Egg de 5 clics
@@ -271,28 +258,11 @@ class VisualNovelController {
       "—",
     );
 
-    const btnClose = h(
-      "button",
-      {
-        type: "button",
-        class: "vn-ctrl-btn vn-ctrl-btn--close",
-        "aria-label": "Cerrar diálogo",
-        title: "Cerrar diálogo (Esc)",
-        on: {
-          click: (e) => {
-            e.stopPropagation();
-            this.close();
-          },
-        },
-      },
-      chalkIcon("cross", { width: 14, height: 14 }),
-    );
-
     const headerEl = h(
       "div",
       { class: "vn-box__header" },
       nameplateEl,
-      h("div", { class: "vn-box__controls" }, btnMin, btnClose),
+      h("div", { class: "vn-box__controls" }, btnMin),
     );
 
     // Cuerpo de texto
@@ -341,11 +311,10 @@ class VisualNovelController {
     this.hudEl = h(
       "div",
       { class: "vn-hud", "aria-hidden": "true" },
-      this.fabEl,
       this.boxEl,
     );
 
-    document.body.append(this.hudEl);
+    document.body.append(this.hudEl, this.fabEl);
 
     // Atajos de teclado globales
     window.addEventListener("keydown", (e) => {
@@ -587,6 +556,7 @@ class VisualNovelController {
     this.hudEl.classList.add("is-visible");
     this.hudEl.classList.remove("is-minimized");
     this.hudEl.setAttribute("aria-hidden", "false");
+    this.fabEl?.classList.add("is-hidden");
 
     this.renderCurrentLine();
   }
@@ -617,6 +587,8 @@ class VisualNovelController {
     if (!this.hudEl) return;
     this.isMinimized = true;
     this.hudEl.classList.add("is-minimized");
+    this.hudEl.setAttribute("aria-hidden", "true");
+    this.fabEl?.classList.remove("is-hidden");
   }
 
   /**
@@ -624,8 +596,18 @@ class VisualNovelController {
    */
   restore() {
     if (!this.hudEl) return;
+    if (!this.isOpen) {
+      this.react({
+        pose: "base",
+        tag: "Alaska",
+        html: "Estoy acá. Elegí un botón de explicación o una palabra subrayada y la desarmamos paso a paso.",
+      });
+      return;
+    }
     this.isMinimized = false;
     this.hudEl.classList.remove("is-minimized");
+    this.hudEl.setAttribute("aria-hidden", "false");
+    this.fabEl?.classList.add("is-hidden");
   }
 
   /**
@@ -650,6 +632,7 @@ class VisualNovelController {
       this.hudEl.classList.remove("is-visible", "is-minimized");
       this.hudEl.setAttribute("aria-hidden", "true");
     }
+    this.fabEl?.classList.remove("is-hidden");
 
     const cb = this.onFinishCallback;
     this.onFinishCallback = null;

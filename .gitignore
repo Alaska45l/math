@@ -12,6 +12,7 @@
 /playwright-report/
 /.nyc_output/
 /coverage/
+artifacts/
 
 # Dependencias locales y temporales
 /node_modules/

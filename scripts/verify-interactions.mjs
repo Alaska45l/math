@@ -645,14 +645,22 @@ const powRadResults = await client.eval(`(async () => {
   const tutorHud = document.querySelector('.vn-hud[aria-hidden="false"]');
   const tutorImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
   const tutorImageValid = Boolean(tutorImage?.naturalWidth > 0);
-  document.querySelector('.vn-ctrl-btn--close')?.click();
+  document.querySelector('.vn-ctrl-btn--min')?.click();
+  const fab = document.querySelector('.vn-fab');
+  const fabAvatar = fab?.querySelector('.vn-fab__avatar');
+  const persistentChibiFab = Boolean(
+    fab &&
+    getComputedStyle(fab).display !== 'none' &&
+    fabAvatar?.naturalWidth > 0,
+  );
+  const closeControlRemoved = !document.querySelector('.vn-ctrl-btn--close');
   const gloss = document.querySelector('#sec-1 [data-gloss]');
   if (gloss) gloss.click();
   await new Promise((resolve) => setTimeout(resolve, 180));
   const glossHud = document.querySelector('.vn-hud[aria-hidden="false"]');
   const glossImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
   const glossImageValid = Boolean(glossImage?.naturalWidth > 0);
-  document.querySelector('.vn-ctrl-btn--close')?.click();
+  document.querySelector('.vn-ctrl-btn--min')?.click();
   return {
     sections: sections.length,
     widgets: widgets.length,
@@ -676,6 +684,8 @@ const powRadResults = await client.eval(`(async () => {
     trainerPrompt: Boolean(document.querySelector('.pr-challenge__prompt')),
     tutorHud: Boolean(tutorHud),
     tutorImageValid,
+    persistentChibiFab,
+    closeControlRemoved,
     glossHud: Boolean(glossHud),
     glossImageValid,
     hasNavLink: Boolean(document.querySelector('.site-nav a[href="potencias-raices.html"]')),
@@ -759,6 +769,8 @@ const powRadOk =
   powRadResults.hasNavLink &&
   powRadResults.tutorHud &&
   powRadResults.tutorImageValid &&
+  powRadResults.persistentChibiFab &&
+  powRadResults.closeControlRemoved &&
   powRadResults.glossHud &&
   powRadResults.glossImageValid &&
   powRadResults.viewportOverflowFree &&
