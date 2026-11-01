@@ -48,9 +48,10 @@ export function initChoqueMundosWidget(host) {
   );
   board.actions.append(errorButton);
 
-  svgText(board.drawing, 24, 28, "CUADRADO DE UN BINOMIO · CUATRO REGIONES", {
+  const squareTitle = svgText(board.drawing, 320, 28, "CUADRADO DE UN BINOMIO · CUATRO REGIONES", {
     fill: "var(--yellow)",
     "font-weight": "bold",
+    "text-anchor": "middle",
   });
   const squareRegions = [];
   for (let index = 0; index < 4; index += 1) {
@@ -93,9 +94,10 @@ export function initChoqueMundosWidget(host) {
     fill: "var(--muted)",
   });
 
-  svgText(board.drawing, 390, 28, "CAMINO POR CATETOS VS. DIAGONAL", {
+  const triangleTitle = svgText(board.drawing, 320, 28, "CAMINO POR CATETOS VS. DIAGONAL", {
     fill: "var(--yellow)",
     "font-weight": "bold",
+    "text-anchor": "middle",
   });
   const legA = svgPath(board.drawing, "", {
     stroke: "var(--blue)",
@@ -125,8 +127,8 @@ export function initChoqueMundosWidget(host) {
     bControl.output.textContent = fmt(b);
     modeSelect.value = String(mode);
     const sign = mode === 1 ? -1 : 1;
-    const scale = 24;
-    const left = 50;
+    const scale = Math.min(24, 240 / (a + b));
+    const left = 180;
     const top = 72;
     const wA = a * scale;
     const wB = b * scale;
@@ -183,6 +185,8 @@ export function initChoqueMundosWidget(host) {
       setVisible(rect, mode !== 2);
       setVisible(label, mode !== 2);
     });
+    setVisible(squareTitle, mode !== 2);
+    setVisible(triangleTitle, mode === 2);
     squareOutline.setAttribute(
       "d",
       `M${left} ${top} H${left + wA + wB} V${top + wA + wB} H${left} Z`,
@@ -206,9 +210,9 @@ export function initChoqueMundosWidget(host) {
       );
       setVisible(line, reveal && mode !== 2);
     });
-    const tx = 410,
-      ty = 278,
-      unit = 25;
+    const tx = 220,
+      ty = 290,
+      unit = Math.min(25, 200 / Math.max(a, b));
     const p0 = { x: tx, y: ty },
       p1 = { x: tx, y: ty - a * unit },
       p2 = { x: tx + b * unit, y: ty };

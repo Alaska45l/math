@@ -135,7 +135,7 @@ export function initCintaNegativaWidget(host) {
       markers[index].setAttribute("cx", String(80 + 112 * index));
     });
     bars.forEach((bar, index) => {
-      const visible = index <= depth && n < 0;
+      const visible = true;
       setVisible(bar, visible);
       setVisible(barLabels[index], visible);
       setVisible(barValues[index], visible);
@@ -146,6 +146,7 @@ export function initCintaNegativaWidget(host) {
         barLabels[index],
         ["Inicio (1)", "Paso 1", "Paso 2", "Paso 3", "Paso 4"][index],
       );
+      bar.setAttribute("opacity", index <= depth || n < 0 ? (index === 0 ? ".7" : ".55") : ".2");
     });
     setVisible(lens, n < 0);
     lens.setAttribute("cx", String(80 + 112 * depth));

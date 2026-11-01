@@ -251,24 +251,26 @@ export function initMitadMundosWidget(host) {
     predictionButton.textContent = prediction
       ? "Ocultar comparación de mitades"
       : "Adiviná dónde cae la mitad multiplicativa";
-    if (prediction) {
-      const additiveMiddle = x / index;
-      readouts.push([
-        "Predicción frente al factor real",
-        [
-          h(
-            "p",
-            null,
-            `El punto aditivo ${fmt(additiveMiddle)} repetido ${fmt(index)} veces da ${fmt(additiveMiddle ** index)}; el factor correcto ${fmt(root, 4)} repetido ${fmt(index)} veces reconstruye ${fmt(x)}.`,
-          ),
-          h(
-            "small",
-            null,
-            "La mitad aditiva divide una cantidad; la mitad multiplicativa busca una escala repetible.",
-          ),
-        ],
-      ]);
-    }
+    const additiveMiddle = x / index;
+    readouts.push([
+      "Predicción frente al factor real",
+      [
+        h(
+          "p",
+          null,
+          prediction
+            ? `El punto aditivo ${fmt(additiveMiddle)} repetido ${fmt(index)} veces da ${fmt(additiveMiddle ** index)}; el factor real ${fmt(root, 4)} repetido ${fmt(index)} veces reconstruye ${fmt(x)}.`
+            : `Antes de revelar, compará ${fmt(additiveMiddle)} como punto aditivo con el factor que repetido ${fmt(index)} veces debe reconstruir ${fmt(x)}.`,
+        ),
+        h(
+          "small",
+          null,
+          prediction
+            ? "La mitad aditiva divide una cantidad; la mitad multiplicativa busca una escala repetible."
+            : "Tocá el botón para comprobar ambas predicciones sin cambiar la altura de esta tarjeta.",
+        ),
+      ],
+    ]);
     renderReadout(board.readout, "Los saltos se pueden leer y reconstruir", readouts);
   };
   connect(state, (value) => value, render);

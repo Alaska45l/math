@@ -82,8 +82,12 @@ export function initDosMundosWidget(host) {
       stroke: step === 0 ? "var(--green)" : "var(--yellow)",
       "stroke-width": 3,
     });
-    const addValue = svgText(board.drawing, x, 132, step === 0 ? "0" : "");
-    const mulValue = svgText(board.drawing, x, 284, step === 0 ? "1" : "");
+    const addValue = svgText(board.drawing, x, 132, step === 0 ? "0" : "", {
+      "text-anchor": "middle",
+    });
+    const mulValue = svgText(board.drawing, x, 284, step === 0 ? "1" : "", {
+      "text-anchor": "middle",
+    });
     additive.push({ dot: addDot, value: addValue });
     multiplicative.push({ dot: mulDot, value: mulValue });
     board.drawing.append(addDot, mulDot);

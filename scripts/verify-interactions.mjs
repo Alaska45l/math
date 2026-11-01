@@ -653,8 +653,6 @@ const powRadResults = await client.eval(`(async () => {
   const glossImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
   const glossImageValid = Boolean(glossImage?.naturalWidth > 0);
   document.querySelector('.vn-ctrl-btn--close')?.click();
-  document.querySelector('.pr-boss__controls .btn')?.click();
-  await new Promise((resolve) => setTimeout(resolve, 850));
   return {
     sections: sections.length,
     widgets: widgets.length,
@@ -673,8 +671,8 @@ const powRadResults = await client.eval(`(async () => {
     negativeZoomWorks: Boolean(negativeZoomWorks),
     stableControls: stable,
     progressSaved: Boolean(stored['sec-1:0']),
-    bossCanvas: Boolean(document.querySelector('.pr-boss__canvas')),
-    bossStarted: ['INTRO','WAVE_ANNOUNCEMENT','ACTIVE_PHASE'].includes(document.querySelector('.pr-boss__canvas')?.dataset.state),
+    practiceTabs: document.querySelectorAll('.pr-chapter-tab').length,
+    bossRemoved: !document.querySelector('#pr-boss-panel, .pr-boss__canvas, .pr-boss'),
     trainerPrompt: Boolean(document.querySelector('.pr-challenge__prompt')),
     tutorHud: Boolean(tutorHud),
     tutorImageValid,
@@ -755,7 +753,8 @@ const powRadOk =
   powRadResults.additiveArcsDrawn &&
   powRadResults.negativeZoomWorks &&
   powRadResults.progressSaved &&
-  powRadResults.bossCanvas &&
+  powRadResults.practiceTabs === 2 &&
+  powRadResults.bossRemoved &&
   powRadResults.trainerPrompt &&
   powRadResults.hasNavLink &&
   powRadResults.tutorHud &&
@@ -764,7 +763,6 @@ const powRadOk =
   powRadResults.glossImageValid &&
   powRadResults.viewportOverflowFree &&
   powRadResults.consoleErrors.length === 0 &&
-  powRadResults.bossStarted &&
   !powRadResults.overflow;
 const allResultsOk = allOk && powRadOk;
 

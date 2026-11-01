@@ -130,7 +130,7 @@ export function initArbolFactoresWidget(host) {
     const circle = s("circle", {
       cx: 300,
       cy: 48,
-      r: 9,
+      r: 10,
       fill: "var(--yellow)",
       "fill-opacity": ".2",
       stroke: "var(--yellow)",
@@ -202,7 +202,7 @@ export function initArbolFactoresWidget(host) {
           totalLeaves === 1 ? 320 : 24 + (leaf * 592) / (totalLeaves - 1);
         leaf += 1;
       }
-      node.y = 40 + depth * 22;
+      node.y = 42 + depth * 25;
       nodes.push(node);
     };
     place(root);
@@ -228,7 +228,7 @@ export function initArbolFactoresWidget(host) {
       if (from)
         edge.setAttribute(
           "d",
-          `M${from.x} ${from.y + 13} L${to.x} ${to.y - 13}`,
+          `M${from.x} ${from.y + 10} L${to.x} ${to.y - 10}`,
         );
     });
     const factors = primeFactors(value);

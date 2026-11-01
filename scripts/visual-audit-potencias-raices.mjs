@@ -220,12 +220,6 @@ try {
     await evaluate(`document.querySelector('#pr-tab-2')?.click();`);
     await pause(150);
     await capture(`${label}-cap4-trampas.png`);
-    await evaluate(
-      `document.querySelector('#pr-tab-3')?.click(); document.querySelector('.pr-boss__controls .btn')?.click();`,
-    );
-    await pause(2600);
-    await evaluate(`document.querySelector('.vn-ctrl-btn--close')?.click();`);
-    await capture(`${label}-cap4-boss.png`);
   };
 
   await screenshotViews("desktop");

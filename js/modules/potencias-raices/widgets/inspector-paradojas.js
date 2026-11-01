@@ -16,22 +16,17 @@ import {
   frac,
 } from "./board-kit.js";
 
-function chainFormula(step) {
-  const formulas = [
-    ["Paso 1", "−2"],
-    ["Paso 2", "(−2)¹"],
-    ["Paso 3", "(−2)^(", frac("2", "2"), ")"],
-    ["Paso 4", "(−2)^(2 · ", frac("1", "2"), ")"],
-    ["Paso 5", "[(−2)²]^(", frac("1", "2"), ")"],
-    ["Paso 6", "4^(", frac("1", "2"), ") = √4"],
-    ["Paso 7", "+2"],
+function formulaParts(step, a) {
+  const squared = fmt(a * a);
+  return [
+    [`−${fmt(a)}`],
+    [`(−${fmt(a)})¹`],
+    [`(−${fmt(a)})^(`, frac("2", "2"), ")"],
+    [`(−${fmt(a)})^(2 · `, frac("1", "2"), ")"],
+    [`[(−${fmt(a)})²]^(`, frac("1", "2"), ")"],
+    [`${squared}^(`, frac("1", "2"), `) = √${squared}`],
+    [`+${fmt(a)}`],
   ][step];
-  return h(
-    "div",
-    { class: "pr-paradox-card" },
-    h("span", { class: "pr-paradox-card__step" }, formulas[0]),
-    h("span", { class: "eq pr-paradox-card__formula" }, ...formulas.slice(1)),
-  );
 }
 
 export function initInspectorParadojasWidget(host) {
@@ -75,9 +70,19 @@ export function initInspectorParadojasWidget(host) {
   );
 
   const equalityButtons = [];
+  const formulaNodes = [];
   const chainParts = [];
   for (let step = 0; step < 7; step += 1) {
-    chainParts.push(chainFormula(step));
+    const formula = h("span", { class: "eq pr-paradox-card__formula" });
+    formulaNodes.push(formula);
+    chainParts.push(
+      h(
+        "div",
+        { class: "pr-paradox-card" },
+        h("span", { class: "pr-paradox-card__step" }, `Paso ${step + 1}`),
+        formula,
+      ),
+    );
     if (step < 6) {
       const equality = h(
         "button",
@@ -159,10 +164,12 @@ export function initInspectorParadojasWidget(host) {
     aControl.output.textContent = fmt(a);
     indexSelect.value = String(index);
     modeSelect.value = String(mode);
+    formulaNodes.forEach((formula, step) => mount(formula, ...formulaParts(step, a)));
     chain.hidden = mode !== 0;
     scan.hidden = mode !== 0;
     precedence.hidden = mode !== 1;
-    board.svg.hidden = mode !== 1;
+    board.svg.hidden = false;
+    board.svg.style.visibility = mode === 1 ? "visible" : "hidden";
     equalityButtons.forEach((button, position) =>
       button.classList.toggle("is-selected", mode === 0 && position === selected),
     );

@@ -632,8 +632,8 @@ export const LESSON_SECTIONS = [
   {
     id: "sec-retos",
     chapter: "Capítulo 4",
-    title: "Entrenador, trampas y la Forja",
-    short: "11 · Entrenamiento",
+    title: "Entrenador y 5 Trampas de Examen",
+    short: "11 · Práctica y trampas",
   },
   {
     id: "sec-repaso",
@@ -745,10 +745,11 @@ export function initBlackboardController() {
     badge.textContent = `Pizarrón ${index + 1} de ${LESSON_SECTIONS.length}`;
     title.textContent = `${LESSON_SECTIONS[index].chapter} · ${LESSON_SECTIONS[index].title}`;
     if (scroll) {
-      /* El toolbar se queda sticky debajo de la navegación. Desplazamos la
-         sección, no el toolbar: así su encabezado no queda escondido detrás
-         de la barra ni de los banners de capítulos anteriores. */
-      activeSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const target = focused ? content : activeSection;
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 70;
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      }
     }
   };
   toggle.addEventListener("click", () => {
