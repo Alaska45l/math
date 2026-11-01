@@ -1012,7 +1012,7 @@ svg text[fill="var(--yellow)"] {
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 2px solid var(--yellow);
+  border: 2px solid var(--ink);
   border-radius: 15%;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
