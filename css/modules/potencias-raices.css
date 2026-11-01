@@ -1380,7 +1380,7 @@
 /* Este laboratorio comparte la navegación de Sucesiones, pero necesita espacio
    adicional para el índice lateral y su mesa de trabajo de dos columnas. */
 .pr-page.page--wide {
-  width: 100%;
+  width: 85%;
   max-width: none;
   padding-inline: 0;
 }
