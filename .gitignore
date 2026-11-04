@@ -13,9 +13,12 @@
 /.nyc_output/
 /coverage/
 artifacts/
+/scripts
 
 # Dependencias locales y temporales
 /node_modules/
 *.log
 /agent
 assets/vn/_backup_orig
+.agents
+ORIGINAL_REQUEST.md

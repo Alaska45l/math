@@ -13,6 +13,7 @@ export const PAGES = [
   { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
   { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
   { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
+  { id: 'exponenciales', href: 'exponenciales.html', label: 'Funciones Exponenciales' },
 ];
 
 export const CURRICULUM_UNITS = [
@@ -82,10 +83,12 @@ export const CURRICULUM_UNITS = [
   {
     number: 8,
     title: 'Función exponencial',
-    status: 'soon',
-    subtitle: 'Crecimiento y decaimiento exponencial f(x) = k·aˣ, base natural e y asíntota horizontal',
+    status: 'active',
+    subtitle: 'Crecimiento y decaimiento f(x) = k·aˣ, base natural e, asíntotas horizontales y ecuaciones',
     concepts: ['Crecimiento y decaimiento', 'Base natural e', 'Asíntota horizontal'],
-    items: [],
+    items: [
+      { id: 'exponenciales', href: 'exponenciales.html', label: 'Laboratorio de Exponenciales', detail: 'Modelos k·aˣ, base e, asíntotas horizontales, radiografía completa y ecuaciones sin logaritmos' },
+    ],
   },
   {
     number: 9,
@@ -347,6 +350,9 @@ function resolveCurrentUnit(current) {
   if (['funciones', 'valor-absoluto', 'sucesiones'].includes(current)) {
     return { unit: 2, itemId: current };
   }
+  if (current === 'exponenciales') {
+    return { unit: 8, itemId: 'exponenciales' };
+  }
   return { unit: null, itemId: null };
 }
 
@@ -482,7 +488,7 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
         h('p', { class: 'site-nav__drawer-kicker' }, 'Mapa curricular · 9 unidades'),
         h('h2', null, 'Ruta de Aprendizaje · Ingreso de UNMDP Exactas'),
       ),
-      h('p', { class: 'site-nav__drawer-count' }, '2 unidades con laboratorios activos · 7 unidades en construcción'),
+      h('p', { class: 'site-nav__drawer-count' }, '3 unidades con laboratorios activos · 6 unidades en construcción'),
     ),
     h(
       'div',

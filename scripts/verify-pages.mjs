@@ -13,6 +13,7 @@ const PAGES = [
   "sucesiones.html",
   "valor-absoluto.html",
   "potencias-raices.html",
+  "exponenciales.html",
 ];
 
 const MIME_MAP = {

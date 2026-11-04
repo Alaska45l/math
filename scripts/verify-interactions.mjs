@@ -719,6 +719,177 @@ console.log(
   JSON.stringify(powRadResults, null, 2),
 );
 
+const expConsoleErrors = [];
+client.on("Runtime.consoleAPICalled", (params) => {
+  if (params.type === "error")
+    expConsoleErrors.push(
+      params.args?.map((item) => item.value || item.description).join(" "),
+    );
+});
+client.on("Runtime.exceptionThrown", (params) => {
+  expConsoleErrors.push(
+    params.exceptionDetails?.exception?.description ||
+      params.exceptionDetails?.text ||
+      "Exception",
+  );
+});
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/exponenciales.html`,
+});
+await new Promise((r) => setTimeout(r, 1100));
+const expResults = await client.eval(`(async () => {
+  const sections = [...document.querySelectorAll('.exp-section')];
+  const widgets = [...document.querySelectorAll('[data-widget]')];
+  const ranges = [...document.querySelectorAll('[data-widget] input[type="range"]')];
+  let stable = ranges.length > 0;
+  for (const range of ranges) {
+    const ref = range;
+    for (const value of [Number(range.min), Number(range.max), Number(range.min)]) {
+      range.value = String(value);
+      range.dispatchEvent(new Event('input', { bubbles: true }));
+      stable &&= range.isConnected && range === ref && [...range.closest('[data-widget]').querySelectorAll('input[type="range"]')].includes(ref);
+    }
+  }
+  const interactiveWidgetSvgs = widgets.every((host) => {
+    const svg = host.querySelector('svg');
+    return Boolean(svg && host.querySelector('input,select,button') && svg.querySelector('path,circle,rect,text'));
+  });
+  const checkBlocks = [...document.querySelectorAll('.exp-section [data-check]')];
+  const allCheckAffordances = checkBlocks.length === 10 && checkBlocks.every((block) =>
+    block.querySelectorAll('button').length >= 3 && block.querySelector('.exp-check__hint, .seq-check__hint') && block.querySelector('.exp-check__solution, .seq-check__solution')
+  );
+
+  const numberCheck = document.querySelectorAll('#sec-1 .exp-check__item')?.[1];
+  const previewInput = numberCheck?.querySelector('input');
+  const preview = numberCheck?.querySelector('.exp-check__preview');
+  if (previewInput && preview) {
+    previewInput.value = '3';
+    previewInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  const livePreviewWorks = Boolean(preview && preview.textContent.includes('3'));
+
+  const firstCheck = document.querySelector('#sec-1 .exp-check__item');
+  const hintBtn = [...(firstCheck?.querySelectorAll('button') || [])].find((b) => b.textContent.includes('Pista'));
+  for (let i = 0; i < 3; i++) hintBtn?.click();
+  const hintEl = firstCheck?.querySelector('.exp-check__hint, .seq-check__hint');
+  const progressiveHintsWork = Boolean(
+    hintEl && !hintEl.hidden && (hintEl.textContent.includes('Pista 3/3') || hintEl.textContent.includes('Pista 3 de 3'))
+  );
+
+  const showBtn = [...(firstCheck?.querySelectorAll('button') || [])].find((b) => b.textContent.includes('solución'));
+  showBtn?.click();
+  const solution = firstCheck?.querySelector('.exp-check__solution, .seq-check__solution');
+  const stepByStepSolutionWorks = Boolean(
+    solution && !solution.hidden && solution.querySelectorAll('ol li').length >= 3
+  );
+
+  const balanza = document.querySelector('[data-widget="balanza-ecuaciones"]');
+  const eqChips = balanza?.querySelectorAll('.balanza-eq-chips .chip');
+  const eqChipsExist = Boolean(eqChips && eqChips.length >= 2);
+  if (eqChips && eqChips.length > 1) {
+    eqChips[1].click();
+  }
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const eqChipSwitchWorks = Boolean(
+    balanza?.querySelector('.exp-readout')?.textContent.includes('4 · 2ˣ = 8ˣ') ||
+    balanza?.querySelector('svg text')?.textContent.includes('4')
+  );
+
+  const firstChoice = firstCheck?.querySelector('.exp-choice button');
+  const reviewBtn = [...(firstCheck?.querySelectorAll('button') || [])].find((b) => b.textContent.includes('Revisar'));
+  if (firstChoice && reviewBtn) {
+    firstChoice.click();
+    reviewBtn.click();
+  }
+  const stored = JSON.parse(localStorage.getItem('exponenciales:progreso:v1') || '{}');
+  const progressSaved = Boolean(stored['sec-1:0']);
+
+  const explain = document.querySelector('#sec-1 [data-tutor="why"]');
+  if (explain) explain.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const tutorHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const tutorImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const tutorImageValid = Boolean(tutorImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--min')?.click();
+  const fab = document.querySelector('.vn-fab');
+  const fabAvatar = fab?.querySelector('.vn-fab__avatar');
+  const persistentChibiFab = Boolean(
+    fab &&
+    getComputedStyle(fab).display !== 'none' &&
+    fabAvatar?.naturalWidth > 0,
+  );
+  const closeControlRemoved = !document.querySelector('.vn-ctrl-btn--close');
+
+  const gloss = document.querySelector('#sec-1 [data-gloss]');
+  if (gloss) gloss.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const glossHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const glossImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const glossImageValid = Boolean(glossImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--min')?.click();
+
+  return {
+    sections: sections.length,
+    widgets: widgets.length,
+    checks: document.querySelectorAll('.exp-check__item').length,
+    tutorButtons: document.querySelectorAll('.vn-trigger[data-tutor]').length,
+    glossaryTerms: document.querySelectorAll('span.gloss-term[data-gloss]').length,
+    interactiveWidgetSvgs,
+    checkBlocks: checkBlocks.length,
+    allCheckAffordances,
+    livePreviewWorks,
+    progressiveHintsWork,
+    stepByStepSolutionWorks,
+    eqChipsExist,
+    eqChipSwitchWorks,
+    progressSaved,
+    stableControls: stable,
+    practiceTabs: document.querySelectorAll('.exp-chapter-tab').length,
+    practicePanels: document.querySelectorAll('.exp-challenge-panel').length,
+    trainerPrompt: Boolean(document.querySelector('.exp-challenge__prompt')),
+    trapsCount: document.querySelectorAll('.exp-trap').length,
+    tutorHud: Boolean(tutorHud),
+    tutorImageValid,
+    persistentChibiFab,
+    closeControlRemoved,
+    glossHud: Boolean(glossHud),
+    glossImageValid,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="exponenciales.html"]')),
+    overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  };
+})()`);
+
+const expWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  expWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+expResults.viewportWidths = expWidths;
+expResults.viewportOverflowFree = expWidths.every(
+  (item) => !item.overflow,
+);
+expResults.consoleErrors = expConsoleErrors;
+console.log(
+  "Resultados de interacción en exponenciales.html:",
+  JSON.stringify(expResults, null, 2),
+);
+
 const allOk =
   interactionResults.sliderThrottlingWorks &&
   interactionResults.soundDisabledWorks &&
@@ -776,7 +947,39 @@ const powRadOk =
   powRadResults.viewportOverflowFree &&
   powRadResults.consoleErrors.length === 0 &&
   !powRadResults.overflow;
-const allResultsOk = allOk && powRadOk;
+
+const expOk =
+  expResults.sections === 10 &&
+  expResults.widgets === 10 &&
+  expResults.checks === 30 &&
+  expResults.tutorButtons === 20 &&
+  expResults.glossaryTerms >= 10 &&
+  expResults.stableControls &&
+  expResults.interactiveWidgetSvgs &&
+  expResults.checkBlocks === 10 &&
+  expResults.allCheckAffordances &&
+  expResults.livePreviewWorks &&
+  expResults.progressiveHintsWork &&
+  expResults.stepByStepSolutionWorks &&
+  expResults.eqChipsExist &&
+  expResults.eqChipSwitchWorks &&
+  expResults.progressSaved &&
+  expResults.practiceTabs === 2 &&
+  expResults.practicePanels === 2 &&
+  expResults.trainerPrompt &&
+  expResults.trapsCount === 5 &&
+  expResults.hasNavLink &&
+  expResults.tutorHud &&
+  expResults.tutorImageValid &&
+  expResults.persistentChibiFab &&
+  expResults.closeControlRemoved &&
+  expResults.glossHud &&
+  expResults.glossImageValid &&
+  expResults.viewportOverflowFree &&
+  expResults.consoleErrors.length === 0 &&
+  !expResults.overflow;
+
+const allResultsOk = allOk && powRadOk && expOk;
 
 client.close();
 chromeProc.kill();
