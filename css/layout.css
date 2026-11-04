@@ -914,3 +914,32 @@ p.intro,
     margin-bottom: 2px;
   }
 }
+
+/* Chips acoplados del navbar: mismo borde de tiza que .site-nav__explore y el botón de sonido. */
+.site-nav .site-nav__dock-btn {
+  border: 6px solid transparent;
+  border-image: var(--chalk-border-rest);
+  border-radius: 10px;
+  background: transparent;
+  padding: 0 8px;
+}
+
+.site-nav .site-nav__dock-btn:hover,
+.site-nav .site-nav__dock-btn[aria-expanded="true"] {
+  border-image: var(--chalk-border-hover);
+}
+
+.site-nav .site-nav__dock-btn:active {
+  border-image: var(--chalk-border-active);
+}
+
+.site-nav .site-nav__sound {
+  border: 6px solid transparent;
+  border-image: var(--chalk-border-rest);
+  border-radius: 10px;
+  background: transparent;
+}
+
+.site-nav .site-nav__sound:hover {
+  border-image: var(--chalk-border-hover);
+}
