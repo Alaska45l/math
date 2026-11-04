@@ -150,7 +150,7 @@
             <h2>Funciones, Modelos y Ecuaciones Exponenciales</h2>
             <p>
               Del neutro multiplicativo 1 a las familias continuas f(x) = k &middot; a<sup>x&minus;h</sup> + c,
-              el análisis asintótico de Exactas y la resolución algebraica sin logaritmos.
+              el análisis asintótico desde primeros principios y la resolución algebraica sin logaritmos.
             </p>
             <p class="pr-progress" data-progress>Chequeos resueltos: 0/30</p>
           </header>
@@ -186,61 +186,59 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    La función lineal suma una diferencia fija a cada paso; la función exponencial multiplica por una razón constante.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    Cuando analizamos una tabla de valores con incrementos horizontales uniformes
-                    <span class="eq">&Delta;x = x_{i+1} &minus; x_i</span>, la firma del fenómeno queda revelada en el comportamiento vertical.
-                  </p>
-                  <p>
-                    Si calculamos las <span class="gloss-term" data-gloss="diferencias_finitas">primeras diferencias</span>
-                    <span class="eq">&Delta;y = y_{i+1} &minus; y_i</span> y obtenemos un valor constante <span class="eq">m</span>,
-                    la relación es estrictamente lineal: <span class="eq">f(x) = mx + b</span>. Cada paso añade la misma cantidad fija.
-                  </p>
-                  <p>
-                    En cambio, si calculamos el cociente entre términos consecutivos y la <span class="gloss-term" data-gloss="razon_multiplicativa">razón</span>
-                    <span class="eq">y<sub>i+1</sub> / y<sub>i</sub></span> resulta ser una constante positiva <span class="eq">a &gt; 0</span>,
-                    el proceso modela un <span class="gloss-term" data-gloss="crecimiento_exponencial">crecimiento exponencial</span>: <span class="eq">f(x) = k &middot; a<sup>x</sup></span>. Aquí cada paso escala lo acumulado en el anterior.
-                  </p>
-                  <p>
-                    Si ni las diferencias ni las razones permanecen constantes, inspeccionamos las segundas diferencias
-                    <span class="eq">&Delta;<sup>2</sup>y = &Delta;y<sub>i+1</sub> &minus; &Delta;y<sub>i</sub></span>: si son constantes, la función es polinómica de segundo grado (cuadrática).
-                  </p>
-                  <div class="exp-table-wrap pr-table-wrap">
-                    <table class="exp-learning-table pr-learning-table">
-                      <thead>
-                        <tr>
-                          <th>Lo que hacés / ves</th>
-                          <th>Cómo se escribe en álgebra</th>
-                          <th>El error mecánico que evitás</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Restar valores sucesivos con &Delta;x uniforme</td>
-                          <td>y<sub>i+1</sub> &minus; y<sub>i</sub> = m (constante)</td>
-                          <td>Calcular pendientes con &Delta;x variable sin dividir</td>
-                        </tr>
-                        <tr>
-                          <td>Dividir valores sucesivos con &Delta;x uniforme</td>
-                          <td>y<sub>i+1</sub> / y<sub>i</sub> = a (razón fija)</td>
-                          <td>Confundir adición constante (+m) con multiplicación (&times;a)</td>
-                        </tr>
-                        <tr>
-                          <td>Detectar aceleración en segundas diferencias</td>
-                          <td>&Delta;<sup>2</sup>y = constante &ne; 0</td>
-                          <td>Forzar una exponencial donde hay una parábola y = x<sup>2</sup></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  La función lineal suma una diferencia fija a cada paso; la función exponencial multiplica por una razón constante.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Cuando analizamos una tabla de valores con incrementos horizontales uniformes
+                  <span class="eq">&Delta;x = x<sub>i+1</sub> &minus; x<sub>i</sub></span>, la firma del fenómeno queda revelada en el comportamiento vertical.
+                </p>
+                <p>
+                  Si calculamos las <span class="gloss-term" data-gloss="diferencias_finitas">primeras diferencias</span>
+                  <span class="eq">&Delta;y = y<sub>i+1</sub> &minus; y<sub>i</sub></span> y obtenemos un valor constante <span class="eq">m</span>,
+                  la relación es estrictamente lineal: <span class="eq">f(x) = mx + b</span>. Cada paso añade la misma cantidad fija.
+                </p>
+                <p>
+                  En cambio, si calculamos el cociente entre términos consecutivos y la <span class="gloss-term" data-gloss="razon_multiplicativa">razón</span>
+                  <span class="eq">y<sub>i+1</sub> / y<sub>i</sub></span> resulta ser una constante positiva <span class="eq">a &gt; 0</span>,
+                  el proceso modela un <span class="gloss-term" data-gloss="crecimiento_exponencial">crecimiento exponencial</span>: <span class="eq">f(x) = k &middot; a<sup>x</sup></span>. Aquí cada paso escala lo acumulado en el anterior.
+                </p>
+                <p>
+                  Si ni las diferencias ni las razones permanecen constantes, inspeccionamos las segundas diferencias
+                  <span class="eq">&Delta;<sup>2</sup>y = &Delta;y<sub>i+1</sub> &minus; &Delta;y<sub>i</sub></span>: si son constantes, la función es polinómica de segundo grado (cuadrática).
+                </p>
+                <div class="exp-table-wrap pr-table-wrap">
+                  <table class="exp-learning-table pr-learning-table">
+                    <thead>
+                      <tr>
+                        <th>Lo que hacés / ves</th>
+                        <th>Cómo se escribe en álgebra</th>
+                        <th>El error mecánico que evitás</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Restar valores sucesivos con &Delta;x uniforme</td>
+                        <td>y<sub>i+1</sub> &minus; y<sub>i</sub> = m (constante)</td>
+                        <td>Calcular pendientes con &Delta;x variable sin dividir</td>
+                      </tr>
+                      <tr>
+                        <td>Dividir valores sucesivos con &Delta;x uniforme</td>
+                        <td>y<sub>i+1</sub> / y<sub>i</sub> = a (razón fija)</td>
+                        <td>Confundir adición constante (+m) con multiplicación (&times;a)</td>
+                      </tr>
+                      <tr>
+                        <td>Detectar aceleración en segundas diferencias</td>
+                        <td>&Delta;<sup>2</sup>y = constante &ne; 0</td>
+                        <td>Forzar una exponencial donde hay una parábola y = x<sup>2</sup></td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
@@ -253,17 +251,6 @@
                   Esta razón constante a es el factor de duplicación, triplicación o amortiguación que gobierna la lección siguiente.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    No te fíes nunca del primer par de puntos. Una recta y una curva exponencial pueden coincidir en dos puntos cualesquiera;
-                    sólo el tercer y cuarto punto verifican si la regla oculta es aditiva o multiplicativa.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-1">
-                  <span class="seq-block__label">Chequeo 1</span>
-                  <div data-check="sec-1"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -271,6 +258,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  No te fíes nunca del primer par de puntos. Una recta y una curva exponencial pueden coincidir en dos puntos cualesquiera;
+                  sólo el tercer y cuarto punto verifican si la regla oculta es aditiva o multiplicativa.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-1">
+                <span class="seq-block__label">Chequeo 1</span>
+                <div data-check="sec-1"></div>
+              </div>
             </div>
           </section>
 
@@ -293,64 +291,62 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    El coeficiente k representa la población inicial en el tiempo cero; la base a marca el ritmo con el que se multiplica esa población.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    En el Problema 1 del Módulo de Exactas (pág. 89), una colonia de amebas se duplica cada hora.
-                    Si arrancamos con 1 ameba, la población evoluciona como <span class="eq">1, 2, 4, 8, 16 &hellip;</span>,
-                    siguiendo la fórmula <span class="eq">f(t) = 2<sup>t</sup></span>. En el instante inicial <span class="eq">t = 0</span>,
-                    el <span class="gloss-term" data-gloss="neutro_multiplicativo">neutro multiplicativo</span> garantiza que
-                    <span class="eq">f(0) = 2<sup>0</sup> = 1</span>.
-                  </p>
-                  <p>
-                    Ahora bien, ¿qué ocurre si el experimento arranca con 3 amebas en el plato de cultivo?
-                    Cada una de las 3 amebas se duplica de manera independiente:
-                    en <span class="eq">t = 0</span> hay 3 amebas; en <span class="eq">t = 1</span> hay <span class="eq">3 &times; 2 = 6</span>;
-                    en <span class="eq">t = 2</span> hay <span class="eq">6 &times; 2 = 12</span>;
-                    en <span class="eq">t = 3</span> hay <span class="eq">12 &times; 2 = 24</span>.
-                    La ley funcional es <span class="eq">f(t) = 3 &middot; 2<sup>t</sup></span>.
-                  </p>
-                  <p>
-                    Por estricta <span class="gloss-term" data-gloss="jerarquia_operaciones">jerarquía de operaciones</span>,
-                    la potencia se resuelve antes que el producto exterior:
-                    <span class="eq">3 &middot; 2<sup>3</sup> = 3 &middot; 8 = 24</span>.
-                    Si alguien multiplica el 3 por la base inventando <span class="eq">6<sup>t</sup></span>, a la hora 3 calcularía
-                    <span class="eq">6<sup>3</sup> = 216</span>. ¡Un error de casi diez veces la población real!
-                  </p>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>3 colonias duplicándose en paralelo</td>
-                        <td>f(t) = 3 &middot; 2<sup>t</sup></td>
-                        <td>Multiplicar coeficiente por base para crear 6<sup>t</sup></td>
-                      </tr>
-                      <tr>
-                        <td>Mirar el plato al tiempo t = 0</td>
-                        <td>f(0) = k &middot; a<sup>0</sup> = k &middot; 1 = k</td>
-                        <td>Creer que en t = 0 la población desaparece</td>
-                      </tr>
-                      <tr>
-                        <td>Calcular el valor en t = 3</td>
-                        <td>3 &middot; (2<sup>3</sup>) = 3 &middot; 8 = 24</td>
-                        <td>Resolver (3 &middot; 2)<sup>3</sup> = 6<sup>3</sup> = 216</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  El coeficiente k representa la población inicial en el tiempo cero; la base a marca el ritmo con el que se multiplica esa población.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Imaginá una colonia de amebas en un medio nutritivo ideal que se duplica puntualmente cada hora.
+                  Si arrancamos con 1 ameba, la población evoluciona como <span class="eq">1, 2, 4, 8, 16 &hellip;</span>,
+                  siguiendo la fórmula <span class="eq">f(t) = 2<sup>t</sup></span>. En el instante inicial <span class="eq">t = 0</span>,
+                  el <span class="gloss-term" data-gloss="neutro_multiplicativo">neutro multiplicativo</span> garantiza que
+                  <span class="eq">f(0) = 2<sup>0</sup> = 1</span>.
+                </p>
+                <p>
+                  Ahora bien, ¿qué ocurre si el experimento arranca con 3 amebas en el plato de cultivo?
+                  Cada una de las 3 amebas se duplica de manera independiente:
+                  en <span class="eq">t = 0</span> hay 3 amebas; en <span class="eq">t = 1</span> hay <span class="eq">3 &times; 2 = 6</span>;
+                  en <span class="eq">t = 2</span> hay <span class="eq">6 &times; 2 = 12</span>;
+                  en <span class="eq">t = 3</span> hay <span class="eq">12 &times; 2 = 24</span>.
+                  La ley funcional es <span class="eq">f(t) = 3 &middot; 2<sup>t</sup></span>.
+                </p>
+                <p>
+                  Por estricta <span class="gloss-term" data-gloss="jerarquia_operaciones">jerarquía de operaciones</span>,
+                  la potencia se resuelve antes que el producto exterior:
+                  <span class="eq">3 &middot; 2<sup>3</sup> = 3 &middot; 8 = 24</span>.
+                  Si alguien multiplica el 3 por la base inventando <span class="eq">6<sup>t</sup></span>, a la hora 3 calcularía
+                  <span class="eq">6<sup>3</sup> = 216</span>. ¡Un error de casi diez veces la población real!
+                </p>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>3 colonias duplicándose en paralelo</td>
+                      <td>f(t) = 3 &middot; 2<sup>t</sup></td>
+                      <td>Multiplicar coeficiente por base para crear 6<sup>t</sup></td>
+                    </tr>
+                    <tr>
+                      <td>Mirar el plato al tiempo t = 0</td>
+                      <td>f(0) = k &middot; a<sup>0</sup> = k &middot; 1 = k</td>
+                      <td>Creer que en t = 0 la población desaparece</td>
+                    </tr>
+                    <tr>
+                      <td>Calcular el valor en t = 3</td>
+                      <td>3 &middot; (2<sup>3</sup>) = 3 &middot; 8 = 24</td>
+                      <td>Resolver (3 &middot; 2)<sup>3</sup> = 6<sup>3</sup> = 216</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -362,17 +358,6 @@
                   Habiendo comprendido la separación entre escala inicial k y base a, ahora extenderemos el dominio discreto a la recta real continua.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    Trampa clásica de parcial: <span class="eq">k &middot; a<sup>x</sup> &ne; (k &middot; a)<sup>x</sup></span>.
-                    El exponente <span class="eq">x</span> afecta exclusivamente a la base adyacente <span class="eq">a</span>.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-2">
-                  <span class="seq-block__label">Chequeo 2</span>
-                  <div data-check="sec-2"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -380,6 +365,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  Trampa clásica: <span class="eq">k &middot; a<sup>x</sup> &ne; (k &middot; a)<sup>x</sup></span>.
+                  El exponente <span class="eq">x</span> afecta exclusivamente a la base adyacente <span class="eq">a</span>.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-2">
+                <span class="seq-block__label">Chequeo 2</span>
+                <div data-check="sec-2"></div>
+              </div>
             </div>
           </section>
 
@@ -414,63 +410,58 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Para que una curva exponencial no se fracture en infinitos agujeros al pasar por fracciones, la base debe ser estrictamente positiva y distinta de 1.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    La definición rigurosa de Exactas (pág. 90) establece:
-                    <span class="eq">f: &reals; &rarr; &reals;, f(x) = k &middot; a<sup>x</sup></span>, con
-                    <span class="eq">k &isin; &reals; &minus; {0}</span> y
-                    <span class="eq">a &isin; &reals;<sup>+</sup> &minus; {1}</span>.
-                  </p>
-                  <p>
-                    ¿Por qué exigimos <span class="eq">a &gt; 0</span>? Porque al densificar la recta real con
-                    <span class="gloss-term" data-gloss="exponentes_racionales">exponentes racionales</span>
-                    <span class="eq">x = m/n</span>, la potencia equivale a un radical <span class="eq"><sup>n</sup>&radic;(a<sup>m</sup>)</span>.
-                    Si intentamos usar una base negativa como <span class="eq">a = &minus;2</span>:
-                    para <span class="eq">x = 1 &rArr; &minus;2</span>; para <span class="eq">x = 2 &rArr; 4</span>; pero para
-                    <span class="eq">x = 1/2 &rArr; &radic;(&minus;2) &notin; &reals;</span>.
-                    La función parpadearía caóticamente entre números reales y números no definidos en &reals;.
-                  </p>
-                  <p>
-                    ¿Y por qué excluimos <span class="eq">a = 1</span> y <span class="eq">a = 0</span>?
-                    Si <span class="eq">a = 1</span>, <span class="eq">1<sup>x</sup> = 1</span> genera una recta constante aburrida, sin crecimiento ni decaimiento.
-                    Y si <span class="eq">a = 0</span>, para exponentes negativos como <span class="eq">x = &minus;1</span> tendríamos
-                    <span class="eq">0<sup>&minus;1</sup> = 1/0</span>, una división por cero indefinida.
-                  </p>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Evaluar a mitad de camino en x = 1/2</td>
-                        <td>a<sup>1/2</sup> = &radic;a &isin; &reals;⁺ (exige a &gt; 0)</td>
-                        <td>Aceptar bases negativas creyendo que (&minus;2)<sup>x</sup> es continua</td>
-                      </tr>
-                      <tr>
-                        <td>Prohibir la base neutra a = 1</td>
-                        <td>a &ne; 1 (evita la recta f(x) = k &middot; 1)</td>
-                        <td>Clasificar una recta constante como función exponencial</td>
-                      </tr>
-                      <tr>
-                        <td>Evaluar exponentes negativos con base 0</td>
-                        <td>0<sup>&minus;1</sup> = 1/0 (indefinido en &reals;)</td>
-                        <td>Olvidar que 0<sup>x</sup> no tiene dominio en todo &reals;</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Para que una curva exponencial no se fracture en infinitos agujeros al pasar por fracciones, la base debe ser estrictamente positiva y distinta de 1.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  En los números reales, la función exponencial canónica se define como <span class="eq">f(x) = k &middot; a<sup>x</sup></span>, donde el coeficiente inicial <span class="eq">k &ne; 0</span> actúa como escala vertical no nula y la base <span class="eq">a &gt; 0, a &ne; 1</span> es el motor multiplicativo continuo.
+                </p>
+                <p>
+                  ¿Por qué exigimos <span class="eq">a &gt; 0</span>? Porque al densificar la recta real con
+                  <span class="gloss-term" data-gloss="exponentes_racionales">exponentes racionales</span>
+                  <span class="eq">x = m/n</span>, la potencia equivale a un radical <span class="eq"><sup>n</sup>&radic;(a<sup>m</sup>)</span>.
+                  Si intentamos usar una base negativa como <span class="eq">a = &minus;2</span>:
+                  para <span class="eq">x = 1 &rArr; &minus;2</span>; para <span class="eq">x = 2 &rArr; 4</span>; pero para
+                  <span class="eq">x = 1/2 &rArr; &radic;(&minus;2) &notin; &reals;</span>.
+                  La función parpadearía caóticamente entre números reales y números no definidos en &reals;.
+                </p>
+                <p>
+                  ¿Y por qué excluimos <span class="eq">a = 1</span> y <span class="eq">a = 0</span>?
+                  Si <span class="eq">a = 1</span>, <span class="eq">1<sup>x</sup> = 1</span> genera una recta constante aburrida, sin crecimiento ni decaimiento.
+                  Y si <span class="eq">a = 0</span>, para exponentes negativos como <span class="eq">x = &minus;1</span> tendríamos
+                  <span class="eq">0<sup>&minus;1</sup> = 1/0</span>, una división por cero indefinida.
+                </p>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Evaluar a mitad de camino en x = 1/2</td>
+                      <td>a<sup>1/2</sup> = &radic;a &isin; &reals;⁺ (exige a &gt; 0)</td>
+                      <td>Aceptar bases negativas creyendo que (&minus;2)<sup>x</sup> es continua</td>
+                    </tr>
+                    <tr>
+                      <td>Prohibir la base neutra a = 1</td>
+                      <td>a &ne; 1 (evita la recta f(x) = k &middot; 1)</td>
+                      <td>Clasificar una recta constante como función exponencial</td>
+                    </tr>
+                    <tr>
+                      <td>Evaluar exponentes negativos con base 0</td>
+                      <td>0<sup>&minus;1</sup> = 1/0 (indefinido en &reals;)</td>
+                      <td>Olvidar que 0<sup>x</sup> no tiene dominio en todo &reals;</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -482,17 +473,6 @@
                   Garantizada una base positiva y distinta de 1, el comportamiento de la curva cambia radicalmente según si a &gt; 1 o si 0 &lt; a &lt; 1.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    En los parciales de Exactas, si en un ejercicio de despeje obtenés <span class="eq">a = &minus;3</span> o <span class="eq">a = 1</span>,
-                    debes descartar ese valor de inmediato aclarando: &ldquo;No define una función exponencial en &reals;&rdquo;.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-3">
-                  <span class="seq-block__label">Chequeo 3</span>
-                  <div data-check="sec-3"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -500,6 +480,16 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  Si en un despeje algebraico obtenés como candidato <span class="eq">a = &minus;3</span> o <span class="eq">a = 1</span>, debés descartarlo de inmediato: una base negativa fractura la continuidad real en infinitos agujeros y una base unitaria aplasta la curva a una recta horizontal.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-3">
+                <span class="seq-block__label">Chequeo 3</span>
+                <div data-check="sec-3"></div>
+              </div>
             </div>
           </section>
 
@@ -522,61 +512,59 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Invertir la base equivale geométricamente a reflejar la gráfica respecto del eje vertical: (1/a)ˣ = a⁻ˣ.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    El Problema 2 de Exactas (pág. 90) estudia el <span class="gloss-term" data-gloss="decaimiento_exponencial">decaimiento exponencial</span> en la desintegración de sustancias radiactivas:
-                    un kilogramo de material que se reduce a la mitad cada año evoluciona según
-                    <span class="eq">f(x) = (1/2)<sup>x</sup> = 2<sup>&minus;x</sup></span>.
-                  </p>
-                  <p>
-                    Por las leyes de potenciación, <span class="eq">(1/a)<sup>x</sup> = (a<sup>&minus;1</sup>)<sup>x</sup> = a<sup>&minus;x</sup></span>.
-                    La operación <span class="eq">x &rarr; &minus;x</span> en el dominio provoca una
-                    <span class="gloss-term" data-gloss="simetria_axial">reflexión respecto al eje vertical y</span>:
-                    lo que antes ocurría hacia el futuro en <span class="eq">2<sup>x</sup></span>, ahora ocurre hacia el pasado en <span class="eq">(1/2)<sup>x</sup></span>.
-                  </p>
-                  <p>
-                    Cuando <span class="eq">x &rarr; +&infin;</span>, la masa se hace infinitamente pequeña:
-                    <span class="eq">1/2, 1/4, 1/8, &hellip;, 1/1024 &hellip;</span> pero jamás llega a ser exactamente cero.
-                    La recta horizontal <span class="eq">y = 0</span> (el eje de abscisas) es la
-                    <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span>.
-                    El conjunto imagen es el intervalo estrictamente abierto <span class="eq">(0; +&infin;)</span>.
-                  </p>
-                  <div class="exp-table-wrap pr-table-wrap">
-                    <table class="exp-learning-table pr-learning-table">
-                      <thead>
-                        <tr>
-                          <th>Lo que hacés / ves</th>
-                          <th>Cómo se escribe en álgebra</th>
-                          <th>El error mecánico que evitás</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Reflejar la curva respecto al eje y</td>
-                          <td>(1/2)<sup>x</sup> = 2<sup>&minus;x</sup></td>
-                          <td>Creer que un exponente negativo produce imágenes negativas</td>
-                        </tr>
-                        <tr>
-                          <td>Aproximarse indefinidamente al eje x</td>
-                          <td>lim<sub>x &rarr; +&infin;</sub> (1/2)<sup>x</sup> = 0⁺ &rArr; Asíntota y = 0</td>
-                          <td>Poner corchete cerrado [0; +&infin;) en el conjunto imagen</td>
-                        </tr>
-                        <tr>
-                          <td>Comparar 2<sup>x</sup>, e<sup>x</sup>, 3<sup>x</sup> en x &gt; 0 vs x &lt; 0</td>
-                          <td>x &gt; 0: 3<sup>x</sup> &gt; e<sup>x</sup> &gt; 2<sup>x</sup>; x &lt; 0: 2<sup>x</sup> &gt; e<sup>x</sup> &gt; 3<sup>x</sup></td>
-                          <td>Asumir que 3<sup>x</sup> está siempre por encima de 2<sup>x</sup> en todo &reals;</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Invertir la base equivale geométricamente a reflejar la gráfica respecto del eje vertical: (1/a)ˣ = a⁻ˣ.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Cuando una magnitud física pierde una fracción fija en cada intervalo de tiempo regular, como en la desintegración de sustancias radiactivas:
+                  un kilogramo de material que se reduce a la mitad cada año evoluciona según
+                  <span class="eq">f(x) = (1/2)<sup>x</sup> = 2<sup>&minus;x</sup></span>.
+                </p>
+                <p>
+                  Por las leyes de potenciación, <span class="eq">(1/a)<sup>x</sup> = (a<sup>&minus;1</sup>)<sup>x</sup> = a<sup>&minus;x</sup></span>.
+                  La operación <span class="eq">x &rarr; &minus;x</span> en el dominio provoca una
+                  <span class="gloss-term" data-gloss="simetria_axial">reflexión respecto al eje vertical y</span>:
+                  lo que antes ocurría hacia el futuro en <span class="eq">2<sup>x</sup></span>, ahora ocurre hacia el pasado en <span class="eq">(1/2)<sup>x</sup></span>.
+                </p>
+                <p>
+                  Cuando <span class="eq">x &rarr; +&infin;</span>, la masa se hace infinitamente pequeña:
+                  <span class="eq">1/2, 1/4, 1/8, &hellip;, 1/1024 &hellip;</span> pero jamás llega a ser exactamente cero.
+                  La recta horizontal <span class="eq">y = 0</span> (el eje de abscisas) es la
+                  <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span>.
+                  El conjunto imagen es el intervalo estrictamente abierto <span class="eq">(0; +&infin;)</span>.
+                </p>
+                <div class="exp-table-wrap pr-table-wrap">
+                  <table class="exp-learning-table pr-learning-table">
+                    <thead>
+                      <tr>
+                        <th>Lo que hacés / ves</th>
+                        <th>Cómo se escribe en álgebra</th>
+                        <th>El error mecánico que evitás</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Reflejar la curva respecto al eje y</td>
+                        <td>(1/2)<sup>x</sup> = 2<sup>&minus;x</sup></td>
+                        <td>Creer que un exponente negativo produce imágenes negativas</td>
+                      </tr>
+                      <tr>
+                        <td>Aproximarse indefinidamente al eje x</td>
+                        <td>lim<sub>x &rarr; +&infin;</sub> (1/2)<sup>x</sup> = 0⁺ &rArr; Asíntota y = 0</td>
+                        <td>Poner corchete cerrado [0; +&infin;) en el conjunto imagen</td>
+                      </tr>
+                      <tr>
+                        <td>Comparar 2<sup>x</sup>, e<sup>x</sup>, 3<sup>x</sup> en x &gt; 0 vs x &lt; 0</td>
+                        <td>x &gt; 0: 3<sup>x</sup> &gt; e<sup>x</sup> &gt; 2<sup>x</sup>; x &lt; 0: 2<sup>x</sup> &gt; e<sup>x</sup> &gt; 3<sup>x</sup></td>
+                        <td>Asumir que 3<sup>x</sup> está siempre por encima de 2<sup>x</sup> en todo &reals;</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
@@ -589,17 +577,6 @@
                   Comprendido el efecto de la base a, pasamos a estudiar cómo interactúa con el signo del coeficiente k.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    ¡Jamás toques la asíntota! Decir que <span class="eq">(1/2)<sup>x</sup> = 0</span> para algún número real <span class="eq">x</span> es un absurdo algebraico.
-                    La función exponencial nunca se anula en &reals;.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-4">
-                  <span class="seq-block__label">Chequeo 4</span>
-                  <div data-check="sec-4"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -607,6 +584,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  ¡Jamás toques la asíntota! Decir que <span class="eq">(1/2)<sup>x</sup> = 0</span> para algún número real <span class="eq">x</span> es un absurdo algebraico.
+                  La función exponencial nunca se anula en &reals;.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-4">
+                <span class="seq-block__label">Chequeo 4</span>
+                <div data-check="sec-4"></div>
+              </div>
             </div>
           </section>
 
@@ -629,59 +617,57 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    El signo de k elige el semiplano y la orientación; el valor de a elige si la curva se aleja o se acerca a la asíntota.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    En las páginas 91 y 92 del Módulo de Exactas, se presentan las cuatro curvas fundamentales de
-                    <span class="eq">f(x) = k &middot; a<sup>x</sup></span> según los signos de <span class="eq">k</span> y la magnitud de <span class="eq">a</span>:
-                  </p>
-                  <ul>
-                    <li><strong>k &gt; 0, a &gt; 1:</strong> Semiplano superior (<span class="eq">y &gt; 0</span>), estrictamente creciente, imagen <span class="eq">(0; +&infin;)</span>. Ej. <span class="eq">f(x) = 3 &middot; 2<sup>x</sup></span>.</li>
-                    <li><strong>k &gt; 0, 0 &lt; a &lt; 1:</strong> Semiplano superior (<span class="eq">y &gt; 0</span>), estrictamente decreciente, imagen <span class="eq">(0; +&infin;)</span>. Ej. <span class="eq">f(x) = 3 &middot; (1/2)<sup>x</sup></span>.</li>
-                    <li><strong>k &lt; 0, a &gt; 1:</strong> Semiplano inferior (<span class="eq">y &lt; 0</span>), estrictamente decreciente, imagen <span class="eq">(&minus;&infin;; 0)</span>. Ej. <span class="eq">f(x) = &minus;3 &middot; 2<sup>x</sup></span>.</li>
-                    <li><strong>k &lt; 0, 0 &lt; a &lt; 1:</strong> Semiplano inferior (<span class="eq">y &lt; 0</span>), ¡estrictamente CRECIENTE!, imagen <span class="eq">(&minus;&infin;; 0)</span>. Ej. <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>.</li>
-                  </ul>
-                  <p>
-                    Detengámonos en el caso de examen <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>:
-                    al aumentar <span class="eq">x</span> de 0 a 1 y luego a 2, <span class="eq">(1/2)<sup>x</sup></span> disminuye (<span class="eq">1 &rarr; 1/2 &rarr; 1/4</span>).
-                    Pero al multiplicar por <span class="eq">&minus;3</span>, las imágenes son <span class="eq">&minus;3, &minus;1.5, &minus;0.75</span>.
-                    En la recta real, <span class="eq">&minus;0.75 &gt; &minus;1.5 &gt; &minus;3</span>: los valores están subiendo hacia cero.
-                    Por lo tanto, la función es <span class="gloss-term" data-gloss="monotonia_creciente">estrictamente creciente en todo &reals;</span>.
-                  </p>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Signo k &gt; 0</td>
-                        <td>Im(f) = (0; +&infin;) (semiplano superior)</td>
-                        <td>Buscar raíces cruzando el eje horizontal cuando c = 0</td>
-                      </tr>
-                      <tr>
-                        <td>Signo k &lt; 0</td>
-                        <td>Im(f) = (&minus;&infin;; 0) (semiplano inferior)</td>
-                        <td>Ignorar la reflexión vertical sobre el eje x</td>
-                      </tr>
-                      <tr>
-                        <td>Combinación k &lt; 0 y 0 &lt; a &lt; 1</td>
-                        <td>x<sub>1</sub> &lt; x<sub>2</sub> &rArr; g(x<sub>1</sub>) &lt; g(x<sub>2</sub>) (Creciente)</td>
-                        <td>Afirmar que 'como la base es 1/2, seguro que decrece'</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  El signo de k elige el semiplano y la orientación; el valor de a elige si la curva se aleja o se acerca a la asíntota.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  El comportamiento global y la forma de la curva exponencial <span class="eq">f(x) = k &middot; a<sup>x</sup></span> quedan gobernados por dos interruptores analíticos independientes:
+                </p>
+                <ul>
+                  <li><strong>k &gt; 0, a &gt; 1:</strong> Semiplano superior (<span class="eq">y &gt; 0</span>), estrictamente creciente, imagen <span class="eq">(0; +&infin;)</span>. Ej. <span class="eq">f(x) = 3 &middot; 2<sup>x</sup></span>.</li>
+                  <li><strong>k &gt; 0, 0 &lt; a &lt; 1:</strong> Semiplano superior (<span class="eq">y &gt; 0</span>), estrictamente decreciente, imagen <span class="eq">(0; +&infin;)</span>. Ej. <span class="eq">f(x) = 3 &middot; (1/2)<sup>x</sup></span>.</li>
+                  <li><strong>k &lt; 0, a &gt; 1:</strong> Semiplano inferior (<span class="eq">y &lt; 0</span>), estrictamente decreciente, imagen <span class="eq">(&minus;&infin;; 0)</span>. Ej. <span class="eq">f(x) = &minus;3 &middot; 2<sup>x</sup></span>.</li>
+                  <li><strong>k &lt; 0, 0 &lt; a &lt; 1:</strong> Semiplano inferior (<span class="eq">y &lt; 0</span>), ¡estrictamente CRECIENTE!, imagen <span class="eq">(&minus;&infin;; 0)</span>. Ej. <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>.</li>
+                </ul>
+                <p>
+                  Detengámonos en el caso que desafía la intuición inmediata: <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>.
+                  Al aumentar <span class="eq">x</span> de 0 a 1 y luego a 2, <span class="eq">(1/2)<sup>x</sup></span> disminuye (<span class="eq">1 &rarr; 1/2 &rarr; 1/4</span>).
+                  Pero al multiplicar por <span class="eq">&minus;3</span>, las imágenes son <span class="eq">&minus;3, &minus;1.5, &minus;0.75</span>.
+                  En la recta real, <span class="eq">&minus;0.75 &gt; &minus;1.5 &gt; &minus;3</span>: los valores están subiendo hacia cero.
+                  Pensalo como saldo deudor: deber $1,50 es estar más arriba en tu balance que deber $3, y deber $0,75 es estar todavía mejor.
+                  Por lo tanto, la función es <span class="gloss-term" data-gloss="monotonia_creciente">estrictamente creciente en todo &reals;</span>.
+                </p>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Signo k &gt; 0</td>
+                      <td>Im(f) = (0; +&infin;) (semiplano superior)</td>
+                      <td>Buscar raíces cruzando el eje horizontal cuando c = 0</td>
+                    </tr>
+                    <tr>
+                      <td>Signo k &lt; 0</td>
+                      <td>Im(f) = (&minus;&infin;; 0) (semiplano inferior)</td>
+                      <td>Ignorar la reflexión vertical sobre el eje x</td>
+                    </tr>
+                    <tr>
+                      <td>Combinación k &lt; 0 y 0 &lt; a &lt; 1</td>
+                      <td>x<sub>1</sub> &lt; x<sub>2</sub> &rArr; g(x<sub>1</sub>) &lt; g(x<sub>2</sub>) (Creciente)</td>
+                      <td>Afirmar que 'como la base es 1/2, seguro que decrece'</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -693,17 +679,6 @@
                   Con el dominio analítico de las cuatro familias, estamos listos para reconstruir una función conociendo únicamente puntos experimentales.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    Regla de oro de Exactas: Un coeficiente <span class="eq">k &lt; 0</span> invierte la monotonía original de la base.
-                    Una base que crecía pasa a decrecer; una base que decrecía pasa a crecer.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-5">
-                  <span class="seq-block__label">Chequeo 5</span>
-                  <div data-check="sec-5"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -711,6 +686,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  Regla fundamental: Un coeficiente <span class="eq">k &lt; 0</span> invierte la monotonía original de la base.
+                  Una base que crecía pasa a decrecer; una base que decrecía pasa a crecer.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-5">
+                <span class="seq-block__label">Chequeo 5</span>
+                <div data-check="sec-5"></div>
+              </div>
             </div>
           </section>
 
@@ -745,68 +731,66 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Dividir miembro a miembro las ecuaciones de dos puntos cancela el coeficiente k y aísla la base a elevada al intervalo transcurrido.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    Dados dos puntos experimentales <span class="eq">P(x<sub>1</sub>; y<sub>1</sub>)</span> y <span class="eq">Q(x<sub>2</sub>; y<sub>2</sub>)</span> con
-                    <span class="eq">x<sub>1</sub> &ne; x<sub>2</sub></span> y el mismo signo no nulo en <span class="eq">y</span>,
-                    planteamos el sistema:
-                  </p>
-                  <p class="math-display">
-                    <span class="eq">y<sub>1</sub> = k &middot; a<sup>x<sub>1</sub></sup></span> &emsp; y &emsp; <span class="eq">y<sub>2</sub> = k &middot; a<sup>x<sub>2</sub></sup></span>
-                  </p>
-                  <p>
-                    En lugar de restar como haríamos en una recta, dividimos miembro a miembro:
-                  </p>
-                  <p class="math-display">
-                    <span class="fr"><span class="top">y<sub>2</sub></span><span class="bot">y<sub>1</sub></span></span> = 
-                    <span class="fr"><span class="top">k &middot; a<sup>x<sub>2</sub></sup></span><span class="bot">k &middot; a<sup>x<sub>1</sub></sup></span></span> = 
-                    a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup> &rArr; a = (<span class="fr"><span class="top">y<sub>2</sub></span><span class="bot">y<sub>1</sub></span></span>)<sup>1 / (x<sub>2</sub> &minus; x<sub>1</sub>)</sup>
-                  </p>
-                  <p>
-                    Con la base <span class="eq">a</span> ya calculada, despejamos <span class="eq">k = y<sub>1</sub> / a<sup>x<sub>1</sub></sup></span>.
-                    Este es el método exacto exigido en el Ejercicio 7 de la guía (pág. 93):
-                  </p>
-                  <ul>
-                    <li><strong>7a:</strong> Pasa por <span class="eq">(&minus;1; 3/2)</span> y <span class="eq">k = 2 &rArr; 2 &middot; a<sup>&minus;1</sup> = 3/2 &rArr; a = 4/3</span>.</li>
-                    <li><strong>7b:</strong> <span class="eq">a = 1/2</span> y corta al eje y en 4 <span class="eq">&rArr; f(0) = 4 &rArr; k = 4</span>. Fórmula: <span class="eq">f(x) = 4 &middot; (1/2)<sup>x</sup></span>.</li>
-                    <li><strong>7c:</strong> Pasa por <span class="eq">P(1; 1)</span> y <span class="eq">Q(2; 3) &rArr; a<sup>2&minus;1</sup> = 3/1 &rArr; a = 3</span>, <span class="eq">k = 1/3 &rArr; f(x) = (1/3) &middot; 3<sup>x</sup> = 3<sup>x&minus;1</sup></span>.</li>
-                    <li><strong>7d:</strong> Pasa por <span class="eq">P(0; 1)</span> y <span class="eq">Q(&minus;2; 25/9) &rArr; k = 1</span>; <span class="eq">a<sup>&minus;2</sup> = 25/9 &rArr; a = 3/5</span>.</li>
-                  </ul>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Dividir las imágenes de dos puntos</td>
-                        <td>y<sub>2</sub> / y<sub>1</sub> = a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup></td>
-                        <td>Restar y<sub>2</sub> &minus; y<sub>1</sub> calculando pendientes lineales</td>
-                      </tr>
-                      <tr>
-                        <td>Despejar k usando x<sub>1</sub> = 0</td>
-                        <td>k = y<sub>1</sub> cuando el punto es (0; y<sub>1</sub>)</td>
-                        <td>Armar sistemas no lineales complicados innecesariamente</td>
-                      </tr>
-                      <tr>
-                        <td>Verificar el signo de y<sub>1</sub> e y<sub>2</sub></td>
-                        <td>sgn(y<sub>1</sub>) = sgn(y<sub>2</sub>) &ne; 0</td>
-                        <td>Intentar ajustar exponenciales con puntos de distinto signo</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Dividir miembro a miembro las ecuaciones de dos puntos cancela el coeficiente k y aísla la base a elevada al intervalo transcurrido.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Dados dos puntos experimentales <span class="eq">P(x<sub>1</sub>; y<sub>1</sub>)</span> y <span class="eq">Q(x<sub>2</sub>; y<sub>2</sub>)</span> con
+                  <span class="eq">x<sub>1</sub> &ne; x<sub>2</sub></span> y el mismo signo no nulo en <span class="eq">y</span>,
+                  planteamos el sistema:
+                </p>
+                <p class="math-display">
+                  <span class="eq">y<sub>1</sub> = k &middot; a<sup>x<sub>1</sub></sup></span> &emsp; y &emsp; <span class="eq">y<sub>2</sub> = k &middot; a<sup>x<sub>2</sub></sup></span>
+                </p>
+                <p>
+                  En lugar de restar como haríamos en una recta, dividimos miembro a miembro:
+                </p>
+                <p class="math-display">
+                  <span class="fr"><span class="top">y<sub>2</sub></span><span class="bot">y<sub>1</sub></span></span> = 
+                  <span class="fr"><span class="top">k &middot; a<sup>x<sub>2</sub></sup></span><span class="bot">k &middot; a<sup>x<sub>1</sub></sup></span></span> = 
+                  a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup> &rArr; a = (<span class="fr"><span class="top">y<sub>2</sub></span><span class="bot">y<sub>1</sub></span></span>)<sup>1 / (x<sub>2</sub> &minus; x<sub>1</sub>)</sup>
+                </p>
+                <p>
+                  Con la base <span class="eq">a</span> ya calculada, despejamos <span class="eq">k = y<sub>1</sub> / a<sup>x<sub>1</sub></sup></span>.
+                  Este principio analítico permite reconstruir cualquier modelo exponencial a partir de dos mediciones del plano cartesiano:
+                </p>
+                <ul>
+                  <li><strong>Caso A (Punto con escala inicial conocida):</strong> Pasa por <span class="eq">(&minus;1; 3/2)</span> y <span class="eq">k = 2 &rArr; 2 &middot; a<sup>&minus;1</sup> = 3/2 &rArr; a = 4/3</span>.</li>
+                  <li><strong>Caso B (Base dada y corte con el eje vertical):</strong> <span class="eq">a = 1/2</span> y corta al eje vertical en 4 <span class="eq">&rArr; f(0) = 4 &rArr; k = 4</span>. Fórmula: <span class="eq">f(x) = 4 &middot; (1/2)<sup>x</sup></span>.</li>
+                  <li><strong>Caso C (Dos puntos cualesquiera):</strong> Pasa por <span class="eq">P(1; 1)</span> y <span class="eq">Q(2; 3) &rArr; a<sup>2&minus;1</sup> = 3/1 &rArr; a = 3</span>, <span class="eq">k = 1/3 &rArr; f(x) = (1/3) &middot; 3<sup>x</sup> = 3<sup>x&minus;1</sup></span>.</li>
+                  <li><strong>Caso D (Punto en el origen y salto negativo):</strong> Pasa por <span class="eq">P(0; 1)</span> y <span class="eq">Q(&minus;2; 25/9) &rArr; k = 1</span>; <span class="eq">a<sup>&minus;2</sup> = 25/9 &rArr; a = 3/5</span>.</li>
+                </ul>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Dividir las imágenes de dos puntos</td>
+                      <td>y<sub>2</sub> / y<sub>1</sub> = a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup></td>
+                      <td>Restar y<sub>2</sub> &minus; y<sub>1</sub> calculando pendientes lineales</td>
+                    </tr>
+                    <tr>
+                      <td>Despejar k usando x<sub>1</sub> = 0</td>
+                      <td>k = y<sub>1</sub> cuando el punto es (0; y<sub>1</sub>)</td>
+                      <td>Armar sistemas no lineales complicados innecesariamente</td>
+                    </tr>
+                    <tr>
+                      <td>Verificar el signo de y<sub>1</sub> e y<sub>2</sub></td>
+                      <td>sgn(y<sub>1</sub>) = sgn(y<sub>2</sub>) &ne; 0</td>
+                      <td>Intentar ajustar exponenciales con puntos de distinto signo</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -818,17 +802,6 @@
                   Esta técnica analítica es el cimiento de todos los modelos físicos, biológicos y económicos en el tiempo real.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    Si uno de los puntos tiene coordenada <span class="eq">y &le; 0</span> y el otro <span class="eq">y &gt; 0</span>,
-                    la curva exponencial no puede unirlos sin cruzar el eje horizontal. ¡No existe función exponencial elemental que pase por ambos!
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-6">
-                  <span class="seq-block__label">Chequeo 6</span>
-                  <div data-check="sec-6"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -836,6 +809,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  Si uno de los puntos tiene coordenada <span class="eq">y &le; 0</span> y el otro <span class="eq">y &gt; 0</span>,
+                  la curva exponencial no puede unirlos sin cruzar el eje horizontal. ¡No existe función exponencial elemental que pase por ambos!
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-6">
+                <span class="seq-block__label">Chequeo 6</span>
+                <div data-check="sec-6"></div>
+              </div>
             </div>
           </section>
 
@@ -858,64 +842,62 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Si un proceso completa su ciclo en un período T, el exponente debe ser t/T para contar cuántas renovaciones completas han tenido lugar.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    Los modelos de la ciencia real adoptan la estructura estándar:
-                    <span class="eq">M(t) = M<sub>0</sub> &middot; a<sup>t / T</sup></span>.
-                  </p>
-                  <p>
-                    <strong>1. Crecimiento porcentual:</strong> Si una cantidad aumenta o disminuye a una tasa <span class="eq">r</span>,
-                    la base multiplicativa no es <span class="eq">r</span>, sino el factor de escala <span class="eq">a = 1 &plusmn; r</span>.
-                    En el Ejercicio 10c de Exactas, una población de 55 millones crece el 12% cada 5 años:
-                    la base es <span class="eq">1 + 0.12 = 1.12</span> y la fórmula es
-                    <span class="eq">P(t) = 55 &middot; (1.12)<sup>t / 5</sup></span>. A los 50 años han pasado <span class="eq">50/5 = 10</span> períodos,
-                    alcanzando <span class="eq">55 &middot; (1.12)<sup>10</sup> &asymp; 170.82 millones</span>.
-                  </p>
-                  <p>
-                    <strong>2. Semidesintegración:</strong> En el Ejercicio 10b, disponemos de 50 g de talio radiactivo con vida media de 3 minutos.
-                    Cada 3 minutos la masa se multiplica por <span class="eq">1/2</span>:
-                    <span class="eq">M(t) = 50 &middot; (1/2)<sup>t / 3</sup></span>. Al cabo de media hora (<span class="eq">t = 30 min</span>),
-                    transcurrieron <span class="eq">30/3 = 10</span> vidas medias: <span class="eq">M(30) = 50 &middot; (1/2)<sup>10</sup> = 50/1024 &asymp; 0.0488 g</span>.
-                  </p>
-                  <p>
-                    <strong>3. Modelos continuos con base e:</strong> En procesos continuos de desintegración o finanzas,
-                    la <span class="gloss-term" data-gloss="base_natural_e">base natural e</span> (<span class="eq">e &asymp; 2.71828</span>) modela tasas continuas <span class="eq">A(t) = A<sub>0</sub> &middot; e<sup>kt</sup></span>.
-                  </p>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Aumento del 12% cada 5 años</td>
-                        <td>P(t) = 55 &middot; (1 + 0.12)<sup>t / 5</sup></td>
-                        <td>Poner 0.12 como base directa o multiplicar 5 &middot; t</td>
-                      </tr>
-                      <tr>
-                        <td>Semivida de 3 minutos en media hora</td>
-                        <td>M(30) = 50 &middot; (1/2)<sup>30 / 3</sup></td>
-                        <td>Olvidar dividir el tiempo total por el período T</td>
-                      </tr>
-                      <tr>
-                        <td>Desintegración continua con tasa &minus;0.05</td>
-                        <td>A(t) = 120 &middot; e<sup>&minus;0.05 t</sup></td>
-                        <td>Confundir modelos de período discreto con tasas continuas</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Si un proceso completa su ciclo en un período T, el exponente debe ser t/T para contar cuántas renovaciones completas han tenido lugar.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Los modelos de la ciencia real adoptan la estructura estándar:
+                  <span class="eq">M(t) = M<sub>0</sub> &middot; a<sup>t / T</sup></span>.
+                </p>
+                <p>
+                  <strong>1. Crecimiento porcentual:</strong> Si una cantidad aumenta o disminuye a una tasa <span class="eq">r</span>,
+                  la base multiplicativa no es <span class="eq">r</span>, sino el factor de escala <span class="eq">a = 1 &plusmn; r</span>.
+                  Por ejemplo, si una población de 55 millones de habitantes crece un 12% cada 5 años:
+                  la base es <span class="eq">1 + 0.12 = 1.12</span> y la fórmula es
+                  <span class="eq">P(t) = 55 &middot; (1.12)<sup>t / 5</sup></span>. A los 50 años han pasado <span class="eq">50/5 = 10</span> períodos,
+                  alcanzando <span class="eq">55 &middot; (1.12)<sup>10</sup> &asymp; 170.82 millones</span>.
+                </p>
+                <p>
+                  <strong>2. Semidesintegración:</strong> Por ejemplo, si disponemos de 50 g de talio radiactivo con una vida media de 3 minutos:
+                  cada 3 minutos la masa se multiplica por <span class="eq">1/2</span>:
+                  <span class="eq">M(t) = 50 &middot; (1/2)<sup>t / 3</sup></span>. Al cabo de media hora (<span class="eq">t = 30 min</span>),
+                  transcurrieron <span class="eq">30/3 = 10</span> vidas medias: <span class="eq">M(30) = 50 &middot; (1/2)<sup>10</sup> = 50/1024 &asymp; 0.0488 g</span>.
+                </p>
+                <p>
+                  <strong>3. Modelos continuos con base e:</strong> En procesos continuos de desintegración o finanzas,
+                  la <span class="gloss-term" data-gloss="base_natural_e">base natural e</span> (<span class="eq">e &asymp; 2.71828</span>) modela tasas continuas <span class="eq">A(t) = A<sub>0</sub> &middot; e<sup>kt</sup></span>.
+                </p>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Aumento del 12% cada 5 años</td>
+                      <td>P(t) = 55 &middot; (1 + 0.12)<sup>t / 5</sup></td>
+                      <td>Poner 0.12 como base directa o multiplicar 5 &middot; t</td>
+                    </tr>
+                    <tr>
+                      <td>Semivida de 3 minutos en media hora</td>
+                      <td>M(30) = 50 &middot; (1/2)<sup>30 / 3</sup></td>
+                      <td>Olvidar dividir el tiempo total por el período T</td>
+                    </tr>
+                    <tr>
+                      <td>Desintegración continua con tasa &minus;0.05</td>
+                      <td>A(t) = 120 &middot; e<sup>&minus;0.05 t</sup></td>
+                      <td>Confundir modelos de período discreto con tasas continuas</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -927,17 +909,6 @@
                   En los problemas más avanzados, la asíntota ya no está pegada al cero: examinaremos cómo se desplaza vertical y horizontalmente.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    ¡Ojo con las unidades temporales! Si el período está en minutos, el tiempo transcurrido debe convertirse a minutos.
-                    Media hora son 30 minutos, no 0.5.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-7">
-                  <span class="seq-block__label">Chequeo 7</span>
-                  <div data-check="sec-7"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -945,6 +916,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  ¡Ojo con las unidades temporales! Si el período está en minutos, el tiempo transcurrido debe convertirse a minutos.
+                  Media hora son 30 minutos, no 0.5.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-7">
+                <span class="seq-block__label">Chequeo 7</span>
+                <div data-check="sec-7"></div>
+              </div>
             </div>
           </section>
 
@@ -979,65 +961,63 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    El término independiente c traslada la asíntota horizontal a la recta y = c y delimita la frontera abierta e inalcanzable de la imagen.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    La forma general completa de una función exponencial desplazada es:
-                  </p>
-                  <p class="math-display">
-                    <span class="eq">f(x) = k &middot; a<sup>x &minus; h</sup> + c</span>
-                  </p>
-                  <p>
-                    Cada parámetro desempeña un rol geométrico preciso:
-                  </p>
-                  <ul>
-                    <li><strong>h (desplazamiento horizontal):</strong> Mueve la curva <span class="eq">h</span> unidades hacia la derecha si es positivo, o hacia la izquierda si es negativo. No altera la asíntota ni el rango de valores.</li>
-                    <li><strong>c (desplazamiento vertical):</strong> Desplaza toda la curva hacia arriba o abajo. Traslada la <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span> de <span class="eq">y = 0</span> a la recta <span class="eq">y = c</span>.</li>
-                  </ul>
-                  <p>
-                    Consecuencia crucial para el <span class="gloss-term" data-gloss="conjunto_imagen">conjunto imagen</span>:
-                    dado que <span class="eq">k &middot; a<sup>x &minus; h</sup></span> nunca puede dar cero, <span class="eq">f(x)</span> jamás alcanza el valor <span class="eq">c</span>.
-                    Por lo tanto:
-                  </p>
-                  <ul>
-                    <li>Si <span class="eq">k &gt; 0</span>, la curva vive por encima de la asíntota: <span class="eq">Im(f) = (c; +&infin;)</span>.</li>
-                    <li>Si <span class="eq">k &lt; 0</span>, la curva vive por debajo de la asíntota: <span class="eq">Im(f) = (&minus;&infin;; c)</span>.</li>
-                  </ul>
-                  <div class="exp-table-wrap pr-table-wrap">
-                    <table class="exp-learning-table pr-learning-table">
-                      <thead>
-                        <tr>
-                          <th>Lo que hacés / ves</th>
-                          <th>Cómo se escribe en álgebra</th>
-                          <th>El error mecánico que evitás</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Trasladar verticalmente c unidades</td>
-                          <td>Asíntota horizontal: y = c</td>
-                          <td>Creer que la asíntota se queda siempre en el eje x (y = 0)</td>
-                        </tr>
-                        <tr>
-                          <td>Determinar la imagen con k &gt; 0</td>
-                          <td>Im(f) = (c; +&infin;) con paréntesis abierto</td>
-                          <td>Poner corchete cerrado [c; +&infin;) tocando la asíntota</td>
-                        </tr>
-                        <tr>
-                          <td>Determinar la imagen con k &lt; 0</td>
-                          <td>Im(f) = (&minus;&infin;; c) con paréntesis abierto</td>
-                          <td>Invertir el orden de los infinitos escribiendo (c; &minus;&infin;)</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  El término independiente c traslada la asíntota horizontal a la recta y = c y delimita la frontera abierta e inalcanzable de la imagen.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  La forma general completa de una función exponencial desplazada es:
+                </p>
+                <p class="math-display">
+                  <span class="eq">f(x) = k &middot; a<sup>x &minus; h</sup> + c</span>
+                </p>
+                <p>
+                  Cada parámetro desempeña un rol geométrico preciso:
+                </p>
+                <ul>
+                  <li><strong>h (desplazamiento horizontal):</strong> Mueve la curva <span class="eq">h</span> unidades hacia la derecha si es positivo, o hacia la izquierda si es negativo. No altera la asíntota ni el rango de valores.</li>
+                  <li><strong>c (desplazamiento vertical):</strong> Desplaza toda la curva hacia arriba o abajo. Traslada la <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span> de <span class="eq">y = 0</span> a la recta <span class="eq">y = c</span>.</li>
+                </ul>
+                <p>
+                  Consecuencia crucial para el <span class="gloss-term" data-gloss="conjunto_imagen">conjunto imagen</span>:
+                  dado que <span class="eq">k &middot; a<sup>x &minus; h</sup></span> nunca puede dar cero, <span class="eq">f(x)</span> jamás alcanza el valor <span class="eq">c</span>.
+                  Por lo tanto:
+                </p>
+                <ul>
+                  <li>Si <span class="eq">k &gt; 0</span>, la curva vive por encima de la asíntota: <span class="eq">Im(f) = (c; +&infin;)</span>.</li>
+                  <li>Si <span class="eq">k &lt; 0</span>, la curva vive por debajo de la asíntota: <span class="eq">Im(f) = (&minus;&infin;; c)</span>.</li>
+                </ul>
+                <div class="exp-table-wrap pr-table-wrap">
+                  <table class="exp-learning-table pr-learning-table">
+                    <thead>
+                      <tr>
+                        <th>Lo que hacés / ves</th>
+                        <th>Cómo se escribe en álgebra</th>
+                        <th>El error mecánico que evitás</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Trasladar verticalmente c unidades</td>
+                        <td>Asíntota horizontal: y = c</td>
+                        <td>Creer que la asíntota se queda siempre en el eje x (y = 0)</td>
+                      </tr>
+                      <tr>
+                        <td>Determinar la imagen con k &gt; 0</td>
+                        <td>Im(f) = (c; +&infin;) con paréntesis abierto</td>
+                        <td>Poner corchete cerrado [c; +&infin;) tocando la asíntota</td>
+                      </tr>
+                      <tr>
+                        <td>Determinar la imagen con k &lt; 0</td>
+                        <td>Im(f) = (&minus;&infin;; c) con paréntesis abierto</td>
+                        <td>Invertir el orden de los infinitos escribiendo (c; &minus;&infin;)</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
@@ -1050,17 +1030,6 @@
                   Habiendo dominado los desplazamientos, integraremos todos los elementos en la radiografía analítica de examen.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    ¡La trampa del millón de Exactas! La asíntota es un límite inalcanzable.
-                    Escribir un corchete cerrado en la asíntota es calificado como falta conceptual grave en los exámenes.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-8">
-                  <span class="seq-block__label">Chequeo 8</span>
-                  <div data-check="sec-8"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -1068,6 +1037,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  ¡Cuidado con la trampa del corchete! La asíntota es un piso o techo magnético inalcanzable.
+                  Escribir un corchete cerrado en la asíntota implicaría que la potencia se hace cero, lo cual es imposible en los reales. La frontera del intervalo imagen siempre lleva paréntesis abierto.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-8">
+                <span class="seq-block__label">Chequeo 8</span>
+                <div data-check="sec-8"></div>
+              </div>
             </div>
           </section>
 
@@ -1076,7 +1056,7 @@
             <header class="seq-section__header">
               <span class="seq-section__tag">CAPÍTULO 4 · SECCIÓN 9</span>
               <h2 id="title-sec-9" class="seq-section__title">
-                Radiografía de examen: análisis exhaustivo de Exactas
+                Radiografía analítica: análisis exhaustivo de la función exponencial
               </h2>
               <div class="vn-trigger-row">
                 <button type="button" class="btn btn--subtle vn-trigger vn-trigger-btn" data-tutor="why" data-vn-script="sec9-why" aria-label="¿Por qué pasa esto? Explicación de Alaska">
@@ -1090,63 +1070,60 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Una radiografía completa desglosa dominio, imagen, asíntota, ordenada, raíz, intervalos de crecimiento y conjuntos de signos.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    En el Ejercicio 14 de la guía (pág. 94) y en el 2° Parcial 2025 de Exactas, el examen exige
-                    la autopsia completa de una función exponencial con desplazamientos:
-                  </p>
-                  <p>
-                    Analicemos el caso modelo del examen: <span class="eq">f(x) = 2 &minus; (1/2)<sup>x</sup></span>.
-                  </p>
-                  <ul>
-                    <li><strong>Dominio:</strong> <span class="eq">Dom(f) = &reals;</span> (las funciones exponenciales no tienen restricciones en el exponente).</li>
-                    <li><strong>Asíntota horizontal:</strong> <span class="eq">y = 2</span>, ya que cuando <span class="eq">x &rarr; +&infin;</span>, <span class="eq">(1/2)<sup>x</sup> &rarr; 0</span>.</li>
-                    <li><strong>Imagen:</strong> Como <span class="eq">k = &minus;1 &lt; 0</span>, la curva resta a partir de 2: <span class="eq">Im(f) = (&minus;&infin;; 2)</span>.</li>
-                    <li><strong>Ordenada al origen:</strong> Evaluamos en cero: <span class="eq">f(0) = 2 &minus; (1/2)<sup>0</sup> = 2 &minus; 1 = 1 &rArr; (0; 1)</span>.</li>
-                    <li><strong>Conjunto de ceros (C0):</strong> Igualamos a cero:
-                      <span class="eq">2 &minus; (1/2)<sup>x</sup> = 0 &rArr; (1/2)<sup>x</sup> = 2 &rArr; 2<sup>&minus;x</sup> = 2<sup>1</sup> &rArr; x = &minus;1</span>.
-                      Luego, <span class="eq">C<sub>0</sub> = { &minus;1 }</span>.</li>
-                    <li><strong>Conjuntos de positividad y negatividad:</strong>
-                      Para <span class="eq">x &gt; &minus;1</span> la curva está por encima del eje: <span class="eq">C⁺ = (&minus;1; +&infin;)</span>.
-                      Para <span class="eq">x &lt; &minus;1</span> la curva está por debajo: <span class="eq">C⁻ = (&minus;&infin;; &minus;1)</span>.</li>
-                    <li><strong>Monotonía:</strong> <span class="eq">k = &minus;1 &lt; 0</span> y <span class="eq">a = 1/2 &lt; 1</span>: estrictamente CRECIENTE en todo &reals;
-                      (<span class="eq">I<sub>&uarr;</sub> = &reals;, I<sub>&darr;</sub> = &empty;</span>).</li>
-                  </ul>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Igualar a cero para hallar la raíz</td>
-                        <td>2 &minus; (1/2)<sup>x</sup> = 0 &rArr; x = &minus;1 &rArr; C<sub>0</sub> = {&minus;1}</td>
-                        <td>Confundir la raíz (corte con eje x) con la ordenada al origen</td>
-                      </tr>
-                      <tr>
-                        <td>Determinar C+ y C- con la raíz</td>
-                        <td>C⁺ = (&minus;1; +&infin;), C⁻ = (&minus;&infin;; &minus;1)</td>
-                        <td>Usar corchetes cerrados en conjuntos de signos</td>
-                      </tr>
-                      <tr>
-                        <td>Concluir monotonía analítica</td>
-                        <td>k = &minus;1 &lt; 0 y a = 1/2 &lt; 1 &rArr; Creciente en &reals;</td>
-                        <td>Guiarse por la forma decreciente de (1/2)<sup>x</sup> ignorando el signo menos</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Una radiografía completa desglosa dominio, imagen, asíntota, ordenada, raíz, intervalos de crecimiento y conjuntos de signos.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  El estudio analítico exhaustivo de una función exponencial con desplazamientos exige determinar cada una de sus propiedades estructurales sin omitir ningún conjunto:
+                </p>
+                <p>
+                  Analicemos la función trasladada representativa: <span class="eq">f(x) = 2 &minus; (1/2)<sup>x</sup></span>.
+                </p>
+                <ul>
+                  <li><strong>Dominio:</strong> <span class="eq">Dom(f) = &reals;</span> (las funciones exponenciales no tienen restricciones en el exponente).</li>
+                  <li><strong>Asíntota horizontal:</strong> <span class="eq">y = 2</span>, ya que cuando <span class="eq">x &rarr; +&infin;</span>, <span class="eq">(1/2)<sup>x</sup> &rarr; 0</span>.</li>
+                  <li><strong>Imagen:</strong> Como <span class="eq">k = &minus;1 &lt; 0</span>, la curva resta a partir de 2: <span class="eq">Im(f) = (&minus;&infin;; 2)</span>.</li>
+                  <li><strong>Ordenada al origen:</strong> Evaluamos en cero: <span class="eq">f(0) = 2 &minus; (1/2)<sup>0</sup> = 2 &minus; 1 = 1 &rArr; (0; 1)</span>.</li>
+                  <li><strong>Conjunto de ceros (C0):</strong> Igualamos a cero:
+                    <span class="eq">2 &minus; (1/2)<sup>x</sup> = 0 &rArr; (1/2)<sup>x</sup> = 2 &rArr; 2<sup>&minus;x</sup> = 2<sup>1</sup> &rArr; x = &minus;1</span>.
+                    Luego, <span class="eq">C<sub>0</sub> = { &minus;1 }</span>.</li>
+                  <li><strong>Conjuntos de positividad y negatividad:</strong>
+                    Para <span class="eq">x &gt; &minus;1</span> la curva está por encima del eje: <span class="eq">C⁺ = (&minus;1; +&infin;)</span>.
+                    Para <span class="eq">x &lt; &minus;1</span> la curva está por debajo: <span class="eq">C⁻ = (&minus;&infin;; &minus;1)</span>.</li>
+                  <li><strong>Monotonía:</strong> <span class="eq">k = &minus;1 &lt; 0</span> y <span class="eq">a = 1/2 &lt; 1</span>: estrictamente CRECIENTE en todo &reals;
+                    (<span class="eq">I<sub>&uarr;</sub> = &reals;, I<sub>&darr;</sub> = &empty;</span>).</li>
+                </ul>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Igualar a cero para hallar la raíz</td>
+                      <td>2 &minus; (1/2)<sup>x</sup> = 0 &rArr; x = &minus;1 &rArr; C<sub>0</sub> = {&minus;1}</td>
+                      <td>Confundir la raíz (corte con eje x) con la ordenada al origen</td>
+                    </tr>
+                    <tr>
+                      <td>Determinar C+ y C- con la raíz</td>
+                      <td>C⁺ = (&minus;1; +&infin;), C⁻ = (&minus;&infin;; &minus;1)</td>
+                      <td>Usar corchetes cerrados en conjuntos de signos</td>
+                    </tr>
+                    <tr>
+                      <td>Concluir monotonía analítica</td>
+                      <td>k = &minus;1 &lt; 0 y a = 1/2 &lt; 1 &rArr; Creciente en &reals;</td>
+                      <td>Guiarse por la forma decreciente de (1/2)<sup>x</sup> ignorando el signo menos</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -1159,17 +1136,6 @@
                   El cálculo de raíces nos conduce directamente al reto definitivo: resolver ecuaciones algebraicas sin necesidad de logaritmos.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    Si <span class="eq">k</span> y <span class="eq">c</span> tienen el mismo signo (ej. <span class="eq">f(x) = 3 &middot; 2<sup>x</sup> + 5</span>),
-                    la curva nunca corta al eje x. El conjunto de ceros es vacío: <span class="eq">C<sub>0</sub> = &empty;</span>.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-9">
-                  <span class="seq-block__label">Chequeo 9</span>
-                  <div data-check="sec-9"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -1177,6 +1143,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  Si <span class="eq">k</span> y <span class="eq">c</span> tienen el mismo signo (ej. <span class="eq">f(x) = 3 &middot; 2<sup>x</sup> + 5</span>),
+                  la curva nunca corta al eje x. El conjunto de ceros es vacío: <span class="eq">C<sub>0</sub> = &empty;</span>.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-9">
+                <span class="seq-block__label">Chequeo 9</span>
+                <div data-check="sec-9"></div>
+              </div>
             </div>
           </section>
 
@@ -1199,67 +1176,65 @@
               </div>
             </header>
             <div class="exp-workbench pr-workbench">
-              <div class="exp-theory-column pr-theory-column">
-                <div class="seq-block seq-block--phrase">
-                  <span class="seq-block__label">En una frase</span>
-                  <blockquote class="seq-phrase-text">
-                    Sin logaritmos, resolvemos ecuaciones exponenciales por tres caminos: igualar bases, extraer factor común, o sustitución cuadrática.
-                  </blockquote>
-                </div>
-                <div class="seq-block seq-block--visual">
-                  <span class="seq-block__label">Cómo se ve</span>
-                  <p>
-                    El Módulo de Exactas (Ejercicio 8 págs. 93-94) y los exámenes parciales estructuran las ecuaciones exponenciales en tres métodos exactos:
-                  </p>
-                  <p>
-                    <strong>1. Igualación de bases:</strong> Dado que la función exponencial es estrictamente inyectiva en &reals;,
-                    <span class="eq">a<sup>f(x)</sup> = a<sup>g(x)</sup> &hArr; f(x) = g(x)</span>.
-                    En el Ejercicio 12a:
-                    <span class="eq">2<sup>3x+1</sup> : 16<sup>x&minus;4</sup> = 1</span>. Escribimos <span class="eq">16 = 2<sup>4</sup></span>, luego
-                    <span class="eq">2<sup>3x+1</sup> : 2<sup>4(x&minus;4)</sup> = 2<sup>0</sup></span>.
-                    Restamos exponentes con paréntesis:
-                    <span class="eq">(3x + 1) &minus; (4x &minus; 16) = 0 &rArr; &minus;x + 17 = 0 &rArr; x = 17 &rArr; S = { 17 }</span>.
-                  </p>
-                  <p>
-                    <strong>2. Factor común:</strong> Cuando la incógnita aparece en varios términos con la misma base.
-                    En el Ejercicio 8h:
-                    <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup> = 12</span>. Descomponemos:
-                    <span class="eq">2<sup>x</sup> &middot; 2<sup>1</sup> + 2<sup>x</sup> &middot; 1 = 12 &rArr; 2<sup>x</sup>(2 + 1) = 12 &rArr; 2<sup>x</sup> &middot; 3 = 12 &rArr; 2<sup>x</sup> = 4 = 2<sup>2</sup> &rArr; x = 2 &rArr; S = { 2 }</span>.
-                  </p>
-                  <p>
-                    <strong>3. <span class="gloss-term" data-gloss="sustitucion_cuadratica">Sustitución cuadrática</span>:</strong> Aparecen términos con <span class="eq">a<sup>2x</sup> = (a<sup>x</sup>)<sup>2</sup></span> y <span class="eq">a<sup>x</sup></span>.
-                    Hacemos el cambio de variable <span class="eq">u = a<sup>x</sup></span>, con la <em>condición biológica ineludible</em>
-                    <span class="eq">u &gt; 0</span>.
-                    Si al resolver la resolvente cuadrática obtenemos <span class="eq">u<sub>1</sub> = 3</span> y <span class="eq">u<sub>2</sub> = &minus;2</span>:
-                    la raíz <span class="eq">u<sub>2</sub> = &minus;2</span> se <strong>descarta de inmediato</strong> porque <span class="eq">a<sup>x</sup></span> jamás puede dar un número no positivo.
-                  </p>
-                  <table class="exp-learning-table pr-learning-table">
-                    <thead>
-                      <tr>
-                        <th>Lo que hacés / ves</th>
-                        <th>Cómo se escribe en álgebra</th>
-                        <th>El error mecánico que evitás</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Restar exponentes en cocientes</td>
-                        <td>(3x + 1) &minus; (4x &minus; 16) = &minus;x + 17</td>
-                        <td>Olvidar el paréntesis y escribir &minus;4x &minus; 16</td>
-                      </tr>
-                      <tr>
-                        <td>Descomponer sumas en el exponente</td>
-                        <td>2<sup>x+1</sup> = 2<sup>x</sup> &middot; 2<sup>1</sup></td>
-                        <td>Sumar bases inventando 4<sup>2x+1</sup></td>
-                      </tr>
-                      <tr>
-                        <td>Sustitución u = a<sup>x</sup></td>
-                        <td>u &gt; 0 estricto en &reals;</td>
-                        <td>Aceptar raíces u &le; 0 creyendo que existen logaritmos reales de negativos</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="seq-block seq-block--phrase exp-phrase">
+                <span class="seq-block__label">En una frase</span>
+                <blockquote class="seq-phrase-text">
+                  Sin logaritmos, resolvemos ecuaciones exponenciales por tres caminos: igualar bases, extraer factor común, o sustitución cuadrática.
+                </blockquote>
+              </div>
+              <div class="seq-block seq-block--visual exp-visual">
+                <span class="seq-block__label">Cómo se ve</span>
+                <p>
+                  Sin recurrir a logaritmos, las ecuaciones exponenciales se resuelven desarmando su estructura mediante tres caminos analíticos puros:
+                </p>
+                <p>
+                  <strong>1. Igualación de bases:</strong> Dado que la función exponencial es estrictamente inyectiva en &reals;,
+                  <span class="eq">a<sup>f(x)</sup> = a<sup>g(x)</sup> &hArr; f(x) = g(x)</span>.
+                  Por ejemplo, en un cociente de potencias con bases emparentadas:
+                  <span class="eq">2<sup>3x+1</sup> : 16<sup>x&minus;4</sup> = 1</span>. Escribimos <span class="eq">16 = 2<sup>4</sup></span>, luego
+                  <span class="eq">2<sup>3x+1</sup> : 2<sup>4(x&minus;4)</sup> = 2<sup>0</sup></span>.
+                  Restamos exponentes con paréntesis:
+                  <span class="eq">(3x + 1) &minus; (4x &minus; 16) = 0 &rArr; &minus;x + 17 = 0 &rArr; x = 17 &rArr; S = { 17 }</span>.
+                </p>
+                <p>
+                  <strong>2. Factor común:</strong> Cuando la incógnita aparece en varios términos con la misma base.
+                  Por ejemplo, en una suma de potencias con la misma base:
+                  <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup> = 12</span>. Descomponemos:
+                  <span class="eq">2<sup>x</sup> &middot; 2<sup>1</sup> + 2<sup>x</sup> &middot; 1 = 12 &rArr; 2<sup>x</sup>(2 + 1) = 12 &rArr; 2<sup>x</sup> &middot; 3 = 12 &rArr; 2<sup>x</sup> = 4 = 2<sup>2</sup> &rArr; x = 2 &rArr; S = { 2 }</span>.
+                </p>
+                <p>
+                  <strong>3. <span class="gloss-term" data-gloss="sustitucion_cuadratica">Sustitución cuadrática</span>:</strong> Aparecen términos con <span class="eq">a<sup>2x</sup> = (a<sup>x</sup>)<sup>2</sup></span> y <span class="eq">a<sup>x</sup></span>.
+                  Hacemos el cambio de variable <span class="eq">u = a<sup>x</sup></span>, con la <em>condición de existencia ineludible en los reales</em>
+                  <span class="eq">u &gt; 0</span>.
+                  Si al resolver la resolvente cuadrática obtenemos <span class="eq">u<sub>1</sub> = 3</span> y <span class="eq">u<sub>2</sub> = &minus;2</span>:
+                  la raíz <span class="eq">u<sub>2</sub> = &minus;2</span> se <strong>descarta de inmediato</strong> porque <span class="eq">a<sup>x</sup></span> jamás puede dar un número no positivo.
+                </p>
+                <table class="exp-learning-table pr-learning-table">
+                  <thead>
+                    <tr>
+                      <th>Lo que hacés / ves</th>
+                      <th>Cómo se escribe en álgebra</th>
+                      <th>El error mecánico que evitás</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Restar exponentes en cocientes</td>
+                      <td>(3x + 1) &minus; (4x &minus; 16) = &minus;x + 17</td>
+                      <td>Olvidar el paréntesis y escribir &minus;4x &minus; 16</td>
+                    </tr>
+                    <tr>
+                      <td>Descomponer sumas en el exponente</td>
+                      <td>2<sup>x+1</sup> = 2<sup>x</sup> &middot; 2<sup>1</sup></td>
+                      <td>Sumar bases inventando 4<sup>2x+1</sup></td>
+                    </tr>
+                    <tr>
+                      <td>Sustitución u = a<sup>x</sup></td>
+                      <td>u &gt; 0 estricto en &reals;</td>
+                      <td>Aceptar raíces u &le; 0 creyendo que existen logaritmos reales de negativos</td>
+                    </tr>
+                  </tbody>
+                </table>
                 <aside class="exp-aha-box pr-aha-box" aria-label="Predicción antes de calcular">
                   <strong>Poné a prueba tu intuición antes de calcular</strong>
                   <p>
@@ -1272,17 +1247,6 @@
                   ¡Felicitaciones! Has completado las 10 secciones teóricas y experimentales. Ahora es momento de consolidar tu dominio en el Entrenador.
                 </p>
                 <div class="exp-annotated-host pr-annotated-host"></div>
-                <div class="seq-block seq-block--caution">
-                  <span class="seq-block__label">Cuidado con</span>
-                  <p>
-                    ¡Pará la mano con la sustitución! En <span class="eq">u = a<sup>x</sup></span>, cualquier raíz cuadrática <span class="eq">u &le; 0</span>
-                    se descarta al instante. <span class="eq">2<sup>x</sup> = &minus;1</span> no tiene solución en el conjunto de los números reales.
-                  </p>
-                </div>
-                <div class="seq-block seq-block--check" data-check-id="sec-10">
-                  <span class="seq-block__label">Chequeo 10</span>
-                  <div data-check="sec-10"></div>
-                </div>
               </div>
               <aside class="exp-probe pr-probe seq-block seq-block--try" aria-label="Simulador interactivo">
                 <span class="seq-block__label">Probalo</span>
@@ -1290,6 +1254,17 @@
                   <div class="exp-readout pr-readout" aria-live="polite"></div>
                 </div>
               </aside>
+              <div class="seq-block seq-block--caution exp-warning">
+                <span class="seq-block__label">Cuidado con</span>
+                <p>
+                  ¡Pará la mano con la sustitución! En <span class="eq">u = a<sup>x</sup></span>, cualquier raíz cuadrática <span class="eq">u &le; 0</span>
+                  se descarta al instante. <span class="eq">2<sup>x</sup> = &minus;1</span> no tiene solución en el conjunto de los números reales.
+                </p>
+              </div>
+              <div class="seq-block seq-block--check exp-check" data-check-id="sec-10">
+                <span class="seq-block__label">Chequeo 10</span>
+                <div data-check="sec-10"></div>
+              </div>
             </div>
           </section>
 
@@ -1300,7 +1275,7 @@
             <span class="seq-chapter-banner__tag">Capítulo 5</span>
             <h2 class="seq-chapter-banner__title">Práctica y Repaso</h2>
             <p class="muted">
-              Población infinita de ejercicios con semillas deterministas y las 5 trampas mortales de examen.
+              Población infinita de ejercicios con semillas deterministas y las 5 trampas conceptuales clásicas.
             </p>
           </div>
 
@@ -1308,7 +1283,7 @@
           <section id="sec-retos" class="seq-section exp-challenge-section pr-challenge-section" aria-labelledby="title-sec-retos">
             <header class="seq-section__header">
               <span class="seq-section__tag">ENTRENAMIENTO Y TRAMPAS</span>
-              <h2 id="title-sec-retos" class="seq-section__title">Entrenador y 5 Trampas de Examen</h2>
+              <h2 id="title-sec-retos" class="seq-section__title">Entrenador y 5 Trampas Conceptuales</h2>
             </header>
             <div id="exp-challenges"></div>
           </section>
@@ -1321,7 +1296,7 @@
             </header>
             <p>
               Resumen sistemático de leyes, restricciones en &reals;, anatomía asintótica y métodos algebraicos de resolución.
-              Utilizá el botón para imprimir esta hoja antes de tu examen parcial.
+              Utilizá el botón para imprimir esta hoja de estudio cuando la necesites.
             </p>
             <button type="button" class="btn btn--subtle" onclick="window.print()">
               Imprimir hoja de repaso

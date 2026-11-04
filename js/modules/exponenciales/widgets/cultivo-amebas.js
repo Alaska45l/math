@@ -300,16 +300,41 @@ export function initWidget(container, options = {}) {
     timeProbeLine.setAttribute('x1', String(px));
     timeProbeLine.setAttribute('x2', String(px));
 
+    const isOver3 = y3 > yMax;
+    const isOverF = yF > yMax;
+
+    const text1 = `2^${t} = ${y1}`;
+    const text3 = isOver3 ? `↑ 3·2^${t} = ${y3} (fuera de escala)` : `3·2^${t} = ${y3}`;
+    const textF = isOverF ? `↑ 6^${t} = ${yF} (fuera de escala)` : `6^${t} = ${yF}`;
+
+    const anchorRight = px > 540;
+    const labelX = anchorRight ? String(px - 10) : String(px + 8);
+    const textAnchor = anchorRight ? 'end' : 'start';
+
+    const py1 = mapY(y1);
+    const py3 = mapY(y3);
+    const pyF = mapY(yF);
+
+    let pyLabel3 = py3 - 6;
+    let pyLabelF = pyF - 6;
+    if (isOver3 && isOverF) {
+      pyLabel3 = py3 - 6;
+      pyLabelF = Math.max(graphY + 14, pyF - 22);
+    } else if (show3 && showF && Math.abs(py3 - pyF) < 16) {
+      pyLabel3 = py3 - 6;
+      pyLabelF = pyF + 14;
+    }
+
     // Update point 1
     if (show1) {
       setVisible(pt1, true);
       setVisible(label1, true);
-      const py1 = mapY(y1);
       pt1.setAttribute('cx', String(px));
       pt1.setAttribute('cy', String(py1));
-      label1.setAttribute('x', String(px + 8));
+      label1.setAttribute('x', labelX);
       label1.setAttribute('y', String(py1 - 6));
-      setText(label1, `2ᵗ = ${y1}`);
+      label1.setAttribute('text-anchor', textAnchor);
+      setText(label1, text1);
     } else {
       setVisible(pt1, false);
       setVisible(label1, false);
@@ -319,12 +344,12 @@ export function initWidget(container, options = {}) {
     if (show3) {
       setVisible(pt3, true);
       setVisible(label3, true);
-      const py3 = mapY(y3);
       pt3.setAttribute('cx', String(px));
       pt3.setAttribute('cy', String(py3));
-      label3.setAttribute('x', String(px + 8));
-      label3.setAttribute('y', String(py3 - 6));
-      setText(label3, `3·2ᵗ = ${y3}`);
+      label3.setAttribute('x', labelX);
+      label3.setAttribute('y', String(pyLabel3));
+      label3.setAttribute('text-anchor', textAnchor);
+      setText(label3, text3);
     } else {
       setVisible(pt3, false);
       setVisible(label3, false);
@@ -334,12 +359,12 @@ export function initWidget(container, options = {}) {
     if (showF) {
       setVisible(ptFallacy, true);
       setVisible(labelFallacy, true);
-      const pyF = mapY(yF);
       ptFallacy.setAttribute('cx', String(px));
       ptFallacy.setAttribute('cy', String(pyF));
-      labelFallacy.setAttribute('x', String(px + 8));
-      labelFallacy.setAttribute('y', String(pyF - 6));
-      setText(labelFallacy, `6ᵗ = ${yF}`);
+      labelFallacy.setAttribute('x', labelX);
+      labelFallacy.setAttribute('y', String(pyLabelF));
+      labelFallacy.setAttribute('text-anchor', textAnchor);
+      setText(labelFallacy, textF);
     } else {
       setVisible(ptFallacy, false);
       setVisible(labelFallacy, false);

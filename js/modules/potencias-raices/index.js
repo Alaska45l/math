@@ -1,5 +1,5 @@
 import { h, mount, qsa } from "../../core/dom.js";
-import { renderNav } from "../../core/nav.js";
+import { renderNav, initLessonDock } from "../../core/nav.js";
 import { initGlossary } from "../../core/glossary.js";
 import { initRetosModule } from "./retos.js";
 import {
@@ -694,6 +694,7 @@ export function initBlackboardController() {
     h("div", { class: "seq-blackboard-toolbar__actions" }, toggle),
   );
   content.prepend(toolbar);
+  initLessonDock();
   const sidebarToggle = toolbar.querySelector("[data-sidebar-toggle]");
   const sidebarClose = h(
     "button",

@@ -261,7 +261,7 @@ export function annotatedExpFormula(root, config = {}) {
     // Token a
     const aNode = formatBaseNode(a);
     const aExpl = state.tokens.a ||
-      `Base a = ${typeof a === "number" ? fmt(a) : a}: razón multiplicativa. ${Number(a) > 1 ? "Como a > 1, representa crecimiento exponencial." : "Como 0 < a < 1, representa decaimiento exponencial."} En Exactas a debe ser positiva y distinta de 1.`;
+      `Base a = ${typeof a === "number" ? fmt(a) : a}: razón multiplicativa. ${Number(a) > 1 ? "Como a > 1, representa crecimiento exponencial." : "Como 0 < a < 1, representa decaimiento exponencial."} En los números reales, la base debe ser positiva y distinta de 1 para evitar raíces complejas y rectas constantes.`;
 
     // Exponente b*x - h
     const expChildren = [];
@@ -302,7 +302,7 @@ export function annotatedExpFormula(root, config = {}) {
 
   mount(note,
     h("p", { class: "seq-annotated__hint-text muted small" },
-      "Tocá o enfocá cada símbolo para que Alaska te explique qué controla en el gráfico y qué condición exige Exactas.",
+      "Tocá o enfocá cada símbolo para que Alaska te explique qué controla en la curva y qué condición matemática necesita para existir en los reales.",
     ),
   );
 

@@ -195,7 +195,7 @@ export function initWidget(container, options = {}) {
     'text-anchor': 'middle',
     'font-weight': 'bold',
     visibility: 'hidden',
-  }, 'X');
+  }, '✕');
 
   probeGroup.append(probeLine, probeDot, probeBadge, probeAlertCross);
   plane.layers.marks.append(probeGroup);
@@ -254,11 +254,47 @@ export function initWidget(container, options = {}) {
       probeY = Math.pow(a, pxVal);
     } else if (a === 1) {
       evalStatus = 'degenerate_one';
-      setVisible(constantLine, true);
+      let step = 1;
+      if (density === 1) step = 1;
+      else if (density === 2) step = 0.5;
+      else if (density === 3) step = 0.25;
+      else step = 0; // continuous
+
+      if (step > 0) {
+        let dotIdx = 0;
+        for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
+          const dot = pointDots[dotIdx++];
+          dot.setAttribute('cx', String(plane.sx(x)));
+          dot.setAttribute('cy', String(plane.sy(1)));
+          dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+          setVisible(dot, true);
+        }
+        setVisible(constantLine, false);
+      } else {
+        setVisible(constantLine, true);
+      }
       probeY = 1;
     } else if (a === 0) {
       evalStatus = 'invalid_zero';
-      setVisible(zeroRay, true);
+      let step = 1;
+      if (density === 1) step = 1;
+      else if (density === 2) step = 0.5;
+      else if (density === 3) step = 0.25;
+      else step = 0;
+
+      if (step > 0) {
+        let dotIdx = 0;
+        for (let x = step; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
+          const dot = pointDots[dotIdx++];
+          dot.setAttribute('cx', String(plane.sx(x)));
+          dot.setAttribute('cy', String(plane.sy(0)));
+          dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+          setVisible(dot, true);
+        }
+        setVisible(zeroRay, false);
+      } else {
+        setVisible(zeroRay, true);
+      }
       setVisible(dangerZone, true);
       setText(dangerText, 'x < 0: 0⁻¹ = 1/0 Indefinido');
       if (pxVal > 0) probeY = 0;
@@ -291,14 +327,18 @@ export function initWidget(container, options = {}) {
     probeLine.setAttribute('x1', String(probeSx));
     probeLine.setAttribute('x2', String(probeSx));
 
+    const isNearRight = probeSx > 480;
+    const badgeAnchor = isNearRight ? 'end' : 'start';
+
     if (probeY !== null && probeY >= -4 && probeY <= 8) {
       setVisible(probeDot, true);
       setVisible(probeAlertCross, false);
       const probeSy = plane.sy(probeY);
       probeDot.setAttribute('cx', String(probeSx));
       probeDot.setAttribute('cy', String(probeSy));
-      probeBadge.setAttribute('x', String(probeSx + 10));
+      probeBadge.setAttribute('x', String(isNearRight ? probeSx - 10 : probeSx + 10));
       probeBadge.setAttribute('y', String(probeSy - 10));
+      probeBadge.setAttribute('text-anchor', badgeAnchor);
       setText(probeBadge, `f(${fmt(pxVal)}) = ${fmt(probeY)}`);
     } else {
       setVisible(probeDot, false);
@@ -306,8 +346,9 @@ export function initWidget(container, options = {}) {
       const alertSy = plane.sy(0);
       probeAlertCross.setAttribute('x', String(probeSx));
       probeAlertCross.setAttribute('y', String(alertSy + 6));
-      probeBadge.setAttribute('x', String(probeSx + 12));
+      probeBadge.setAttribute('x', String(isNearRight ? probeSx - 12 : probeSx + 12));
       probeBadge.setAttribute('y', String(alertSy - 15));
+      probeBadge.setAttribute('text-anchor', badgeAnchor);
       if (evalStatus === 'invalid_neg') {
         setText(probeBadge, `(${a})^(${fmt(pxVal)}) ∉ ℝ (Raíz no real)`);
       } else if (evalStatus === 'invalid_zero') {

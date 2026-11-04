@@ -18,8 +18,8 @@ import {
 
 const MODES = [
   ['mirror', '1. Simetría Espejo'],
-  ['decay', '2. Radiactividad (Exactas 2)'],
-  ['trio', '3. Trío 2ˣ, eˣ, 3ˣ (Exactas 3)'],
+  ['decay', '2. Desintegración Radiactiva'],
+  ['trio', '3. Trío 2ˣ, eˣ, 3ˣ'],
 ];
 
 const BASES_MIRROR = [
@@ -75,6 +75,7 @@ export function initWidget(container, options = {}) {
     (b) => store.set({ mirrorBase: Number(b) }),
     'Base Espejo',
   );
+  const mirrorBaseGroup = board.controls.lastElementChild;
 
   const updateDecayMassChips = addChips(
     board.controls,
@@ -83,6 +84,7 @@ export function initWidget(container, options = {}) {
     (m) => store.set({ decayMass: m === 'both' ? 'both' : Number(m) }),
     'Masa Inicial',
   );
+  const decayMassGroup = board.controls.lastElementChild;
 
   const { labelEl: yearLabel, input: yearSlider } = addRange(
     board.controls,
@@ -184,6 +186,8 @@ export function initWidget(container, options = {}) {
     const isDecay = state.mode === 'decay';
     const isTrio = state.mode === 'trio';
 
+    mirrorBaseGroup.style.display = isMirror ? '' : 'none';
+    decayMassGroup.style.display = isDecay ? '' : 'none';
     yearLabel.style.display = isDecay ? '' : 'none';
     probeLabel.style.display = isDecay ? 'none' : '';
 
@@ -297,7 +301,7 @@ export function initWidget(container, options = {}) {
       }
 
       rows.push([
-        'Desintegración al 50% Anual (Exactas pág. 90)',
+        'Desintegración al 50% Anual',
         `M₁(t) = (1/2)ᵗ y M₂(t) = 2 · (1/2)ᵗ = (1/2)ᵗ⁻¹. El cultivo de 2 kg tarda exactamente 1 año más en alcanzar la masa del cultivo de 1 kg.`,
       ]);
       rows.push([
@@ -350,7 +354,7 @@ export function initWidget(container, options = {}) {
       setText(labelB, `3ˣ = ${fmt(y3)}`);
 
       rows.push([
-        'Ejercicio 3 de Exactas (pág. 91)',
+        'Decaimiento Rápido al 25%',
         'Comparación de las tres curvas canónicas: 2ˣ (azul), eˣ ≈ 2,718ˣ (verde) y 3ˣ (amarillo).',
       ]);
 

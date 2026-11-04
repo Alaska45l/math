@@ -416,6 +416,11 @@ output {
   font-weight: 400;
 }
 
+/* La barra de herramientas del pizarrón nunca flota por su cuenta (se acopla al site-nav). */
+.seq-blackboard-toolbar {
+  position: static;
+}
+
 /* Chips (presets y botones de modo compactos): min-height 44px para accesibilidad */
 .chip {
   min-height: 44px;
@@ -718,12 +723,29 @@ output {
 
 /* Expresión matemática en línea */
 .eq {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
+  display: inline;
   font-family: var(--font-hand);
   font-size: 1.125rem;
+}
+
+sup, sub {
+  position: relative;
+  line-height: 0;
+  vertical-align: baseline;
+  font-size: 0.8em;
+}
+
+sup {
+  top: -0.45em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+.eq sup,
+.eq sub {
+  display: inline;
 }
 
 .eq--lg {
@@ -1236,6 +1258,27 @@ button.vn-ctrl-btn:hover,
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: var(--chalk);
+}
+
+.vn-text sup,
+.vn-text sub {
+  position: relative;
+  line-height: 0;
+  vertical-align: baseline;
+  font-size: 0.8em;
+  display: inline;
+}
+
+.vn-text sup {
+  top: -0.45em;
+}
+
+.vn-text sub {
+  bottom: -0.25em;
+}
+
+.vn-text .eq {
+  display: inline;
 }
 
 .vn-box__footer {

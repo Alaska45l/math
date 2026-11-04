@@ -3,6 +3,16 @@
  * Unidad 08 de Alaska Math Lab.
  */
 
+:root {
+  --accent: var(--yellow);
+  --border: var(--line, rgba(236, 242, 232, 0.28));
+  --panel: var(--surface, #24322b);
+  --text: var(--ink, #ecf2e8);
+  --text-muted: var(--muted, #a7b8ae);
+  --orange: #f4a261;
+  --purple: #c3a6ff;
+}
+
 .exp-page {
   --exp-nav-h: 56px;
   --exp-sidebar-w: 250px;
@@ -85,9 +95,8 @@
 }
 
 .exp-page .seq-blackboard-toolbar {
-  position: sticky;
+  position: static;
   z-index: 30;
-  top: var(--exp-nav-h);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -600,29 +609,90 @@
 
 .exp-page .exp-widget__controls,
 .exp-page .pr-widget__controls {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.exp-page .pr-chip-group,
+.exp-page .exp-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  grid-column: 1 / -1;
+  margin: 4px 0 8px;
 }
 
 .exp-page .exp-control,
 .exp-page .pr-control {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   color: var(--muted);
   font-size: 0.9rem;
+  width: 100%;
+}
+
+.exp-page .exp-control__header,
+.exp-page .pr-control__header,
+.exp-page .field__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+}
+
+.exp-page .exp-control .field__label,
+.exp-page .pr-control .field__label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.exp-page .exp-control output,
+.exp-page .exp-control .field__value,
+.exp-page .pr-control output,
+.exp-page .pr-control .field__value {
+  color: var(--blue);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.exp-page .exp-control:not(:has(.field__header)),
+.exp-page .pr-control:not(:has(.field__header)) {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "label value"
+    "range range";
+}
+
+.exp-page .exp-control:not(:has(.field__header)) .field__label,
+.exp-page .pr-control:not(:has(.field__header)) .field__label {
+  grid-area: label;
+}
+
+.exp-page .exp-control:not(:has(.field__header)) output,
+.exp-page .exp-control:not(:has(.field__header)) .field__value,
+.exp-page .pr-control:not(:has(.field__header)) output,
+.exp-page .pr-control:not(:has(.field__header)) .field__value {
+  grid-area: value;
+}
+
+.exp-page .exp-control:not(:has(.field__header)) input[type="range"],
+.exp-page .pr-control:not(:has(.field__header)) input[type="range"] {
+  grid-area: range;
 }
 
 .exp-page .exp-control input[type="range"],
 .exp-page .pr-control input[type="range"] {
   width: 100%;
   accent-color: var(--blue);
-}
-
-.exp-page .exp-control output,
-.exp-page .pr-control output {
-  color: var(--blue);
-  font-weight: 700;
 }
 
 .exp-page .exp-control select,
@@ -644,7 +714,10 @@
 .exp-page .pr-widget__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  grid-column: 1 / -1;
 }
 
 .exp-page .exp-widget__actions .btn,

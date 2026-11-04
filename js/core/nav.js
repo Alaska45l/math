@@ -305,36 +305,20 @@ export const FUNDAMENTAL_LAWS = [
   },
 ];
 
+/** Contenido del botón de sonido: únicamente el ícono SVG (18×18), sin texto. */
 function createSoundBtnContent(enabled) {
-  const icon = s('svg', {
-    class: 'site-nav__sound-icon',
-    viewBox: '0 0 24 24',
-    width: '14',
-    height: '14',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '2',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'aria-hidden': 'true',
-  },
-    s('polygon', { points: '11 5 6 9 2 9 2 15 6 15 11 19 11 5', fill: 'currentColor' }),
-    enabled
-      ? [
-          s('path', { d: 'M15.54 8.46a5 5 0 0 1 0 7.07' }),
-          s('path', { d: 'M19.07 4.93a10 10 0 0 1 0 14.14' }),
-        ]
-      : [
-          s('line', { x1: '23', y1: '9', x2: '17', y2: '15' }),
-          s('line', { x1: '17', y1: '9', x2: '23', y2: '15' }),
-        ]
-  );
-  const label = h('span', { class: 'site-nav__sound-label' }, enabled ? 'Sonido' : 'Silencio');
-  return [icon, label];
+  return [
+    chalkIcon(enabled ? 'volume' : 'mute', {
+      width: 18,
+      height: 18,
+      class: 'site-nav__sound-icon',
+    }),
+  ];
 }
 
 function updateSoundBtn(btn, enabled) {
   btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+  btn.setAttribute('aria-label', 'Activar o silenciar sonido');
   btn.title = enabled ? 'Silenciar sonidos' : 'Activar sonidos';
   btn.replaceChildren(...createSoundBtnContent(enabled));
 }
@@ -427,9 +411,9 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       class: 'site-nav__brand',
       href: 'index.html',
       title: 'Volver al inicio',
-      'aria-label': 'c igual a uno sobre raíz de mu cero épsilon cero. Volver al inicio.',
+      'aria-label': 'Inicio. Volver a la página principal.',
     },
-    'c = 1 / √(μ₀ε₀)',
+    'Inicio',
   );
 
   const exploreButton = h(
@@ -439,27 +423,24 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       class: 'site-nav__explore',
       'aria-expanded': 'false',
       'aria-controls': 'site-curriculum-drawer',
+      title: currentUnit ? `U${currentUnit.number} · ${currentUnit.title}` : 'Módulos y unidades',
     },
-    chalkIcon('book', { width: 17, height: 17, class: 'site-nav__explore-icon' }),
-    h('span', null, 'Temario (9 unidades)'),
+    h('span', null, 'Módulos'),
     h('span', { class: 'site-nav__explore-caret', 'aria-hidden': 'true' }, '▾'),
   );
 
-  const center = h(
-    'div',
-    { class: 'site-nav__center' },
-    currentUnit
-      ? h('span', { class: 'site-nav__context' }, `U${currentUnit.number} · ${currentUnit.title}`)
-      : null,
-  );
+  // Ranura inteligente: aloja los controles del pizarrón al acoplarse (ver initLessonDock).
+  const dock = h('div', { class: 'site-nav__dock', 'data-site-nav-dock': 'true' });
+  const modeSlot = h('div', { class: 'site-nav__mode-slot', 'data-site-nav-mode': 'true' });
 
   const soundEnabled = isSoundEnabled();
   const soundBtn = h(
     'button',
     {
       type: 'button',
-      class: 'site-nav__sound-btn',
+      class: 'chip chip--icon-only site-nav__sound site-nav__sound-btn',
       'aria-pressed': soundEnabled ? 'true' : 'false',
+      'aria-label': 'Activar o silenciar sonido',
       title: soundEnabled ? 'Silenciar sonidos' : 'Activar sonidos',
     },
     ...createSoundBtnContent(soundEnabled),
@@ -501,7 +482,7 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   const backdrop = h('button', {
     type: 'button',
     class: 'site-nav__backdrop',
-    'aria-label': 'Cerrar temario',
+    'aria-label': 'Cerrar menú de módulos',
     tabindex: '-1',
   });
   const setDrawerOpen = (open, restoreFocus = false) => {
@@ -531,8 +512,8 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       'div',
       { class: 'site-nav__bar' },
       h('div', { class: 'site-nav__left' }, brandLink, exploreButton),
-      center,
-      h('div', { class: 'site-nav__right' }, soundBtn),
+      dock,
+      h('div', { class: 'site-nav__right' }, modeSlot, soundBtn),
     ),
     drawer,
   );
@@ -542,6 +523,163 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   renderChalkSill();
   initGlobalSoundUI();
   initScratchpad();
+}
+
+/**
+ * Acopla los controles de `#seq-board-toolbar` (toggle de índice, capítulo/pizarrón
+ * actual y modo de vista) al `site-nav` cuando la barra natural sale por arriba del viewport.
+ * Los controles acoplados delegan en los originales (`.click()`) y se sincronizan por
+ * MutationObserver, de modo que el estado siempre es el de la barra del pizarrón.
+ */
+export function initLessonDock(root = document.querySelector('[data-site-nav]')) {
+  const toolbar = document.getElementById('seq-board-toolbar');
+  const dock = root?.querySelector('[data-site-nav-dock]');
+  const modeSlot = root?.querySelector('[data-site-nav-mode]');
+  if (!root || !toolbar || !dock || !modeSlot) return;
+  root._dockCleanup?.();
+
+  const origSidebar = toolbar.querySelector('[data-sidebar-toggle]');
+  const origMode = document.getElementById('seq-mode-toggle');
+  const origBadge = document.getElementById('seq-board-badge');
+  const origTitle = document.getElementById('seq-board-title');
+  const cleanups = [];
+
+  const sidebarBtn = origSidebar
+    ? h('button', {
+        type: 'button',
+        class: 'chip site-nav__dock-btn site-nav__sidebar-toggle',
+        'aria-controls': origSidebar.getAttribute('aria-controls'),
+        on: { click: () => origSidebar.click() },
+      })
+    : null;
+
+  const pickerLabel = h('span', { class: 'site-nav__chapter-label' });
+  const picker = h(
+    'button',
+    {
+      type: 'button',
+      class: 'chip site-nav__dock-btn site-nav__chapter-picker',
+      'aria-haspopup': 'true',
+      'aria-expanded': 'false',
+      'aria-controls': 'site-chapter-popover',
+    },
+    pickerLabel,
+    h('span', { class: 'site-nav__explore-caret', 'aria-hidden': 'true' }, '▾'),
+  );
+  const popover = h('div', {
+    id: 'site-chapter-popover',
+    class: 'site-nav__chapter-popover',
+    role: 'menu',
+    'aria-label': 'Secciones del módulo',
+    hidden: true,
+  });
+
+  const modeBtn = origMode
+    ? h('button', {
+        type: 'button',
+        class: 'chip site-nav__dock-btn site-nav__mode',
+        on: { click: () => origMode.click() },
+      })
+    : null;
+
+  const setPopover = (open) => {
+    popover.hidden = !open;
+    picker.setAttribute('aria-expanded', String(open));
+  };
+  const buildPopover = () => {
+    const links = [...document.querySelectorAll('.seq-sidebar__link[data-sec]')];
+    popover.replaceChildren(
+      ...links.map((link) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            role: 'menuitem',
+            class: `site-nav__chapter-item${link.classList.contains('is-active') ? ' is-active' : ''}`,
+            'aria-current': link.classList.contains('is-active') ? 'true' : null,
+            on: {
+              click: () => {
+                link.click();
+                setPopover(false);
+              },
+            },
+          },
+          link.textContent.trim().replace(/\s+/g, ' '),
+        ),
+      ),
+    );
+  };
+  picker.addEventListener('click', () => {
+    if (popover.hidden) buildPopover();
+    setPopover(popover.hidden);
+  });
+  const onDocClick = (event) => {
+    if (!popover.hidden && !event.target.closest?.('.site-nav__chapter-picker, .site-nav__chapter-popover')) {
+      setPopover(false);
+    }
+  };
+  const onKey = (event) => {
+    if (event.key === 'Escape' && !popover.hidden) {
+      setPopover(false);
+      picker.focus();
+    }
+  };
+  document.addEventListener('click', onDocClick);
+  document.addEventListener('keydown', onKey);
+  cleanups.push(() => {
+    document.removeEventListener('click', onDocClick);
+    document.removeEventListener('keydown', onKey);
+  });
+
+  const sync = () => {
+    if (sidebarBtn && origSidebar) {
+      sidebarBtn.textContent = origSidebar.textContent.replace('Ocultar índice', 'Índice').trim();
+      const expanded = origSidebar.getAttribute('aria-expanded');
+      if (expanded !== null) sidebarBtn.setAttribute('aria-expanded', expanded);
+    }
+    const badge = origBadge?.textContent.trim() || '';
+    const title = origTitle?.textContent.trim() || '';
+    pickerLabel.textContent = title;
+    picker.title = [badge, title].filter(Boolean).join(' — ') || 'Ir a otra sección';
+    picker.setAttribute('aria-label', `Capítulo actual: ${title}. Elegir otra sección`);
+    if (modeBtn && origMode) {
+      const continuous = /continua/i.test(origMode.textContent);
+      modeBtn.textContent = continuous ? 'Continua' : 'Pizarrón';
+      modeBtn.classList.toggle('chip--ghost', origMode.classList.contains('chip--ghost'));
+      modeBtn.title = origMode.title || 'Alternar modo de vista';
+    }
+  };
+  sync();
+  if (typeof MutationObserver !== 'undefined') {
+    const mo = new MutationObserver(sync);
+    [origSidebar, origMode, origBadge, origTitle].filter(Boolean).forEach((el) =>
+      mo.observe(el, { childList: true, characterData: true, subtree: true, attributes: true }),
+    );
+    cleanups.push(() => mo.disconnect());
+  }
+
+  dock.replaceChildren(...[sidebarBtn, picker, popover].filter(Boolean));
+  modeSlot.replaceChildren(...[modeBtn].filter(Boolean));
+
+  const setDocked = (docked) => {
+    root.classList.toggle('is-lesson-docked', docked);
+    if (!docked) setPopover(false);
+  };
+  if (typeof IntersectionObserver !== 'undefined') {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[entries.length - 1];
+        setDocked(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0, rootMargin: '-56px 0px 0px 0px' },
+    );
+    io.observe(toolbar);
+    cleanups.push(() => io.disconnect());
+  }
+  root._dockCleanup = () => {
+    cleanups.forEach((fn) => fn());
+    root.classList.remove('is-lesson-docked');
+  };
 }
 
 /** Renderiza la repisa inferior de pizarra con un trozo de tiza SVG (solo visible >= 820px). */

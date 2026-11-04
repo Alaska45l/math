@@ -46,6 +46,55 @@ export {
   snapTo,
 };
 
+let boardClipUid = 0;
+
+/**
+ * Applies a dedicated rectangular clipPath to layers or custom elements matching plane.box.
+ */
+export function applyPlaneClip(board, plane) {
+  if (!board || !plane || !plane.box) return null;
+  if (board.clipPath && typeof board.clipPath.remove === 'function') {
+    board.clipPath.remove();
+  } else if (board.clipId && board.svg) {
+    const prev = board.svg.querySelector(`#${board.clipId}`);
+    if (prev && typeof prev.remove === 'function') {
+      prev.remove();
+    }
+  }
+  const clipId = `exp-plane-clip-${++boardClipUid}`;
+  const clipRect = s('rect', {
+    x: plane.box.x,
+    y: plane.box.y,
+    width: plane.box.w,
+    height: plane.box.h,
+  });
+  const clipPath = s('clipPath', { id: clipId }, clipRect);
+
+  let defs = board.svg ? board.svg.querySelector('defs') : null;
+  if (!defs) {
+    defs = s('defs');
+    if (board.svg) board.svg.prepend(defs);
+  }
+  defs.append(clipPath);
+
+  if (plane.layers) {
+    if (plane.layers.curve) {
+      plane.layers.curve.setAttribute('clip-path', `url(#${clipId})`);
+    }
+    if (plane.layers.shade) {
+      plane.layers.shade.setAttribute('clip-path', `url(#${clipId})`);
+    }
+    if (plane.layers.under) {
+      plane.layers.under.setAttribute('clip-path', `url(#${clipId})`);
+    }
+  }
+
+  board.clipId = clipId;
+  board.clipPath = clipPath;
+  board.clipRect = clipRect;
+  return clipId;
+}
+
 /**
  * Standard Blackboard container for custom SVG scenes or hybrid cards.
  */
@@ -53,6 +102,7 @@ export function createBoard(host, title, viewBox = '0 0 600 320') {
   if (!host) throw new Error('[board-kit] Host container is required');
 
   const controls = h('div', { class: 'exp-widget__controls pr-widget__controls' });
+  const defs = s('defs');
   const svg = s('svg', {
     class: 'exp-board-svg pr-board-svg',
     viewBox,
@@ -60,7 +110,7 @@ export function createBoard(host, title, viewBox = '0 0 600 320') {
     'aria-label': title,
   });
   const drawing = s('g', { class: 'exp-board-scene pr-board-scene' });
-  svg.append(drawing);
+  svg.append(defs, drawing);
 
   let readout = host.querySelector('.exp-readout, .pr-readout');
   if (!readout) {
@@ -73,7 +123,17 @@ export function createBoard(host, title, viewBox = '0 0 600 320') {
   host.classList.add('exp-widget', 'pr-widget');
   host.replaceChildren(controls, svg, readout, actions);
 
-  return { host, frame: host, controls, svg, drawing, readout, actions };
+  const boardObj = { host, frame: host, controls, svg, defs, drawing, readout, actions };
+
+  boardObj.applyPlaneClip = (plane) => applyPlaneClip(boardObj, plane);
+  boardObj.addClipPath = (id, x, y, width, height) => {
+    const clipRect = s('rect', { x, y, width, height });
+    const clipPath = s('clipPath', { id }, clipRect);
+    defs.append(clipPath);
+    return { clipPath, clipRect };
+  };
+
+  return boardObj;
 }
 
 /**
@@ -97,10 +157,14 @@ export function createCartesianBoard(host, title, planeCfg = {}) {
     ...planeCfg,
   });
 
+  // Apply dedicated clipPath matching plane.box exactly: [x0, x1] x [y0, y1]
+  applyPlaneClip(board, plane);
+
   // Alias drawing to the curve layer
   board.drawing = plane.layers.curve;
+  board.plane = plane;
 
-  return { ...board, plane };
+  return { ...board, plane, clipId: board.clipId, clipPath: board.clipPath };
 }
 
 /**
@@ -133,16 +197,22 @@ export function addRange(
     store.set({ [key]: value });
   });
 
+  const header = h(
+    'div',
+    { class: 'field__header exp-control__header pr-control__header' },
+    h('span', { class: 'field__label' }, label),
+    output,
+  );
+
   const labelEl = h(
     'label',
     { class: 'field seq-control exp-control pr-control' },
-    h('span', { class: 'field__label' }, label),
+    header,
     input,
-    output,
   );
   controls.append(labelEl);
 
-  return { labelEl, input, output };
+  return { labelEl, input, output, header };
 }
 
 /**
@@ -329,15 +399,145 @@ export function plotAsymptote(plane, c, attrs = {}) {
 }
 
 /**
- * Helper to plot point marker on plane marks layer.
+ * Returns safe plane bounds or fallback defaults.
  */
-export function plotPointMarker(plane, x, y, label = '', attrs = {}) {
+export function getPlaneBox(plane) {
+  if (plane && plane.box) {
+    return plane.box;
+  }
+  const w = (plane && plane.cfg && plane.cfg.width) || 600;
+  const h = (plane && plane.cfg && plane.cfg.height) || 320;
+  return { x: 44, y: 18, w: w - 64, h: h - 38 };
+}
+
+/**
+ * Clamping estricto de coordenadas en píxeles al recuadro interior de plane.box.
+ */
+export function clampToPlane(plane, px, py, margin = 8) {
+  const box = getPlaneBox(plane);
+  const minX = box.x + margin;
+  const maxX = box.x + box.w - margin;
+  const minY = box.y + margin;
+  const maxY = box.y + box.h - margin;
+
+  let safePx = px;
+  if (!Number.isFinite(px)) {
+    safePx = px === Infinity ? maxX : minX;
+  }
+  let safePy = py;
+  if (!Number.isFinite(py)) {
+    safePy = py === -Infinity ? minY : maxY;
+  }
+
+  const cx = Math.max(minX, Math.min(maxX, safePx));
+  const cy = Math.max(minY, Math.min(maxY, safePy));
+
+  const isFiniteInput = Number.isFinite(px) && Number.isFinite(py);
+  const isClampedX = !Number.isFinite(px) || px < minX || px > maxX;
+  const isClampedY = !Number.isFinite(py) || py < minY || py > maxY;
+
+  return {
+    cx,
+    cy,
+    isClampedX,
+    isClampedY,
+    isClamped: isClampedX || isClampedY,
+    isFinite: isFiniteInput,
+  };
+}
+
+/**
+ * Cálculo inteligente de posición y dynamic text-anchor para etiquetas en el plano cartesiano.
+ * Evita cortes contra los bordes perimetrales de plane.box y del canvas SVG.
+ */
+export function anchorPlaneLabel(
+  plane,
+  px,
+  py,
+  labelWidthEst = 60,
+  offset = { x: 10, y: 8 },
+) {
+  const box = getPlaneBox(plane);
+  const rightBoundary = box.x + box.w - 8;
+  const leftBoundary = box.x + 8;
+  const topBoundary = box.y + 14;
+  const bottomBoundary = box.y + box.h - 8;
+
+  const safePx = Number.isFinite(px) ? px : leftBoundary;
+  const safePy = Number.isFinite(py) ? py : bottomBoundary;
+
+  let anchor = 'start';
+  let lx = safePx + offset.x;
+
+  // Si la etiqueta se sale por la derecha, anclar al final ('end') y ubicar hacia la izquierda
+  if (safePx + offset.x + labelWidthEst > rightBoundary) {
+    anchor = 'end';
+    lx = safePx - offset.x;
+  } else if (safePx - offset.x - labelWidthEst < leftBoundary) {
+    anchor = 'start';
+    lx = safePx + offset.x;
+  }
+
+  // Desplazamiento vertical: si está muy cerca del techo, posicionar la etiqueta debajo del marcador
+  let ly = safePy - offset.y;
+  if (safePy - offset.y < topBoundary) {
+    ly = safePy + offset.y + 14;
+  } else if (safePy + offset.y > bottomBoundary && ly > bottomBoundary) {
+    ly = safePy - offset.y;
+  }
+
+  // Clamping perimetral de seguridad para no salirse jamás de plane.box
+  if (anchor === 'end') {
+    lx = Math.max(box.x + Math.min(labelWidthEst, 40), Math.min(box.x + box.w - 4, lx));
+  } else if (anchor === 'start') {
+    lx = Math.max(box.x + 4, Math.min(box.x + box.w - Math.min(labelWidthEst, 40), lx));
+  } else {
+    lx = Math.max(box.x + 10, Math.min(box.x + box.w - 10, lx));
+  }
+  ly = Math.max(box.y + 12, Math.min(box.y + box.h - 4, ly));
+
+  return { lx, ly, anchor };
+}
+
+/**
+ * Updates marker dot and label with boundary clamping and dynamic anchor.
+ */
+export function updateMarker(plane, dotNode, labelNode, x, y, labelText, radius = 5) {
+  if (!plane) return;
   const px = plane.sx(x);
   const py = plane.sy(y);
+  const { cx, cy } = clampToPlane(plane, px, py, radius + 2);
+
+  if (dotNode) {
+    dotNode.setAttribute('cx', String(cx));
+    dotNode.setAttribute('cy', String(cy));
+  }
+
+  if (labelNode) {
+    if (labelText !== undefined && labelText !== null) {
+      labelNode.textContent = String(labelText);
+    }
+    const txt = labelNode.textContent || labelText || '';
+    const labelEstWidth = Math.max(35, txt.length * 7.5);
+    const { lx, ly, anchor } = anchorPlaneLabel(plane, cx, cy, labelEstWidth);
+    labelNode.setAttribute('x', String(lx));
+    labelNode.setAttribute('y', String(ly));
+    labelNode.setAttribute('text-anchor', anchor);
+  }
+}
+
+/**
+ * Helper to plot point marker on plane marks layer with strict clamping and dynamic anchor.
+ */
+export function plotPointMarker(plane, x, y, label = '', attrs = {}) {
+  const rawPx = plane.sx(x);
+  const rawPy = plane.sy(y);
+  const { cx, cy } = clampToPlane(plane, rawPx, rawPy, 6);
+
   const group = s('g', { class: 'exp-svg-point-marker' });
   const dot = s('circle', {
-    cx: px,
-    cy: py,
+    cx,
+    cy,
     r: 5,
     fill: 'var(--yellow)',
     stroke: 'var(--bg)',
@@ -345,21 +545,50 @@ export function plotPointMarker(plane, x, y, label = '', attrs = {}) {
     ...attrs,
   });
   group.append(dot);
+
+  let textNode = null;
   if (label) {
-    const text = s('text', {
-      x: px + 8,
-      y: py - 6,
-      class: 'exp-svg-label',
-      fill: 'var(--text)',
-    }, label);
-    group.append(text);
+    const labelEstWidth = Math.max(30, String(label).length * 7.5);
+    const { lx, ly, anchor } = anchorPlaneLabel(plane, cx, cy, labelEstWidth);
+    textNode = s(
+      'text',
+      {
+        x: lx,
+        y: ly,
+        class: 'exp-svg-label',
+        fill: 'var(--text)',
+        'text-anchor': anchor,
+      },
+      label,
+    );
+    group.append(textNode);
   }
+
   plane.layers.marks.append(group);
+
+  group.dot = dot;
+  group.text = textNode;
+  group.setPos = (nx, ny, newLabel) => {
+    const npx = plane.sx(nx);
+    const npy = plane.sy(ny);
+    const c = clampToPlane(plane, npx, npy, 6);
+    dot.setAttribute('cx', String(c.cx));
+    dot.setAttribute('cy', String(c.cy));
+    if (textNode) {
+      if (newLabel !== undefined) textNode.textContent = String(newLabel);
+      const lWidth = Math.max(30, (textNode.textContent || '').length * 7.5);
+      const pos = anchorPlaneLabel(plane, c.cx, c.cy, lWidth);
+      textNode.setAttribute('x', String(pos.lx));
+      textNode.setAttribute('y', String(pos.ly));
+      textNode.setAttribute('text-anchor', pos.anchor);
+    }
+  };
+
   return group;
 }
 
 /**
- * Creates an interactive draggable point marker on a Cartesian plane.
+ * Creates an interactive draggable point marker on a Cartesian plane with strict boundary containment.
  */
 export function addDraggableMarker(
   board,
@@ -381,53 +610,57 @@ export function addDraggableMarker(
 
   const group = s('g', { class: 'exp-svg-point-group' });
   const hitArea = s('circle', {
-    cx: plane.sx(currentX),
-    cy: plane.sy(currentY),
     r: radius + 14,
     fill: 'transparent',
     style: 'cursor: grab; touch-action: none;',
   });
   const dot = s('circle', {
-    cx: plane.sx(currentX),
-    cy: plane.sy(currentY),
     r: radius,
     fill: color,
     stroke: 'var(--bg)',
     'stroke-width': 2,
     style: 'pointer-events: none;',
   });
-  const badge = s(
-    'text',
-    {
-      x: plane.sx(currentX) + 12,
-      y: plane.sy(currentY) - 10,
-      class: 'exp-svg-label',
-      fill: color,
-      style: 'pointer-events: none;',
-    },
-    label ? `${label}(${fmt(currentX)}; ${fmt(currentY)})` : `(${fmt(currentX)}; ${fmt(currentY)})`,
-  );
+  const badge = s('text', {
+    class: 'exp-svg-label',
+    fill: color,
+    style: 'pointer-events: none;',
+  });
 
   group.append(hitArea, dot, badge);
   plane.layers.marks.append(group);
 
-  let isDragging = false;
-
   const setPos = (x, y) => {
     currentX = x;
     currentY = y;
-    const px = plane.sx(x);
-    const py = plane.sy(y);
-    hitArea.setAttribute('cx', String(px));
-    hitArea.setAttribute('cy', String(py));
-    dot.setAttribute('cx', String(px));
-    dot.setAttribute('cy', String(py));
-    badge.setAttribute('x', String(px + 12));
-    badge.setAttribute('y', String(py - 10));
-    badge.textContent = label
+    const rawPx = plane.sx(x);
+    const rawPy = plane.sy(y);
+    const { cx, cy } = clampToPlane(plane, rawPx, rawPy, radius + 2);
+
+    hitArea.setAttribute('cx', String(cx));
+    hitArea.setAttribute('cy', String(cy));
+    dot.setAttribute('cx', String(cx));
+    dot.setAttribute('cy', String(cy));
+
+    const labelText = label
       ? `${label}(${fmt(x)}; ${fmt(y)})`
       : `(${fmt(x)}; ${fmt(y)})`;
+    badge.textContent = labelText;
+
+    const labelEstWidth = Math.max(40, labelText.length * 7.5);
+    const { lx, ly, anchor } = anchorPlaneLabel(plane, cx, cy, labelEstWidth, {
+      x: 12,
+      y: 10,
+    });
+    badge.setAttribute('x', String(lx));
+    badge.setAttribute('y', String(ly));
+    badge.setAttribute('text-anchor', anchor);
   };
+
+  // Initial positioning with clamping and dynamic anchor
+  setPos(initialX, initialY);
+
+  let isDragging = false;
 
   hitArea.addEventListener('pointerdown', (e) => {
     if (e.button !== undefined && e.button !== 0) return;
@@ -473,6 +706,9 @@ export function addDraggableMarker(
 
   return {
     group,
+    hitArea,
+    dot,
+    badge,
     setPos,
     getPos: () => ({ x: currentX, y: currentY }),
   };

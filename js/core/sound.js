@@ -825,9 +825,9 @@ export function initGlobalSoundUI() {
     if (!target || typeof target.closest !== 'function') return;
 
     const match = target.closest(
-      'button:not(.site-nav__sound-btn), .btn, .toggle, .vn-trigger, .tab-btn, .seq-ribbon__post, [role="tab"], .chip, .seq-check__opt-btn, .fn-reveal, .fn-quiz-btn, .dim-tool__btn'
+      'button:not(.site-nav__sound-btn):not(.site-nav__sound), .btn, .toggle, .vn-trigger, .tab-btn, .seq-ribbon__post, [role="tab"], .chip, .seq-check__opt-btn, .fn-reveal, .fn-quiz-btn, .dim-tool__btn'
     );
-    if (match && !match.classList.contains('site-nav__sound-btn') && !match.disabled) {
+    if (match && !match.classList.contains('site-nav__sound-btn') && !match.classList.contains('site-nav__sound') && !match.disabled) {
       playClick();
     }
   }, { passive: true });

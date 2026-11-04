@@ -1016,9 +1016,8 @@
 }
 
 .pr-page .seq-blackboard-toolbar {
-  position: sticky;
+  position: static;
   z-index: 30;
-  top: 56px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1447,7 +1446,7 @@ header[data-site-nav] {
 }
 
 .pr-page .seq-blackboard-toolbar {
-  top: var(--pr-nav-h);
+  position: static;
   scroll-margin-top: calc(var(--pr-nav-h) + 16px);
 }
 

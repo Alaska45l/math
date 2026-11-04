@@ -5,7 +5,7 @@
  */
 
 import { h, mount, qsa } from "../../core/dom.js";
-import { renderNav } from "../../core/nav.js";
+import { renderNav, initLessonDock } from "../../core/nav.js";
 import { initGlossary } from "../../core/glossary.js";
 import {
   bindTutorButtons,
@@ -66,7 +66,7 @@ export const LESSON_SECTIONS = [
   {
     id: "sec-9",
     chapter: "Capítulo 4",
-    title: "Radiografía completa de examen de Exactas",
+    title: "Radiografía analítica completa de la función exponencial",
     short: "9 · Radiografía",
   },
   {
@@ -221,7 +221,7 @@ export const CHECKS_DATA = {
     },
     {
       type: "choice",
-      prompt: "¿Por qué en Exactas se exige estrictamente que la base a sea positiva (a > 0)?",
+      prompt: "¿Por qué en el conjunto de los números reales se exige estrictamente que la base a sea positiva (a > 0)?",
       options: [
         "Porque con base negativa a < 0, potencias como (−2)^(1/2) no tienen resultado real",
         "Porque las bases negativas son difíciles de graficar a mano",
@@ -511,7 +511,7 @@ export const CHECKS_DATA = {
     },
     {
       type: "choice",
-      prompt: "¿Cómo se escribe formalmente en Exactas la imagen de f(x) = 5 · 2ˣ − 7?",
+      prompt: "¿Cómo se escribe formalmente el conjunto imagen de f(x) = 5 · 2ˣ − 7?",
       options: [
         "(−7; +∞)",
         "[−7; +∞)",
@@ -535,7 +535,7 @@ export const CHECKS_DATA = {
   "sec-9": [
     {
       type: "number",
-      prompt: "En el Ejercicio 14 de Exactas f(x) = 2 − (1/2)ˣ, calculá la raíz real x₀ resolviendo 2 − (1/2)ˣ = 0.",
+      prompt: "Dada la función trasladada f(x) = 2 − (1/2)ˣ, calculá la raíz real x₀ resolviendo 2 − (1/2)ˣ = 0.",
       spec: { value: -1, context: "raiz 2 - (1/2)^x = 0 => x = -1" },
       checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - (-1)) < 1e-6,
       hints: [
@@ -567,7 +567,7 @@ export const CHECKS_DATA = {
     },
     {
       type: "number",
-      prompt: "En la función del 2° Parcial 2025 f(x) = 1 − (1/2)ˣ, calculá la raíz real resolviendo 1 − (1/2)ˣ = 0.",
+      prompt: "En la función con corte en el origen f(x) = 1 − (1/2)ˣ, calculá la raíz real resolviendo 1 − (1/2)ˣ = 0.",
       spec: { value: 0, context: "raiz 1 - (1/2)^x = 0 => x = 0" },
       checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 0) < 1e-6,
       hints: [
@@ -664,13 +664,7 @@ export function initBlackboardController() {
   const menuGlyph = String.fromCodePoint(0x2630);
   const closeGlyph = String.fromCodePoint(0x2715);
 
-  // 1. Hoisting de la sonda interactiva sobre la columna de teoría en móviles
-  document.querySelectorAll(".exp-workbench, .pr-workbench").forEach((workbench) => {
-    const probe = workbench.querySelector(":scope > .exp-probe, :scope > .pr-probe");
-    if (probe) workbench.insertBefore(probe, workbench.firstElementChild);
-  });
-
-  // 2. Barra de herramientas sticky del pizarrón
+  // Barra de herramientas sticky del pizarrón
   const badge = h("span", {
     class: "seq-blackboard-toolbar__badge",
     id: "seq-board-badge",
@@ -698,6 +692,7 @@ export function initBlackboardController() {
     h("div", { class: "seq-blackboard-toolbar__actions" }, toggle),
   );
   content.prepend(toolbar);
+  initLessonDock();
 
   // 3. Control de la barra lateral (Sidebar)
   const sidebarToggle = toolbar.querySelector("[data-sidebar-toggle]");

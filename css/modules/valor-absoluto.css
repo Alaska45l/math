@@ -183,6 +183,7 @@
 
 .seq-blackboard-toolbar,
 .board-TopBar {
+  position: static;
   display: flex;
   justify-content: space-between;
   align-items: center;

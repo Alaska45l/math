@@ -134,6 +134,16 @@ export function chalkIcon(type, attrs = {}) {
       s('path', { d: 'M2 3.5h4.5a1.5 1.5 0 0 1 1.5 1.5v8a1.2 1.2 0 0 0-1.2-1.2H2V3.5z' }),
       s('path', { d: 'M14 3.5H9.5A1.5 1.5 0 0 0 8 5v8a1.2 1.2 0 0 1 1.2-1.2H14V3.5z' })
     );
+  } else if (type === 'volume') {
+    icon.append(
+      s('path', { d: 'M2 6h2.5L8 3v10L4.5 10H2z', fill: 'currentColor' }),
+      s('path', { d: 'M10.5 5.8a3.2 3.2 0 0 1 0 4.4M12.4 3.9a5.9 5.9 0 0 1 0 8.2' })
+    );
+  } else if (type === 'mute') {
+    icon.append(
+      s('path', { d: 'M2 6h2.5L8 3v10L4.5 10H2z', fill: 'currentColor' }),
+      s('path', { d: 'M10.8 6l3.6 4M14.4 6l-3.6 4' })
+    );
   } else if (type === 'play') {
     icon.append(
       s('polygon', { points: '4.5,3 12.5,8 4.5,13' })

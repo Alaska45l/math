@@ -4,7 +4,7 @@
  */
 
 import { byId, qsa, mount, h, chalkIcon } from '../../core/dom.js';
-import { renderNav } from '../../core/nav.js';
+import { renderNav, initLessonDock } from '../../core/nav.js';
 import { createCheckBlock, annotatedFormula, getProgress } from './components.js';
 
 // Widgets Capítulo 1
@@ -717,6 +717,7 @@ export function initBlackboardController() {
   );
 
   contentEl.prepend(toolbarEl);
+  initLessonDock();
   contentEl.classList.add('mode-blackboard');
 
   function setActiveBoard(secId, { scroll = true, updateHash = true } = {}) {

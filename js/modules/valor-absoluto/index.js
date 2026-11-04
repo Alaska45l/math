@@ -5,7 +5,7 @@
  */
 
 import { byId, qsa, h, mount, chalkIcon } from '../../core/dom.js';
-import { renderNav } from '../../core/nav.js';
+import { renderNav, initLessonDock } from '../../core/nav.js';
 import {
   createCheckBlock,
   annotatedAbsFormula,
@@ -662,6 +662,7 @@ export function initBlackboardController() {
   );
 
   contentEl.prepend(toolbarEl);
+  initLessonDock();
   contentEl.classList.add('mode-blackboard');
 
   function setActiveBoard(secId, { scroll = true, updateHash = true } = {}) {

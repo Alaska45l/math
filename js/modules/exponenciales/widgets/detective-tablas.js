@@ -257,7 +257,7 @@ export function initWidget(container, options = {}) {
         x1: 330,
         y1: 20 + g * 59,
         x2: 625,
-        y1: 20 + g * 59,
+        y2: 20 + g * 59,
         stroke: 'var(--border)',
         opacity: 0.25,
       }),
@@ -427,8 +427,14 @@ export function initWidget(container, options = {}) {
         const py = mapY(preset.ys[i]);
         pt.circle.setAttribute('cx', String(px));
         pt.circle.setAttribute('cy', String(py));
-        pt.label.setAttribute('x', String(px + 8));
-        pt.label.setAttribute('y', String(py - 6));
+        if (px > 580) {
+          pt.label.setAttribute('x', String(px - 8));
+          pt.label.setAttribute('text-anchor', 'end');
+        } else {
+          pt.label.setAttribute('x', String(px + 8));
+          pt.label.setAttribute('text-anchor', 'start');
+        }
+        pt.label.setAttribute('y', String(Math.max(35, py - 6)));
         setText(pt.label, `(${preset.xs[i]}; ${preset.ys[i]})`);
       } else {
         setVisible(pt.ptGroup, false);
