@@ -1028,7 +1028,8 @@
 }
 
 header[data-site-nav] {
-  z-index: 40;
+  /* Sin z-index propio: debe conservar el de .site-nav (100) para quedar sobre
+     .site-nav__backdrop (99) y que el menú de módulos sea clickeable. */
   background: var(--bg);
 }
 

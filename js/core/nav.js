@@ -405,16 +405,17 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   root._navAbortController = new AbortController();
   const { signal } = root._navAbortController;
 
-  const brandLink = h(
-    'a',
-    {
-      class: 'site-nav__brand',
-      href: 'index.html',
-      title: 'Volver al inicio',
-      'aria-label': 'Inicio. Volver a la página principal.',
-    },
-    'Inicio',
-  );
+  // Determinista por página (sin Math.random()): cada página muestra una ley/fórmula fundamental.
+  const pageIdx = Math.max(0, PAGES.findIndex((p) => p.id === current));
+  const lawIdx = current === 'inicio' ? 21 : (pageIdx * 5 + 3) % FUNDAMENTAL_LAWS.length;
+  const law = FUNDAMENTAL_LAWS[lawIdx];
+  const brandLink = h('a', {
+    class: 'site-nav__brand',
+    href: 'index.html',
+    title: `${law.name} · Ir al Inicio`,
+    'aria-label': `${law.ariaLabel}. Ir al inicio.`,
+  });
+  brandLink.innerHTML = law.html;
 
   const exploreButton = h(
     'button',
