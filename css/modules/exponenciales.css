@@ -276,29 +276,63 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
 }
 
+.exp-page .pr-probe {
+  border: 6px solid transparent;
+  border-image: var(--chalk-border-rest);
+}
+
 @media (min-width: 1120px) {
-  .exp-page .exp-workbench::after,
-  .exp-page .pr-workbench::after {
-    display: table;
-    clear: both;
-    content: "";
+  .exp-page .exp-workbench,
+  .exp-page .pr-workbench {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(380px, 0.88fr);
+    grid-template-areas:
+      "phrase  probe"
+      "visual  probe"
+      "caution probe"
+      "check   probe"
+      "tray    tray";
+    gap: 16px 28px;
+    align-items: start;
+  }
+
+  .exp-page .seq-block--phrase {
+    grid-area: phrase;
+    margin: 0;
+  }
+
+  .exp-page .seq-block--visual {
+    grid-area: visual;
+    margin: 0;
   }
 
   .exp-page .exp-probe,
   .exp-page .pr-probe {
-    float: right;
-    width: clamp(360px, 42%, 500px);
-    margin: 0 0 24px 28px;
-    padding: 14px 16px;
-    position: relative;
+    grid-area: probe;
+    float: none;
+    width: 100%;
+    margin: 0;
+    position: sticky;
+    top: calc(var(--nav-h, 60px) + 20px);
     z-index: 2;
     box-sizing: border-box;
-    max-height: none;
-    overflow: visible;
+    max-height: calc(100vh - var(--nav-h, 60px) - 36px);
+    overflow-y: auto;
+  }
+
+  .exp-page .seq-block--caution {
+    grid-area: caution;
+    margin: 0;
   }
 
   .exp-page .seq-block--check {
-    clear: both;
+    grid-area: check;
+    margin: 0;
+  }
+
+  .exp-page .seq-chalk-tray {
+    grid-area: tray;
+    margin-top: 16px;
   }
 }
 

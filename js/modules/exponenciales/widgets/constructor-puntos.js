@@ -1,7 +1,7 @@
 /**
  * constructor-puntos.js — Widget 6 (F18)
  * Reconstrucción analítica y geométrica de f(x) = k · aˣ con dos puntos arrastrables P y Q.
- * Demuestra f(x₂)/f(x₁) = a^(x₂ - x₁) y cubre los presets de Ejercicio 7 (Exactas pág. 93) y Parcial.
+ * Demuestra f(x₂)/f(x₁) = a^(x₂ - x₁) y cubre presets canónicos de reconstrucción de fórmulas.
  */
 
 import {
@@ -19,31 +19,31 @@ import { fitExponentialFromPoints } from '../logic.js';
 
 const PRESETS = {
   '7a': {
-    label: 'Ej. 7a: (−1, 3/2) y k=2',
+    label: '(−1; 3/2) y k=2',
     p1: { x: -1, y: 1.5 },
     p2: { x: 0, y: 2 },
     note: 'Como f(0) = 2, k = 2 inmediatamente. Razón a = 2 / 1,5 = 4/3.',
   },
   '7b': {
-    label: 'Ej. 7b: a=1/2 y O(0,4)',
+    label: 'a=1/2 y O(0; 4)',
     p1: { x: 0, y: 4 },
     p2: { x: 1, y: 2 },
     note: 'Ordenada al origen f(0) = 4 y razón 1/2: en x = 1 vale 2.',
   },
   '7c': {
-    label: 'Ej. 7c: P(1,1) y Q(2,3)',
+    label: 'P(1; 1) y Q(2; 3)',
     p1: { x: 1, y: 1 },
     p2: { x: 2, y: 3 },
     note: 'Paso Δx = 1, razón 3/1 = 3 ⟹ a = 3. Coeficiente k = 1 / 3¹ = 1/3.',
   },
   '7d': {
-    label: 'Ej. 7d: P(0,1) y Q(−2, 25/9)',
+    label: 'P(0; 1) y Q(−2; 25/9)',
     p1: { x: 0, y: 1 },
     p2: { x: -2, y: 25 / 9 },
     note: 'Paso Δx = −2, razón 25/9 ⟹ a = (25/9)^(−1/2) = 3/5 = 0,6.',
   },
   parcial: {
-    label: 'Parcial: (0,−3) y (2,−0.75)',
+    label: '(0; −3) y (2; −0.75)',
     p1: { x: 0, y: -3 },
     p2: { x: 2, y: -0.75 },
     note: 'Ambos puntos en y < 0. Razón (−0,75)/(−3) = 1/4 con Δx = 2 ⟹ a = 1/2, k = −3. ¡Creciente!',
@@ -97,7 +97,7 @@ export function initWidget(container, options = {}) {
         store.set({ preset: 'custom' });
       }
     },
-    'Casos de Examen y Guía',
+    'Casos Clásicos de Reconstrucción',
   );
 
   // 2. SVG Elements
@@ -144,6 +144,15 @@ export function initWidget(container, options = {}) {
 
     const p1 = state.p1;
     const p2 = state.p2;
+
+    const curP = markerP.getPos();
+    if (curP.x !== p1.x || curP.y !== p1.y) {
+      markerP.setPos(p1.x, p1.y);
+    }
+    const curQ = markerQ.getPos();
+    if (curQ.x !== p2.x || curQ.y !== p2.y) {
+      markerQ.setPos(p2.x, p2.y);
+    }
 
     // Update projections
     const sx1 = plane.sx(p1.x);

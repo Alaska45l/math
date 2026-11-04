@@ -205,7 +205,8 @@
   max-height: none;
   overflow: visible;
   padding: 16px;
-  border: 1px solid var(--line, var(--border));
+  border: 6px solid transparent;
+  border-image: var(--chalk-border-rest);
   background: var(--surface, var(--bg));
   box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
 }

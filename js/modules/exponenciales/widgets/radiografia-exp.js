@@ -1,8 +1,8 @@
 /**
  * radiografia-exp.js — Widget 9 (F21)
- * Radiografía completa de examen de Exactas UNMDP:
- * Dom, Im, asíntota, P_y, C₀, C⁺, C⁻, I_crec, I_dec, y límites en ±∞.
- * Cubre Ejercicio 14 (pág. 94) y el 2° Parcial 2025 (pág. 152).
+ * Radiografía completa de una función exponencial en ℝ:
+ * Dom, Im, asíntota, P_y, C₀, C⁺, C⁻, I_crec, I_dec, y comportamiento en ±∞.
+ * Estudio analítico riguroso y casos característicos de examen.
  */
 
 import {
@@ -19,34 +19,34 @@ import { analyzeExponential } from '../logic.js';
 
 const PRESETS = {
   ej14: {
-    label: 'Ej. 14: 2 − (½)ˣ',
+    label: '2 − (½)ˣ (Asíntota y=2)',
     k: -1,
     a: 0.5,
     h: 0,
     c: 2,
     formulaDisplay: 'f(x) = 2 − (1/2)ˣ',
-    note: 'Ejercicio 14 de la guía: raíz en x = −1, creciente en todo ℝ.',
+    note: 'Raíz en x = −1, estrictamente creciente en todo ℝ.',
   },
   parcial2025: {
-    label: '2° Parcial 2025: 1 − (½)ˣ',
+    label: '1 − (½)ˣ (Pasa por el origen)',
     k: -1,
     a: 0.5,
     h: 0,
     c: 1,
     formulaDisplay: 'f(x) = 1 − (1/2)ˣ',
-    note: 'Problema real de examen: raíz en x = 0, C⁺ = (0; +∞), Im = (−∞; 1).',
+    note: 'Raíz y ordenada al origen coinciden en (0; 0), C⁺ = (0; +∞), Im = (−∞; 1).',
   },
   parcial_dec: {
-    label: 'Parcial: 1 − 2ˣ',
+    label: '1 − 2ˣ (Decreciente)',
     k: -1,
     a: 2,
     h: 0,
     c: 1,
     formulaDisplay: 'g(x) = 1 − 2ˣ',
-    note: 'Opción verdadera del parcial: estrictamente DECRECIENTE, C⁺ = (−∞; 0).',
+    note: 'Estrictamente decreciente en todo ℝ, C⁺ = (−∞; 0).',
   },
   sin_corte: {
-    label: 'Sin corte: 2·3ˣ + 1',
+    label: '2·3ˣ + 1 (Sin raíz real)',
     k: 2,
     a: 3,
     h: 0,
@@ -68,7 +68,7 @@ const HIGHLIGHTS = [
 export function initWidget(container, options = {}) {
   const board = createCartesianBoard(
     container,
-    'Radiografía Completa de Examen de Exactas',
+    'Radiografía Analítica Completa',
     {
       width: 640,
       height: 340,
@@ -98,7 +98,7 @@ export function initWidget(container, options = {}) {
     presetOptions,
     store.get().preset,
     (key) => store.set({ preset: key }),
-    'Casos de Examen',
+    'Funciones para Analizar',
   );
 
   const updateHighlightChips = addChips(
@@ -214,9 +214,6 @@ export function initWidget(container, options = {}) {
     const sy0 = plane.sy(y0);
     ptIntercept.setAttribute('cx', String(sx0));
     ptIntercept.setAttribute('cy', String(sy0));
-    labelIntercept.setAttribute('x', String(sx0 + 8));
-    labelIntercept.setAttribute('y', String(sy0 - 6));
-    setText(labelIntercept, `P_y(0; ${fmt(y0)})`);
 
     const showIntercept = hl === 'all' || hl === 'intercept';
     setVisible(ptIntercept, showIntercept);
@@ -230,8 +227,22 @@ export function initWidget(container, options = {}) {
       const syRoot = plane.sy(0);
       ptRoot.setAttribute('cx', String(sxRoot));
       ptRoot.setAttribute('cy', String(syRoot));
-      labelRoot.setAttribute('x', String(sxRoot + 8));
-      labelRoot.setAttribute('y', String(syRoot - 8));
+
+      const pointsCoincide = Math.abs(sxRoot - sx0) < 8 && Math.abs(syRoot - sy0) < 8;
+      if (pointsCoincide) {
+        // Vertically offset >= 24px: C0 above (-12px), Py below (+16px) => 28px separation
+        labelRoot.setAttribute('x', String(sxRoot + 8));
+        labelRoot.setAttribute('y', String(syRoot - 12));
+        labelIntercept.setAttribute('x', String(sx0 + 8));
+        labelIntercept.setAttribute('y', String(sy0 + 16));
+      } else {
+        labelRoot.setAttribute('x', String(sxRoot + 8));
+        labelRoot.setAttribute('y', String(syRoot - 8));
+        labelIntercept.setAttribute('x', String(sx0 + 8));
+        labelIntercept.setAttribute('y', String(sy0 - 6));
+      }
+
+      setText(labelIntercept, `P_y(0; ${fmt(y0)})`);
       setText(labelRoot, `C₀ = { ${fmt(x0)} }`);
 
       const showRoot = hl === 'all' || hl === 'root';
@@ -273,6 +284,9 @@ export function initWidget(container, options = {}) {
         setVisible(shadeGroupNeg, false);
       }
     } else {
+      labelIntercept.setAttribute('x', String(sx0 + 8));
+      labelIntercept.setAttribute('y', String(sy0 - 6));
+      setText(labelIntercept, `P_y(0; ${fmt(y0)})`);
       setVisible(ptRoot, false);
       setVisible(labelRoot, false);
       setVisible(shadeGroupPos, hl === 'cpos' || hl === 'all');
@@ -291,7 +305,7 @@ export function initWidget(container, options = {}) {
       ['7. Monotonía', `Estrictamente ${analysis.monotonicity.toUpperCase()} en todo ℝ (I_${analysis.monotonicity === 'creciente' ? '↑' : '↓'} = ℝ)`],
     ];
 
-    renderReadout(board.readout, 'Ficha Médica de Examen de Exactas', rows);
+    renderReadout(board.readout, 'Radiografía Analítica Completa', rows);
   };
 
   const unsub = store.subscribe(render);

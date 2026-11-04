@@ -2,7 +2,7 @@
  * reloj-semidesintegracion.js — Widget 7 (F19)
  * Modelos temporales del mundo real con tasas porcentuales (a = 1 ± r),
  * períodos compuestos (t/T) y base natural e (e^(kt)).
- * Cubre Talio radiactivo, Población, Cultivo bacteriano, Isótopo y Vacuna (Parcial 2025).
+ * Cubre Talio radiactivo, Población, Cultivo bacteriano, Isótopo y Concentración de Fármaco.
  */
 
 import {
@@ -20,7 +20,7 @@ import {
 
 const PRESETS = {
   talio: {
-    label: 'Talio-206 (Exactas 5b)',
+    label: 'Talio-206 (Desintegración)',
     name: 'Talio radiactivo',
     unitT: 'min',
     unitY: 'g',
@@ -33,7 +33,7 @@ const PRESETS = {
     targetNote: 'A los 30 min (10 vidas medias): M(30) = 50 · (1/2)¹⁰ = 50/1024 ≈ 0,049 g.',
   },
   poblacion: {
-    label: 'Población +12% (Exactas 5c)',
+    label: 'Población (+12% anual)',
     name: 'Crecimiento de población',
     unitT: 'años',
     unitY: 'M hab.',
@@ -46,7 +46,7 @@ const PRESETS = {
     targetNote: 'A los 50 años (10 ciclos de 5 años): P(50) = 55 · (1,12)¹⁰ ≈ 170,82 millones.',
   },
   bacterias: {
-    label: 'Bacterias +3,5% (Parcial)',
+    label: 'Bacterias (+3,5% cada 10h)',
     name: 'Cultivo bacteriano',
     unitT: 'horas',
     unitY: 'g',
@@ -59,7 +59,7 @@ const PRESETS = {
     targetNote: 'A las 120 h (5 días = 12 ciclos de 10 h): P(120) = 200 g exactos.',
   },
   isotopo_e: {
-    label: 'Isótopo base e (Parcial)',
+    label: 'Isótopo (Base natural e)',
     name: 'Desintegración continua',
     unitT: 'horas',
     unitY: 'mg',
@@ -72,7 +72,7 @@ const PRESETS = {
     targetNote: 'A las 20 h: A(20) = 120 · e⁻¹ ≈ 44,15 mg.',
   },
   vacuna: {
-    label: 'Vacuna 2° Parcial 2025',
+    label: 'Concentración de Fármaco',
     name: 'Concentración en sangre',
     unitT: 'horas',
     unitY: 'mg',
@@ -85,6 +85,100 @@ const PRESETS = {
     targetNote: 'A las 5 h: C(5) = 200 · e^(−1,5) ≈ 44,63 mg.',
   },
 };
+
+function rebuildPlaneGridAndAxes(plane, unitT, unitY) {
+  plane.clear('grid', 'axes', 'axisLabels');
+
+  const c = plane.cfg;
+  const W = c.width, H = c.height, P = c.pad;
+  const pw = W - P.l - P.r, ph = H - P.t - P.b;
+
+  function ticks(min, max, step) {
+    if (!Number.isFinite(min) || !Number.isFinite(max) || !Number.isFinite(step) || step <= 0) return [];
+    let effStep = step;
+    if ((max - min) / effStep > 40) {
+      effStep = Math.max(1e-6, (max - min) / 8);
+    }
+    const out = [];
+    const start = Math.ceil(min / effStep) * effStep;
+    for (let t = start; t <= max + 1e-9 && out.length < 50; t += effStep) out.push(Number(t.toFixed(6)));
+    return out;
+  }
+
+  const xTicks = ticks(c.xMin, c.xMax, c.xStep);
+  const yTicks = ticks(c.yMin, c.yMax, c.yStep);
+
+  // Re-trazar grilla
+  xTicks.forEach((t) => {
+    plane.layers.grid.append(
+      s('line', {
+        x1: plane.sx(t),
+        y1: P.t,
+        x2: plane.sx(t),
+        y2: P.t + ph,
+        class: 'plot-grid',
+      }),
+    );
+  });
+  yTicks.forEach((t) => {
+    plane.layers.grid.append(
+      s('line', {
+        x1: P.l,
+        y1: plane.sy(t),
+        x2: P.l + pw,
+        y2: plane.sy(t),
+        class: 'plot-grid',
+      }),
+    );
+  });
+
+  // Re-trazar ejes y flechas
+  const xAxisY = plane.sy(0);
+  const yAxisX = plane.sx(0);
+  plane.layers.axes.append(
+    s('line', {
+      x1: P.l,
+      y1: xAxisY,
+      x2: P.l + pw + 8,
+      y2: xAxisY,
+      class: 'plot-axis',
+      'marker-end': `url(#${plane.arrowId})`,
+    }),
+    s('line', {
+      x1: yAxisX,
+      y1: P.t + ph,
+      x2: yAxisX,
+      y2: P.t - 8,
+      class: 'plot-axis',
+      'marker-end': `url(#${plane.arrowId})`,
+    }),
+  );
+
+  // Re-trazar etiquetas de ejes
+  plane.layers.axisLabels.append(
+    s('text', { x: P.l + pw + 6, y: xAxisY - 8, class: 'plot-axis-label', 'text-anchor': 'end' }, unitT ? `t (${unitT})` : 't'),
+    s('text', { x: yAxisX + 8, y: P.t + 4, class: 'plot-axis-label' }, unitY ? `y (${unitY})` : 'y'),
+  );
+
+  // Re-trazar números de ticks y marcas
+  xTicks.forEach((t) => {
+    plane.layers.axes.append(
+      s('line', { x1: plane.sx(t), y1: xAxisY - 3, x2: plane.sx(t), y2: xAxisY + 3, class: 'plot-axis' }),
+    );
+    plane.layers.axisLabels.append(
+      s('text', { x: plane.sx(t), y: xAxisY + 20, class: 'plot-tick', 'text-anchor': 'middle' }, fmt(t)),
+    );
+  });
+  yTicks.forEach((t) => {
+    if (Math.abs(t) < 1e-9) return;
+    plane.layers.axes.append(
+      s('line', { x1: yAxisX - 3, y1: plane.sy(t), x2: yAxisX + 3, y2: plane.sy(t), class: 'plot-axis' }),
+    );
+    plane.layers.axisLabels.append(
+      s('text', { x: yAxisX - 8, y: plane.sy(t) + 4, class: 'plot-tick', 'text-anchor': 'end' }, fmt(t)),
+    );
+  });
+}
 
 export function initWidget(container, options = {}) {
   const defaultPreset = options.preset || 'talio';
@@ -127,6 +221,7 @@ export function initWidget(container, options = {}) {
       plane.cfg.yStep = plane.cfg.yMax / 4;
       timeSlider.max = String(nextModel.tMax);
       timeSlider.step = String(nextModel.tStep);
+      rebuildPlaneGridAndAxes(plane, nextModel.unitT, nextModel.unitY);
       store.set({ presetKey: key, t: 0 });
     },
     'Modelos Temporales Canónicos',
@@ -144,8 +239,13 @@ export function initWidget(container, options = {}) {
     (v) => `${v} ${initialModel.unitT}`,
   );
 
+  timeSlider.addEventListener('input', () => {
+    const curModel = PRESETS[store.get().presetKey] || PRESETS.talio;
+    timeOutput.textContent = `${timeSlider.value} ${curModel.unitT}`;
+  });
+
   // Target Button
-  const targetBtn = button('Ir a la Meta de Examen', 'target', () => {
+  const targetBtn = button('Ir al punto clave', 'target', () => {
     const curModel = PRESETS[store.get().presetKey];
     store.set({ t: curModel.targetT });
   });
@@ -266,8 +366,10 @@ export function initWidget(container, options = {}) {
     ptCurrent.setAttribute('cx', String(sx));
     ptCurrent.setAttribute('cy', String(sy));
 
-    labelCurrent.setAttribute('x', String(Math.min(plane.sx(model.tMax) - 60, sx + 8)));
-    labelCurrent.setAttribute('y', String(sy - 8));
+    const isNearEnd = sx > plane.sx(model.tMax) - 70;
+    labelCurrent.setAttribute('x', String(isNearEnd ? sx - 8 : sx + 8));
+    labelCurrent.setAttribute('text-anchor', isNearEnd ? 'end' : 'start');
+    labelCurrent.setAttribute('y', String(Math.max(plane.box.y + 16, sy - 8)));
     setText(labelCurrent, `${fmt(yVal)} ${model.unitY}`);
 
     // Update level gauge
@@ -286,7 +388,7 @@ export function initWidget(container, options = {}) {
         `Instante t = ${t} ${model.unitT}`,
         `Cantidad remanente / actual: ${fmt(yVal)} ${model.unitY} (${fmt(ratio * 100)}% respecto al valor inicial ${model.y0} ${model.unitY}).`,
       ],
-      ['Punto Clave del Examen', model.targetNote],
+      ['Punto Clave', model.targetNote],
     ];
     renderReadout(board.readout, 'Análisis del Modelo Temporal', rows);
   };
@@ -304,6 +406,7 @@ export function initWidget(container, options = {}) {
       plane.cfg.yStep = model.y0 / 4;
       timeSlider.max = String(model.tMax);
       timeSlider.step = String(model.tStep);
+      rebuildPlaneGridAndAxes(plane, model.unitT, model.unitY);
       store.set({ presetKey: 'talio', t: 0 });
     },
     update: (patch) => store.set(patch),

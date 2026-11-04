@@ -1,6 +1,6 @@
 /**
  * puente-continuo.js — Widget 3 (F15)
- * Definición formal de Exactas UNMDP (pág. 90: f(x) = k · aˣ, a ∈ ℝ⁺ − {1}, k ∈ ℝ − {0}).
+ * Definición formal f(x) = k · aˣ con a ∈ ℝ⁺ − {1} y k ∈ ℝ − {0}.
  * Muestra la densificación en ℝ (Z -> Q -> R) y el colapso con a < 0, a = 0 o a = 1.
  */
 
@@ -186,16 +186,15 @@ export function initWidget(container, options = {}) {
     'font-size': '12px',
     'font-weight': 'bold',
   }, '');
-  const probeAlertCross = s('text', {
-    x: 0,
-    y: 0,
-    class: 'exp-svg-label',
-    fill: 'var(--pink)',
-    'font-size': '20px',
-    'text-anchor': 'middle',
-    'font-weight': 'bold',
+  const probeAlertCross = s('g', {
+    class: 'exp-svg-alert-cross',
     visibility: 'hidden',
-  }, '✕');
+  }, s('path', {
+    d: 'M -7 -7 L 7 7 M 7 -7 L -7 7',
+    stroke: 'var(--pink)',
+    'stroke-width': 2.5,
+    'stroke-linecap': 'round',
+  }));
 
   probeGroup.append(probeLine, probeDot, probeBadge, probeAlertCross);
   plane.layers.marks.append(probeGroup);
@@ -245,7 +244,10 @@ export function initWidget(container, options = {}) {
             const dot = pointDots[dotIdx++];
             dot.setAttribute('cx', String(plane.sx(x)));
             dot.setAttribute('cy', String(plane.sy(y)));
+            dot.setAttribute('r', '4.5');
             dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+            dot.setAttribute('stroke', 'var(--bg)');
+            dot.setAttribute('stroke-width', '1.5');
             setVisible(dot, true);
           }
         }
@@ -266,7 +268,10 @@ export function initWidget(container, options = {}) {
           const dot = pointDots[dotIdx++];
           dot.setAttribute('cx', String(plane.sx(x)));
           dot.setAttribute('cy', String(plane.sy(1)));
+          dot.setAttribute('r', '4.5');
           dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+          dot.setAttribute('stroke', 'var(--bg)');
+          dot.setAttribute('stroke-width', '1.5');
           setVisible(dot, true);
         }
         setVisible(constantLine, false);
@@ -288,7 +293,10 @@ export function initWidget(container, options = {}) {
           const dot = pointDots[dotIdx++];
           dot.setAttribute('cx', String(plane.sx(x)));
           dot.setAttribute('cy', String(plane.sy(0)));
+          dot.setAttribute('r', '4.5');
           dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+          dot.setAttribute('stroke', 'var(--bg)');
+          dot.setAttribute('stroke-width', '1.5');
           setVisible(dot, true);
         }
         setVisible(zeroRay, false);
@@ -301,16 +309,54 @@ export function initWidget(container, options = {}) {
       else probeY = null;
     } else if (a < 0) {
       evalStatus = 'invalid_neg';
-      // Render alternating integer points
+      let step = 1;
+      if (density === 1) step = 1;
+      else if (density === 2) step = 0.5;
+      else if (density === 3) step = 0.25;
+      else step = 0; // continuous mode
+
       let dotIdx = 0;
-      for (let x = -3; x <= 3 && dotIdx < maxDiscrete; x += 1) {
-        const y = Math.pow(a, x);
-        if (y >= -4 && y <= 8) {
-          const dot = pointDots[dotIdx++];
-          dot.setAttribute('cx', String(plane.sx(x)));
-          dot.setAttribute('cy', String(plane.sy(y)));
-          dot.setAttribute('fill', 'var(--pink)');
-          setVisible(dot, true);
+      if (step > 0) {
+        for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
+          const isInt = Math.abs(x - Math.round(x)) < 1e-6;
+          if (isInt) {
+            const y = Math.pow(a, Math.round(x));
+            if (y >= -4 && y <= 8) {
+              const dot = pointDots[dotIdx++];
+              dot.setAttribute('cx', String(plane.sx(x)));
+              dot.setAttribute('cy', String(plane.sy(y)));
+              dot.setAttribute('r', '4.5');
+              dot.setAttribute('fill', 'var(--pink)');
+              dot.setAttribute('stroke', 'var(--bg)');
+              dot.setAttribute('stroke-width', '1.5');
+              setVisible(dot, true);
+            }
+          } else {
+            // Fractional rational power collapses in R: show collapse marker on x-axis
+            const dot = pointDots[dotIdx++];
+            dot.setAttribute('cx', String(plane.sx(x)));
+            dot.setAttribute('cy', String(plane.sy(0)));
+            dot.setAttribute('r', '3');
+            dot.setAttribute('fill', 'none');
+            dot.setAttribute('stroke', 'var(--pink)');
+            dot.setAttribute('stroke-width', '1.5');
+            setVisible(dot, true);
+          }
+        }
+      } else {
+        // Continuous mode: show only valid integer points
+        for (let x = -3; x <= 3 && dotIdx < maxDiscrete; x += 1) {
+          const y = Math.pow(a, x);
+          if (y >= -4 && y <= 8) {
+            const dot = pointDots[dotIdx++];
+            dot.setAttribute('cx', String(plane.sx(x)));
+            dot.setAttribute('cy', String(plane.sy(y)));
+            dot.setAttribute('r', '4.5');
+            dot.setAttribute('fill', 'var(--pink)');
+            dot.setAttribute('stroke', 'var(--bg)');
+            dot.setAttribute('stroke-width', '1.5');
+            setVisible(dot, true);
+          }
         }
       }
 
@@ -329,6 +375,7 @@ export function initWidget(container, options = {}) {
 
     const isNearRight = probeSx > 480;
     const badgeAnchor = isNearRight ? 'end' : 'start';
+    const badgeX = isNearRight ? String(probeSx - 12) : String(probeSx + 12);
 
     if (probeY !== null && probeY >= -4 && probeY <= 8) {
       setVisible(probeDot, true);
@@ -336,17 +383,29 @@ export function initWidget(container, options = {}) {
       const probeSy = plane.sy(probeY);
       probeDot.setAttribute('cx', String(probeSx));
       probeDot.setAttribute('cy', String(probeSy));
-      probeBadge.setAttribute('x', String(isNearRight ? probeSx - 10 : probeSx + 10));
-      probeBadge.setAttribute('y', String(probeSy - 10));
+      probeBadge.setAttribute('x', badgeX);
+      probeBadge.setAttribute('y', String(Math.max(35, probeSy - 10)));
       probeBadge.setAttribute('text-anchor', badgeAnchor);
       setText(probeBadge, `f(${fmt(pxVal)}) = ${fmt(probeY)}`);
+    } else if (probeY !== null) {
+      // Real value but out of visual scale [-4, 8]
+      setVisible(probeDot, true);
+      setVisible(probeAlertCross, false);
+      const isAbove = probeY > 8;
+      const clampedSy = plane.sy(isAbove ? 8 : -4);
+      probeDot.setAttribute('cx', String(probeSx));
+      probeDot.setAttribute('cy', String(clampedSy));
+      probeBadge.setAttribute('x', badgeX);
+      probeBadge.setAttribute('y', String(isAbove ? clampedSy + 16 : clampedSy - 8));
+      probeBadge.setAttribute('text-anchor', badgeAnchor);
+      setText(probeBadge, `f(${fmt(pxVal)}) = ${fmt(probeY)} (fuera de escala)`);
     } else {
+      // Collapse or undefined in R: display formal cross alert
       setVisible(probeDot, false);
       setVisible(probeAlertCross, true);
       const alertSy = plane.sy(0);
-      probeAlertCross.setAttribute('x', String(probeSx));
-      probeAlertCross.setAttribute('y', String(alertSy + 6));
-      probeBadge.setAttribute('x', String(isNearRight ? probeSx - 12 : probeSx + 12));
+      probeAlertCross.setAttribute('transform', `translate(${probeSx}, ${alertSy})`);
+      probeBadge.setAttribute('x', badgeX);
       probeBadge.setAttribute('y', String(alertSy - 15));
       probeBadge.setAttribute('text-anchor', badgeAnchor);
       if (evalStatus === 'invalid_neg') {
@@ -354,7 +413,7 @@ export function initWidget(container, options = {}) {
       } else if (evalStatus === 'invalid_zero') {
         setText(probeBadge, `0^(${fmt(pxVal)}) = 1/0 Indefinido`);
       } else {
-        setText(probeBadge, 'Fuera de escala');
+        setText(probeBadge, 'Indefinido en ℝ');
       }
     }
 
@@ -382,7 +441,7 @@ export function initWidget(container, options = {}) {
     } else if (evalStatus === 'invalid_neg') {
       rows.push([
         'Colapso en ℝ: Base Negativa a < 0',
-        '¡Alerta de Cátedra! Si a < 0 (ej. a = −2), en x = 1/2 se tendría (−2)^(1/2) = √(−2) ∉ ℝ. No existe raíz real para índices pares.',
+        '¡Atención! Si a < 0 (ej. a = −2), en x = 1/2 se tendría (−2)^(1/2) = √(−2) ∉ ℝ. No existe raíz real para índices pares.',
       ]);
       rows.push([
         'Consecuencia Geométrica',
@@ -404,7 +463,7 @@ export function initWidget(container, options = {}) {
       ]);
       rows.push([
         'Exclusión Formal',
-        'Por convención de Exactas y Khan Academy, a = 1 se excluye porque carece de crecimiento exponencial, asíntota horizontal real o vida media.',
+        'Por definición formal, a = 1 se excluye porque carece de crecimiento exponencial, asíntota horizontal real o vida media.',
       ]);
     }
 

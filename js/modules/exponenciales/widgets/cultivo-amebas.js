@@ -1,6 +1,6 @@
 /**
  * cultivo-amebas.js — Widget 2 (F14)
- * Simulación de bipartición celular basada en el Problema 1 de Exactas UNMDP (pág. 89).
+ * Simulación de bipartición celular y crecimiento exponencial con factor inicial k.
  * Compara f(t) = 2ᵗ (1 ameba) vs g(t) = 3 · 2ᵗ (3 amebas), explica el neutro a⁰ = 1,
  * y desarma visualmente la falacia 3 · 2ᵗ ≠ 6ᵗ.
  */
@@ -315,11 +315,18 @@ export function initWidget(container, options = {}) {
     const py3 = mapY(y3);
     const pyF = mapY(yF);
 
+    let pyLabel1 = py1 - 6;
     let pyLabel3 = py3 - 6;
     let pyLabelF = pyF - 6;
+
+    if (show1 && show3 && Math.abs(py1 - py3) < 16) {
+      pyLabel1 = py1 + 14;
+      pyLabel3 = py3 - 6;
+    }
+
     if (isOver3 && isOverF) {
       pyLabel3 = py3 - 6;
-      pyLabelF = Math.max(graphY + 14, pyF - 22);
+      pyLabelF = pyF + 14;
     } else if (show3 && showF && Math.abs(py3 - pyF) < 16) {
       pyLabel3 = py3 - 6;
       pyLabelF = pyF + 14;
@@ -332,7 +339,7 @@ export function initWidget(container, options = {}) {
       pt1.setAttribute('cx', String(px));
       pt1.setAttribute('cy', String(py1));
       label1.setAttribute('x', labelX);
-      label1.setAttribute('y', String(py1 - 6));
+      label1.setAttribute('y', String(pyLabel1));
       label1.setAttribute('text-anchor', textAnchor);
       setText(label1, text1);
     } else {

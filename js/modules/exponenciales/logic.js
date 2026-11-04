@@ -671,8 +671,8 @@ export const EXP_DIAGNOSTICS = {
   closed_bracket_on_asymptote: {
     id: "closed_bracket_on_asymptote",
     pose: "lentes-brillo",
-    tag: "Cazabobos de Exactas",
-    message: "¡Cazabobos mortal de examen de Exactas! La curva exponencial se acerca tanto como quieras a la recta asíntota y = c, pero como a^x jamás se anula en los reales, la función nunca llega a tocar ese valor. La asíntota no pertenece a la imagen: va SIEMPRE con paréntesis abierto (, jamás con corchete cerrado [.",
+    tag: "Cazabobos de Examen",
+    message: "¡Cazabobos mortal de examen! La curva exponencial se acerca tanto como quieras a la recta asíntota y = c, pero como a^x jamás se anula en los reales, la función nunca llega a tocar ese valor. La asíntota no pertenece a la imagen: va SIEMPRE con paréntesis abierto (, jamás con corchete cerrado [.",
   },
   subtracted_exponents_without_parens: {
     id: "subtracted_exponents_without_parens",

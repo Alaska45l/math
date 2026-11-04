@@ -1,6 +1,6 @@
 /**
  * espejo-base.js — Widget 4 (F16)
- * Simulación del Problema 2 de Exactas (pág. 90: decaimiento radiactivo de 1 kg y 2 kg),
+ * Simulación de decaimiento radiactivo (1 kg y 2 kg),
  * simetría espejo (1/a)ˣ = a⁻ˣ respecto al eje Y, asíntota y = 0, y comparación 2ˣ, eˣ, 3ˣ.
  */
 
@@ -76,6 +76,7 @@ export function initWidget(container, options = {}) {
     'Base Espejo',
   );
   const mirrorBaseGroup = board.controls.lastElementChild;
+  updateMirrorBaseChips.group = mirrorBaseGroup;
 
   const updateDecayMassChips = addChips(
     board.controls,
@@ -85,6 +86,7 @@ export function initWidget(container, options = {}) {
     'Masa Inicial',
   );
   const decayMassGroup = board.controls.lastElementChild;
+  updateDecayMassChips.group = decayMassGroup;
 
   const { labelEl: yearLabel, input: yearSlider } = addRange(
     board.controls,
@@ -228,16 +230,22 @@ export function initWidget(container, options = {}) {
       mirrorTie.setAttribute('x2', String(pNegX));
       mirrorTie.setAttribute('y2', String(pyA));
 
+      const isNearRight = px > 480;
+      const labelX = isNearRight ? String(px - 10) : String(px + 8);
+      const textAnchor = isNearRight ? 'end' : 'start';
+
       ptA.setAttribute('cx', String(px));
       ptA.setAttribute('cy', String(pyA));
-      labelA.setAttribute('x', String(px + 8));
+      labelA.setAttribute('x', labelX);
       labelA.setAttribute('y', String(pyA - 6));
+      labelA.setAttribute('text-anchor', textAnchor);
       setText(labelA, `${a}^(${fmt(x)}) = ${fmt(yA)}`);
 
       ptB.setAttribute('cx', String(px));
       ptB.setAttribute('cy', String(pyB));
-      labelB.setAttribute('x', String(px + 8));
+      labelB.setAttribute('x', labelX);
       labelB.setAttribute('y', String(pyB + 14));
+      labelB.setAttribute('text-anchor', textAnchor);
       setText(labelB, `(1/${a})^(${fmt(x)}) = ${fmt(yB)}`);
 
       rows.push([
@@ -272,14 +280,19 @@ export function initWidget(container, options = {}) {
       const m1 = Math.pow(0.5, t);
       const m2 = 2 * Math.pow(0.5, t);
 
+      const isNearRight = ptT > 480;
+      const labelX = isNearRight ? String(ptT - 10) : String(ptT + 8);
+      const textAnchor = isNearRight ? 'end' : 'start';
+
       if (show1) {
         setVisible(ptA, true);
         setVisible(labelA, true);
         const py1 = plane.sy(m1);
         ptA.setAttribute('cx', String(ptT));
         ptA.setAttribute('cy', String(py1));
-        labelA.setAttribute('x', String(ptT + 8));
+        labelA.setAttribute('x', labelX);
         labelA.setAttribute('y', String(py1 - 6));
+        labelA.setAttribute('text-anchor', textAnchor);
         setText(labelA, `1kg: ${fmt(m1)} kg`);
       } else {
         setVisible(ptA, false);
@@ -292,8 +305,9 @@ export function initWidget(container, options = {}) {
         const py2 = plane.sy(m2);
         ptB.setAttribute('cx', String(ptT));
         ptB.setAttribute('cy', String(py2));
-        labelB.setAttribute('x', String(ptT + 8));
+        labelB.setAttribute('x', labelX);
         labelB.setAttribute('y', String(py2 - 6));
+        labelB.setAttribute('text-anchor', textAnchor);
         setText(labelB, `2kg: ${fmt(m2)} kg`);
       } else {
         setVisible(ptB, false);
@@ -335,22 +349,29 @@ export function initWidget(container, options = {}) {
       const pye = plane.sy(Math.min(8, ye));
       const py3 = plane.sy(Math.min(8, y3));
 
+      const isNearRight = px > 480;
+      const labelX = isNearRight ? String(px - 10) : String(px + 8);
+      const textAnchor = isNearRight ? 'end' : 'start';
+
       ptA.setAttribute('cx', String(px));
       ptA.setAttribute('cy', String(py2));
-      labelA.setAttribute('x', String(px + 8));
+      labelA.setAttribute('x', labelX);
       labelA.setAttribute('y', String(py2 + 12));
+      labelA.setAttribute('text-anchor', textAnchor);
       setText(labelA, `2ˣ = ${fmt(y2)}`);
 
       ptC.setAttribute('cx', String(px));
       ptC.setAttribute('cy', String(pye));
-      labelC.setAttribute('x', String(px + 8));
+      labelC.setAttribute('x', labelX);
       labelC.setAttribute('y', String(pye - 6));
+      labelC.setAttribute('text-anchor', textAnchor);
       setText(labelC, `eˣ = ${fmt(ye)}`);
 
       ptB.setAttribute('cx', String(px));
       ptB.setAttribute('cy', String(py3));
-      labelB.setAttribute('x', String(px + 8));
+      labelB.setAttribute('x', labelX);
       labelB.setAttribute('y', String(py3 - 6));
+      labelB.setAttribute('text-anchor', textAnchor);
       setText(labelB, `3ˣ = ${fmt(y3)}`);
 
       rows.push([

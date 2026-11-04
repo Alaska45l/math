@@ -34,21 +34,21 @@ const PRESETS = {
     c: 3,
   },
   ej11: {
-    label: 'Exactas Ej. 11: 1 − 2ˣ',
+    label: 'Invertida: 1 − 2ˣ',
     k: -1,
     a: 2,
     h: 0,
     c: 1,
   },
   ej14: {
-    label: 'Exactas Ej. 14: 2 − (½)ˣ',
+    label: 'Decreciente: 2 − (½)ˣ',
     k: -1,
     a: 0.5,
     h: 0,
     c: 2,
   },
   parcial2025: {
-    label: '2° Parcial 2025: 1 − (½)ˣ',
+    label: 'Cruce en origen: 1 − (½)ˣ',
     k: -1,
     a: 0.5,
     h: 0,
@@ -105,7 +105,7 @@ export function initWidget(container, options = {}) {
         store.set({ preset: 'custom' });
       }
     },
-    'Casos de Examen',
+    'Familias y Desplazamientos',
   );
 
   const { input: kSlider } = addRange(
@@ -161,12 +161,20 @@ export function initWidget(container, options = {}) {
     store,
     'probeX',
     'Sonda asintótica x',
-    -8,
-    8,
+    -5.5,
+    5.5,
     store.get().probeX,
     0.5,
     (v) => `x = ${fmt(v)}`,
   );
+
+  [kSlider, aSlider, hSlider, cSlider].forEach((slider) => {
+    slider.addEventListener('input', () => {
+      if (store.get().preset !== 'custom') {
+        store.set({ preset: 'custom' });
+      }
+    });
+  });
 
   // Trap button
   const trapBtn = button('¿Toca la asíntota y = c?', 'hint', () => {
@@ -287,15 +295,19 @@ export function initWidget(container, options = {}) {
     setText(labelIntercept, `(0; ${fmt(y0)})`);
 
     // Probe point
-    const px = state.probeX;
+    const px = Math.max(-5.5, Math.min(5.5, state.probeX));
     const py = k * Math.pow(a, px - h) + c;
     const sxP = plane.sx(px);
     const syP = plane.sy(Math.max(-6, Math.min(6, py)));
 
-    ptProbe.setAttribute('cx', String(Math.max(10, Math.min(plane.cfg.width - 10, sxP))));
-    ptProbe.setAttribute('cy', String(syP));
-    labelProbe.setAttribute('x', String(Math.max(10, Math.min(plane.sx(5) - 30, sxP + 8))));
-    labelProbe.setAttribute('y', String(Math.max(16, Math.min(plane.cfg.height - 10, syP - 8))));
+    ptProbe.setAttribute('cx', String(Math.max(plane.box.x + 6, Math.min(plane.box.x + plane.box.w - 6, sxP))));
+    ptProbe.setAttribute('cy', String(Math.max(plane.box.y + 6, Math.min(plane.box.y + plane.box.h - 6, syP))));
+
+    const isProbeNearRight = sxP > plane.box.x + plane.box.w - 85;
+    labelProbe.setAttribute('x', String(isProbeNearRight ? sxP - 10 : sxP + 10));
+    labelProbe.setAttribute('text-anchor', isProbeNearRight ? 'end' : 'start');
+    const isProbeNearTop = syP < plane.box.y + 24;
+    labelProbe.setAttribute('y', String(isProbeNearTop ? syP + 20 : syP - 8));
     setText(labelProbe, `f(${fmt(px)}) = ${fmt(py)}`);
 
     // Distance to asymptote
@@ -315,7 +327,7 @@ export function initWidget(container, options = {}) {
       ],
       [
         'Conjunto Imagen y Trampa del Corchete',
-        `Im(f) = ${analysis.image}. ¡SIEMPRE con paréntesis abierto! En el 2° Parcial 2025 pusieron corchete cerrado [ para atrapar a los distraídos. Como a^(x−h) > 0 en todo ℝ, f(x) jamás llega a valer ${fmt(c)}.`,
+        `Im(f) = ${analysis.image}. ¡SIEMPRE con paréntesis abierto! La clásica trampa de examen es poner corchete cerrado [ para atrapar a los distraídos. Como a^(x−h) > 0 en todo ℝ, f(x) jamás llega a valer ${fmt(c)}.`,
       ],
       [
         'Sonda de Proximidad Asintótica',
@@ -325,7 +337,7 @@ export function initWidget(container, options = {}) {
 
     if (state.showTrapChallenge) {
       rows.push([
-        'Desarme Teórico de Cátedra',
+        'Desarme Teórico',
         `Si f(x) = ${fmt(c)}, tendríamos: ${fmt(k)} · a^(x−${fmt(h)}) + ${fmt(c)} = ${fmt(c)} ⟹ ${fmt(k)} · a^(x−${fmt(h)}) = 0 ⟹ a^(x−${fmt(h)}) = 0. Pero una potencia de base positiva es ESTRICTAMENTE MAYOR QUE CERO en todo ℝ. ¡La ecuación no tiene solución! Por eso la asíntota es intocable.`,
       ]);
     }

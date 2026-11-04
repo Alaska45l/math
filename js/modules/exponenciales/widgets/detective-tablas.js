@@ -1,7 +1,6 @@
 /**
  * detective-tablas.js — Widget 1 (F13)
  * Comparación interactiva de tablas: Lineal vs Exponencial vs Cuadrática.
- * Incluye los casos canónicos de Khan Academy y cátedra de Exactas UNMDP.
  */
 
 import {
@@ -44,7 +43,7 @@ const PRESETS = {
     note: 'Las diferencias crecen (+5, +7, +9), pero las segundas diferencias son constantes (+2). No es exponencial.',
   },
   exactas_dup: {
-    label: '4. Duplicación (Exactas 2ˣ⁺¹)',
+    label: '4. Duplicación (2ˣ⁺¹)',
     xs: [0, 1, 2, 3],
     ys: [2, 4, 8, 16],
     model: 'Exponencial: y = 2 · 2ˣ',

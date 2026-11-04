@@ -18,6 +18,48 @@ import {
   setVisible,
 } from './board-kit.js';
 
+function toSuperscripts(str) {
+  if (!str) return '';
+  const SUP = {
+    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+    '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+    '+': '⁺', '-': '⁻', '−': '⁻', '=': '⁼', '(': '⁽', ')': '⁾',
+    'x': 'ˣ', 'u': 'ᵘ', 'n': 'ⁿ', 't': 'ᵗ'
+  };
+  let res = '';
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === '^') {
+      let exp = '';
+      if (str[i + 1] === '(') {
+        let depth = 1;
+        let j = i + 2;
+        while (j < str.length && depth > 0) {
+          if (str[j] === '(') depth++;
+          else if (str[j] === ')') depth--;
+          if (depth > 0) exp += str[j];
+          j++;
+        }
+        i = j - 1;
+      } else {
+        let j = i + 1;
+        while (j < str.length && /[0-9a-z+\-−]/i.test(str[j])) {
+          exp += str[j];
+          j++;
+        }
+        i = j - 1;
+      }
+      res += exp
+        .replace(/\s+/g, '')
+        .split('')
+        .map((ch) => SUP[ch] || ch)
+        .join('');
+    } else {
+      res += str[i];
+    }
+  }
+  return res;
+}
+
 const METHODS = [
   ['equal_base', '1. Igualación de Bases'],
   ['common_factor', '2. Factor Común'],
@@ -28,7 +70,7 @@ const EQUATIONS = {
   equal_base: [
     {
       id: 'ej12a',
-      title: 'Ej. 12a: 2^(3x+1) : 16^(x−4) = 1',
+      title: '2^(3x+1) : 16^(x−4) = 1',
       steps: [
         {
           lhs: '2^(3x + 1) : 16^(x − 4)',
@@ -65,7 +107,7 @@ const EQUATIONS = {
     },
     {
       id: 'eq_simple',
-      title: 'Exactas: 4 · 2ˣ = 8ˣ',
+      title: '4 · 2ˣ = 8ˣ',
       steps: [
         {
           lhs: '4 · 2ˣ',
@@ -99,7 +141,7 @@ const EQUATIONS = {
   common_factor: [
     {
       id: 'ej8h',
-      title: 'Ej. 8h: 2^(x+1) + 2ˣ = 12',
+      title: '2^(x+1) + 2ˣ = 12',
       steps: [
         {
           lhs: '2^(x + 1) + 2ˣ',
@@ -138,7 +180,7 @@ const EQUATIONS = {
   quadratic_sub: [
     {
       id: 'discard_trap',
-      title: 'Parcial: 2^(2x) − 3 · 2ˣ − 4 = 0',
+      title: '2^(2x) − 3 · 2ˣ − 4 = 0',
       steps: [
         {
           lhs: '(2ˣ)² − 3 · (2ˣ) − 4',
@@ -148,7 +190,7 @@ const EQUATIONS = {
         {
           lhs: 'u² − 3u − 4 = 0',
           rhs: 'con u = 2ˣ > 0',
-          rule: 'Sustitución de variable u = 2ˣ. ¡Condición obligatoria de cátedra: u DEBE ser > 0!',
+          rule: 'Sustitución de variable u = 2ˣ. ¡Condición obligatoria: u DEBE ser > 0!',
         },
         {
           lhs: '(u − 4)(u + 1)',
@@ -158,7 +200,7 @@ const EQUATIONS = {
         {
           lhs: 'u₁ = 4 (válido) | u₂ = −1',
           rhs: '¡u₂ DESCARTADO!',
-          rule: '¡ATENCIÓN DE EXAMEN! u₂ = −1 ≤ 0 se descarta obligatoriamente: 2ˣ = −1 carece de solución en ℝ.',
+          rule: '¡ATENCIÓN! u₂ = −1 ≤ 0 se descarta obligatoriamente: 2ˣ = −1 carece de solución en ℝ.',
         },
         {
           lhs: '2ˣ = 4 = 2²',
@@ -171,7 +213,7 @@ const EQUATIONS = {
     },
     {
       id: 'ej8i',
-      title: 'Ej. 8i: 3^(2x) − 4 · 3^(x+1) : 9 + 1/3 = 0',
+      title: '3^(2x) − 4 · 3^(x+1) : 9 + 1/3 = 0',
       steps: [
         {
           lhs: '3^(2x) − (4/3) · 3ˣ + 1/3',
@@ -257,7 +299,7 @@ export function initWidget(container, options = {}) {
               },
             },
           },
-          eq.title,
+          toSuperscripts(eq.title),
         );
         eqGroupContainer.append(chip);
         return chip;
@@ -273,12 +315,12 @@ export function initWidget(container, options = {}) {
   };
 
   // Stepper Controls
-  const prevBtn = button('← Paso anterior', null, () => {
+  const prevBtn = button('Paso anterior', null, () => {
     const curStep = store.get().step;
     if (curStep > 0) store.set({ step: curStep - 1, tiltTrap: false });
   });
 
-  const nextBtn = button('Paso siguiente →', null, () => {
+  const nextBtn = button('Siguiente paso', null, () => {
     const eqList = EQUATIONS[store.get().method];
     const eq = eqList[store.get().eqIndex];
     const curStep = store.get().step;
@@ -309,7 +351,10 @@ export function initWidget(container, options = {}) {
     // Base platform
     s('polygon', {
       points: `${fulcrumX - 45},${fulcrumY + 115} ${fulcrumX + 45},${fulcrumY + 115} ${fulcrumX + 35},${fulcrumY + 105} ${fulcrumX - 35},${fulcrumY + 105}`,
-      fill: 'var(--border)',
+      fill: 'var(--muted, #a7b8ae)',
+      stroke: 'var(--accent, var(--yellow))',
+      'stroke-width': 1.5,
+      opacity: 0.85,
     }),
     // Vertical column
     s('rect', {
@@ -317,17 +362,20 @@ export function initWidget(container, options = {}) {
       y: fulcrumY,
       width: 12,
       height: 105,
-      fill: 'var(--border)',
+      fill: 'var(--muted, #a7b8ae)',
+      stroke: 'var(--border, rgba(236, 242, 232, 0.28))',
+      'stroke-width': 1,
       rx: 3,
+      opacity: 0.9,
     }),
     // Center pivot jewel
     s('circle', {
       cx: fulcrumX,
       cy: fulcrumY,
       r: 9,
-      fill: 'var(--accent)',
-      stroke: 'var(--bg)',
-      'stroke-width': 2,
+      fill: 'var(--accent, var(--yellow))',
+      stroke: 'var(--bg, #26352d)',
+      'stroke-width': 2.5,
     }),
   );
 
@@ -341,7 +389,7 @@ export function initWidget(container, options = {}) {
     y1: fulcrumY,
     x2: fulcrumX + beamLength / 2,
     y2: fulcrumY,
-    stroke: 'var(--accent)',
+    stroke: 'var(--accent, var(--yellow))',
     'stroke-width': 4.5,
     'stroke-linecap': 'round',
   });
@@ -350,20 +398,20 @@ export function initWidget(container, options = {}) {
   // Left Pan Assembly
   const leftX = fulcrumX - beamLength / 2;
   const leftPanGroup = s('g', { class: 'exp-left-pan' });
-  const leftChainL = s('line', { x1: leftX, y1: fulcrumY, x2: leftX - 45, y2: fulcrumY + 65, stroke: 'var(--border)', 'stroke-width': 1.5 });
-  const leftChainR = s('line', { x1: leftX, y1: fulcrumY, x2: leftX + 45, y2: fulcrumY + 65, stroke: 'var(--border)', 'stroke-width': 1.5 });
+  const leftChainL = s('line', { x1: leftX, y1: fulcrumY, x2: leftX - 55, y2: fulcrumY + 65, stroke: 'var(--muted, #a7b8ae)', 'stroke-width': 1.5, opacity: 0.8 });
+  const leftChainR = s('line', { x1: leftX, y1: fulcrumY, x2: leftX + 55, y2: fulcrumY + 65, stroke: 'var(--muted, #a7b8ae)', 'stroke-width': 1.5, opacity: 0.8 });
   const leftDish = s('path', {
-    d: `M ${leftX - 55} ${fulcrumY + 65} Q ${leftX} ${fulcrumY + 85} ${leftX + 55} ${fulcrumY + 65}`,
-    fill: 'rgba(255, 255, 255, 0.05)',
-    stroke: 'var(--accent)',
+    d: `M ${leftX - 65} ${fulcrumY + 65} Q ${leftX} ${fulcrumY + 88} ${leftX + 65} ${fulcrumY + 65}`,
+    fill: 'rgba(230, 211, 138, 0.12)',
+    stroke: 'var(--accent, var(--yellow))',
     'stroke-width': 2.5,
   });
   const leftText = s('text', {
     x: leftX,
-    y: fulcrumY + 55,
+    y: fulcrumY + 54,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
-    'font-size': '12px',
+    'font-size': '14.5px',
     'font-weight': 'bold',
     fill: 'var(--blue)',
   }, '');
@@ -373,20 +421,20 @@ export function initWidget(container, options = {}) {
   // Right Pan Assembly
   const rightX = fulcrumX + beamLength / 2;
   const rightPanGroup = s('g', { class: 'exp-right-pan' });
-  const rightChainL = s('line', { x1: rightX, y1: fulcrumY, x2: rightX - 45, y2: fulcrumY + 65, stroke: 'var(--border)', 'stroke-width': 1.5 });
-  const rightChainR = s('line', { x1: rightX, y1: fulcrumY, x2: rightX + 45, y2: fulcrumY + 65, stroke: 'var(--border)', 'stroke-width': 1.5 });
+  const rightChainL = s('line', { x1: rightX, y1: fulcrumY, x2: rightX - 55, y2: fulcrumY + 65, stroke: 'var(--muted, #a7b8ae)', 'stroke-width': 1.5, opacity: 0.8 });
+  const rightChainR = s('line', { x1: rightX, y1: fulcrumY, x2: rightX + 55, y2: fulcrumY + 65, stroke: 'var(--muted, #a7b8ae)', 'stroke-width': 1.5, opacity: 0.8 });
   const rightDish = s('path', {
-    d: `M ${rightX - 55} ${fulcrumY + 65} Q ${rightX} ${fulcrumY + 85} ${rightX + 55} ${fulcrumY + 65}`,
-    fill: 'rgba(255, 255, 255, 0.05)',
-    stroke: 'var(--accent)',
+    d: `M ${rightX - 65} ${fulcrumY + 65} Q ${rightX} ${fulcrumY + 88} ${rightX + 65} ${fulcrumY + 65}`,
+    fill: 'rgba(230, 211, 138, 0.12)',
+    stroke: 'var(--accent, var(--yellow))',
     'stroke-width': 2.5,
   });
   const rightText = s('text', {
     x: rightX,
-    y: fulcrumY + 55,
+    y: fulcrumY + 54,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
-    'font-size': '12px',
+    'font-size': '14.5px',
     'font-weight': 'bold',
     fill: 'var(--yellow)',
   }, '');
@@ -411,20 +459,20 @@ export function initWidget(container, options = {}) {
     y: 35,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
-    'font-size': '14px',
+    'font-size': '15px',
     'font-weight': 'bold',
-    fill: 'var(--accent)',
+    fill: 'var(--accent, var(--yellow))',
   }, '');
   scene.append(titleText);
 
   // Step Progress Badge
   const stepBadge = s('text', {
     x: fulcrumX,
-    y: 60,
+    y: 58,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
-    'font-size': '12px',
-    fill: 'var(--text-muted)',
+    'font-size': '12.5px',
+    fill: 'var(--text-muted, #a7b8ae)',
   }, '');
   scene.append(stepBadge);
 
@@ -460,12 +508,12 @@ export function initWidget(container, options = {}) {
     rightPanGroup.setAttribute('transform', `translate(${curRightX - rightX}, ${curRightY - fulcrumY})`);
 
     // Pan texts
-    setText(leftText, isTilted ? '2ˣ = −1' : stepData.lhs);
-    setText(rightText, isTilted ? '¡Imposible!' : stepData.rhs);
+    setText(leftText, isTilted ? '2ˣ = −1' : toSuperscripts(stepData.lhs));
+    setText(rightText, isTilted ? '¡Imposible!' : toSuperscripts(stepData.rhs));
     setText(equalBadge, isTilted ? '≠' : '=');
     equalBadge.setAttribute('fill', isTilted ? 'var(--pink)' : 'var(--green)');
 
-    setText(titleText, eq.title);
+    setText(titleText, toSuperscripts(eq.title));
     setText(stepBadge, `Paso ${step + 1} de ${eq.steps.length}`);
 
     // Update buttons state
@@ -475,7 +523,7 @@ export function initWidget(container, options = {}) {
     // Readout rows
     const rows = [
       ['Método Aplicado', `${METHODS.find((m) => m[0] === state.method)[1]}`],
-      [`Paso ${step + 1}: Transformación Algebraica`, stepData.rule],
+      [`Paso ${step + 1}: Transformación Algebraica`, toSuperscripts(stepData.rule)],
       [
         'Estado de la Balanza',
         isTilted
