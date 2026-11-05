@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="assets/vn/base.webp" alt="Alaska — tutora de Visual Novel y mascota del pizarrón" width="220">
+  <img src="assets/github/readme.webp" alt="Alaska — Visual Novel tutor and chalkboard mascot" width="220">
   <h1>Alaska Math Lab</h1>
-  <p><strong>Laboratorios interactivos de matemática desde primeros principios, con diagnóstico conceptual, exploración experimental y una arquitectura de aprendizaje adaptativo en desarrollo.</strong></p>
+  <p><strong>Interactive first-principles math laboratories featuring conceptual diagnosis, experimental exploration, and an evolving adaptive learning architecture.</strong></p>
 </div>
 
 <p align="center">
@@ -11,193 +11,193 @@
   <img src="https://img.shields.io/badge/Playwright-Visual%20%26%20DOM%20QA-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright QA">
 </p>
 
-Alaska Math Lab es un laboratorio web local-first para aprender matemática de ingreso universitario y contenidos iniciales de Análisis. Su propósito es ayudar a comprender por qué funcionan las ideas matemáticas, experimentar con sus consecuencias, reconocer errores de razonamiento y transferir lo aprendido a problemas nuevos.
+Alaska Math Lab is a local-first web laboratory for learning college-entry mathematics and introductory Analysis concepts. Its purpose is to help learners understand why mathematical ideas work, experiment with their consequences, recognize reasoning errors, and transfer what they have learned to new problems.
 
-En lugar de presentar reglas como recetas aisladas, el proyecto representa estructuras matemáticas mediante objetos que se pueden manipular: circuitos lógicos, conectores dimensionales, rectas numéricas, cintas de sucesiones, planos cartesianos, espejos, curvas y modelos exponenciales.
+Instead of presenting rules as isolated recipes, the project represents mathematical structures through manipulable objects: logic circuits, dimensional connectors, number lines, sequence ribbons, Cartesian planes, mirrors, curves, and exponential models.
 
-La experiencia combina tres capas:
+The experience combines three layers:
 
-- **Laboratorios matemáticos:** simuladores y representaciones interactivas que hacen observables las relaciones abstractas.
-- **Acompañamiento narrativo:** Alaska, una tutora con motor Visual Novel, guía explicaciones, pistas y diagnósticos cuando su intervención aporta valor.
-- **Aprendizaje durable:** una arquitectura pedagógica en desarrollo que organiza recuperación activa, práctica distribuida, intercalación, metacognición y transferencia.
+- **Mathematical laboratories:** simulators and interactive representations that make abstract relationships observable.
+- **Narrative guidance:** Alaska, a Visual Novel engine tutor, guides explanations, hints, and diagnostics whenever her intervention adds value.
+- **Durable learning:** a pedagogical architecture in development that organizes active retrieval, spaced practice, interleaving, metacognition, and transfer.
 
-**El objetivo no es maximizar el tiempo de pantalla, las rachas ni la cantidad de clics. Es desarrollar razonamiento matemático independiente que persista más allá de cada sesión.**
+**The goal is not to maximize screen time, streaks, or click counts. It is to develop independent mathematical reasoning that persists beyond each session.**
 
 ---
 
-## Estado del proyecto
+## Project Status
 
-El repositorio combina capacidades implementadas con una arquitectura de aprendizaje que todavía debe construirse por etapas. Esta distinción es deliberada: una especificación documentada no equivale a una funcionalidad disponible.
+The repository combines implemented capabilities with a learning architecture that still needs to be built in stages. This distinction is deliberate: a documented specification does not equate to an available feature.
 
-| Área | Estado actual |
+| Area | Current Status |
 |---|---|
-| Laboratorios interactivos y planos SVG | Implementado en los módulos publicados en el hub |
-| Evaluadores algebraicos mediante AST | Implementado en módulos que aceptan fórmulas |
-| Diagnósticos de errores conceptuales | Implementado para un catálogo concreto de errores por módulo |
-| Tutora Visual Novel, guiones, poses y audio procedural | Implementado |
-| Glosario contextual y pizarra de trabajo | Implementado en los módulos que los integran |
-| Progreso local por sección | Implementado en determinados módulos |
-| Motor central de competencias y dominio | Planificado |
-| Repetición espaciada adaptativa | Planificado |
-| Selección global de práctica intercalada | Planificado |
-| Calibración metacognitiva de confianza | Planificado |
-| Atlas longitudinal de errores | Planificado |
-| Campamento persistente y autónomo | Exploración futura |
-| Jefes como evaluaciones integradoras | Dirección de diseño; motor unificado pendiente |
+| Interactive laboratories and SVG boards | Implemented in the modules published on the hub |
+| AST-based algebraic evaluators | Implemented in modules that accept formulas |
+| Conceptual error diagnostics | Implemented for a specific catalog of errors per module |
+| Visual Novel tutor, scripts, poses, and procedural audio | Implemented |
+| Contextual glossary and working scratchpad | Implemented in the modules that integrate them |
+| Local progress by section | Implemented in specific modules |
+| Core competency and mastery engine | Planned |
+| Adaptive spaced repetition | Planned |
+| Global interleaved practice selection | Planned |
+| Metacognitive confidence calibration | Planned |
+| Longitudinal error atlas | Planned |
+| Persistent and autonomous base camp | Future exploration |
+| Bosses as integrative assessments | Design direction; unified engine pending |
 
-El estado detallado de implementación y las dependencias entre tareas se mantienen en [ROADMAP.md](ROADMAP.md). La arquitectura pedagógica objetivo, sus fundamentos y las referencias científicas están en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
+Detailed implementation status and task dependencies are maintained in [ROADMAP.md](ROADMAP.md). The target pedagogical architecture, its foundations, and scientific references are in [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
 
-## Qué ofrece actualmente
+## What It Currently Offers
 
-El hub presenta siete laboratorios:
+The hub features seven laboratories:
 
-| Laboratorio | Entrada | Enfoque |
+| Laboratory | Entry Point | Focus |
 |---|---|---|
-| Desigualdades compuestas | [desigualdades.html](desigualdades.html) | Desigualdades como circuitos en serie y paralelo, inversión de polaridad, intervalos y conjuntos solución. |
-| Unidades y análisis dimensional | [unidades.html](unidades.html) | Conversión mediante factores, conectores dimensionales, operaciones equivalentes y neutro multiplicativo. |
-| Funciones | [funciones.html](funciones.html) | Unicidad, dominio e imagen, conjuntos de positividad, monotonía, secante y función inversa. |
-| Sucesiones | [sucesiones.html](sucesiones.html) | Sucesiones aritméticas y geométricas, reglas recursivas y explícitas, conteo de saltos, signos y límites. |
-| Valor absoluto y funciones por partes | [valor-absoluto.html](valor-absoluto.html) | Distancia, vértice, transformaciones, ramas, dominio, imagen, fronteras y unicidad. |
-| Potencias y raíces | [potencias-raices.html](potencias-raices.html) | Exponentes, raíces, propiedades, restricciones de dominio y relaciones entre representaciones. |
-| Funciones exponenciales | [exponenciales.html](exponenciales.html) | Crecimiento y decaimiento, base, factor inicial, tablas, modelos y asíntotas. |
+| Compound Inequalities | [desigualdades.html](desigualdades.html) | Inequalities as series and parallel circuits, polarity inversion, intervals, and solution sets. |
+| Units and Dimensional Analysis | [unidades.html](unidades.html) | Factor-based conversion, dimensional connectors, equivalent operations, and the multiplicative identity. |
+| Functions | [funciones.html](funciones.html) | Uniqueness, domain and range, positivity sets, monotonicity, secant line, and inverse function. |
+| Sequences | [sucesiones.html](sucesiones.html) | Arithmetic and geometric sequences, recursive and explicit rules, step counting, signs, and limits. |
+| Absolute Value and Piecewise Functions | [valor-absoluto.html](valor-absoluto.html) | Distance, vertex, transformations, branches, domain, range, boundaries, and uniqueness. |
+| Powers and Roots | [potencias-raices.html](potencias-raices.html) | Exponents, roots, properties, domain restrictions, and relationships between representations. |
+| Exponential Functions | [exponenciales.html](exponenciales.html) | Growth and decay, base, initial factor, tables, models, and asymptotes. |
 
-La página de Unidades conserva además una entrada alternativa en el repositorio: [laboratorio_unidades.html](laboratorio_unidades.html). La navegación principal del hub utiliza actualmente **unidades.html**.
+The Units page also retains an alternative entry point in the repository: [laboratorio_unidades.html](laboratorio_unidades.html). The main hub navigation currently uses **unidades.html**.
 
-### Principios matemáticos del proyecto
+### Mathematical Principles of the Project
 
-- **Primeros principios antes que trucos:** explicar las transformaciones mediante propiedades y equivalencias, no mediante expresiones como “pasa al otro lado y cambia de signo”.
-- **Equivalencia antes que coincidencia textual:** cuando el módulo lo permite, las fórmulas se interpretan mediante árboles sintácticos y se comparan matemáticamente.
-- **Diagnóstico antes que una cruz roja:** los errores conocidos deben asociarse a una hipótesis conceptual y a una intervención útil.
-- **Manipulación con significado:** mover un objeto debe permitir observar una relación matemática, no ser una animación sin consecuencias.
-- **Precisión formal:** gráficos, dominios, fronteras, signos y resultados deben conservar su significado matemático.
-- **Retirada gradual de ayudas:** el acompañamiento tiene que conducir a la resolución independiente, no crear dependencia de la interfaz o de Alaska.
+- **First principles before tricks:** explain transformations through properties and equivalences, not through phrases like “move it to the other side and flip the sign.”
+- **Equivalence before text matching:** when supported by the module, formulas are parsed via syntax trees and compared mathematically.
+- **Diagnosis before a red cross:** known errors must be associated with a conceptual hypothesis and a useful intervention.
+- **Meaningful manipulation:** moving an object must allow observing a mathematical relationship, not serve as an inconsequential animation.
+- **Formal precision:** graphs, domains, boundaries, signs, and results must preserve their mathematical meaning.
+- **Gradual fading of scaffolding:** guidance must lead to independent problem-solving, not create dependence on the interface or on Alaska.
 
-## Cómo debería funcionar el aprendizaje
+## How Learning Should Work
 
-La arquitectura objetivo sigue un ciclo que conecta exploración y consolidación:
+The target architecture follows a cycle that connects exploration and consolidation:
 
-1. **Predecir:** formular una hipótesis antes de revelar el resultado.
-2. **Experimentar:** modificar variables u objetos en un widget.
-3. **Observar:** identificar qué cambia, qué permanece y por qué.
-4. **Formalizar:** conectar la observación con definiciones, propiedades y expresiones simbólicas.
-5. **Practicar:** resolver problemas con ayudas que se retiran progresivamente.
-6. **Recuperar:** volver a utilizar el concepto después de un intervalo.
-7. **Transferir:** aplicarlo a un problema nuevo, con otra apariencia o representación.
+1. **Predict:** formulate a hypothesis before revealing the outcome.
+2. **Experiment:** modify variables or objects within a widget.
+3. **Observe:** identify what changes, what remains invariant, and why.
+4. **Formalize:** connect the observation with definitions, properties, and symbolic expressions.
+5. **Practice:** solve problems with scaffolding that fades progressively.
+6. **Retrieve:** reuse the concept after an interval.
+7. **Transfer:** apply it to a new problem with a different appearance or representation.
 
-No todas las actividades deben contener todas las etapas. La secuencia se adapta al concepto, al conocimiento previo y al estado de aprendizaje.
+Not every activity must contain all stages. The sequence adapts to the concept, prior knowledge, and learning state.
 
-La arquitectura completa está especificada en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md). Sus estrategias centrales incluyen recuperación activa, práctica distribuida, intercalación, ejemplos resueltos con retirada gradual de pasos, comparación de métodos, autoexplicación, calibración de confianza y traducción entre representaciones.
+The complete architecture is specified in [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md). Its core strategies include active retrieval, spaced practice, interleaving, worked examples with faded steps, method comparison, self-explanation, confidence calibration, and translation across representations.
 
-## Alaska: tutora, no sustituta del razonamiento
+## Alaska: Tutor, Not a Substitute for Reasoning
 
-Alaska es una presencia narrativa que debe intervenir de forma contextual:
+Alaska is a narrative presence designed to intervene contextually:
 
-- Explica un prerrequisito cuando detecta una laguna.
-- Señala qué propiedad o paso necesita revisión.
-- Cambia de representación cuando una explicación no alcanza.
-- Ofrece pistas graduadas sin revelar inmediatamente la solución.
-- Reconoce estrategias matemáticas concretas, no sólo respuestas correctas.
-- Se retira cuando el estudiante puede continuar de manera autónoma.
+- Explains a prerequisite when she detects a gap.
+- Points out which property or step needs review.
+- Switches representations when an explanation falls short.
+- Offers graduated hints without immediately revealing the solution.
+- Recognizes specific mathematical strategies, not just correct answers.
+- Steps back when the student can continue autonomously.
 
-Su personalidad puede ser irónica, expresiva y tsundere. El humor nunca debe convertirse en humillación, presión, culpa o evaluación de la capacidad personal del estudiante.
+Her personality can be ironic, expressive, and tsundere. Humor must never turn into humiliation, pressure, guilt, or evaluation of the student's personal ability.
 
-## Arquitectura técnica
+## Technical Architecture
 
-El proyecto utiliza HTML, CSS y módulos JavaScript nativos, sin dependencias de ejecución. No utiliza frameworks de UI, bibliotecas externas de graficación, eval() ni new Function().
+The project uses HTML, CSS, and native JavaScript modules, with zero runtime dependencies. It does not use UI frameworks, external graphing libraries, eval(), or new Function().
 
-La lógica matemática se separa de la representación y de los eventos DOM. En los módulos que lo necesitan, las expresiones se analizan como AST y los validadores trabajan sobre estructuras matemáticas en vez de comparar cadenas.
+Mathematical logic is separated from rendering and DOM events. In modules that require it, expressions are parsed as ASTs and validators work on mathematical structures instead of comparing strings.
 
-### Núcleo compartido
+### Shared Core
 
-| Archivo | Responsabilidad |
+| File | Responsibility |
 |---|---|
-| js/core/dom.js | Helpers DOM/SVG, montaje, delegación de eventos y store reactivo. |
-| js/core/plot.js | Conversión de coordenadas, planos SVG y arrastre persistente. |
-| js/core/math-format.js | Formato matemático y convenciones numéricas es-AR. |
-| js/core/vn.js | HUD Visual Novel, diálogo, poses y reacciones de Alaska. |
-| js/core/sound.js | Síntesis procedural de sonidos y preferencias de audio. |
-| js/core/nav.js | Navegación global, menú curricular y controles compartidos. |
-| js/core/glossary.js | Glosario contextual y consulta de términos. |
-| js/core/scratchpad.js | Pizarra de trabajo auxiliar. |
+| js/core/dom.js | DOM/SVG helpers, mounting, event delegation, and reactive store. |
+| js/core/plot.js | Coordinate conversion, SVG boards, and persistent dragging. |
+| js/core/math-format.js | Mathematical formatting and es-AR numeric conventions. |
+| js/core/vn.js | Visual Novel HUD, dialogue, poses, and Alaska's reactions. |
+| js/core/sound.js | Procedural sound synthesis and audio preferences. |
+| js/core/nav.js | Global navigation, curriculum menu, and shared controls. |
+| js/core/glossary.js | Contextual glossary and term lookup. |
+| js/core/scratchpad.js | Auxiliary working scratchpad. |
 
-### Módulos matemáticos
+### Mathematical Modules
 
-- **js/modules/circuitos/**: lógica y renderizado de desigualdades compuestas.
-- **js/modules/dimensional/**: cálculo y representación de análisis dimensional.
-- **js/modules/funciones/**: scanner de unicidad, radiografía, secante e inversa.
-- **js/modules/potencias-raices/**: lógica, parser, componentes, retos y widgets.
-- **js/modules/sucesiones/**: lógica, parser, diagnóstico, retos, guiones y widgets.
-- **js/modules/valor-absoluto/**: lógica, parser, diagnóstico, retos, guiones y widgets.
-- **js/modules/exponenciales/**: lecciones, componentes, parser, retos y widgets.
+- **js/modules/circuitos/**: logic and rendering for compound inequalities.
+- **js/modules/dimensional/**: calculation and representation for dimensional analysis.
+- **js/modules/funciones/**: uniqueness scanner, X-ray view, secant line, and inverse function.
+- **js/modules/potencias-raices/**: logic, parser, components, challenges, and widgets.
+- **js/modules/sucesiones/**: logic, parser, diagnostics, challenges, scripts, and widgets.
+- **js/modules/valor-absoluto/**: logic, parser, diagnostics, challenges, scripts, and widgets.
+- **js/modules/exponenciales/**: lessons, components, parser, challenges, and widgets.
 
-No todos los módulos comparten aún el mismo modelo de lección, persistencia o chequeo. La futura arquitectura adaptativa deberá integrarse progresivamente, sin forzar una migración masiva ni duplicar motores existentes.
+Not all modules share the same lesson, persistence, or validation model yet. The future adaptive architecture must be integrated progressively, without forcing a massive migration or duplicating existing engines.
 
-## Documentación del proyecto
+## Project Documentation
 
-Estos documentos tienen responsabilidades diferentes y deben leerse en conjunto:
+These documents have different responsibilities and should be read together:
 
-| Documento | Pregunta que responde | Autoridad |
+| Document | Question Answered | Authority |
 |---|---|---|
-| [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md) | ¿Qué procesos de aprendizaje queremos apoyar y cómo medirlos? | Decisiones pedagógicas, modelo de competencias, recuperación y evaluación. |
-| [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) | ¿Cómo debe presentarse y comportarse la experiencia? | Identidad visual, interacción, feedback, narrativa y accesibilidad. |
-| [ROADMAP.md](ROADMAP.md) | ¿Qué se construye, en qué orden y con qué criterios de aceptación? | Secuencia de implementación, dependencias y estado del trabajo. |
-| README.md | ¿Qué es el proyecto y qué está disponible hoy? | Presentación pública y mapa de documentación; no reemplaza las especificaciones anteriores. |
+| [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md) | What learning processes do we want to support and how do we measure them? | Pedagogical decisions, competency model, retrieval, and assessment. |
+| [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) | How should the experience be presented and behave? | Visual identity, interaction, feedback, narrative, and accessibility. |
+| [ROADMAP.md](ROADMAP.md) | What is built, in what order, and with what acceptance criteria? | Implementation sequence, dependencies, and work status. |
+| README.md | What is the project and what is available today? | Public overview and documentation map; does not replace the specifications above. |
 
-### Instrucciones para agentes de programación
+### Instructions for Coding Agents
 
-Antes de modificar el proyecto:
+Before modifying the project:
 
-1. Leer este README para reconocer el estado real del repositorio.
-2. Leer LEARNING_ARCHITECTURE.md si el cambio afecta ejercicios, diagnóstico, progreso, motivación, recuperación, planificación o evaluación.
-3. Leer DESIGN_PHILOSOPHY.md si el cambio afecta composición, tipografía, color, animación, interacción, Alaska o accesibilidad.
-4. Leer ROADMAP.md para comprobar dependencias, prioridad, estado y criterios de aceptación.
-5. Inspeccionar los archivos y patrones reales del módulo afectado antes de proponer una abstracción nueva.
+1. Read this README to recognize the actual state of the repository.
+2. Read LEARNING_ARCHITECTURE.md if the change affects exercises, diagnostics, progress, motivation, retrieval, scheduling, or assessment.
+3. Read DESIGN_PHILOSOPHY.md if the change affects layout, typography, color, animation, interaction, Alaska, or accessibility.
+4. Read ROADMAP.md to check dependencies, priority, status, and acceptance criteria.
+5. Inspect the actual files and patterns of the affected module before proposing a new abstraction.
 
-Durante el trabajo:
+During work:
 
-- No presentar una función planificada como implementada.
-- No inventar resultados científicos ni convertir hipótesis de diseño en hechos demostrados.
-- No alterar la semántica matemática para simplificar la UI.
-- No reemplazar una lógica pura ya probada por lógica duplicada dentro de un componente.
-- No añadir dependencias de ejecución sin una justificación técnica y una decisión documentada.
-- Mantener compatibilidad con teclado, touch, lectores de pantalla, movimiento reducido y pantallas estrechas.
-- Preferir cambios incrementales que puedan probarse aisladamente.
-- Actualizar ROADMAP.md cuando cambie el estado de una tarea y README.md sólo cuando cambie una capacidad visible o una instrucción de uso.
-- Si una decisión afecta varias capas, actualizar la especificación correspondiente además del código.
+- Do not present a planned feature as implemented.
+- Do not invent scientific results or turn design hypotheses into proven facts.
+- Do not alter mathematical semantics to simplify the UI.
+- Do not replace tested pure logic with duplicated logic inside a component.
+- Do not add runtime dependencies without a technical justification and a documented decision.
+- Maintain compatibility with keyboard, touch, screen readers, reduced motion, and narrow screens.
+- Prefer incremental changes that can be tested in isolation.
+- Update ROADMAP.md when a task's status changes and README.md only when a visible capability or usage instruction changes.
+- If a decision affects multiple layers, update the corresponding specification in addition to the code.
 
-Al terminar, informar archivos modificados, pruebas ejecutadas, resultados observados, limitaciones y cualquier decisión pendiente. Nunca afirmar que una prueba pasó si no se ejecutó.
+Upon completion, report modified files, executed tests, observed results, limitations, and any pending decisions. Never claim a test passed if it was not executed.
 
-## Requisitos
+## Requirements
 
-| Herramienta | Uso |
+| Tool | Usage |
 |---|---|
-| Python 3 o un servidor HTTP estático equivalente | Servir los archivos y habilitar módulos ES nativos. |
-| Node.js 20+ | Ejecutar pruebas con node --test. |
-| Playwright Chromium | Ejecutar verificaciones visuales y de interacción; requerido sólo para esos scripts. |
+| Python 3 or an equivalent static HTTP server | Serve files and enable native ES modules. |
+| Node.js 20+ | Run tests with node --test. |
+| Playwright Chromium | Run visual and interaction checks; required only for those scripts. |
 
-## Instalación
+## Installation
 
-Clonar el repositorio y servir el directorio raíz:
+Clone the repository and serve the root directory:
 
     python3 -m http.server 8000 --bind 127.0.0.1
 
-Abrir http://127.0.0.1:8000/ en el navegador.
+Open http://127.0.0.1:8000/ in your browser.
 
-No abrir las páginas directamente con file:// porque los módulos ES nativos requieren un servidor HTTP.
+Do not open pages directly with file:// because native ES modules require an HTTP server.
 
-## Pruebas y verificación
+## Testing and Verification
 
-Ejecutar las pruebas unitarias disponibles:
+Run the available unit tests:
 
     node --test tests/sound.test.mjs tests/sucesiones/*.test.mjs tests/valor-absoluto/*.test.mjs
 
-Con el servidor activo, ejecutar las verificaciones Playwright:
+With the server running, execute the Playwright checks:
 
     BASE_URL=http://127.0.0.1:8000 node scripts/verify-pages.mjs
     BASE_URL=http://127.0.0.1:8000 node scripts/verify-interactions.mjs
 
-Los scripts verifican aspectos como respuestas HTTP, errores de consola, desbordamiento horizontal, interacción y persistencia de arrastre. Los comandos deben mantenerse sincronizados con los scripts y suites que existan realmente.
+The scripts verify aspects such as HTTP responses, console errors, horizontal overflow, interaction, and drag persistence. Commands must be kept synchronized with the scripts and suites that actually exist.
 
-## Hojas de estudio imprimibles
+## Printable Study Sheets
 
-Las lecciones de Sucesiones y Valor Absoluto incluyen hojas de repaso con estilos de impresión para retirar controles interactivos y producir material de estudio legible. Consultar cada módulo para conocer el alcance actual de su exportación.
+The Sequences and Absolute Value lessons include review sheets with print styles to remove interactive controls and produce readable study material. Check each module for the current scope of its export support.
