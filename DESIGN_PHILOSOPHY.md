@@ -1,7 +1,7 @@
 # Filosofía de diseño — Alaska Math Lab
 
-**Estado:** guía normativa para nuevas implementaciones y refactorizaciones.  
-**Ámbito:** interfaz, interacción, visualizaciones, tipografía, color, feedback, narrativa, accesibilidad y decisiones de experiencia.  
+**Estado:** guía normativa para nuevas implementaciones y refactorizaciones.
+**Ámbito:** interfaz, interacción, visualizaciones, tipografía, color, feedback, narrativa, accesibilidad y decisiones de experiencia.
 **Documento relacionado:** LEARNING_ARCHITECTURE.md define qué procesos de aprendizaje debe apoyar el producto; ROADMAP.md determina cuándo construirlos.
 
 Esta guía está dirigida a desarrolladores y agentes que agreguen páginas, ejercicios, gráficos, controles o experiencias narrativas. Define invariantes del producto y criterios para las nuevas decisiones. No es una orden de rediseñar lo que ya existe ni una plantilla que deba imponerse a cada módulo.
