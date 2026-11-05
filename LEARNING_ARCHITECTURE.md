@@ -229,7 +229,37 @@ Preguntas útiles:
 
 **Evidencia:** Chi et al. (1989) documentaron la relación entre autoexplicaciones elaboradas y comprensión de ejemplos. La implementación con un NPC es una extrapolación de diseño, no una prueba de que un personaje virtual produzca por sí mismo ese efecto.
 
-### 4.8. Feedback orientado a tarea, proceso y autorregulación
+### 4.8. Traducción entre representaciones matemáticas
+
+**Idea adicional específica para Alaska Math Lab:** no evaluar únicamente si el estudiante manipula bien un widget o reconoce una fórmula, sino si puede traducir el mismo objeto matemático entre representaciones y explicar qué información conserva cada una.
+
+Un estudiante puede saber arrastrar el vértice de una V, pero no interpretar la fórmula correspondiente. También puede resolver una fórmula y no reconocer el comportamiento en el gráfico. Esa brecha es precisamente lo que esta actividad debe hacer visible.
+
+**Ciclo de traducción:**
+
+1. **Manipulador:** mover nodos, postes, conectores o controles.
+2. **Gráfico:** interpretar el comportamiento, los puntos relevantes y las regiones.
+3. **Tabla o secuencia:** leer valores, patrones y relaciones.
+4. **Expresión simbólica:** construir una fórmula o condición equivalente.
+5. **Explicación verbal:** expresar qué significa la estructura y por qué es válida.
+
+No siempre deben aparecer las cinco formas. Se seleccionan las que aporten una función distinta para el concepto.
+
+**Ejemplo con valor absoluto:**
+
+- El estudiante arrastra el vértice de la función.
+- Identifica el punto de distancia cero en la recta numérica.
+- Lee el vértice en el gráfico cartesiano.
+- Construye \(f(x)=a|x-h|+k\).
+- Explica por qué el signo de \(a\) determina si el vértice es mínimo o máximo.
+
+Después se invierte la dirección: presentar la expresión sin el gráfico y pedir que prediga su forma. La traducción en ambas direcciones evita que una representación se convierta en una pista permanente.
+
+**Componente sugerido:** `RepresentationChallenge`, alimentado por el mismo modelo de competencias y por las funciones de lógica/AST existentes. El sistema debe comprobar equivalencia matemática, no igualdad textual, y distinguir interpretación gráfica de manipulación precisa.
+
+**Evidencia:** Ainsworth (2006) propone el marco DeFT (Design, Functions, Tasks): varias representaciones pueden ofrecer beneficios complementarios, pero su eficacia depende de cómo se diseñan, qué función cumple cada una y qué tareas de coordinación debe realizar el estudiante. Por tanto, no se deben mostrar cinco representaciones simultáneas por defecto; hay que enseñar a conectarlas deliberadamente.
+
+### 4.9. Feedback orientado a tarea, proceso y autorregulación
 
 El feedback debe responder tres preguntas: qué se intenta lograr, cómo va el razonamiento y cuál es el siguiente paso útil.
 
@@ -254,7 +284,7 @@ El feedback debe responder tres preguntas: qué se intenta lograr, cómo va el r
 
 **Evidencia:** Hattie y Timperley (2007); Barbieri et al. (2023); Agarwal et al. (2021).
 
-### 4.9. Confianza y calibración metacognitiva
+### 4.10. Confianza y calibración metacognitiva
 
 Antes de comprobar algunas respuestas, ofrecer una elección no intrusiva: “¿Qué tan seguro estás?”. Usar tres niveles (baja, media, alta), no pedir una escala precisa que parezca más exacta de lo que es.
 
@@ -267,7 +297,7 @@ Antes de comprobar algunas respuestas, ofrecer una elección no intrusiva: “¿
 
 La confianza no es una medida directa de conocimiento. Debe usarse como señal complementaria, comparada a lo largo de múltiples ejercicios, nunca para etiquetar a una persona.
 
-### 4.10. Diseño multimedia y carga cognitiva
+### 4.11. Diseño multimedia y carga cognitiva
 
 Los widgets visuales son una ventaja solo cuando ayudan a procesar la estructura matemática. La animación, el audio y los personajes deben reducir ambigüedad o aportar orientación, no competir por la atención.
 
@@ -332,6 +362,31 @@ Terminar una sesión con:
 - una propuesta de siguiente actividad de duración estimada.
 
 No bloquear el widget, dejar una tarea artificialmente incompleta ni esconder el cierre para provocar regreso. El estudiante debe poder terminar cuando quiera.
+
+### 5.6. Curiosidad elegida: el cuaderno de preguntas abiertas
+
+**Idea adicional para volver sin presión:** crear un pequeño cuaderno de misterios matemáticos. No son cliffhangers que bloquean la lección, sino preguntas voluntarias que despiertan curiosidad y conectan una sesión con otra.
+
+Ejemplos:
+
+- “¿Por qué una razón negativa hace alternar signos, pero una diferencia negativa no?”
+- “¿Puede una gráfica parecer una función y, sin embargo, fallar la prueba de la recta vertical?”
+- “¿Por qué \(\sqrt{x^2}\) no es siempre \(x\)?”
+- “¿Qué condición hace que una ecuación con valor absoluto no tenga soluciones?”
+
+**Flujo:**
+
+1. Alaska presenta una pregunta o anomalía breve, con una pista sobre qué concepto interviene.
+2. El estudiante puede explorarla ahora, guardarla en su cuaderno o descartarla.
+3. Si la guarda, queda asociada a una competencia y a una posible sesión de retorno.
+4. Cuando el estudiante vuelve, el sistema puede ofrecer la pregunta como una opción de exploración, sin convertirla en tarea vencida.
+5. Tras resolverla, se cierra el misterio con una explicación rigurosa y una variante que compruebe transferencia.
+
+El cuaderno debe limitar la cantidad de preguntas abiertas. Una lista interminable de cabos sueltos crea ruido y sensación de deuda. Cada misterio puede cerrarse, archivarse o descartarse manualmente.
+
+**Qué lo diferencia de un cliffhanger:** el alumno controla si guarda la pregunta, puede ver la respuesta inmediatamente y no pierde acceso a ninguna actividad por dejarla pendiente.
+
+**Evidencia y límites:** Kang et al. (2009) y Gruber, Gelman y Ranganath (2014) encontraron asociaciones entre estados de curiosidad y mejor memoria para información de interés; Gruber et al. también observaron beneficios para material incidental presentado durante estados de curiosidad. Esos estudios utilizaron preguntas de trivia y tareas experimentales, no cursos universitarios de matemática. Por ello, el cuaderno de misterios es una extrapolación de diseño prometedora que debe evaluarse, no una garantía de aprendizaje profundo.
 
 ### 5.5. El laboratorio vivo y el campamento
 
@@ -844,6 +899,8 @@ La lista diferencia revisiones y metaanálisis de estudios experimentales. Los e
 24. **Wang, Y., Wang, H., Wang, S., Wind, S. A., & Gill, C. (2024).** A systematic review and meta-analysis of self-determination-theory-based interventions in the education context. *Learning and Motivation, 87*, 102015. [https://doi.org/10.1016/j.lmot.2024.102015](https://doi.org/10.1016/j.lmot.2024.102015). Metaanálisis de intervenciones educativas basadas en teoría de autodeterminación.
 25. **Sailer, M., & Homner, L. (2020).** The gamification of learning: A meta-analysis. *Educational Psychology Review, 32*, 77–112. [https://doi.org/10.1007/s10648-019-09498-w](https://doi.org/10.1007/s10648-019-09498-w). Metaanálisis de resultados cognitivos, motivacionales y conductuales; los efectos dependen del diseño y del contexto.
 26. **Gollwitzer, P. M. (1999).** Implementation intentions: Strong effects of simple plans. *American Psychologist, 54*(7), 493–503. [https://doi.org/10.1037/0003-066X.54.7.493](https://doi.org/10.1037/0003-066X.54.7.493). Marco de planes del tipo “si ocurre X, haré Y”.
+28. **Kang, M. J., Hsu, M., Krajbich, I. M., Loewenstein, G., McClure, S. M., Wang, J. T., & Camerer, C. F. (2009).** The wick in the candle of learning: Epistemic curiosity activates reward circuitry and enhances memory. *Psychological Science, 20*(8), 963–973. [https://doi.org/10.1111/j.1467-9280.2009.02402.x](https://doi.org/10.1111/j.1467-9280.2009.02402.x). Estudio experimental de curiosidad y memoria con preguntas de trivia; la aplicación a problemas matemáticos es una extrapolación.
+29. **Gruber, M. J., Gelman, B. D., & Ranganath, C. (2014).** States of curiosity modulate hippocampus-dependent learning via the dopaminergic circuit. *Neuron, 84*(2), 486–496. [https://doi.org/10.1016/j.neuron.2014.08.060](https://doi.org/10.1016/j.neuron.2014.08.060). Estudio sobre curiosidad, actividad cerebral y memoria inmediata/demorada; no evalúa un programa de matemática.
 27. **Gollwitzer, P. M., & Sheeran, P. (2006).** Implementation intentions and goal achievement: A meta-analysis of effects and processes. In *Advances in Experimental Social Psychology, 38*, 69–119. [https://doi.org/10.1016/S0065-2601(06)38002-1](https://doi.org/10.1016/S0065-2601(06)38002-1). Metaanálisis de planes de implementación en consecución de objetivos.
 
 ---
