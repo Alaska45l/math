@@ -1,195 +1,203 @@
 <div align="center">
-  <img src="assets/vn/base.webp" alt="Alaska — Visual Novel Tutor and Chalkboard Mascot" width="220">
+  <img src="assets/vn/base.webp" alt="Alaska — tutora de Visual Novel y mascota del pizarrón" width="220">
   <h1>Alaska Math Lab</h1>
-  <p><strong>First-principles interactive mathematics, custom AST algebraic evaluators, reactive SVG cartesian boards, and Visual Novel tutoring for university entrance mastery.</strong></p>
+  <p><strong>Laboratorios interactivos de matemática desde primeros principios, con diagnóstico conceptual, exploración experimental y una arquitectura de aprendizaje adaptativo en desarrollo.</strong></p>
 </div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/JavaScript-ES2023%2B%20Modules-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111" alt="Vanilla ES Modules">
-  <img src="https://img.shields.io/badge/Dependencies-Zero-2EAD33?style=for-the-badge&logo=node.js&logoColor=white" alt="Zero Dependencies">
+  <img src="https://img.shields.io/badge/Dependencies-Zero%20Runtime-2EAD33?style=for-the-badge&logo=node.js&logoColor=white" alt="Zero runtime dependencies">
   <img src="https://img.shields.io/badge/SVG-Interactive%20Boards-FFB13B?style=for-the-badge&logo=svg&logoColor=111111" alt="Interactive SVG">
   <img src="https://img.shields.io/badge/Playwright-Visual%20%26%20DOM%20QA-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright QA">
-  <img src="https://img.shields.io/badge/Web%20Audio-Procedural%20Synth-003B57?style=for-the-badge&logo=audiomack&logoColor=white" alt="Web Audio Synth">
 </p>
 
-Alaska Math Lab is a local-first, zero-dependency interactive web laboratory built to master pre-calculus and university entrance mathematics (Facultad de Ciencias Exactas / Análisis Matemático I). It replaces passive video lectures, static SVG diagrams, and mechanical rule-memorization with direct spatial manipulation on a chalk-on-slate digital blackboard.
+Alaska Math Lab es un laboratorio web local-first para aprender matemática de ingreso universitario y contenidos iniciales de Análisis. Su propósito es ayudar a comprender por qué funcionan las ideas matemáticas, experimentar con sus consecuencias, reconocer errores de razonamiento y transferir lo aprendido a problemas nuevos.
 
-It was born out of a concrete frustration while preparing for university exams: platforms like Khan Academy often reduce rich geometric and algebraic structures to rote recipes (*"flip the sign of $h$, cancel the units by crossing them out, plug numbers into a text box"*). When an exam problem twists the premise, memorized recipes collapse. Instead of accepting black-box rules, this repository dissects each mathematical object into interactive mechanical gears that you can drag, fold, and test with your own hands.
+En lugar de presentar reglas como recetas aisladas, el proyecto representa estructuras matemáticas mediante objetos que se pueden manipular: circuitos lógicos, conectores dimensionales, rectas numéricas, cintas de sucesiones, planos cartesianos, espejos, curvas y modelos exponenciales.
 
-The project is intentionally built in pure Vanilla HTML5, CSS3, and native ES Modules with **zero runtime dependencies**. It does not use `eval()`, `new Function()`, heavy UI frameworks, or external graphing libraries. Algebraic expressions are parsed through custom recursive-descent AST evaluators, and every pedagogical error is caught by deterministic diagnostic engines tested under `node --test`.
+La experiencia combina tres capas:
 
-## What It Does
+- **Laboratorios matemáticos:** simuladores y representaciones interactivas que hacen observables las relaciones abstractas.
+- **Acompañamiento narrativo:** Alaska, una tutora con motor Visual Novel, guía explicaciones, pistas y diagnósticos cuando su intervención aporta valor.
+- **Aprendizaje durable:** una arquitectura pedagógica en desarrollo que organiza recuperación activa, práctica distribuida, intercalación, metacognición y transferencia.
 
-The application is structured around five interactive laboratories and a shared reactive core:
+**El objetivo no es maximizar el tiempo de pantalla, las rachas ni la cantidad de clics. Es desarrollar razonamiento matemático independiente que persista más allá de cada sesión.**
 
-| Laboratory | Entry Point & Module | What happens |
-| --- | --- | --- |
-| **1. Compound Inequalities (Logic Circuits)** | `desigualdades.html`<br>`js/modules/circuitos/` | Models inequalities ($<, \le, >, \ge$) as series ($\land$ AND) and parallel ($\lor$ OR) electrical switches. Visualizes polarity inversion when multiplying/dividing by negative numbers and detects empty sets ($\emptyset$) or full-line conduction ($\mathbb{R}$). |
-| **2. Dimensional Analysis & Multiplicative Neutral** | `unidades.html`<br>`js/modules/dimensional/` | Replaces "crossing out units by magic" with physical male/female pin-and-socket tokens. Demonstrates how conversion factors form the multiplicative identity ($\frac{u}{u} = 1$) and exposes intermediate commutative grouping and cubic volume scaling ($\text{cm}^3$). |
-| **3. Functions (Unit 8 & Exactas)** | `funciones.html`<br>`js/modules/funciones/` | Four sub-simulators covering the vertical-line uniqueness scanner, domain/range shadow projection, Cartesian X-ray lenses ($C_0, C^+, C^-, I_\uparrow, I_\downarrow$), average rate of change secant triangles ($\frac{\Delta y}{\Delta x}$), and reversible operation pipelines across the $y = x$ mirror ($f^{-1}$). |
-| **4. Sequences & Discrete Functions (Unit 9)** | `sucesiones.html`<br>`js/modules/sucesiones/` | A 4-chapter linear interactive lesson covering arithmetic ($+d$) and geometric ($\times r$) progressions, fencepost jump counting ($n - 1$ vs. $n$), recursive staircases (including Fibonacci dual anchors), explicit teleporters, negative base precedence, and convergence limits ($\lim_{n\to\infty}$). |
-| **5. Absolute Value & Piecewise Functions (Unit 10)** | `valor-absoluto.html`<br>`js/modules/valor-absoluto/` | Connects 1D metric distance ($\vert{}x - h\vert{}$) with the 2D X-axis reflection mirror, live two-node dragging of $f(x) = a\vert{}x - h\vert{} + k$, algebraic unfolding into piecewise linear branches, boundary uniqueness collisions ($\circ$ vs. $\bullet$), step functions, and the $\sqrt{x^2} = \vert{}x\vert{}$ identity. |
+---
 
-## Why It Exists
+## Estado del proyecto
 
-Most educational math software falls into one of two traps: either it is a static textbook disguised as a web page with multiple-choice forms, or it is a general-purpose calculator (like GeoGebra or Desmos) that plots anything without explaining *why* the curve behaves that way or where students typically fail.
+El repositorio combina capacidades implementadas con una arquitectura de aprendizaje que todavía debe construirse por etapas. Esta distinción es deliberada: una especificación documentada no equivale a una funcionalidad disponible.
 
-Alaska Math Lab takes a third route: **guided tactile dissection**.
+| Área | Estado actual |
+|---|---|
+| Laboratorios interactivos y planos SVG | Implementado en los módulos publicados en el hub |
+| Evaluadores algebraicos mediante AST | Implementado en módulos que aceptan fórmulas |
+| Diagnósticos de errores conceptuales | Implementado para un catálogo concreto de errores por módulo |
+| Tutora Visual Novel, guiones, poses y audio procedural | Implementado |
+| Glosario contextual y pizarra de trabajo | Implementado en los módulos que los integran |
+| Progreso local por sección | Implementado en determinados módulos |
+| Motor central de competencias y dominio | Planificado |
+| Repetición espaciada adaptativa | Planificado |
+| Selección global de práctica intercalada | Planificado |
+| Calibración metacognitiva de confianza | Planificado |
+| Atlas longitudinal de errores | Planificado |
+| Campamento persistente y autónomo | Exploración futura |
+| Jefes como evaluaciones integradoras | Dirección de diseño; motor unificado pendiente |
 
-The design philosophy is strict:
+El estado detallado de implementación y las dependencias entre tareas se mantienen en [ROADMAP.md](ROADMAP.md). La arquitectura pedagógica objetivo, sus fundamentos y las referencias científicas están en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
 
-- **First principles over schoolyard tricks:** Prohibited from saying *"it passes to the other side with the opposite sign"* or *"cross it out."* Operations are framed through uniform property, additive identity ($+0$), and multiplicative identity ($\times 1$).
-- **Equivalence over string matching:** Student formulas are parsed into an Abstract Syntax Tree (AST) and evaluated across domain samples. Writing `-9 + 4n` when standard form `-5 + 4(n - 1)` is expected is recognized as mathematically equivalent while issuing a structural warning.
-- **Targeted error diagnosis over generic red crosses:** Dedicated `diagnose()` engines inspect wrong answers against known cognitive traps (e.g., forgetting parentheses on negative bases `-5^(n-1)`, swapping $h$ and $k$, reading intervals on the $Y$ axis instead of the $X$ axis, or off-by-one fencepost shifts).
-- **Direct manipulation over dead graphics:** Cartesian planes and number lines use persistent pointer-capture SVG dragging so vertices, slopes, secant nodes, and laser scanners respond at 60 FPS without losing DOM focus.
-- **Strict typographic semantics:** All numerical readouts enforce `es-AR` formatting (decimal comma and true Unicode minus `−` U+2212), and every division or rational slope renders as a two-story horizontal fraction (`.fr`) rather than an ambiguous inline slash `/`.
-- **Visual Novel tutoring:** **Alaska**, a *tsundere* exact-sciences tutor rendered in a reactive Visual Novel HUD, guides lessons with step-by-step chalk explanations, foundational *"from scratch"* breakdowns, and dynamic emotional reactions to user streaks.
+## Qué ofrece actualmente
 
-## Visual System & Alaska VN Engine
+El hub presenta siete laboratorios:
 
-The visual identity emulates a dark green classroom slate (`#1e2923`) with hand-drawn chalk typography (`Caveat` and `Kalam`), custom SVG chalk icons (strictly zero Unicode emojis across the codebase), and a strict semantic color code:
+| Laboratorio | Entrada | Enfoque |
+|---|---|---|
+| Desigualdades compuestas | [desigualdades.html](desigualdades.html) | Desigualdades como circuitos en serie y paralelo, inversión de polaridad, intervalos y conjuntos solución. |
+| Unidades y análisis dimensional | [unidades.html](unidades.html) | Conversión mediante factores, conectores dimensionales, operaciones equivalentes y neutro multiplicativo. |
+| Funciones | [funciones.html](funciones.html) | Unicidad, dominio e imagen, conjuntos de positividad, monotonía, secante y función inversa. |
+| Sucesiones | [sucesiones.html](sucesiones.html) | Sucesiones aritméticas y geométricas, reglas recursivas y explícitas, conteo de saltos, signos y límites. |
+| Valor absoluto y funciones por partes | [valor-absoluto.html](valor-absoluto.html) | Distancia, vértice, transformaciones, ramas, dominio, imagen, fronteras y unicidad. |
+| Potencias y raíces | [potencias-raices.html](potencias-raices.html) | Exponentes, raíces, propiedades, restricciones de dominio y relaciones entre representaciones. |
+| Funciones exponenciales | [exponenciales.html](exponenciales.html) | Crecimiento y decaimiento, base, factor inicial, tablas, modelos y asíntotas. |
 
-- **`--ink` / `--muted`:** Axes, coordinate grids, and ghost reference curves (e.g., the unreflected $y < 0$ portion of a line before bouncing off the $\vert{}x\vert{}$ mirror).
-- **`--blue`:** User-controlled interactive handles, draggable vertices $(h, k)$, and active input parameters.
-- **`--yellow`:** Highlighted mathematical targets, detected constants, axes of symmetry ($x = h$), and active piecewise branches.
-- **`--pink`:** Conceptual errors, domain violations, boundary uniqueness collisions, and forbidden negative regions.
-- **`--green`:** Reserved **exclusively** for verified correct answers, satisfied uniqueness, and neutral elements ($+0$ and $\times 1$).
+La página de Unidades conserva además una entrada alternativa en el repositorio: [laboratorio_unidades.html](laboratorio_unidades.html). La navegación principal del hub utiliza actualmente **unidades.html**.
 
-The Visual Novel subsystem (`js/core/vn.js`) pairs with a procedural Web Audio API synthesizer (`js/core/sound.js`) that generates typewriter voice blips and chord progressions without external audio files. Alaska shifts across five WebP sprites (`base`, `orgullosa`, `colapso`, `enojada`, `feliz`) depending on the active script step or the specific error ID returned by the diagnostic engine.
+### Principios matemáticos del proyecto
 
-## Architecture
+- **Primeros principios antes que trucos:** explicar las transformaciones mediante propiedades y equivalencias, no mediante expresiones como “pasa al otro lado y cambia de signo”.
+- **Equivalencia antes que coincidencia textual:** cuando el módulo lo permite, las fórmulas se interpretan mediante árboles sintácticos y se comparan matemáticamente.
+- **Diagnóstico antes que una cruz roja:** los errores conocidos deben asociarse a una hipótesis conceptual y a una intervención útil.
+- **Manipulación con significado:** mover un objeto debe permitir observar una relación matemática, no ser una animación sin consecuencias.
+- **Precisión formal:** gráficos, dominios, fronteras, signos y resultados deben conservar su significado matemático.
+- **Retirada gradual de ayudas:** el acompañamiento tiene que conducir a la resolución independiente, no crear dependencia de la interfaz o de Alaska.
 
-```text
-+-----------------------------------------------------------------------------------+
-|                               HTML5 Entry Points                                  |
-|  index.html | desigualdades.html | unidades.html | funciones.html |               |
-|  sucesiones.html | valor-absoluto.html                                            |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-|                         Module Controllers & Widgets                              |
-|  • Declarative widget mounting ([data-widget="..."])                              |
-|  • Unidirectional store subscriptions (createStore / connect)                     |
-|  • Seeded PRNG infinite problem generators (mulberry32) & CheckBlocks             |
-+-------------------+---------------------+---------------------+-------------------+
-                    |                     |                     |
-                    v                     v                     v
-+-------------------------+ +---------------------------+ +-------------------------+
-|    Pure Math & AST      | |    Core UI & SVG Plot     | |   Visual Novel & Audio  |
-|  • logic.js (pure)      | |  • dom.js (h, s, mount)   | |  • vn.js (HUD & poses)  |
-|  • expr.js (AST parser) | |  • plot.js (createPlane,  | |  • vn-scripts.js        |
-|  • diagnose() catalogs  | |    bindSvgDrag, snapTo)   | |  • sound.js (WebAudio)  |
-|  • Zero DOM access      | |  • math-format.js (.fr)   | |  • localStorage state   |
-+-------------------------+ +---------------------------+ +-------------------------+
+## Cómo debería funcionar el aprendizaje
 
-```
+La arquitectura objetivo sigue un ciclo que conecta exploración y consolidación:
 
-Every laboratory strictly separates pure mathematical computation from DOM rendering:
+1. **Predecir:** formular una hipótesis antes de revelar el resultado.
+2. **Experimentar:** modificar variables u objetos en un widget.
+3. **Observar:** identificar qué cambia, qué permanece y por qué.
+4. **Formalizar:** conectar la observación con definiciones, propiedades y expresiones simbólicas.
+5. **Practicar:** resolver problemas con ayudas que se retiran progresivamente.
+6. **Recuperar:** volver a utilizar el concepto después de un intervalo.
+7. **Transferir:** aplicarlo a un problema nuevo, con otra apariencia o representación.
 
-1. **Pure Logic Layer (`logic.js` & `expr.js`):** Contains zero references to `window` or `document`. Handles AST parsing, symbolic simplification, interval formatting, root finding, piecewise validation, and pedagogical error classification. Directly testable in Node.js.
-2. **Reactive Store & DOM Helpers (`js/core/dom.js`):** Provides hyperscript-style builders (`h` for HTML, `s` for SVG), event delegation (`on`), and a lightweight store (`createStore`, `connect`). Interactive controls (`<input type="range">`, `<svg>`) are mounted once and updated via targeted slot mutation so pointer capture is never interrupted mid-drag.
-3. **Cartesian & Ribbon Plotters (`js/core/plot.js`):** Translates between mathematical coordinates and SVG viewBox pixels, manages keyboard-accessible (`Arrow` keys) and pointer-captured node dragging, and scales handwritten SVG labels dynamically via `ResizeObserver`.
+No todas las actividades deben contener todas las etapas. La secuencia se adapta al concepto, al conocimiento previo y al estado de aprendizaje.
 
-## Pedagogical Diagnostic Engine
+La arquitectura completa está especificada en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md). Sus estrategias centrales incluyen recuperación activa, práctica distribuida, intercalación, ejemplos resueltos con retirada gradual de pasos, comparación de métodos, autoexplicación, calibración de confianza y traducción entre representaciones.
 
-Unlike standard platforms that only return `Correct` or `Incorrect`, the `expr.js` and `logic.js` modules in **Sucesiones** and **Valor Absoluto** classify the exact algebraic misconception committed by the student:
+## Alaska: tutora, no sustituta del razonamiento
 
-| Diagnostic ID | Module | Detected Misconception |
-| --- | --- | --- |
-| `neg_pow_precedence` | `sucesiones` | Wrote `8 * -5^(n-1)` instead of `8 * (-5)^(n-1)`, ignoring that exponentiation binds tighter than unary negation. |
-| `exponent_n` / `off_by_one` | `sucesiones` | Used $n$ jumps instead of $(n - 1)$ jumps when starting at $a(1)$ (the classic Woo-Jin fencepost trap). |
-| `wrong_anchor_a2` | `sucesiones` | Counted $(n - 1)$ jumps correctly but used the second term $a(2)$ as the initial anchor $k$ (the Kiran trap). |
-| `not_standard_but_equivalent` | `sucesiones` / `valor-absoluto` | Entered an algebraically equivalent formula (e.g., `-4 + 6n` instead of `2 + 6(n-1)`, or ` |
-| `inverted_h_sign` | `valor-absoluto` | Confused the horizontal shift sign in $a\vert{}x - h\vert{} + k$ (placed the vertex of $\vert{}x + 3\vert{} - 2$ at $x = +3$ instead of $x = -3$). |
-| `swapped_h_k` | `valor-absoluto` | Swapped the horizontal shift $h$ with the vertical shift $k$. |
-| `confused_x_and_y_in_intervals` | `valor-absoluto` / `funciones` | Wrote positivity ($C^+$) or monotonicity ($I_\uparrow, I_\downarrow$) intervals reading vertical $y = k$ heights instead of horizontal $x = h$ coordinates. |
+Alaska es una presencia narrativa que debe intervenir de forma contextual:
 
-## Repository Layout
+- Explica un prerrequisito cuando detecta una laguna.
+- Señala qué propiedad o paso necesita revisión.
+- Cambia de representación cuando una explicación no alcanza.
+- Ofrece pistas graduadas sin revelar inmediatamente la solución.
+- Reconoce estrategias matemáticas concretas, no sólo respuestas correctas.
+- Se retira cuando el estudiante puede continuar de manera autónoma.
 
-```text
-math/
-+-- index.html                        # Main Hub with cards for all 5 laboratories
-+-- desigualdades.html                # Lab 1: Compound Inequalities & Logic Circuits
-+-- unidades.html                     # Lab 2: Dimensional Analysis & Pin/Socket Tokens
-+-- funciones.html                    # Lab 3: Functions, Domain, Secant TCP & Inverse
-+-- sucesiones.html                   # Lab 4: Linear Lesson on Arithmetic & Geometric Sequences
-+-- valor-absoluto.html               # Lab 5: Linear Lesson on Absolute Value & Piecewise Functions
-+-- assets/
-|   +-- vn/                           # WebP character sprites for Alaska (5 poses)
-+-- fonts/                            # Self-hosted Woff2 fonts (Caveat, Kalam, Math subset)
-+-- css/
-|   +-- base.css                      # Chalkboard design tokens, typography, color semantics
-|   +-- layout.css                    # Page shells, navigation bar, responsive grids
-|   +-- components.css                # Horizontal fractions (.fr), buttons, VN HUD, CheckBlocks
-|   +-- modules/                      # Scoped styles per laboratory (including @media print)
-+-- js/
-|   +-- hub.js                        # Hub page initializer
-|   +-- core/
-|   |   +-- dom.js                    # h(), s(), mount(), chalkIcon(), createStore(), connect()
-|   |   +-- math-format.js            # es-AR formatter, Unicode minus, horizontal fractions
-|   |   +-- nav.js                    # Global navigation bar & accessible tab controller
-|   |   +-- plot.js                   # SVG coordinate plane & pointer-capture drag engine
-|   |   +-- sound.js                  # Procedural Web Audio API synthesizer (SFX & voice blips)
-|   |   +-- vn.js                     # Visual Novel dialogue & reactive HUD engine
-|   +-- modules/
-|       +-- circuitos/                # Logic & SVG renderer for compound inequalities
-|       +-- dimensional/              # Logic & token encastre renderer for unit conversion
-|       +-- funciones/                # scanner.js, radiografia.js, secante.js, inversa.js
-|       +-- sucesiones/               # logic.js, expr.js, components.js, vn-scripts.js, retos.js, 10 widgets
-|       +-- valor-absoluto/           # logic.js, expr.js, components.js, vn-scripts.js, retos.js, 10 widgets
-+-- scripts/
-|   +-- verify-pages.mjs              # Headless Chromium layout, overflow & console error verifier
-|   +-- verify-interactions.mjs       # Automated E2E interaction & continuous drag reference checks
-+-- tests/                            # Pure Node.js unit test suites (node --test)
+Su personalidad puede ser irónica, expresiva y tsundere. El humor nunca debe convertirse en humillación, presión, culpa o evaluación de la capacidad personal del estudiante.
 
-```
+## Arquitectura técnica
 
-## Requirements
+El proyecto utiliza HTML, CSS y módulos JavaScript nativos, sin dependencias de ejecución. No utiliza frameworks de UI, bibliotecas externas de graficación, eval() ni new Function().
 
-| Requirement | Used by | Notes |
-| --- | --- | --- |
-| Static HTTP Server (`python3` or `npx serve`) | Local browser usage | Required because native ES Modules (`type="module"`) enforce CORS and cannot run over `file://`. |
-| Node.js 20+ | `node --test` | Runs the pure algebraic, parser, and sound unit test suites with zero external packages. |
-| Playwright Chromium | `scripts/verify-*.mjs` | Optional; used for automated E2E visual regression, viewport overflow, and pointer-capture drag checks. |
+La lógica matemática se separa de la representación y de los eventos DOM. En los módulos que lo necesitan, las expresiones se analizan como AST y los validadores trabajan sobre estructuras matemáticas en vez de comparar cadenas.
 
-## Quick Start
+### Núcleo compartido
 
-Clone the repository and serve the root directory with any static HTTP server:
+| Archivo | Responsabilidad |
+|---|---|
+| js/core/dom.js | Helpers DOM/SVG, montaje, delegación de eventos y store reactivo. |
+| js/core/plot.js | Conversión de coordenadas, planos SVG y arrastre persistente. |
+| js/core/math-format.js | Formato matemático y convenciones numéricas es-AR. |
+| js/core/vn.js | HUD Visual Novel, diálogo, poses y reacciones de Alaska. |
+| js/core/sound.js | Síntesis procedural de sonidos y preferencias de audio. |
+| js/core/nav.js | Navegación global, menú curricular y controles compartidos. |
+| js/core/glossary.js | Glosario contextual y consulta de términos. |
+| js/core/scratchpad.js | Pizarra de trabajo auxiliar. |
 
-```bash
-python3 -m http.server 8000 --bind 127.0.0.1
+### Módulos matemáticos
 
-```
+- **js/modules/circuitos/**: lógica y renderizado de desigualdades compuestas.
+- **js/modules/dimensional/**: cálculo y representación de análisis dimensional.
+- **js/modules/funciones/**: scanner de unicidad, radiografía, secante e inversa.
+- **js/modules/potencias-raices/**: lógica, parser, componentes, retos y widgets.
+- **js/modules/sucesiones/**: lógica, parser, diagnóstico, retos, guiones y widgets.
+- **js/modules/valor-absoluto/**: lógica, parser, diagnóstico, retos, guiones y widgets.
+- **js/modules/exponenciales/**: lecciones, componentes, parser, retos y widgets.
 
-Open your browser at:
+No todos los módulos comparten aún el mismo modelo de lección, persistencia o chequeo. La futura arquitectura adaptativa deberá integrarse progresivamente, sin forzar una migración masiva ni duplicar motores existentes.
 
-```text
-[http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+## Documentación del proyecto
 
-```
+Estos documentos tienen responsabilidades diferentes y deben leerse en conjunto:
 
-From the main hub (`index.html`), you can jump into any of the five laboratories. Progress on linear lessons (`sucesiones.html` and `valor-absoluto.html`) and audio preferences are persisted automatically in `localStorage`.
+| Documento | Pregunta que responde | Autoridad |
+|---|---|---|
+| [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md) | ¿Qué procesos de aprendizaje queremos apoyar y cómo medirlos? | Decisiones pedagógicas, modelo de competencias, recuperación y evaluación. |
+| [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) | ¿Cómo debe presentarse y comportarse la experiencia? | Identidad visual, interacción, feedback, narrativa y accesibilidad. |
+| [ROADMAP.md](ROADMAP.md) | ¿Qué se construye, en qué orden y con qué criterios de aceptación? | Secuencia de implementación, dependencias y estado del trabajo. |
+| README.md | ¿Qué es el proyecto y qué está disponible hoy? | Presentación pública y mapa de documentación; no reemplaza las especificaciones anteriores. |
 
-## Testing & Verification
+### Instrucciones para agentes de programación
 
-Run the unit test suites (algebraic parsers, diagnostic catalogs, sequence/absolute-value logic, and audio synthesizer):
+Antes de modificar el proyecto:
 
-```bash
-node --test tests/sound.test.mjs tests/sucesiones/*.test.mjs tests/valor-absoluto/*.test.mjs
+1. Leer este README para reconocer el estado real del repositorio.
+2. Leer LEARNING_ARCHITECTURE.md si el cambio afecta ejercicios, diagnóstico, progreso, motivación, recuperación, planificación o evaluación.
+3. Leer DESIGN_PHILOSOPHY.md si el cambio afecta composición, tipografía, color, animación, interacción, Alaska o accesibilidad.
+4. Leer ROADMAP.md para comprobar dependencias, prioridad, estado y criterios de aceptación.
+5. Inspeccionar los archivos y patrones reales del módulo afectado antes de proponer una abstracción nueva.
 
-```
+Durante el trabajo:
 
-With the local HTTP server running, execute the headless Playwright verification scripts to validate HTTP 200 responses, zero console/page errors, zero horizontal overflow across mobile and desktop viewports (`320px` to `1280px`), and continuous slider/SVG drag node persistence:
+- No presentar una función planificada como implementada.
+- No inventar resultados científicos ni convertir hipótesis de diseño en hechos demostrados.
+- No alterar la semántica matemática para simplificar la UI.
+- No reemplazar una lógica pura ya probada por lógica duplicada dentro de un componente.
+- No añadir dependencias de ejecución sin una justificación técnica y una decisión documentada.
+- Mantener compatibilidad con teclado, touch, lectores de pantalla, movimiento reducido y pantallas estrechas.
+- Preferir cambios incrementales que puedan probarse aisladamente.
+- Actualizar ROADMAP.md cuando cambie el estado de una tarea y README.md sólo cuando cambie una capacidad visible o una instrucción de uso.
+- Si una decisión afecta varias capas, actualizar la especificación correspondiente además del código.
 
-```bash
-BASE_URL=[http://127.0.0.1:8000](http://127.0.0.1:8000) node scripts/verify-pages.mjs
-BASE_URL=[http://127.0.0.1:8000](http://127.0.0.1:8000) node scripts/verify-interactions.mjs
+Al terminar, informar archivos modificados, pruebas ejecutadas, resultados observados, limitaciones y cualquier decisión pendiente. Nunca afirmar que una prueba pasó si no se ejecutó.
 
-```
+## Requisitos
 
-## Printable Study Sheets
+| Herramienta | Uso |
+|---|---|
+| Python 3 o un servidor HTTP estático equivalente | Servir los archivos y habilitar módulos ES nativos. |
+| Node.js 20+ | Ejecutar pruebas con node --test. |
+| Playwright Chromium | Ejecutar verificaciones visuales y de interacción; requerido sólo para esos scripts. |
 
-Both linear lessons (`sucesiones.html` and `valor-absoluto.html`) include a dedicated `#sec-repaso` summary table at the end of the page with a **Print / Export to PDF** trigger. Dedicated `@media print` rules strip out interactive sliders, navigation bars, and the Visual Novel HUD, formatting the comparison tables into clean black-on-white study sheets for offline exam review.
+## Instalación
 
-```
+Clonar el repositorio y servir el directorio raíz:
+
+    python3 -m http.server 8000 --bind 127.0.0.1
+
+Abrir http://127.0.0.1:8000/ en el navegador.
+
+No abrir las páginas directamente con file:// porque los módulos ES nativos requieren un servidor HTTP.
+
+## Pruebas y verificación
+
+Ejecutar las pruebas unitarias disponibles:
+
+    node --test tests/sound.test.mjs tests/sucesiones/*.test.mjs tests/valor-absoluto/*.test.mjs
+
+Con el servidor activo, ejecutar las verificaciones Playwright:
+
+    BASE_URL=http://127.0.0.1:8000 node scripts/verify-pages.mjs
+    BASE_URL=http://127.0.0.1:8000 node scripts/verify-interactions.mjs
+
+Los scripts verifican aspectos como respuestas HTTP, errores de consola, desbordamiento horizontal, interacción y persistencia de arrastre. Los comandos deben mantenerse sincronizados con los scripts y suites que existan realmente.
+
+## Hojas de estudio imprimibles
+
+Las lecciones de Sucesiones y Valor Absoluto incluyen hojas de repaso con estilos de impresión para retirar controles interactivos y producir material de estudio legible. Consultar cada módulo para conocer el alcance actual de su exportación.
