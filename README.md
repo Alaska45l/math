@@ -201,3 +201,16 @@ The scripts verify aspects such as HTTP responses, console errors, horizontal ov
 ## Printable Study Sheets
 
 The Sequences and Absolute Value lessons include review sheets with print styles to remove interactive controls and produce readable study material. Check each module for the current scope of its export support.
+
+## Licensing & Intellectual Property (Split Licensing)
+
+This project uses a split licensing model to separate the technical source code from its narrative identity and pedagogical content:
+
+1. **Source Code & Technical Engine (`js/`, `css/`, `scripts/`, `tests/`):**
+   Distributed under the terms of the **GNU Affero General Public License v3.0 (AGPLv3)**. See the [LICENSE](LICENSE) file for details.
+
+2. **Pedagogical Content & Lesson Prose (`*.html`, `*.md`, scripts):**
+   Licensed under **[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/)**. You are free to share and adapt this material for non-commercial educational purposes, provided you give appropriate credit to **Alaska Math Lab**.
+
+3. **Character "Alaska" & Visual Assets (`assets/vn/`, `assets/github/`):**
+   © 2026 Alaska45l. **All rights reserved.** The character design of Alaska, her expression sprites (`assets/vn/*.webp`), chibi variants, and conceptual art are included in this repository strictly for the execution and visualization of this educational web lab. Independent redistribution, modification, AI model training, or use in third-party products (commercial or otherwise) is strictly prohibited without explicit written consent.
