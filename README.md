@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/github/readme.webp" alt="Alaska — Visual Novel tutor and chalkboard mascot" width="220">
+  <img src="assets/github/readme.webp" alt="Alaska — Visual Novel tutor and chalkboard mascot" width="100%">
   <h1>Alaska Math Lab</h1>
   <p><strong>Interactive first-principles math laboratories featuring conceptual diagnosis, experimental exploration, and an evolving adaptive learning architecture.</strong></p>
 </div>

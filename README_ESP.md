@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/github/readme_esp.webp" alt="Alaska — tutora de Visual Novel y mascota del pizarrón" width="220">
+  <img src="assets/github/readme_esp.webp" alt="Alaska — tutora de Visual Novel y mascota del pizarrón" width="100%">
   <h1>Alaska Math Lab</h1>
   <p><strong>Laboratorios interactivos de matemática desde primeros principios, con diagnóstico conceptual, exploración experimental y una arquitectura de aprendizaje adaptativo en desarrollo.</strong></p>
 </div>
