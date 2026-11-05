@@ -1363,7 +1363,6 @@ button.vn-ctrl-btn:hover,
   color: var(--yellow);
   background: rgba(230, 211, 138, 0.08);
   border: 1px solid rgba(230, 211, 138, 0.32);
-  border-radius: 6px;
   padding: 7px 14px;
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s, transform 0.1s;

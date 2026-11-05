@@ -180,7 +180,7 @@ export const VN_SCRIPTS = {
     line("complice", "Deslizá a ambos lados del cero", `Llevá x a −4 y después a +4. Seguí las cajas de cada máquina y preguntate cuál operación ocurre primero. Esa V de |x| vuelve al despejar cuadráticas, donde olvidar el dominio puede hacerte perder soluciones.`),
   ],
   "sec10-paradojas": [
-    line("empatia", "Una servilleta sospechosa", `Imaginate que, repasando con un compañero en el buffet antes del parcial, alguien dibuja una cadena y asegura haber demostrado que <span class="eq">−2=2</span>. No te rías todavía, detective: sigamos cada igualdad y encontremos el paso que no tiene permiso.`),
+    line("empatia", "Una servilleta sospechosa", `Imaginate que, repasando con un compañero antes del parcial, alguien dibuja una cadena y asegura haber demostrado que <span class="eq">−2=2</span>. No te rías todavía, detective: sigamos cada igualdad y encontremos el paso que no tiene permiso.`),
     line(
       "pensativa",
       "Detective de la igualdad falsa",
