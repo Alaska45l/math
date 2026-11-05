@@ -1,7 +1,7 @@
 # ROADMAP — Alaska Math Lab
 
-**Estado del documento:** hoja de ruta activa.  
-**Última revisión:** 5 de noviembre de 2026.  
+**Estado del documento:** hoja de ruta activa.
+**Última revisión:** 5 de noviembre de 2026.
 **Principio rector:** construir primero la infraestructura que permite aprender y medir aprendizaje; después ampliar la experiencia narrativa y la gamificación.
 
 Este roadmap organiza la evolución técnica y pedagógica del repositorio. No es una promesa de fechas ni una afirmación de que las funciones descritas ya estén implementadas. Cada elemento utiliza un estado explícito y debe cambiarse sólo después de inspeccionar el código y verificar sus criterios de aceptación.
@@ -116,6 +116,8 @@ Existe también laboratorio_unidades.html como entrada alternativa en el reposit
 
 ## 4. Reglas de priorización
 
+**Prioridades:** P0 = infraestructura indispensable; P1 = núcleo de aprendizaje; P2 = experiencia y gamificación dependientes del núcleo; P3 = expansión curricular o mejoras no bloqueantes.
+
 Las tareas se ordenan por dependencias y valor pedagógico, no por atractivo visual.
 
 1. **Primero la instrumentación y el modelo de competencias.** Sin observar qué concepto se practica, no se puede programar un repaso inteligente.
@@ -132,8 +134,8 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 0 — Contratos, inventario y mapa curricular
 
-**Estado:** Parcial / en curso.  
-**Prioridad:** P0.  
+**Estado:** Parcial / en curso.
+**Prioridad:** P0.
 **Objetivo:** crear el lenguaje común que permitirá que módulos diferentes alimenten un sistema de aprendizaje coherente.
 
 #### Tareas
@@ -177,8 +179,8 @@ Cada competencia puede declarar:
 
 ### Fase 1 — Motor local de evidencia y progreso por competencia
 
-**Estado:** Planificado.  
-**Prioridad:** P0.  
+**Estado:** Planificado.
+**Prioridad:** P0.
 **Dependencias:** Fase 0.
 
 #### Tareas
@@ -214,8 +216,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 2 — Recuperación activa, repetición espaciada y reentrada
 
-**Estado:** Planificado.  
-**Prioridad:** P0.  
+**Estado:** Planificado.
+**Prioridad:** P0.
 **Dependencias:** Fase 1.
 
 #### Tareas
@@ -249,8 +251,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 3 — Selección adaptativa, intercalación y atlas de errores
 
-**Estado:** Planificado.  
-**Prioridad:** P1.  
+**Estado:** Planificado.
+**Prioridad:** P1.
 **Dependencias:** Fases 0 y 1; para adaptación temporal, Fase 2.
 
 #### Tareas
@@ -277,8 +279,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 4 — Exploración productiva, andamiaje y transferencia
 
-**Estado:** Planificado.  
-**Prioridad:** P1.  
+**Estado:** Planificado.
+**Prioridad:** P1.
 **Dependencias:** Fase 0; integración con Fase 1.
 
 #### Tareas
@@ -306,8 +308,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 5 — Metacognición y acompañamiento contextual
 
-**Estado:** Planificado.  
-**Prioridad:** P1.  
+**Estado:** Planificado.
+**Prioridad:** P1.
 **Dependencias:** Fases 1 y 3.
 
 #### Tareas
@@ -332,8 +334,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 6 — Experiencia, reentrada y mundo narrativo
 
-**Estado:** En evaluación / planificado.  
-**Prioridad:** P2.  
+**Estado:** En evaluación / planificado.
+**Prioridad:** P2.
 **Dependencias:** Fases 1 y 2 para eventos de progreso; Fase 4 para integrar actividades pedagógicas.
 
 #### Tareas de experiencia
@@ -368,8 +370,8 @@ Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones de
 
 ### Fase 7 — Jefes, evaluaciones integradoras y simulación de examen
 
-**Estado:** Planificado.  
-**Prioridad:** P2.  
+**Estado:** Planificado.
+**Prioridad:** P2.
 **Dependencias:** Fases 0, 1, 3 y 4.
 
 #### Regla de diseño
@@ -407,8 +409,8 @@ Un jefe no es un formulario decorado ni una prueba de reflejos. Debe exigir reco
 
 ### Fase 8 — Validación pedagógica y expansión curricular
 
-**Estado:** Planificado.  
-**Prioridad:** P1 continua; expansión P3.  
+**Estado:** Planificado.
+**Prioridad:** P1 continua; expansión P3.
 **Dependencias:** instrumentación de Fase 1 y funciones suficientes de Fases 2–4.
 
 #### Validación
