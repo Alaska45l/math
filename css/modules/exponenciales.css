@@ -886,6 +886,7 @@
 .exp-page .pr-table {
   border-collapse: collapse;
   font-size: 0.91rem;
+  margin-bottom: 0.91rem;
 }
 
 .exp-page .exp-learning-table th,
