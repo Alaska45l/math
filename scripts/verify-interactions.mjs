@@ -979,7 +979,190 @@ const expOk =
   expResults.consoleErrors.length === 0 &&
   !expResults.overflow;
 
-const allResultsOk = allOk && powRadOk && expOk;
+const quadConsoleErrors = [];
+client.on("Runtime.consoleAPICalled", (params) => {
+  if (params.type === "error")
+    quadConsoleErrors.push(
+      params.args?.map((item) => item.value || item.description).join(" "),
+    );
+});
+client.on("Runtime.exceptionThrown", (params) => {
+  quadConsoleErrors.push(
+    params.exceptionDetails?.exception?.description ||
+      params.exceptionDetails?.text ||
+      "Exception",
+  );
+});
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/cuadraticas.html`,
+});
+await new Promise((r) => setTimeout(r, 1100));
+const quadResults = await client.eval(`(async () => {
+  const sections = [...document.querySelectorAll('.seq-section[id^="sec-"]:not(#sec-retos):not(#sec-repaso)')];
+  const widgets = [...document.querySelectorAll('[data-widget]')];
+  const ranges = [...document.querySelectorAll('[data-widget] input[type="range"]')];
+  let stable = ranges.length > 0;
+  let allSvgsSameNodeReference = widgets.length === 10;
+  for (const host of widgets) {
+    const svgBefore = host.querySelector('svg');
+    const hostRanges = [...host.querySelectorAll('input[type="range"]')];
+    for (const range of hostRanges) {
+      const ref = range;
+      for (const value of [Number(range.min), Number(range.max), Number(range.min)]) {
+        range.value = String(value);
+        range.dispatchEvent(new Event('input', { bubbles: true }));
+        stable &&= range.isConnected && range === ref && [...host.querySelectorAll('input[type="range"]')].includes(ref);
+      }
+    }
+    const svgAfter = host.querySelector('svg');
+    allSvgsSameNodeReference &&= Boolean(svgBefore && svgAfter && svgBefore === svgAfter && svgAfter.isConnected);
+  }
+  const interactiveWidgetSvgs = widgets.every((host) => {
+    const svg = host.querySelector('svg.quad-board-svg');
+    return Boolean(svg && host.querySelector('input,select,button') && svg.querySelector('path,circle,rect,text,line'));
+  });
+  const checkBlocks = [...document.querySelectorAll('.seq-section [data-check]')];
+  const allCheckAffordances = checkBlocks.length === 10 && checkBlocks.every((block) =>
+    block.querySelectorAll('.quad-check-card').length === 3 &&
+    block.querySelectorAll('button').length >= 3 &&
+    block.querySelector('.quad-check-hints') &&
+    block.querySelector('.pr-check-feedback')
+  );
+
+  const firstCheck = document.querySelector('#sec-area-binomios .quad-check-card');
+  const hintBtn = firstCheck?.querySelector('.quad-hint-btn');
+  for (let i = 0; i < 3; i++) hintBtn?.click();
+  const hintEl = firstCheck?.querySelector('.quad-check-hints');
+  const progressiveHintsWork = Boolean(
+    hintEl && !hintEl.hidden && hintEl.querySelectorAll('.quad-hint-item').length === 3
+  );
+
+  const inputCheck = [...document.querySelectorAll('#sec-area-binomios .quad-check-card')].find(c => c.querySelector('input.pr-check-input'));
+  const checkInputEl = inputCheck?.querySelector('input.pr-check-input');
+  const checkSubmitBtn = inputCheck?.querySelector('.pr-check-submit');
+  if (checkInputEl && checkSubmitBtn) {
+    checkInputEl.value = 'x^2 + 3x - 28';
+    checkSubmitBtn.click();
+  }
+  const livePreviewWorks = Boolean(inputCheck?.classList.contains('is-solved'));
+  const stepByStepSolutionWorks = Boolean(
+    inputCheck?.querySelector('.pr-check-feedback.is-ok')?.textContent.length > 10
+  );
+
+  const explain = document.querySelector('#sec-area-binomios [data-vn-trigger="sec1-area"]');
+  if (explain) explain.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const tutorHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const tutorImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const tutorImageValid = Boolean(tutorImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--min')?.click();
+  const fab = document.querySelector('.vn-fab');
+  const fabAvatar = fab?.querySelector('.vn-fab__avatar');
+  const persistentChibiFab = Boolean(
+    fab &&
+    getComputedStyle(fab).display !== 'none' &&
+    fabAvatar?.naturalWidth > 0,
+  );
+  const closeControlRemoved = !document.querySelector('.vn-ctrl-btn--close');
+
+  const gloss = document.querySelector('#sec-area-binomios [data-gloss]');
+  if (gloss) gloss.click();
+  await new Promise((resolve) => setTimeout(resolve, 180));
+  const glossHud = document.querySelector('.vn-hud[aria-hidden="false"]');
+  const glossImage = document.querySelector('.vn-hud[aria-hidden="false"] .vn-sprite');
+  const glossImageValid = Boolean(glossImage?.naturalWidth > 0);
+  document.querySelector('.vn-ctrl-btn--min')?.click();
+
+  return {
+    sections: sections.length,
+    widgets: widgets.length,
+    checks: document.querySelectorAll('.quad-check-card').length,
+    tutorButtons: document.querySelectorAll('[data-vn-trigger]').length,
+    glossaryTerms: document.querySelectorAll('span.gloss-term[data-gloss]').length,
+    interactiveWidgetSvgs,
+    allSvgsSameNodeReference,
+    checkBlocks: checkBlocks.length,
+    allCheckAffordances,
+    livePreviewWorks,
+    progressiveHintsWork,
+    stepByStepSolutionWorks,
+    stableControls: stable,
+    practiceTabs: document.querySelectorAll('.quad-retos-tabs button').length,
+    practicePanels: document.querySelectorAll('.quad-retos-pane').length,
+    trainerPrompt: Boolean(document.querySelector('.quad-reto-prompt')),
+    trapsCount: document.querySelectorAll('.quad-retos-pane')[1]?.querySelectorAll('.pr-chip-row button').length || 0,
+    tutorHud: Boolean(tutorHud),
+    tutorImageValid,
+    persistentChibiFab,
+    closeControlRemoved,
+    glossHud: Boolean(glossHud),
+    glossImageValid,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="cuadraticas.html"]')),
+    overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  };
+})()`);
+
+const quadWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  quadWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+quadResults.viewportWidths = quadWidths;
+quadResults.viewportOverflowFree = quadWidths.every(
+  (item) => !item.overflow,
+);
+quadResults.consoleErrors = quadConsoleErrors;
+console.log(
+  "Resultados de interacción en cuadraticas.html:",
+  JSON.stringify(quadResults, null, 2),
+);
+
+const quadOk =
+  quadResults.sections === 10 &&
+  quadResults.widgets === 10 &&
+  quadResults.checks === 30 &&
+  quadResults.tutorButtons === 20 &&
+  quadResults.glossaryTerms >= 12 &&
+  quadResults.stableControls &&
+  quadResults.interactiveWidgetSvgs &&
+  quadResults.allSvgsSameNodeReference &&
+  quadResults.checkBlocks === 10 &&
+  quadResults.allCheckAffordances &&
+  quadResults.livePreviewWorks &&
+  quadResults.progressiveHintsWork &&
+  quadResults.stepByStepSolutionWorks &&
+  quadResults.practiceTabs === 2 &&
+  quadResults.practicePanels === 2 &&
+  quadResults.trainerPrompt &&
+  quadResults.trapsCount === 5 &&
+  quadResults.hasNavLink &&
+  quadResults.tutorHud &&
+  quadResults.tutorImageValid &&
+  quadResults.persistentChibiFab &&
+  quadResults.closeControlRemoved &&
+  quadResults.glossHud &&
+  quadResults.glossImageValid &&
+  quadResults.viewportOverflowFree &&
+  quadResults.consoleErrors.length === 0 &&
+  !quadResults.overflow;
+
+const allResultsOk = allOk && powRadOk && expOk && quadOk;
 
 client.close();
 chromeProc.kill();

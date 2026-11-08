@@ -49,7 +49,7 @@ El estado detallado de implementación y las dependencias entre tareas se mantie
 
 ## Qué ofrece actualmente
 
-El hub presenta siete laboratorios:
+El hub presenta ocho laboratorios:
 
 | Laboratorio | Entrada | Enfoque |
 |---|---|---|
@@ -60,6 +60,7 @@ El hub presenta siete laboratorios:
 | Valor absoluto y funciones por partes | [valor-absoluto.html](valor-absoluto.html) | Distancia, vértice, transformaciones, ramas, dominio, imagen, fronteras y unicidad. |
 | Potencias y raíces | [potencias-raices.html](potencias-raices.html) | Exponentes, raíces, propiedades, restricciones de dominio y relaciones entre representaciones. |
 | Funciones exponenciales | [exponenciales.html](exponenciales.html) | Crecimiento y decaimiento, base, factor inicial, tablas, modelos y asíntotas. |
+| Función cuadrática, factorización y parábolas | [cuadraticas.html](cuadraticas.html) | Producto de binomios, factorización, formas canónica/factorizada/polinómica, completar el cuadrado, discriminante, Cardano-Vieta, intersección recta-parábola y optimización. |
 
 La página de Unidades conserva además una entrada alternativa en el repositorio: [laboratorio_unidades.html](laboratorio_unidades.html). La navegación principal del hub utiliza actualmente **unidades.html**.
 
@@ -129,6 +130,7 @@ La lógica matemática se separa de la representación y de los eventos DOM. En 
 - **js/modules/sucesiones/**: lógica, parser, diagnóstico, retos, guiones y widgets.
 - **js/modules/valor-absoluto/**: lógica, parser, diagnóstico, retos, guiones y widgets.
 - **js/modules/exponenciales/**: lecciones, componentes, parser, retos y widgets.
+- **js/modules/cuadraticas/**: parser AST, diagnóstico conceptual, mapa de competencias, lecciones, retos, guiones y widgets.
 
 No todos los módulos comparten aún el mismo modelo de lección, persistencia o chequeo. La futura arquitectura adaptativa deberá integrarse progresivamente, sin forzar una migración masiva ni duplicar motores existentes.
 
@@ -189,7 +191,7 @@ No abrir las páginas directamente con file:// porque los módulos ES nativos re
 
 Ejecutar las pruebas unitarias disponibles:
 
-    node --test tests/sound.test.mjs tests/sucesiones/*.test.mjs tests/valor-absoluto/*.test.mjs
+    node --test tests/*.test.mjs tests/*/*.test.mjs
 
 Con el servidor activo, ejecutar las verificaciones Playwright:
 

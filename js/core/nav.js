@@ -13,6 +13,7 @@ export const PAGES = [
   { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
   { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
   { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
+  { id: 'cuadraticas', href: 'cuadraticas.html', label: 'Función Cuadrática' },
   { id: 'exponenciales', href: 'exponenciales.html', label: 'Funciones Exponenciales' },
 ];
 
@@ -59,10 +60,17 @@ export const CURRICULUM_UNITS = [
   {
     number: 5,
     title: 'Función cuadrática',
-    status: 'soon',
+    status: 'active',
     subtitle: 'Parábola, formas polinómica, canónica y factorizada, vértice, simetría y discriminante Δ',
     concepts: ['Parábola y vértice', 'Formas de la cuadrática', 'Simetría y discriminante Δ'],
-    items: [],
+    items: [
+      {
+        id: 'cuadraticas',
+        href: 'cuadraticas.html',
+        label: 'Laboratorio de Función Cuadrática',
+        detail: 'Modelo de área, factorización, las 3 formas de la parábola, completar el cuadrado, radar Δ, tangencia y optimización',
+      },
+    ],
   },
   {
     number: 6,

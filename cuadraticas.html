@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#26352d" />
+    <meta
+      name="description"
+      content="Laboratorio interactivo de función cuadrática, factorización de polinomios, las tres formas de la parábola, completar el cuadrado, discriminante, sistemas parábola-recta y optimización."
+    />
+    <title>Función Cuadrática y Parábolas · Alaska Math Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Klee+One:wght@400;600&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/valor-absoluto.css" />
+    <link rel="stylesheet" href="css/modules/cuadraticas.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/cuadraticas/index.js"></script>
+  </head>
+  <body data-page="cuadraticas">
+    <header data-site-nav="cuadraticas"></header>
+    <main class="page page--wide seq-page quad-page">
+      <header class="page-header">
+        <h1>Función Cuadrática, Factorización y Parábolas</h1>
+        <p class="intro">
+          Unidad 05 · Del modelo geométrico de área y el arte de factorizar a las tres vestimentas de la parábola,
+          el método de completar el cuadrado, el radar del discriminante, intersecciones y optimización en contexto.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <!-- Barra lateral de navegación por pizarrones -->
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 05 · Cuadráticas</h2>
+          <p class="muted small" id="seq-progress-text">0/10 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Área y Factorización</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-area-binomios" data-sec="sec-area-binomios">
+                <span>1 · Del Rectángulo al Polinomio</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-balanza-suma-producto" data-sec="sec-balanza-suma-producto">
+                <span>2 · Balanza Suma-Producto</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-agrupacion-estrategia" data-sec="sec-agrupacion-estrategia">
+                <span>3 · Agrupación y 5 Pasos</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Las 3 Vestimentas</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-canonica-vertice" data-sec="sec-canonica-vertice">
+                <span>4 · Forma Canónica y Vértice</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-factorizada-simetria" data-sec="sec-factorizada-simetria">
+                <span>5 · Factorizada y Simetría</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-completar-cuadrado" data-sec="sec-completar-cuadrado">
+                <span>6 · Completar el Cuadrado</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Radar Δ y Análisis</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-discriminante-vieta" data-sec="sec-discriminante-vieta">
+                <span>7 · Resolvente, Δ y Vieta</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-radiografia-cuadratica" data-sec="sec-radiografia-cuadratica">
+                <span>8 · Radiografía Completa</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-interseccion-recta-parabola" data-sec="sec-interseccion-recta-parabola">
+                <span>9 · Parábola y Recta</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 4 · Extremos y Práctica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-optimizacion-extremos" data-sec="sec-optimizacion-extremos">
+                <span>10 · Optimización en Contexto</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso Imprimible</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="quad-hero">
+            <p class="quad-kicker">Laboratorio 08 · Unidad 05 del Temario General</p>
+            <h1>Función Cuadrática, Factorización y Parábolas</h1>
+            <p>
+              Antes de recitar fórmulas de memoria, vamos a construir las herramientas con las manos:
+              verás por qué multiplicar dos paréntesis es partir un rectángulo en cuatro parcelas, cómo
+              desarmar trinomios rebobinando ese mismo proceso y cómo leer el vértice, las raíces y el
+              discriminante en las tres vestimentas de una misma parábola.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 1 · MODELO DE ÁREA Y PRODUCTOS NOTABLES
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-area-binomios">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 10</div>
+              <h2 class="seq-section__title">
+                1. Del Rectángulo al Polinomio: Multiplicar Binomios sin Memorizar Flechitas
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                En el colegio suelen enseñar a multiplicar dos paréntesis como <span class="eq">(x + 3) &middot; (x + 2)</span>
+                dibujando un arcoíris de flechitas mecánicas («el primero con el primero, el primero con el segundo...»).
+                El problema de las recetas sin dibujo es que en medio de un examen te olvidás de una flecha y perdés todo el ejercicio.
+                Miremos qué pasa en el mundo físico: imaginá un terreno rectangular cuyo ancho mide <span class="eq">x + 3</span> metros
+                y cuyo alto mide <span class="eq">x + 2</span> metros. Si trazás una línea vertical donde termina <span class="eq">x</span>
+                y otra horizontal donde termina <span class="eq">x</span>, el terreno queda partido en <strong>cuatro parcelas</strong> a la vista:
+                un cuadrado principal de área <span class="eq">x<sup>2</sup></span>, dos franjas rectangulares de áreas
+                <span class="eq">3x</span> y <span class="eq">2x</span>, y una esquina numérica de <span class="eq">3 &middot; 2 = 6</span>.
+                Al sumar las cuatro parcelas y juntar las dos franjas del mismo tipo (<span class="eq">3x + 2x = 5x</span>),
+                nace la <span class="gloss-term" data-gloss="forma_polinomica">forma polinómica</span>
+                <span class="eq">x<sup>2</sup> + 5x + 6</span>.
+              </p>
+
+              <p>
+                ¿Y qué pasa cuando en un paréntesis aparece una resta, como en <span class="eq">(x &minus; 4)(x + 7)</span>?
+                Aunque en una maderera nadie vende tablas de «<span class="eq">&minus;4</span> metros», el modelo de área funciona
+                como una <strong>contabilidad exacta de superficies y descuentos</strong>: las parcelas con signo positivo suman área
+                (<span class="eq">x<sup>2</sup></span> y <span class="eq">+7x</span>) y las parcelas que multiplican por <span class="eq">&minus;4</span>
+                descuentan área (<span class="eq">&minus;4x</span> y <span class="eq">&minus;28</span>), dejando un saldo neto de
+                <span class="eq">x<sup>2</sup> + 3x &minus; 28</span>.
+              </p>
+
+              <div class="quad-step-box">
+                <h4>Los dos Productos Notables vistos con los ojos</h4>
+                <p>
+                  <strong>1. Cuadrado de un binomio <span class="eq">(a + b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup></span>:</strong>
+                  Cuando el terreno es un cuadrado perfecto de lado <span class="eq">x + 3</span> por <span class="eq">x + 3</span>,
+                  además del cuadrado <span class="eq">x<sup>2</sup></span> y la esquina <span class="eq">3<sup>2</sup> = 9</span>,
+                  en las diagonales aparecen <strong>dos rectángulos gemelos</strong> de área <span class="eq">3x</span> cada uno.
+                  Juntos suman el doble producto <span class="eq">+6x</span>. Por eso <span class="eq">(x + 3)<sup>2</sup></span>
+                  jamás es <span class="eq">x<sup>2</sup> + 9</span>.
+                </p>
+                <p>
+                  <strong>2. Diferencia de cuadrados <span class="eq">(a + b)(a &minus; b) = a<sup>2</sup> &minus; b<sup>2</sup></span>:</strong>
+                  Cuando multiplicás una suma por su resta conjugada, como <span class="eq">(x + 3)(x &minus; 3)</span>,
+                  una franja lateral suma <span class="eq">+3x</span> y la otra descuenta exactamente <span class="eq">&minus;3x</span>.
+                  Los dos rectángulos cruzados son opuestos y se neutralizan sumando <span class="eq">0</span>, dejando únicamente
+                  <span class="eq">x<sup>2</sup> &minus; 9</span>.
+                </p>
+              </div>
+
+              <p>
+                Llamamos <strong>función cuadrática</strong> a toda relación que, una vez abiertos todos los paréntesis y agrupados los términos semejantes,
+                queda vestida como <span class="eq">f(x) = ax<sup>2</sup> + bx + c</span> con el coeficiente principal
+                <strong><span class="eq">a &ne; 0</span></strong>. Esa última condición no es un capricho burocrático: si al desarrollar una expresión
+                como <span class="eq">f(n) = 2(n &minus; 1)<sup>2</sup> &minus; 2n<sup>2</sup></span> los términos con <span class="eq">n<sup>2</sup></span>
+                se cancelan entre sí (<span class="eq">2n<sup>2</sup> &minus; 2n<sup>2</sup> = 0</span>), lo que parecía una parábola se desinfla y queda la recta
+                <span class="eq">f(n) = &minus;4n + 2</span>.
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1-area">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="modelo-area-binomios"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con la trampa de examen:</strong> En <span class="eq">(2 &minus; 3x)<sup>2</sup></span>, la tentación automática es
+              repartir el exponente y escribir <span class="eq">4 &minus; 9x<sup>2</sup></span>. ¡Error doble! Primero, te comiste el doble producto
+              <span class="eq">2 &middot; 2 &middot; (&minus;3x) = &minus;12x</span>; segundo, el cuadrado de <span class="eq">&minus;3x</span> es
+              <span class="eq">(&minus;3x) &middot; (&minus;3x) = +9x<sup>2</sup></span> positivo. El desarrollo verdadero es
+              <span class="eq">9x<sup>2</sup> &minus; 12x + 4</span>.
+            </div>
+
+            <div data-check="sec-area-binomios"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 2 · BALANZA SUMA-PRODUCTO (a = 1)
+               ================================================================ -->
+          <section class="seq-section" id="sec-balanza-suma-producto">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 10</div>
+              <h2 class="seq-section__title">
+                2. Ingeniería Inversa: Factor Común y el Rompecabezas Suma-Producto (a = 1)
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                Factorizar un polinomio no es aprender una regla marciana: es simplemente <strong>rebobinar la película del Pizarrón 1</strong>.
+                Hace un minuto teníamos las medidas de los lados <span class="eq">(x + m)(x + n)</span> y calculábamos el área total desplegada.
+                Ahora nos dan el área total ya sumada, por ejemplo <span class="eq">x<sup>2</sup> + 5x + 6</span>, y queremos descubrir cuánto medían
+                la base y la altura originales.
+              </p>
+
+              <div class="quad-step-box">
+                <h4>La pista del detective: dónde viven la Suma y el Producto</h4>
+                <p>
+                  Si desarrollamos con letras generales el producto de dos binomios con coeficiente principal <span class="eq">a = 1</span>,
+                  las cuatro parcelas del rectángulo nos revelan el secreto:
+                </p>
+                <p class="eq">
+                  (x + m) &middot; (x + n) = x<sup>2</sup> + mx + nx + m &middot; n = x<sup>2</sup> + (m + n)x + m &middot; n
+                </p>
+                <p>
+                  Comparando término a término con <span class="eq">x<sup>2</sup> + bx + c</span>, quedan al descubierto las dos condiciones:
+                  buscamos dos números <span class="eq">m</span> y <span class="eq">n</span> tales que su <strong>producto sea el número suelto <span class="eq">c</span></strong>
+                  (<span class="eq">m &middot; n = c</span>) y su <strong>suma sea el coeficiente lineal <span class="eq">b</span></strong>
+                  (<span class="eq">m + n = b</span>).
+                </p>
+              </div>
+
+              <p>
+                Para no adivinar a ciegas, leé primero los signos como una brújula:
+                si el producto <span class="eq">c</span> es <strong>positivo</strong>, ambos números tienen obligatoriamente el <strong>mismo signo</strong>
+                (ambos positivos si <span class="eq">b &gt; 0</span>, como en <span class="eq">x<sup>2</sup> + 5x + 6 = (x + 2)(x + 3)</span>;
+                ambos negativos si <span class="eq">b &lt; 0</span>, como en <span class="eq">x<sup>2</sup> &minus; 5x + 6 = (x &minus; 2)(x &minus; 3)</span>).
+                En cambio, si el producto <span class="eq">c</span> es <strong>negativo</strong>, uno es positivo y el otro es negativo, y gana en tamaño
+                absoluto el que lleva el signo de <span class="eq">b</span>: por ejemplo, en <span class="eq">x<sup>2</sup> &minus; x &minus; 42</span>,
+                los divisores vecinos <span class="eq">&minus;7</span> y <span class="eq">+6</span> multiplican <span class="eq">&minus;42</span> y suman
+                <span class="eq">&minus;1</span>, dando <span class="eq">(x &minus; 7)(x + 6)</span>.
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2-balanza">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="balanza-suma-producto"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con invertir suma y producto:</strong> Un tropiezo frecuente bajo presión es buscar dos números que
+              <em>sumen</em> <span class="eq">c</span> y <em>multipliquen</em> <span class="eq">b</span>. Recordá siempre el modelo de área:
+              la esquina sin <span class="eq">x</span> nace de multiplicar las dos constantes (<span class="eq">m &middot; n = c</span>), mientras que las
+              dos tiras con <span class="eq">x</span> se suman entre sí (<span class="eq">m + n = b</span>).
+            </div>
+
+            <div data-check="sec-balanza-suma-producto"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 3 · AGRUPACIÓN (a != 1) Y BRÚJULA DE 5 PASOS
+               ================================================================ -->
+          <section class="seq-section" id="sec-agrupacion-estrategia">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 3 de 10</div>
+              <h2 class="seq-section__title">
+                3. Cuando a &ne; 1: El Arte de Agrupar y la Brújula de los 5 Pasos
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                ¿Por qué cuando delante de <span class="eq">x<sup>2</sup></span> hay un número distinto de <span class="eq">1</span>
+                —como en <span class="eq">2x<sup>2</sup> + 7x + 3</span>— ya no alcanza con buscar divisores de <span class="eq">3</span>
+                que sumen <span class="eq">7</span>? Porque ese coeficiente <span class="eq">a = 2</span> multiplica a una de las tiras laterales
+                del rectángulo. Para reconstruir las cuatro parcelas originales sin adivinar, buscamos dos números <span class="eq">m</span> y <span class="eq">n</span>
+                que multiplicados den el <strong>producto de las puntas <span class="eq">a &middot; c</span></strong>
+                (acá <span class="eq">2 &middot; 3 = 6</span>) y sumados den el término central <span class="eq">b = 7</span>.
+              </p>
+
+              <div class="quad-step-box">
+                <h4>Cocina paso a paso de la Factorización por Agrupación</h4>
+                <p>
+                  En <span class="eq">2x<sup>2</sup> + 7x + 3</span>, los números que multiplican <span class="eq">6</span> y suman <span class="eq">7</span>
+                  son <span class="eq">1</span> y <span class="eq">6</span>. Esos dos números sirven para <strong>desarmar el término del medio</strong>
+                  <span class="eq">7x = 1x + 6x</span> y volver a ver las cuatro parcelas:
+                </p>
+                <p class="eq">
+                  2x<sup>2</sup> + 7x + 3 = (2x<sup>2</sup> + 1x) + (6x + 3) = x &middot; (2x + 1) + 3 &middot; (2x + 1) = (2x + 1) &middot; (x + 3)
+                </p>
+                <p>
+                  <strong>Peligro del signo menos en el tercer término:</strong> Si al desarmar <span class="eq">3x<sup>2</sup> &minus; 10x + 8</span>
+                  te queda <span class="eq">3x<sup>2</sup> &minus; 6x &minus; 4x + 8</span>, en la primera pareja sacás <span class="eq">3x(x &minus; 2)</span>.
+                  Para que en la segunda pareja <span class="eq">&minus;4x + 8</span> aparezca idéntico el paréntesis <span class="eq">(x &minus; 2)</span>,
+                  tenés que extraer <strong><span class="eq">&minus;4</span> negativo</strong>: como <span class="eq">+8 : (&minus;4) = &minus;2</span>,
+                  queda <span class="eq">&minus;4(x &minus; 2)</span>, cerrando limpio en <span class="eq">(3x &minus; 4)(x &minus; 2)</span>.
+                </p>
+              </div>
+
+              <p>
+                Para enfrentar cualquier polinomio en un parcial sin entrar en pánico, seguí la <strong>Brújula de 5 Preguntas</strong> en orden:
+                <strong>1.º</strong> ¿Hay un factor común en todos los términos que achique los números? (ej. en <span class="eq">5x<sup>2</sup> &minus; 80</span>
+                sacás el <span class="eq">5</span> y queda <span class="eq">5(x<sup>2</sup> &minus; 16)</span>);
+                <strong>2.º</strong> ¿Es una diferencia de cuadrados?;
+                <strong>3.º</strong> ¿Es un trinomio cuadrado perfecto? (ej. <span class="eq">4x<sup>2</sup> + 12x + 9 = (2x + 3)<sup>2</sup></span>);
+                <strong>4.º</strong> Si <span class="eq">a = 1</span>, ¿sale por suma-producto?;
+                <strong>5.º</strong> Si <span class="eq">a &ne; 1</span>, ¿sale por agrupación con <span class="eq">a &middot; c</span>?
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3-agrupacion">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="agrupacion-estrategia"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con olvidarte del factor común inicial:</strong> Si en <span class="eq">4x<sup>2</sup> + 18x &minus; 10</span>
+              sacás primero el factor común <span class="eq">2</span> para trabajar más liviano con <span class="eq">2x<sup>2</sup> + 9x &minus; 5</span>,
+              ese <span class="eq">2</span> sigue siendo parte de la función y debe quedar multiplicando adelante en la respuesta final:
+              <span class="eq">2(2x &minus; 1)(x + 5)</span>.
+            </div>
+
+            <div data-check="sec-agrupacion-estrategia"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 4 · FORMA CANÓNICA, VÉRTICE Y DESPEJE POR RAÍZ
+               ================================================================ -->
+          <section class="seq-section" id="sec-canonica-vertice">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 10</div>
+              <h2 class="seq-section__title">
+                4. De la «V» a la Curva: Forma Canónica f(x) = a(x &minus; xᵥ)² + yᵥ y Despeje por Raíz
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                Si venís del laboratorio de Valor Absoluto, esta estructura te va a resultar recontra familiar:
+                en <span class="eq">a|x &minus; h| + k</span> los escalones subían de forma rígida (<span class="eq">1, 2, 3&hellip;</span>)
+                formando una «V» puntiaguda. Ahora cambiamos las barras de módulo por un paréntesis al cuadrado y obtenemos la
+                <span class="gloss-term" data-gloss="forma_canonica">forma canónica</span>:
+                <span class="eq">f(x) = a(x &minus; x<sub>v</sub>)<sup>2</sup> + y<sub>v</sub></span>.
+                Al elevar al cuadrado respecto de la <span class="gloss-term" data-gloss="parabola_matriz">parábola matriz</span>
+                <span class="eq">y = x<sup>2</sup></span>, cuando te alejás <span class="eq">1, 2, 3</span> unidades horizontalmente desde el
+                <span class="gloss-term" data-gloss="vertice_parabola">vértice</span>, la altura salta como los cuadrados
+                <strong><span class="eq">1a, 4a, 9a</span></strong>, dibujando esa curva suave llamada <strong>parábola</strong>.
+              </p>
+
+              <p>
+                ¿Por qué la coordenada horizontal del vértice (<span class="eq">x<sub>v</sub></span>) se lee con el <strong>signo cambiado</strong>
+                respecto al paréntesis? No es brujería: como cualquier número real elevado al cuadrado da siempre <strong><span class="eq">0</span> o positivo</strong>,
+                el paréntesis <span class="eq">(x &minus; x<sub>v</sub>)<sup>2</sup></span> toca su piso más bajo posible únicamente cuando su interior
+                vale exactamente <strong>cero</strong> (<span class="eq">x &minus; x<sub>v</sub> = 0 &rArr; x = x<sub>v</sub></span>).
+                Justo en ese valor de <span class="eq">x</span> el término cuadrático se apaga y la altura de la curva queda clavada en <span class="eq">y<sub>v</sub></span>.
+                El signo del coeficiente <span class="eq">a</span> decide la <span class="gloss-term" data-gloss="concavidad">concavidad</span>:
+                si <span class="eq">a &gt; 0</span> abre las ramas hacia arriba (<span class="eq">&cup;</span>) teniendo un piso <strong>mínimo</strong>;
+                si <span class="eq">a &lt; 0</span> abre hacia abajo (<span class="eq">&cap;</span>) teniendo un techo <strong>máximo</strong>.
+              </p>
+
+              <div data-quad-formula="canonical" data-a="2" data-b="-12" data-c="14"></div>
+
+              <div class="quad-step-box">
+                <h4>Cómo hallar las raíces desde la Forma Canónica sin desarrollar todo el polinomio</h4>
+                <p>
+                  Si tenés <span class="eq">2(x &minus; 3)<sup>2</sup> &minus; 8 = 0</span>, expandir el cuadrado para después aplicar la resolvente
+                  es trabajar el doble. Despejá directamente el paréntesis al cuadrado:
+                </p>
+                <p class="eq">
+                  2(x &minus; 3)<sup>2</sup> = 8 &rArr; (x &minus; 3)<sup>2</sup> = 4 &rArr; &radic;((x &minus; 3)<sup>2</sup>) = &radic;4 &rArr; |x &minus; 3| = 2
+                </p>
+                <p>
+                  Recordando que <span class="eq">&radic;(u<sup>2</sup>) = |u|</span> abre dos caminos simétricos (<span class="eq">x &minus; 3 = &pm;2</span>),
+                  sumás <span class="eq">3</span> y obtenés al instante <span class="eq">x<sub>1</sub> = 3 &minus; 2 = 1</span> y
+                  <span class="eq">x<sub>2</sub> = 3 + 2 = 5</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4-canonica">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="canonica-vertice"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con confundir <span class="eq">y<sub>v</sub></span> con la ordenada al origen:</strong>
+              En <span class="eq">f(x) = &minus;5(x + 1)<sup>2</sup> &minus; 6</span>, el vértice es <span class="eq">(&minus;1; &minus;6)</span>,
+              pero la curva <strong>NO</strong> corta al eje Y en <span class="eq">&minus;6</span>. Para hallar la ordenada al origen hay que evaluar
+              <span class="eq">x = 0</span>: <span class="eq">f(0) = &minus;5(0 + 1)<sup>2</sup> &minus; 6 = &minus;5 &minus; 6 = &minus;11</span>.
+            </div>
+
+            <div data-check="sec-canonica-vertice"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 5 · FORMA FACTORIZADA Y SIMETRÍA DE LAS RAÍCES
+               ================================================================ -->
+          <section class="seq-section" id="sec-factorizada-simetria">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 5 de 10</div>
+              <h2 class="seq-section__title">
+                5. La Forma Factorizada f(x) = a(x &minus; x₁)(x &minus; x₂) y el Secreto del Espejo
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                Si la forma canónica te regala el vértice en bandeja, la
+                <span class="gloss-term" data-gloss="forma_factorizada">forma factorizada</span>
+                <span class="eq">f(x) = a(x &minus; x<sub>1</sub>)(x &minus; x<sub>2</sub>)</span> te regala los
+                <strong>puntos donde la parábola pisa el suelo del eje X (sus raíces <span class="eq">x<sub>1</sub></span> y <span class="eq">x<sub>2</sub></span>)</strong>.
+                Funciona gracias a la <span class="gloss-term" data-gloss="propiedad_producto_cero">propiedad del producto cero</span>:
+                para que una multiplicación dé <span class="eq">0</span>, alcanza con que cualquiera de los paréntesis valga <span class="eq">0</span>
+                (<span class="eq">x = x<sub>1</sub></span> o <span class="eq">x = x<sub>2</sub></span>).
+              </p>
+
+              <div class="quad-step-box">
+                <h4>El atajo del espejo: cómo hallar el vértice promediando las raíces</h4>
+                <p>
+                  Como toda parábola es perfectamente simétrica respecto de su
+                  <span class="gloss-term" data-gloss="eje_simetria">eje de simetría</span>, el vértice cae siempre
+                  <strong>justo a mitad de camino entre las dos raíces</strong> (su promedio aritmético):
+                </p>
+                <p class="eq">
+                  x<sub>v</sub> = <span class="fr"><span class="top">x<sub>1</sub> + x<sub>2</sub></span><span class="bar"></span><span class="bot">2</span></span>
+                  &emsp;&rArr;&emsp; y<sub>v</sub> = f(x<sub>v</sub>)
+                </p>
+                <p>
+                  Una vez que calculaste ese punto medio <span class="eq">x<sub>v</sub></span>, simplemente lo metés adentro de la fórmula factorizada
+                  para saber qué tan alto o qué tan bajo llega el vértice (<span class="eq">y<sub>v</sub> = f(x<sub>v</sub>)</span>), ¡sin necesidad de
+                  expandir el polinomio!
+                </p>
+              </div>
+
+              <div data-quad-formula="factored" data-a="-2" data-b="4" data-c="6"></div>
+
+              <p>
+                Cuando aparece una cuadrática incompleta como <span class="eq">x<sup>2</sup> &minus; 4x = 0</span>, la tentación escolar número uno es
+                pasar el <span class="eq">4x</span> al otro lado (<span class="eq">x<sup>2</sup> = 4x</span>) y «tachar una <span class="eq">x</span> de cada lado»
+                para decir que <span class="eq">x = 4</span>. ¡Trampa mortal de parcial! Cuando dividís ambos lados por <span class="eq">x</span>, estás asumiendo
+                en secreto que <span class="eq">x</span> no vale cero (porque dividir por cero está prohibido), y al hacerlo <strong>matás la solución <span class="eq">x = 0</span></strong>.
+                El camino limpio es sacar <strong>factor común</strong>: <span class="eq">x &middot; (x &minus; 4) = 0</span>. Ahora tenés dos piezas multiplicándose
+                que dan cero: o vale cero la primera (<span class="eq">x<sub>1</sub> = 0</span>) o vale cero la segunda (<span class="eq">x &minus; 4 = 0 &rArr; x<sub>2</sub> = 4</span>).
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec5-factorizada">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec5-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="factorizada-simetria"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado al reconstruir una parábola desde sus raíces:</strong> Si te dicen que una parábola corta al eje X en
+              <span class="eq">&minus;1</span> y en <span class="eq">3</span> y pasa por <span class="eq">(0; 6)</span>, no escribas
+              solamente <span class="eq">(x + 1)(x &minus; 3)</span>. Tenés que incluir adelante el coeficiente principal <span class="eq">a</span>:
+              planteás <span class="eq">f(x) = a(x + 1)(x &minus; 3)</span>, reemplazás <span class="eq">6 = a(1)(&minus;3)</span> y despejás
+              <span class="eq">a = &minus;2</span>.
+            </div>
+
+            <div data-check="sec-factorizada-simetria"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 6 · COMPLETAR EL CUADRADO Y DEDUCCIÓN DE xv = -b/(2a)
+               ================================================================ -->
+          <section class="seq-section" id="sec-completar-cuadrado">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 6 de 10</div>
+              <h2 class="seq-section__title">
+                6. El Puente Alquimista: Completar el Cuadrado y por qué xᵥ = &minus;b / (2a)
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                La mayoría de las veces te tiran la cuadrática vestida en forma polinómica (<span class="eq">f(x) = ax<sup>2</sup> + bx + c</span>),
+                donde el único dato gratis es la ordenada al origen <span class="eq">f(0) = c</span>, pero tanto el vértice como las raíces están escondidos.
+                En vez de memorizar la fórmula <span class="eq">x<sub>v</sub> = &minus;b / (2a)</span> como un versito ciego, abramos la cocina completa
+                con el método geométrico de <span class="gloss-term" data-gloss="completar_cuadrado">completar el cuadrado</span>.
+              </p>
+
+              <div class="quad-step-box">
+                <h4>La cocina completa paso a paso: de <span class="eq">x<sup>2</sup> &minus; 6x + 2</span> a <span class="eq">(x &minus; 3)<sup>2</sup> &minus; 7</span></h4>
+                <p>
+                  <strong>Paso 1 (Partir las alas):</strong> Tomamos el término lineal <span class="eq">&minus;6x</span> y lo partimos en dos mitades iguales
+                  de <span class="eq">&minus;3x</span> para armar los dos bordes de un cuadrado de lado <span class="eq">(x &minus; 3)</span>.
+                </p>
+                <p>
+                  <strong>Paso 2 (Fabricar el neutro aditivo <span class="eq">+0</span>):</strong> Para cerrar la esquina de ese cuadrado de lado
+                  <span class="eq">(x &minus; 3)</span> nos falta un cuadradito numérico de <span class="eq">(&minus;3)<sup>2</sup> = 9</span>.
+                  Como no podemos alterar la función, sumamos y restamos <span class="eq">9</span> en el mismo renglón (que equivale a sumar <span class="eq">+0</span>):
+                </p>
+                <p class="eq">
+                  x<sup>2</sup> &minus; 6x + 2 = (x<sup>2</sup> &minus; 6x + 9) &minus; 9 + 2 = (x &minus; 3)<sup>2</sup> &minus; 7
+                </p>
+                <p>
+                  <strong>Paso 3 (¿Y si <span class="eq">a &ne; 1</span>?):</strong> En <span class="eq">ax<sup>2</sup> + bx + c</span>, primero extraemos
+                  <span class="eq">a</span> de los términos con <span class="eq">x</span>: <span class="eq">a[x<sup>2</sup> + (b/a)x] + c</span>.
+                  La mitad del coeficiente lineal dentro del corchete es <span class="eq">b / (2a)</span>, por lo que el cuadrado se cierra en
+                  <span class="eq">(x + b/(2a))<sup>2</sup></span>. ¡De ahí nace para siempre que el vértice vive en
+                  <strong><span class="eq">x<sub>v</sub> = &minus;b / (2a)</span></strong>!
+                </p>
+              </div>
+
+              <div data-quad-rosetta="true" data-a="1" data-b="-6" data-c="5"></div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec6-completar">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec6-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="completar-cuadrado"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con el factor <span class="eq">a</span> al salir del corchete:</strong> En <span class="eq">3x<sup>2</sup> &minus; 6x &minus; 1</span>,
+              al armar <span class="eq">3[(x<sup>2</sup> &minus; 2x + 1) &minus; 1] &minus; 1</span>, ese <span class="eq">&minus;1</span> restado adentro del corchete
+              está multiplicado por el <span class="eq">3</span> de adelante: sale como <span class="eq">&minus;3</span>, dando
+              <span class="eq">3(x &minus; 1)<sup>2</sup> &minus; 4</span> (y no <span class="eq">&minus;2</span>).
+            </div>
+
+            <div data-check="sec-completar-cuadrado"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 7 · FÓRMULA RESOLVENTE, DISCRIMINANTE Δ Y CARDANO-VIETA
+               ================================================================ -->
+          <section class="seq-section" id="sec-discriminante-vieta">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 7 de 10</div>
+              <h2 class="seq-section__title">
+                7. La Fórmula Resolvente por Dentro, el Radar Δ y Cardano-Vieta
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                La famosa <strong>Fórmula Resolvente</strong> (o de Bhaskara) no cayó del cielo: es simplemente igualar a cero la forma canónica
+                obtenida en el Pizarrón 6 y despejar la <span class="eq">x</span>. Si en lugar de memorizar un bloque compacto la escribís separada en dos
+                términos, su significado geométrico salta a la vista:
+              </p>
+
+              <div data-quad-formula="resolvente" data-a="1" data-b="-6" data-c="2"></div>
+
+              <p>
+                El primer término <span class="eq">&minus;b / (2a)</span> te para en el eje de simetría <span class="eq">x<sub>v</sub></span>, y el segundo término
+                suma y resta la distancia horizontal hasta cada raíz. Por eso lo que está adentro de la raíz cuadrada —el
+                <span class="gloss-term" data-gloss="discriminante">discriminante</span>
+                <strong><span class="eq">&Delta; = b<sup>2</sup> &minus; 4ac</span></strong>— decide cuántas veces la parábola corta al eje X:
+              </p>
+
+              <div class="quad-step-box">
+                <h4>Los tres veredictos del Radar &Delta; y las Propiedades de Cardano-Vieta</h4>
+                <p>
+                  &bull; <strong>Si <span class="eq">&Delta; &gt; 0</span>:</strong> La raíz cuadrada de un positivo existe y es mayor que cero; caminás esa distancia
+                  a izquierda y derecha de <span class="eq">x<sub>v</sub></span> y tenés <strong>2 raíces reales distintas</strong>
+                  (racionales si <span class="eq">&Delta;</span> es cuadrado perfecto, o irracionales conjugadas como <span class="eq">3 &pm; &radic;7</span>).<br />
+                  &bull; <strong>Si <span class="eq">&Delta; = 0</span>:</strong> Sumás y restás cero (<span class="eq">x<sub>v</sub> &pm; 0</span>); las dos raíces
+                  se funden en <strong>1 única raíz real doble</strong> (<span class="eq">x<sub>1</sub> = x<sub>2</sub> = x<sub>v</sub></span>) y la parábola es
+                  <strong>tangente al eje X</strong>.<br />
+                  &bull; <strong>Si <span class="eq">&Delta; &lt; 0</span>:</strong> En <span class="eq">&Ropf;</span> no existe la raíz cuadrada de un número negativo;
+                  la parábola flota entera arriba o abajo del eje X y <strong>no tiene raíces reales (<span class="eq">C<sub>0</sub> = &empty;</span>)</strong>.
+                </p>
+                <p>
+                  Además, por las relaciones de <span class="gloss-term" data-gloss="cardano_vieta">Cardano-Vieta</span>, al sumar las dos ramas de la resolvente
+                  las raíces cuadradas se cancelan dando <strong><span class="eq">x<sub>1</sub> + x<sub>2</sub> = &minus;b / a</span></strong>, y al multiplicarlas
+                  por diferencia de cuadrados queda <strong><span class="eq">x<sub>1</sub> &middot; x<sub>2</sub> = c / a</span></strong>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec7-discriminante">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec7-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="discriminante-vieta"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con los signos cuando <span class="eq">b</span> es negativo:</strong> Si <span class="eq">b = &minus;6</span>, adelante en la
+              resolvente va <span class="eq">&minus;b = &minus;(&minus;6) = +6</span> positivo, y adentro del discriminante va
+              <span class="eq">(&minus;6)<sup>2</sup> = +36</span> positivo. Escribir <span class="eq">&minus;6<sup>2</sup> = &minus;36</span> arruina todo el discriminante.
+            </div>
+
+            <div data-check="sec-discriminante-vieta"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 8 · RADIOGRAFÍA COMPLETA (IMAGEN, SIGNOS, MONOTONÍA, BIYECTIVIDAD)
+               ================================================================ -->
+          <section class="seq-section" id="sec-radiografia-cuadratica">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 8 de 10</div>
+              <h2 class="seq-section__title">
+                8. Radiografía Completa: Imagen, Signos (C⁺, C⁻), Monotonía y Biyectividad
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                Acá es donde medio curso pierde puntos por mezclar los dos ejes. Imaginá que caminás sobre el gráfico de
+                <span class="eq">f(x) = &minus;(x + 3)<sup>2</sup> + 1</span> de izquierda a derecha: tus pies avanzan por el
+                <strong>piso (el eje X)</strong> y tu cabeza mide la <strong>altura (el eje Y)</strong>. Mientras venís desde
+                <span class="eq">&minus;&infin;</span> hasta el kilómetro <span class="eq">x = &minus;3</span>, estás subiendo la montaña:
+                por eso el intervalo de crecimiento es <span class="eq">I<sub>&uarr;</sub> = (&minus;&infin;; &minus;3)</span> y el de decrecimiento es
+                <span class="eq">I<sub>&darr;</sub> = (&minus;3; +&infin;)</span>, ¡mirando siempre el piso <span class="eq">X</span> en <span class="eq">x<sub>v</sub></span>,
+                nunca la altura <span class="eq">1</span>!
+              </p>
+
+              <p>
+                En cambio, cuando te piden la <strong>Imagen</strong>, te preguntan qué alturas alcanza el dibujo sobre el eje Y.
+                A diferencia de las funciones exponenciales —donde la asíntota horizontal llevaba paréntesis abierto porque la curva jamás la tocaba—,
+                en una parábola el vértice es un punto real que la curva <strong>sí pisa</strong>. Por eso en <span class="eq">y<sub>v</sub></span>
+                va <strong>siempre corchete cerrado</strong>: <span class="eq">[y<sub>v</sub>; +&infin;)</span> si <span class="eq">a &gt; 0</span>, o
+                <span class="eq">(&minus;&infin;; y<sub>v</sub>]</span> si <span class="eq">a &lt; 0</span>.
+              </p>
+
+              <div class="quad-step-box">
+                <h4>Positividad (<span class="eq">C<sup>+</sup></span>), Negatividad (<span class="eq">C<sup>&minus;</sup></span>) y por qué restringimos el dominio para invertir</h4>
+                <p>
+                  &bull; <strong>Conjuntos de signos:</strong> Miramos en qué tramos del eje X la parábola vuela por encima del eje X (<span class="eq">C<sup>+</sup></span>)
+                  o se hunde por debajo (<span class="eq">C<sup>&minus;</sup></span>). Ojo cuando la parábola rebota en una raíz doble <span class="eq">x<sub>v</sub></span>
+                  (por ejemplo <span class="eq">f(x) = &minus;2(x &minus; 1)<sup>2</sup></span>): en <span class="eq">x = 1</span> vale exactamente <span class="eq">0</span>,
+                  así que para la negatividad hay que excluir ese punto: <span class="eq">C<sup>&minus;</sup> = (&minus;&infin;; 1) &cup; (1; +&infin;) = &Ropf; &minus; {1}</span>.<br />
+                  &bull; <strong>Biyectividad e Inversa:</strong> Ninguna cuadrática con dominio <span class="eq">&Ropf;</span> es inyectiva (dos valores simétricos
+                  <span class="eq">x<sub>v</sub> &minus; d</span> y <span class="eq">x<sub>v</sub> + d</span> tienen la misma altura) ni suryectiva en <span class="eq">&Ropf;</span>.
+                  Para hacerla biyectiva y poder invertirla con una raíz cuadrada, nos quedamos con <strong>una sola rama</strong> a partir del vértice:
+                  <span class="eq">[x<sub>v</sub>; +&infin;) &rarr; Im(f)</span> o <span class="eq">(&minus;&infin;; x<sub>v</sub>] &rarr; Im(f)</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec8-radiografia">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec8-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="radiografia-cuadratica"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con los dos errores clásicos de parcial en análisis de parábolas:</strong>
+              1) Nunca pongas paréntesis abierto en <span class="eq">y<sub>v</sub></span> al escribir la Imagen (va corchete cerrado).
+              2) Nunca metas <span class="eq">y<sub>v</sub></span> en los intervalos de crecimiento o decrecimiento (quiebran siempre en <span class="eq">x<sub>v</sub></span>).
+            </div>
+
+            <div data-check="sec-radiografia-cuadratica"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 9 · INTERSECCIÓN PARÁBOLA-RECTA Y TANGENCIA
+               ================================================================ -->
+          <section class="seq-section" id="sec-interseccion-recta-parabola">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 9 de 10</div>
+              <h2 class="seq-section__title">
+                9. Encuentros en el Plano: Sistemas Parábola-Recta y Recta Tangente
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                ¿Qué pasa cuando lanzamos un rayo láser recto <span class="eq">g(x) = mx + d</span> hacia una parábola
+                <span class="eq">f(x) = ax<sup>2</sup> + bx + c</span>? Buscar dónde se chocan es pedir que en el mismo valor horizontal <span class="eq">x</span>
+                ambas tengan exactamente la misma altura <span class="eq">y</span>: igualamos <span class="eq">ax<sup>2</sup> + bx + c = mx + d</span>.
+                Al restar <span class="eq">mx + d</span> en ambos lados para dejar un <span class="eq">0</span> a la derecha, nos queda una
+                <strong>nueva ecuación cuadrática diferencia</strong>:
+              </p>
+
+              <p class="eq">
+                ax<sup>2</sup> + (b &minus; m)x + (c &minus; d) = 0 &emsp;con&emsp; &Delta;<sub>int</sub> = (b &minus; m)<sup>2</sup> &minus; 4a(c &minus; d)
+              </p>
+
+              <div class="quad-step-box">
+                <h4>Cómo usar <span class="eq">&Delta;<sub>int</sub> = 0</span> para cazar rectas tangentes con parámetro <span class="eq">k</span></h4>
+                <p>
+                  El discriminante de intersección <span class="eq">&Delta;<sub>int</sub></span> decide la geometría del encuentro:
+                  si <span class="eq">&Delta;<sub>int</sub> &gt; 0</span> la recta corta en <strong>2 puntos (es secante)</strong>;
+                  si <span class="eq">&Delta;<sub>int</sub> &lt; 0</span> no la toca nunca (<strong>exterior</strong>);
+                  y si <strong><span class="eq">&Delta;<sub>int</sub> = 0</span></strong> se tocan en <strong>1 único punto</strong> y tenemos una
+                  <span class="gloss-term" data-gloss="recta_tangente_parabola">recta tangente a una parábola</span>.
+                </p>
+                <p>
+                  Por ejemplo, para hallar qué pendiente <span class="eq">k</span> hace que la recta <span class="eq">y = kx &minus; 1</span> sea tangente a
+                  <span class="eq">y = x<sup>2</sup> + 2x + 3</span>, igualamos <span class="eq">x<sup>2</sup> + 2x + 3 = kx &minus; 1 &rArr; x<sup>2</sup> + (2 &minus; k)x + 4 = 0</span>.
+                  Exigimos <span class="eq">&Delta;<sub>int</sub> = (2 &minus; k)<sup>2</sup> &minus; 4 &middot; 1 &middot; 4 = 0 &rArr; (2 &minus; k)<sup>2</sup> = 16 &rArr; |2 &minus; k| = 4</span>,
+                  de donde brotan las dos rectas tangentes posibles: <span class="eq">k<sub>1</sub> = &minus;2</span> y <span class="eq">k<sub>2</sub> = 6</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec9-interseccion">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec9-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="interseccion-recta-parabola"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con entregar solo la coordenada <span class="eq">x</span>:</strong> Un punto de intersección en el plano tiene dos coordenadas
+              <span class="eq">(x; y)</span>. Después de resolver la ecuación cuadrática igualada para hallar <span class="eq">x</span>, reemplazá cada valor
+              en la ecuación de la recta <span class="eq">y = mx + d</span> para encontrar su altura <span class="eq">y</span> correspondiente.
+            </div>
+
+            <div data-check="sec-interseccion-recta-parabola"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN 10 · OPTIMIZACIÓN DE EXTREMOS EN CONTEXTO
+               ================================================================ -->
+          <section class="seq-section" id="sec-optimizacion-extremos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 4 · Pizarrón 10 de 10</div>
+              <h2 class="seq-section__title">
+                10. Dominar los Extremos: Proyectiles, Cercos y el Misterio del Cuadrado Inscrito
+              </h2>
+            </header>
+
+            <div class="quad-prose">
+              <p>
+                En los problemas aplicados nadie te dice «calculá el vértice»; te preguntan <em>«¿cuál es la altura máxima que alcanza el proyectil?»</em>,
+                <em>«¿qué dimensiones maximizan el área del terreno cercado?»</em> o <em>«¿qué corte minimiza la superficie de la pieza?»</em>.
+                En cuanto armás la fórmula y ves que la variable aparece elevada al cuadrado (<span class="eq">x<sup>2</sup></span> o <span class="eq">t<sup>2</sup></span>),
+                sabés que el gráfico es una parábola y que el extremo buscado <strong>es simplemente el vértice <span class="eq">(x<sub>v</sub>; y<sub>v</sub>)</span></strong>:
+                <span class="eq">x<sub>v</sub></span> responde «para qué valor de la variable ocurre» e <span class="eq">y<sub>v</sub></span> responde «cuánto vale ese máximo o mínimo».
+              </p>
+
+              <div class="quad-step-box">
+                <h4>El problema estrella desarmado paso a paso: El cuadrado inscrito en un cuadrado de 16 cm</h4>
+                <p>
+                  Dentro de un cuadrado exterior de <span class="eq">16 cm</span> de lado inscribimos otro cuadrado <span class="eq">MNOP</span> marcando una distancia
+                  <span class="eq">x</span> desde cada esquina. En las cuatro esquinas quedan cuatro triángulos rectángulos idénticos cuyos catetos miden
+                  <span class="eq">x</span> y <span class="eq">16 &minus; x</span>.
+                </p>
+                <p>
+                  Por el Teorema de Pitágoras, el lado <span class="eq">L</span> del cuadrado interior cumple
+                  <span class="eq">L<sup>2</sup> = x<sup>2</sup> + (16 &minus; x)<sup>2</sup></span>. Y como el área del cuadrado interior es justamente
+                  <span class="eq">S(x) = L<sup>2</sup></span>, al desarrollar el binomio obtenemos la función cuadrática sobre su <strong>dominio físico <span class="eq">x &isin; [0; 16]</span></strong>:
+                </p>
+                <p class="eq">
+                  S(x) = x<sup>2</sup> + (256 &minus; 32x + x<sup>2</sup>) = 2x<sup>2</sup> &minus; 32x + 256
+                </p>
+                <p>
+                  Como <span class="eq">a = 2 &gt; 0</span>, la parábola abre hacia arriba y alcanza su <strong>área mínima</strong> en el punto medio
+                  <span class="eq">x<sub>v</sub> = &minus;(&minus;32) / (2 &middot; 2) = 8 cm</span>, donde vale <span class="eq">S(8) = 128 cm<sup>2</sup></span>
+                  (exactamente la mitad del cuadrado exterior). En cambio, el <strong>área máxima</strong> (<span class="eq">256 cm<sup>2</sup></span>) se alcanza en
+                  los bordes del dominio físico: <span class="eq">x = 0 cm</span> o <span class="eq">x = 16 cm</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec10-optimizacion">
+                ¿Por qué pasa esto? · Explicación de Alaska
+              </button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec10-base">
+                Base desde cero: lo que nadie te explica
+              </button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="optimizacion-extremos"></div>
+            </div>
+
+            <div class="quad-warning-box">
+              <strong>Cuidado con confundir <span class="eq">x<sub>v</sub></span> con <span class="eq">y<sub>v</sub></span> en la respuesta final:</strong>
+              Leé con lupa si el enunciado pregunta <em>«¿cuánto debe medir el corte x?»</em> (respuesta: <span class="eq">x<sub>v</sub> = 8 cm</span>)
+              o <em>«¿cuál es el área mínima alcanzada?»</em> (respuesta: <span class="eq">y<sub>v</sub> = 128 cm<sup>2</sup></span>).
+            </div>
+
+            <div data-check="sec-optimizacion-extremos"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN RETOS · ENTRENADOR CONTRASTIVO + 5 TRAMPAS DE EXAMEN
+               ================================================================ -->
+          <section class="seq-section" id="sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 4 · Práctica Integradora</div>
+              <h2 class="seq-section__title">
+                Entrenador Contrastivo Infinito y las 5 Trampas Clásicas de Examen
+              </h2>
+            </header>
+            <p class="quad-prose">
+              Poné a prueba tu dominio en las 8 familias de problemas de Función Cuadrática con generador infinito por semilla
+              y entrená tu ojo clínico comparando resoluciones saboteadas contra resoluciones rigurosas en la pestaña de Trampas de Examen.
+            </p>
+            <div id="quad-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN REPASO · HOJA DE SÍNTESIS IMPRIMIBLE
+               ================================================================ -->
+          <section class="seq-section" id="sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis de Estudio · Unidad 05</div>
+              <h2 class="seq-section__title">
+                Hoja de Repaso Imprimible · Función Cuadrática y Parábolas
+              </h2>
+            </header>
+
+            <div class="pr-chip-row quad-no-print">
+              <button type="button" class="pr-btn" data-print-sheet="true">
+                Imprimir / Guardar PDF de Repaso
+              </button>
+            </div>
+
+            <div class="quad-cheat-grid">
+              <article class="quad-cheat-card">
+                <h3>1. Las Tres Formas de la Parábola (a &ne; 0)</h3>
+                <p><strong>Polinómica:</strong> <span class="eq">f(x) = ax<sup>2</sup> + bx + c</span> &rarr; regala la ordenada al origen <span class="eq">f(0) = c</span>.</p>
+                <p><strong>Canónica:</strong> <span class="eq">f(x) = a(x &minus; x<sub>v</sub>)<sup>2</sup> + y<sub>v</sub></span> &rarr; regala el vértice <span class="eq">V(x<sub>v</sub>; y<sub>v</sub>)</span> y el eje <span class="eq">x = x<sub>v</sub></span>.</p>
+                <p><strong>Factorizada:</strong> <span class="eq">f(x) = a(x &minus; x<sub>1</sub>)(x &minus; x<sub>2</sub>)</span> &rarr; regala las raíces reales <span class="eq">x<sub>1</sub>, x<sub>2</sub></span> (cuando <span class="eq">&Delta; &ge; 0</span>).</p>
+              </article>
+
+              <article class="quad-cheat-card">
+                <h3>2. Puentes Rápidos hacia el Vértice</h3>
+                <p><strong>Desde Polinómica:</strong> <span class="eq">x<sub>v</sub> = &minus;b / (2a)</span> y luego <span class="eq">y<sub>v</sub> = f(x<sub>v</sub>)</span>.</p>
+                <p><strong>Desde Factorizada (Espejo):</strong> <span class="eq">x<sub>v</sub> = (x<sub>1</sub> + x<sub>2</sub>) / 2</span> y luego <span class="eq">y<sub>v</sub> = f(x<sub>v</sub>)</span>.</p>
+                <p><strong>Completar el cuadrado:</strong> Sumar y restar <span class="eq">(b/(2a))<sup>2</sup></span> adentro del corchete (neutro <span class="eq">+0</span>) y multiplicar por <span class="eq">a</span> al salir.</p>
+              </article>
+
+              <article class="quad-cheat-card">
+                <h3>3. Resolvente, Radar &Delta; y Cardano-Vieta</h3>
+                <p><strong>Fórmula Resolvente:</strong> <span class="eq">x<sub>1,2</sub> = &minus;b/(2a) &pm; &radic;&Delta;/(2a)</span> con <span class="eq">&Delta; = b<sup>2</sup> &minus; 4ac</span>.</p>
+                <p><strong>Naturaleza de raíces:</strong> <span class="eq">&Delta; &gt; 0</span> (2 reales distintas) &middot; <span class="eq">&Delta; = 0</span> (1 raíz doble, rebota) &middot; <span class="eq">&Delta; &lt; 0</span> (sin raíces reales, <span class="eq">C<sub>0</sub> = &empty;</span>).</p>
+                <p><strong>Cardano-Vieta:</strong> <span class="eq">x<sub>1</sub> + x<sub>2</sub> = &minus;b/a</span> &emsp;|&emsp; <span class="eq">x<sub>1</sub> &middot; x<sub>2</sub> = c/a</span>.</p>
+              </article>
+
+              <article class="quad-cheat-card">
+                <h3>4. Radiografía Exactas e Intersecciones</h3>
+                <p><strong>Imagen (Eje Y, siempre corchete cerrado en <span class="eq">y<sub>v</sub></span>):</strong> <span class="eq">[y<sub>v</sub>; +&infin;)</span> si <span class="eq">a &gt; 0</span>; <span class="eq">(&minus;&infin;; y<sub>v</sub>]</span> si <span class="eq">a &lt; 0</span>.</p>
+                <p><strong>Monotonía (Eje X, quiebra en <span class="eq">x<sub>v</sub></span>):</strong> Si <span class="eq">a &gt; 0</span>, <span class="eq">I<sub>&darr;</sub> = (&minus;&infin;; x<sub>v</sub>)</span> e <span class="eq">I<sub>&uarr;</sub> = (x<sub>v</sub>; +&infin;)</span>.</p>
+                <p><strong>Parábola y Recta:</strong> Igualar <span class="eq">ax<sup>2</sup> + (b &minus; m)x + (c &minus; d) = 0</span>. Es <strong>tangente</strong> si y solo si <span class="eq">&Delta;<sub>int</sub> = 0</span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

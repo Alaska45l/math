@@ -49,7 +49,7 @@ Detailed implementation status and task dependencies are maintained in [ROADMAP.
 
 ## What It Currently Offers
 
-The hub features seven laboratories:
+The hub features eight laboratories:
 
 | Laboratory | Entry Point | Focus |
 |---|---|---|
@@ -60,6 +60,7 @@ The hub features seven laboratories:
 | Absolute Value and Piecewise Functions | [valor-absoluto.html](valor-absoluto.html) | Distance, vertex, transformations, branches, domain, range, boundaries, and uniqueness. |
 | Powers and Roots | [potencias-raices.html](potencias-raices.html) | Exponents, roots, properties, domain restrictions, and relationships between representations. |
 | Exponential Functions | [exponenciales.html](exponenciales.html) | Growth and decay, base, initial factor, tables, models, and asymptotes. |
+| Quadratic Functions and Parabolas | [cuadraticas.html](cuadraticas.html) | Binomial multiplication, factoring, canonical/factored/polynomial forms, completing the square, discriminant, Vieta's formulas, line-parabola systems, and optimization. |
 
 The Units page also retains an alternative entry point in the repository: [laboratorio_unidades.html](laboratorio_unidades.html). The main hub navigation currently uses **unidades.html**.
 
@@ -129,6 +130,7 @@ Mathematical logic is separated from rendering and DOM events. In modules that r
 - **js/modules/sucesiones/**: logic, parser, diagnostics, challenges, scripts, and widgets.
 - **js/modules/valor-absoluto/**: logic, parser, diagnostics, challenges, scripts, and widgets.
 - **js/modules/exponenciales/**: lessons, components, parser, challenges, and widgets.
+- **js/modules/cuadraticas/**: AST parser, conceptual diagnostics, competency map, lessons, challenges, scripts, and widgets.
 
 Not all modules share the same lesson, persistence, or validation model yet. The future adaptive architecture must be integrated progressively, without forcing a massive migration or duplicating existing engines.
 
@@ -189,7 +191,7 @@ Do not open pages directly with file:// because native ES modules require an HTT
 
 Run the available unit tests:
 
-    node --test tests/sound.test.mjs tests/sucesiones/*.test.mjs tests/valor-absoluto/*.test.mjs
+    node --test tests/*.test.mjs tests/*/*.test.mjs
 
 With the server running, execute the Playwright checks:
 

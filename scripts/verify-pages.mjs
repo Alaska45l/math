@@ -14,6 +14,7 @@ const PAGES = [
   "valor-absoluto.html",
   "potencias-raices.html",
   "exponenciales.html",
+  "cuadraticas.html",
 ];
 
 const MIME_MAP = {

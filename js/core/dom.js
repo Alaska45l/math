@@ -67,7 +67,9 @@ export function s(tag, attrs, ...children) {
  * dot-open, dot-closed.
  */
 export function chalkIcon(type, attrs = {}) {
-  const { class: customClass, ...restAttrs } = attrs;
+  const normalizedAttrs =
+    typeof attrs === 'number' ? { width: String(attrs), height: String(attrs) } : attrs || {};
+  const { class: customClass, ...restAttrs } = normalizedAttrs;
   const fullClass = customClass
     ? `chalk-icon chalk-icon--${type} ${customClass}`
     : `chalk-icon chalk-icon--${type}`;
@@ -148,7 +150,7 @@ export function chalkIcon(type, attrs = {}) {
     icon.append(
       s('polygon', { points: '4.5,3 12.5,8 4.5,13' })
     );
-  } else if (type === 'hint') {
+  } else if (type === 'hint' || type === 'bulb') {
     icon.append(
       s('path', { d: 'M5.5 10.2A4 4 0 1 1 10.5 10.2c-.5.5-.8 1.1-.8 1.8H6.3c0-.7-.3-1.3-.8-1.8z' }),
       s('path', { d: 'M6.5 14h3' })
@@ -158,7 +160,7 @@ export function chalkIcon(type, attrs = {}) {
       s('path', { d: 'M3.2 6.5A5 5 0 1 1 4 11.5' }),
       s('path', { d: 'M2.5 3.5v3.2h3.2' })
     );
-  } else if (type === 'target') {
+  } else if (type === 'target' || type === 'compass' || type === 'warn') {
     icon.append(
       s('circle', { cx: 8, cy: 8, r: 5.2 }),
       s('circle', { cx: 8, cy: 8, r: 1.8 }),
@@ -174,6 +176,30 @@ export function chalkIcon(type, attrs = {}) {
     );
   }
   return icon;
+}
+
+/** Limpia todos los hijos de un nodo. */
+export function clear(el) {
+  if (el && typeof el.replaceChildren === 'function') {
+    el.replaceChildren();
+  }
+  return el;
+}
+
+/** Fracción horizontal accesible (.fr). */
+export function frac(top, bot) {
+  return h(
+    'span',
+    { class: 'fr' },
+    h('span', { class: 'top' }, top),
+    h('span', { class: 'bar', 'aria-hidden': 'true' }),
+    h('span', { class: 'bot' }, bot)
+  );
+}
+
+/** Formateo numérico rápido con signo menos tipográfico. */
+export function num(v) {
+  return String(v).replace('-', '\u2212');
 }
 
 /** Reemplaza todos los hijos del nodo. */

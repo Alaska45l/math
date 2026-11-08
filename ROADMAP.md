@@ -99,7 +99,7 @@ Esta sección describe capacidades presentes en el repositorio al momento de la 
 
 ### 3.1. Laboratorios publicados en el hub
 
-El hub actual ofrece siete áreas: Desigualdades, Unidades, Funciones, Sucesiones, Valor Absoluto y Funciones por Partes, Potencias y Raíces, y Exponenciales.
+El hub actual ofrece ocho áreas: Desigualdades, Unidades, Funciones, Sucesiones, Valor Absoluto y Funciones por Partes, Potencias y Raíces, Exponenciales, y Función Cuadrática y Parábolas.
 
 Entradas principales:
 - desigualdades.html
@@ -109,6 +109,7 @@ Entradas principales:
 - valor-absoluto.html
 - potencias-raices.html
 - exponenciales.html
+- cuadraticas.html
 
 Existe también laboratorio_unidades.html como entrada alternativa en el repositorio; la navegación principal utiliza unidades.html.
 
