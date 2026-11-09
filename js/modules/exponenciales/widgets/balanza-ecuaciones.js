@@ -289,7 +289,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     METHODS,
     store.get().method,
-    (m) => store.set({ method: m, eqIndex: 0, step: 0, tiltTrap: false }),
+    (m) => {
+      predictBox.notifyInteraction();
+      store.set({ method: m, eqIndex: 0, step: 0, tiltTrap: false });
+    },
     'Métodos de Resolución en ℝ',
   );
 
@@ -322,6 +325,7 @@ export function initWidget(container, options = {}) {
             'aria-pressed': String(idx === eqIndex),
             on: {
               click: () => {
+                predictBox.notifyInteraction();
                 store.set({ eqIndex: idx, step: 0, tiltTrap: false });
               },
             },
@@ -343,11 +347,13 @@ export function initWidget(container, options = {}) {
 
   // Stepper Controls
   const prevBtn = button('Paso anterior', null, () => {
+    predictBox.notifyInteraction();
     const curStep = store.get().step;
     if (curStep > 0) store.set({ step: curStep - 1, tiltTrap: false });
   });
 
   const nextBtn = button('Siguiente paso', null, () => {
+    predictBox.notifyInteraction();
     const eqList = EQUATIONS[store.get().method];
     const eq = eqList[store.get().eqIndex];
     const curStep = store.get().step;
@@ -357,10 +363,12 @@ export function initWidget(container, options = {}) {
   });
 
   const restartBtn = button('', 'reset', () => {
+    predictBox.notifyInteraction();
     store.set({ step: 0, tiltTrap: false });
   }, 'chip chip--icon-only', { title: 'Reiniciar paso a paso', 'aria-label': 'Reiniciar paso a paso' });
 
   const trapTriggerBtn = button('¿Y si acepto u = −1?', 'hint', () => {
+    predictBox.notifyInteraction();
     store.set({ tiltTrap: !store.get().tiltTrap });
   });
 

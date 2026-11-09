@@ -397,7 +397,14 @@ function buildAnswerControl(question, questionIndex) {
 
 function assess(question, value) {
   if (question.type === "choice") {
-    const correct = Number(value) === question.expected;
+    if (value === "" || value === null || value === undefined) {
+      return {
+        correct: false,
+        empty: true,
+        diagnostics: [{ id: null, message: "Seleccioná una opción antes de revisar." }],
+      };
+    }
+    const correct = value !== "" && value !== null && Number(value) === question.expected;
     return {
       correct,
       diagnostics: correct
@@ -406,6 +413,13 @@ function assess(question, value) {
     };
   }
   if (question.type === "pair") {
+    if (!Array.isArray(value) || value.some((entry) => String(entry).trim() === "")) {
+      return {
+        correct: false,
+        empty: true,
+        diagnostics: [{ id: null, message: "Completá ambos casilleros antes de revisar." }],
+      };
+    }
     const actual = value.map((entry) => Number(String(entry).replace(",", ".")));
     const correct =
       actual.every(Number.isFinite) &&
@@ -422,6 +436,13 @@ function assess(question, value) {
                 "Revisá cada valor por separado y verificá la relación en la ecuación original.",
             },
           ],
+    };
+  }
+  if (typeof value === "string" && value.trim() === "") {
+    return {
+      correct: false,
+      empty: true,
+      diagnostics: [{ id: null, message: "Ingresá una respuesta antes de revisar." }],
     };
   }
   // Evalúa mediante el motor de diagnóstico cognitivo de exponenciales
@@ -553,6 +574,11 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
 
     review.addEventListener("click", () => {
       const result = assess(question, answer.value());
+      if (result.empty) {
+        feedback.textContent = result.diagnostics[0]?.message || "Seleccioná o ingresá una respuesta antes de revisar.";
+        feedback.className = "exp-check__feedback seq-check__feedback is-warning";
+        return;
+      }
       if (result.correct) {
         const isIndependent = hintStep === 0 && !solutionRevealed;
         const status = isIndependent ? "independent" : "assisted";

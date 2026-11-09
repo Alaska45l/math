@@ -79,6 +79,7 @@ export function initWidget(container, options = {}) {
     QUADRANTS,
     store.get().quadrant,
     (q) => {
+      predictBox.notifyInteraction();
       let patch = { quadrant: q };
       if (q === 'q1') patch = { quadrant: q, k: 3, a: 2 };
       else if (q === 'q2') patch = { quadrant: q, k: 3, a: 0.5 };
@@ -114,6 +115,7 @@ export function initWidget(container, options = {}) {
   );
 
   const syncQuadrantFromSliders = () => {
+    predictBox.notifyInteraction();
     const curK = Number(kSlider.value);
     const curA = Number(aSlider.value);
     let q = 'q1';

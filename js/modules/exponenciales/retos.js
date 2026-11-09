@@ -83,6 +83,7 @@ export function makeChallenge(seed, requestedType = null) {
       const linearDiff = y1 - y0;
       return {
         ...common,
+        competencyId: "exponentials.tables_additive_vs_multiplicative",
         prompt: `Dada la tabla exponencial (0, ${y0}), (1, ${y1}), (2, ${y2}), (3, ${y3}) con paso Δx = 1 regular, ¿cuál es la razón multiplicativa constante a = y_(i+1) / y_i entre términos consecutivos?`,
         answer: a,
         displayAnswer: fmt(a),
@@ -96,7 +97,7 @@ export function makeChallenge(seed, requestedType = null) {
         },
         hints: [
           "Calculá el cociente entre dos renglones consecutivos: dividí el valor de y en x = 1 por el valor en x = 0.",
-          `Comprobá que esa división se mantenga constante: ${y2} / ${y1} = ${a} y ${y1} / ${y0} = ${a}. No restes los valores.`,
+          `Comprobá que esa división se mantenga constante calculando ${y2} / ${y1} y ${y1} / ${y0}. No restes los valores.`,
           `Ese cociente constante y_(i+1) / y_i entre términos consecutivos es exactamente la base exponencial buscada.`,
         ],
         solution: [
@@ -116,6 +117,7 @@ export function makeChallenge(seed, requestedType = null) {
       const trapVal = (k * a) ** x;
       return {
         ...common,
+        competencyId: "exponentials.neutral_and_order_of_operations",
         prompt: `Para f(x) = ${k} · ${a}ˣ, evaluá el valor exacto de f(${x}) recordando que k · aˣ ≠ (k · a)ˣ.`,
         answer: correctVal,
         displayAnswer: fmt(correctVal),
@@ -148,6 +150,7 @@ export function makeChallenge(seed, requestedType = null) {
       const correctVal = k * root;
       return {
         ...common,
+        competencyId: "exponentials.rational_density_and_base_restrictions",
         prompt: `Evaluá f(1/2) para la función f(x) = ${k} · ${base}ˣ en ℝ, expresando el exponente fraccionario como radical.`,
         answer: correctVal,
         displayAnswer: fmt(correctVal),
@@ -171,6 +174,7 @@ export function makeChallenge(seed, requestedType = null) {
       const correctVal = b ** m;
       return {
         ...common,
+        competencyId: "exponentials.base_reflection_and_asymptote",
         prompt: `Aplicá la simetría de base inversa (1/${b})ˣ = ${b}⁻ˣ para calcular el valor exacto de (1/${b})⁻${m}.`,
         answer: correctVal,
         displayAnswer: fmt(correctVal),
@@ -196,6 +200,7 @@ export function makeChallenge(seed, requestedType = null) {
       const y3 = k * a * a * a;
       return {
         ...common,
+        competencyId: "exponentials.analytical_reconstruction_two_points",
         prompt: `Una función exponencial f(x) = k · aˣ pasa por los puntos P(1; ${y1}) y Q(2; ${y2}). Hallá el valor de f(3).`,
         answer: y3,
         displayAnswer: fmt(y3),
@@ -222,6 +227,7 @@ export function makeChallenge(seed, requestedType = null) {
       const correctVal = M0 / divisor;
       return {
         ...common,
+        competencyId: "exponentials.time_models_rates_and_euler_base",
         prompt: `Una sustancia radiactiva de M₀ = ${M0} g tiene una vida media de T = ${T} minutos y sigue el modelo M(t) = ${M0} · (1/2)^(t/${T}). ¿Cuántos gramos quedan a los t = ${t} minutos?`,
         answer: correctVal,
         displayAnswer: fmt(correctVal),
@@ -247,6 +253,7 @@ export function makeChallenge(seed, requestedType = null) {
       const anchorVal = k + c;
       return {
         ...common,
+        competencyId: "exponentials.shifts_and_horizontal_asymptote",
         prompt: `Para la función desplazada f(x) = ${k} · ${a}^(x−${hVal}) + ${c}, ¿cuál es el valor del ancla f(${hVal})?`,
         answer: anchorVal,
         displayAnswer: fmt(anchorVal),
@@ -270,6 +277,7 @@ export function makeChallenge(seed, requestedType = null) {
       const rhs = 3 * powerVal;
       return {
         ...common,
+        competencyId: "exponentials.equations_three_methods_in_reals",
         prompt: `Resolvé en ℝ sin usar logaritmos sacando factor común: 2^(x+1) + 2ˣ = ${rhs}. ¿Cuánto vale x?`,
         answer: m,
         displayAnswer: fmt(m),
@@ -531,6 +539,11 @@ function createTrainer(root) {
       on: {
         click: () => {
           const raw = input.value.trim().replace(",", ".");
+          if (!raw) {
+            feedback.textContent = "Ingresá una respuesta antes de revisar.";
+            feedback.className = "exp-check__feedback pr-check__feedback is-warning";
+            return;
+          }
           const valNum = Number(raw);
           let isCorrect = Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
 
@@ -541,10 +554,10 @@ function createTrainer(root) {
               if (
                 expectedIv &&
                 userIv &&
-                expectedIv.openLeft === userIv.openLeft &&
-                expectedIv.openRight === userIv.openRight &&
-                Math.abs(expectedIv.left - userIv.left) < 1e-4 &&
-                Math.abs(expectedIv.right - userIv.right) < 1e-4
+                expectedIv.loOpen === userIv.loOpen &&
+                expectedIv.hiOpen === userIv.hiOpen &&
+                (expectedIv.lo === userIv.lo || Math.abs(expectedIv.lo - userIv.lo) < 1e-4) &&
+                (expectedIv.hi === userIv.hi || Math.abs(expectedIv.hi - userIv.hi) < 1e-4)
               ) {
                 isCorrect = true;
               }

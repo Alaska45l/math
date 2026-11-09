@@ -86,7 +86,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     MODES,
     store.get().mode,
-    (m) => store.set({ mode: m }),
+    (m) => {
+      predictBox.notifyInteraction();
+      store.set({ mode: m });
+    },
     'Modo de Análisis',
   );
 
@@ -94,7 +97,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     BASES_MIRROR,
     store.get().mirrorBase,
-    (b) => store.set({ mirrorBase: Number(b) }),
+    (b) => {
+      predictBox.notifyInteraction();
+      store.set({ mirrorBase: Number(b) });
+    },
     'Base Espejo',
   );
   const mirrorBaseGroup = board.controls.lastElementChild;
@@ -104,7 +110,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     DECAY_MASSES,
     store.get().decayMass,
-    (m) => store.set({ decayMass: m === 'both' ? 'both' : Number(m) }),
+    (m) => {
+      predictBox.notifyInteraction();
+      store.set({ decayMass: m === 'both' ? 'both' : Number(m) });
+    },
     'Masa Inicial',
   );
   const decayMassGroup = board.controls.lastElementChild;
@@ -121,6 +130,9 @@ export function initWidget(container, options = {}) {
     1,
     (v) => `${v} años`,
   );
+  yearSlider.addEventListener('input', () => {
+    predictBox.notifyInteraction();
+  });
 
   const { labelEl: probeLabel, input: probeSlider } = addRange(
     board.controls,
@@ -133,6 +145,9 @@ export function initWidget(container, options = {}) {
     0.5,
     (v) => `x = ${fmt(v)}`,
   );
+  probeSlider.addEventListener('input', () => {
+    predictBox.notifyInteraction();
+  });
 
   // 2. SVG Elements
   // Horizontal Asymptote y = 0
@@ -221,6 +236,8 @@ export function initWidget(container, options = {}) {
     setVisible(ptC, isTrio);
     setVisible(labelC, isTrio);
     setVisible(mirrorTie, isMirror);
+    setVisible(ptReflected, false);
+    setVisible(labelReflected, false);
     setVisible(vProbe, !isDecay);
 
     const rows = [];
@@ -295,8 +312,6 @@ export function initWidget(container, options = {}) {
         'Simetría de Alturas',
         `Para x = ${fmt(x)}: la curva ${a}ˣ tiene altura ${fmt(yA)}, exactamente igual a la altura de (1/${a})ˣ en x = ${fmt(-x)}.`,
       ]);
-      setVisible(ptReflected, false);
-      setVisible(labelReflected, false);
     } else if (isDecay) {
       // Radioactive decay: 1 kg vs 2 kg
       const t = state.decayYear;

@@ -113,6 +113,7 @@ export function initWidget(container, options = {}) {
     presetOptions,
     store.get().preset,
     (key) => {
+      predictBox.notifyInteraction();
       if (PRESETS[key]) {
         const p = PRESETS[key];
         markerP.setPos(p.p1.x, p.p1.y);
@@ -171,6 +172,7 @@ export function initWidget(container, options = {}) {
     radius: 7,
     snapStep: 0.5,
     onDrag: ({ x, y, phase }) => {
+      predictBox.notifyInteraction();
       store.set({ preset: 'custom', p1: { x, y } });
     },
   });
@@ -181,6 +183,7 @@ export function initWidget(container, options = {}) {
     radius: 7,
     snapStep: 0.5,
     onDrag: ({ x, y, phase }) => {
+      predictBox.notifyInteraction();
       store.set({ preset: 'custom', p2: { x, y } });
     },
   });

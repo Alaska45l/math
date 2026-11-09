@@ -121,6 +121,7 @@ export function initWidget(container, options = {}) {
     presetOptions,
     store.get().preset,
     (key) => {
+      predictBox.notifyInteraction();
       if (PRESETS[key]) {
         const p = PRESETS[key];
         store.set({ preset: key, k: p.k, a: p.a, h: p.h, c: p.c });
@@ -191,9 +192,10 @@ export function initWidget(container, options = {}) {
     (v) => `x = ${fmt(v)}`,
   );
 
-  [kSlider, aSlider, hSlider, cSlider].forEach((slider) => {
+  [kSlider, aSlider, hSlider, cSlider, probeSlider].forEach((slider) => {
     slider.addEventListener('input', () => {
-      if (store.get().preset !== 'custom') {
+      predictBox.notifyInteraction();
+      if (slider !== probeSlider && store.get().preset !== 'custom') {
         store.set({ preset: 'custom' });
       }
     });

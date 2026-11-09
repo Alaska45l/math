@@ -798,13 +798,13 @@ export function createPredictBox({ prompt, options = [], onSelect, onVerify } = 
     chalkIcon('spark', 15),
     ` Predicción previa: ${prompt}`,
   ]);
-  const optionsRow = h('div', { class: 'pr-chip-row exp-predict-options quad-predict-options' });
+  const optionsRow = h('div', { class: 'pr-chip-group chip-group exp-predict-options quad-predict-options' });
   const actionsRow = h('div', { class: 'exp-predict-actions quad-predict-actions', style: 'margin-top: 8px;' });
   const verifyBtn = h(
     'button',
     {
       type: 'button',
-      class: 'pr-chip exp-predict-verify-btn quad-predict-verify-btn',
+      class: 'chip is-active exp-predict-verify-btn quad-predict-verify-btn',
       hidden: '',
       disabled: '',
     },
@@ -851,7 +851,7 @@ export function createPredictBox({ prompt, options = [], onSelect, onVerify } = 
   };
 
   options.forEach((opt) => {
-    const btn = h('button', { type: 'button', class: 'pr-chip' }, opt.label);
+    const btn = h('button', { type: 'button', class: 'chip chip--ghost pr-chip' }, opt.label);
     btn.addEventListener('click', () => {
       selectedOpt = opt;
       verified = false;
@@ -884,6 +884,11 @@ export function createPredictBox({ prompt, options = [], onSelect, onVerify } = 
   box.append(titleEl, optionsRow, actionsRow, feedbackEl);
 
   box.verify = runVerification;
+  box.notifyInteraction = () => {
+    if (selectedOpt && !verified) {
+      runVerification(selectedOpt);
+    }
+  };
   box.getSelectedOption = () => selectedOpt;
   box.isVerified = () => verified;
 

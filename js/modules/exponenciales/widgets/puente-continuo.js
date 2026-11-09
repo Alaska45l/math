@@ -83,7 +83,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     [[1, 'k = 1'], [2, 'k = 2'], [-1, 'k = −1'], [0, 'k = 0 (degenerada)']],
     store.get().k,
-    (val) => store.set({ k: Number(val) }),
+    (val) => {
+      predictBox.notifyInteraction();
+      store.set({ k: Number(val) });
+    },
     'Coeficiente k',
   );
 
@@ -91,7 +94,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     BASES,
     store.get().a,
-    (val) => store.set({ a: Number(val) }),
+    (val) => {
+      predictBox.notifyInteraction();
+      store.set({ a: Number(val) });
+    },
     'Base de la Exponencial',
   );
 
@@ -99,7 +105,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     DENSITIES,
     store.get().density,
-    (val) => store.set({ density: Number(val) }),
+    (val) => {
+      predictBox.notifyInteraction();
+      store.set({ density: Number(val) });
+    },
     'Densidad de Muestreo',
   );
 
@@ -114,6 +123,9 @@ export function initWidget(container, options = {}) {
     0.25,
     (v) => `x = ${fmt(v)}`,
   );
+  probeSlider.addEventListener('input', () => {
+    predictBox.notifyInteraction();
+  });
 
   // 2. SVG Elements
   // Continuous curve path
@@ -190,6 +202,10 @@ export function initWidget(container, options = {}) {
   }
   plane.layers.marks.append(pointsGroup);
 
+  // Pink crosses marking domain breaks when a < 0 at fractional points
+  const domainBreakCrosses = s('g', { class: 'exp-domain-breaks', visibility: 'hidden' });
+  plane.layers.marks.append(domainBreakCrosses);
+
   // Probe indicator
   const probeGroup = s('g', { class: 'exp-probe-marker' });
   const probeLine = s('line', {
@@ -232,6 +248,7 @@ export function initWidget(container, options = {}) {
 
   // 3. Render pipeline
   const render = (state) => {
+    updateKChips(state.k);
     updateBaseChips(state.a);
     updateDensityChips(state.density);
     probeSlider.value = String(state.probeX);
@@ -250,14 +267,61 @@ export function initWidget(container, options = {}) {
     // Hide all discrete dots initially
     pointDots.forEach((d) => setVisible(d, false));
 
+    // Fractional domain break crosses for a < 0
+    domainBreakCrosses.replaceChildren();
+    if (a < 0 && (density === 2 || density === 3)) {
+      setVisible(domainBreakCrosses, true);
+      const fracStep = density === 2 ? 0.5 : 0.25;
+      for (let x = -3; x <= 3.01; x += fracStep) {
+        const isInt = Math.abs(x - Math.round(x)) < 1e-6;
+        if (!isInt) {
+          const cx = plane.sx(x);
+          const cy = plane.sy(0);
+          const g = s('g', { transform: `translate(${cx}, ${cy})` });
+          const p = s('path', {
+            d: 'M -4 -4 L 4 4 M 4 -4 L -4 4',
+            stroke: 'var(--pink)',
+            'stroke-width': 2,
+            'stroke-linecap': 'round',
+          });
+          g.append(p);
+          domainBreakCrosses.append(g);
+        }
+      }
+    } else {
+      setVisible(domainBreakCrosses, false);
+    }
+
     // Handle base cases
-    let evalStatus = 'valid'; // 'valid' | 'invalid_neg' | 'invalid_zero' | 'degenerate_one'
+    let evalStatus = 'valid'; // 'valid' | 'invalid_neg' | 'invalid_zero' | 'degenerate_one' | 'degenerate_zero_k'
     let probeY = null;
 
-    if (a > 0 && a !== 1) {
+    if (k === 0) {
+      evalStatus = 'degenerate_zero_k';
+      // Degenerate line y = 0
+      constantLine.setAttribute('y1', String(plane.sy(0)));
+      constantLine.setAttribute('y2', String(plane.sy(0)));
+      if (density === 4) {
+        setVisible(constantLine, true);
+      } else {
+        let step = density === 1 ? 1 : density === 2 ? 0.5 : 0.25;
+        let dotIdx = 0;
+        for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
+          const dot = pointDots[dotIdx++];
+          dot.setAttribute('cx', String(plane.sx(x)));
+          dot.setAttribute('cy', String(plane.sy(0)));
+          dot.setAttribute('r', '4.5');
+          dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
+          dot.setAttribute('stroke', 'var(--bg)');
+          dot.setAttribute('stroke-width', '1.5');
+          setVisible(dot, true);
+        }
+      }
+      probeY = 0;
+    } else if (a > 0 && a !== 1) {
       evalStatus = 'valid';
       // Continuous curve in density 4 or background
-      const pathD = plane.fnPath((x) => Math.pow(a, x), -3.5, 3.5);
+      const pathD = plane.fnPath((x) => k * Math.pow(a, x), -3.5, 3.5);
       curvePath.setAttribute('d', pathD);
       setVisible(curvePath, density === 4);
 
@@ -271,7 +335,7 @@ export function initWidget(container, options = {}) {
       if (step > 0) {
         let dotIdx = 0;
         for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
-          const y = Math.pow(a, x);
+          const y = k * Math.pow(a, x);
           if (y >= -4 && y <= 8) {
             const dot = pointDots[dotIdx++];
             dot.setAttribute('cx', String(plane.sx(x)));
@@ -285,9 +349,11 @@ export function initWidget(container, options = {}) {
         }
       }
 
-      probeY = Math.pow(a, pxVal);
+      probeY = k * Math.pow(a, pxVal);
     } else if (a === 1) {
       evalStatus = 'degenerate_one';
+      constantLine.setAttribute('y1', String(plane.sy(k)));
+      constantLine.setAttribute('y2', String(plane.sy(k)));
       let step = 1;
       if (density === 1) step = 1;
       else if (density === 2) step = 0.5;
@@ -299,7 +365,7 @@ export function initWidget(container, options = {}) {
         for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
           const dot = pointDots[dotIdx++];
           dot.setAttribute('cx', String(plane.sx(x)));
-          dot.setAttribute('cy', String(plane.sy(1)));
+          dot.setAttribute('cy', String(plane.sy(k)));
           dot.setAttribute('r', '4.5');
           dot.setAttribute('fill', step === 1 ? 'var(--blue)' : 'var(--yellow)');
           dot.setAttribute('stroke', 'var(--bg)');
@@ -310,7 +376,7 @@ export function initWidget(container, options = {}) {
       } else {
         setVisible(constantLine, true);
       }
-      probeY = 1;
+      probeY = k;
     } else if (a === 0) {
       evalStatus = 'invalid_zero';
       let step = 1;
@@ -352,7 +418,7 @@ export function initWidget(container, options = {}) {
         for (let x = -3; x <= 3.01 && dotIdx < maxDiscrete; x += step) {
           const isInt = Math.abs(x - Math.round(x)) < 1e-6;
           if (isInt) {
-            const y = Math.pow(a, Math.round(x));
+            const y = k * Math.pow(a, Math.round(x));
             if (y >= -4 && y <= 8) {
               const dot = pointDots[dotIdx++];
               dot.setAttribute('cx', String(plane.sx(x)));
@@ -372,7 +438,7 @@ export function initWidget(container, options = {}) {
       } else {
         // Continuous mode: show only valid integer points
         for (let x = -3; x <= 3 && dotIdx < maxDiscrete; x += 1) {
-          const y = Math.pow(a, x);
+          const y = k * Math.pow(a, x);
           if (y >= -4 && y <= 8) {
             const dot = pointDots[dotIdx++];
             dot.setAttribute('cx', String(plane.sx(x)));
@@ -388,7 +454,7 @@ export function initWidget(container, options = {}) {
 
       // Check if probe x is an integer
       if (Math.abs(pxVal - Math.round(pxVal)) < 1e-9) {
-        probeY = Math.pow(a, Math.round(pxVal));
+        probeY = k * Math.pow(a, Math.round(pxVal));
       } else {
         probeY = null;
       }
@@ -445,10 +511,22 @@ export function initWidget(container, options = {}) {
 
     // Readout rows
     const rows = [];
-    if (evalStatus === 'valid') {
+    if (evalStatus === 'degenerate_zero_k') {
+      rows.push([
+        'Colapso por Coeficiente k = 0',
+        'Con k = 0, la función f(x) = 0 · aˣ = 0 se anula para todo x ∈ ℝ: es la recta horizontal degenerada y = 0. Por eso, la definición formal exige estrictamente k ∈ ℝ − {0}: sin coeficiente no nulo no existe comportamiento exponencial ni asíntota.',
+      ]);
+      rows.push([
+        'Sonda Actual',
+        `Para cualquier x, f(${fmt(pxVal)}) = 0. Carece de crecimiento, asíntota y base invertible.`,
+      ]);
+    } else if (evalStatus === 'valid') {
+      const kStr = k === 1 ? '' : k === -1 ? '−' : `${k} · `;
+      const aStr = a === 0.5 ? '(1/2)' : String(a);
+      const imStr = k > 0 ? '(0; +∞)' : '(−∞; 0)';
       rows.push([
         'Estado del Dominio',
-        `Función Exponencial Válida en ℝ: f(x) = ${a === 0.5 ? '(1/2)' : a}ˣ. Dominio = ℝ, Imagen = (0; +∞).`,
+        `Función Exponencial Válida en ℝ: f(x) = ${kStr}${aStr}ˣ. Dominio = ℝ, Imagen = ${imStr}.`,
       ]);
       rows.push([
         'Densificación de la Curva',
@@ -462,7 +540,7 @@ export function initWidget(container, options = {}) {
       ]);
       rows.push([
         'Sonda Actual',
-        `Para x = ${fmt(pxVal)}: f(${fmt(pxVal)}) = ${fmt(probeY)}. Curva estrictamente ${a > 1 ? 'creciente' : 'decreciente'}.`,
+        `Para x = ${fmt(pxVal)}: f(${fmt(pxVal)}) = ${fmt(probeY)}. Curva estrictamente ${(k > 0 ? a > 1 : a < 1) ? 'creciente' : 'decreciente'}.`,
       ]);
     } else if (evalStatus === 'invalid_neg') {
       rows.push([

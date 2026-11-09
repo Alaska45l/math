@@ -98,7 +98,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     presetOptions,
     store.get().presetKey,
-    (key) => store.set({ presetKey: key }),
+    (key) => {
+      predictBox.notifyInteraction();
+      store.set({ presetKey: key });
+    },
     'Datasets Canónicos',
   );
 
@@ -112,7 +115,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     modeOptions,
     store.get().analysisMode,
-    (mode) => store.set({ analysisMode: mode }),
+    (mode) => {
+      predictBox.notifyInteraction();
+      store.set({ analysisMode: mode });
+    },
     'Herramienta Analítica',
   );
 
@@ -127,6 +133,9 @@ export function initWidget(container, options = {}) {
     1,
     (v) => `${v} puntos`,
   );
+  rangeInput.addEventListener('input', () => {
+    predictBox.notifyInteraction();
+  });
 
   // 2. SVG Scene Setup (Left: Table + Arcs, Right: Mini Coordinate Plane)
   const scene = board.drawing;
@@ -222,22 +231,22 @@ export function initWidget(container, options = {}) {
   // Second difference badge (between arcs 0 and 1)
   const secDiffGroup = s('g', { class: 'exp-detective-sec-diff' });
   const secPath = s('path', {
-    d: 'M 285 112 Q 310 140 285 168',
+    d: 'M 275 112 Q 298 140 275 168',
     fill: 'none',
     stroke: 'var(--pink)',
     'stroke-width': 2,
   });
   const secBadgeBg = s('rect', {
-    x: 255,
+    x: 238,
     y: 129,
-    width: 65,
+    width: 62,
     height: 22,
     fill: 'var(--panel)',
     stroke: 'var(--pink)',
     rx: 6,
   });
   const secBadgeText = s('text', {
-    x: 287,
+    x: 269,
     y: 144,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
@@ -499,17 +508,30 @@ export function initWidget(container, options = {}) {
     curvePath.setAttribute('d', curveD);
 
     if (n === 2) {
-      // Draw competing candidate line passing through first 2 points
-      const m = (preset.ys[1] - preset.ys[0]) / (preset.xs[1] - preset.xs[0]);
+      // Draw competing candidate trajectory passing through first 2 points
+      const x0 = preset.xs[0];
+      const y0 = preset.ys[0];
+      const x1 = preset.xs[1];
+      const y1 = preset.ys[1];
+      const m = (y1 - y0) / (x1 - x0);
+
       const linePts = [];
       for (let sIdx = 0; sIdx <= numSamples; sIdx++) {
         const cx = minX + (sIdx / numSamples) * (maxX - minX);
-        const cy = preset.ys[0] + m * (cx - preset.xs[0]);
+        let cy = 0;
+        if (preset.type === 'linear') {
+          // If real model is a line, draw a competing non-linear trajectory (parabola) through (x0, y0) and (x1, y1)
+          const curvature = 0.08;
+          cy = y0 + m * (cx - x0) + curvature * (cx - x0) * (cx - x1);
+        } else {
+          // If real model is curved, draw a competing straight line through (x0, y0) and (x1, y1)
+          cy = y0 + m * (cx - x0);
+        }
         linePts.push(`${sIdx === 0 ? 'M' : 'L'} ${mapX(cx).toFixed(1)} ${mapY(cy).toFixed(1)}`);
       }
       candidateLinePath.setAttribute('d', linePts.join(' '));
       setVisible(candidateLinePath, true);
-      setText(planeLegend, `Con 2 puntos: ¿Recta (verde) o Curva? ¡Falta el 3°!`);
+      setText(planeLegend, `Con 2 puntos: ¿Recta o Curva? ¡Falta el 3°!`);
     } else {
       setVisible(candidateLinePath, false);
       setText(planeLegend, preset.model);

@@ -59,7 +59,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     modeOptions,
     store.get().mode,
-    (m) => store.set({ mode: m }),
+    (m) => {
+      predictBox.notifyInteraction();
+      store.set({ mode: m });
+    },
     'Experimento',
   );
 
@@ -71,7 +74,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     fallacyOptions,
     store.get().showFallacy,
-    (f) => store.set({ showFallacy: f }),
+    (f) => {
+      predictBox.notifyInteraction();
+      store.set({ showFallacy: f });
+    },
     'Trampa de Examen',
   );
 
@@ -86,6 +92,9 @@ export function initWidget(container, options = {}) {
     1,
     (v) => `${v} h`,
   );
+  timeSlider.addEventListener('input', () => {
+    predictBox.notifyInteraction();
+  });
 
   // 2. SVG Scene Layout
   // Left: Petri Dish (x: 20 to 240)
@@ -181,13 +190,10 @@ export function initWidget(container, options = {}) {
   );
 
   // Axes ticks and grid
-  const yMax = 100;
   const tMax = 10;
-
   const mapT = (t) => graphX + 40 + (t / tMax) * (graphW - 60);
-  const mapY = (y) => graphY + graphH - 30 - (Math.min(y, yMax) / yMax) * (graphH - 50);
 
-  // Grid lines
+  // Time grid lines (T axis)
   for (let t = 0; t <= tMax; t++) {
     const gx = mapT(t);
     graphGroup.append(
@@ -209,26 +215,9 @@ export function initWidget(container, options = {}) {
     );
   }
 
-  for (let v = 0; v <= yMax; v += 25) {
-    const gy = mapY(v);
-    graphGroup.append(
-      s('line', {
-        x1: graphX + 35,
-        y1: gy,
-        x2: graphX + graphW - 15,
-        y2: gy,
-        stroke: 'var(--border)',
-        opacity: 0.25,
-      }),
-      s('text', {
-        x: graphX + 30,
-        y: gy + 4,
-        class: 'exp-svg-label',
-        'text-anchor': 'end',
-        'font-size': '11px',
-      }, String(v)),
-    );
-  }
+  // Dynamic Y grid group (populated in render)
+  const yGridGroup = s('g', { class: 'exp-y-grid' });
+  graphGroup.append(yGridGroup);
 
   // Curve 1: f(t) = 2^t (Blue)
   const curve1 = s('path', {
@@ -276,28 +265,6 @@ export function initWidget(container, options = {}) {
   const labelFallacy = s('text', { class: 'exp-svg-label', 'font-size': '11px', fill: 'var(--pink)' }, '');
   graphGroup.append(label1, label3, labelFallacy);
 
-  // Pre-generate curve paths
-  const samples = 80;
-  const path1 = [];
-  const path3 = [];
-  const pathF = [];
-  for (let sIdx = 0; sIdx <= samples; sIdx++) {
-    const curT = (sIdx / samples) * tMax;
-    const yVal1 = Math.pow(2, curT);
-    const yVal3 = 3 * Math.pow(2, curT);
-    const yValF = Math.pow(6, curT);
-
-    const sx = mapT(curT).toFixed(1);
-    path1.push(`${sIdx === 0 ? 'M' : 'L'} ${sx} ${mapY(yVal1).toFixed(1)}`);
-    path3.push(`${sIdx === 0 ? 'M' : 'L'} ${sx} ${mapY(yVal3).toFixed(1)}`);
-    if (yValF <= yMax * 1.5) {
-      pathF.push(`${pathF.length === 0 ? 'M' : 'L'} ${sx} ${mapY(yValF).toFixed(1)}`);
-    }
-  }
-  curve1.setAttribute('d', path1.join(' '));
-  curve3.setAttribute('d', path3.join(' '));
-  curveFallacy.setAttribute('d', pathF.join(' '));
-
   // 3. Render pipeline
   const render = (state) => {
     updateModeChips(state.mode);
@@ -308,6 +275,65 @@ export function initWidget(container, options = {}) {
     const y1 = Math.pow(2, t);
     const y3 = 3 * Math.pow(2, t);
     const yF = Math.pow(6, t);
+
+    // Dynamic Y scale according to time t, preventing curve flattening at the ceiling
+    const dynamicYMax = Math.max(100, Math.ceil((3 * Math.pow(2, t)) / 50) * 50);
+    const mapY = (y) => graphY + graphH - 30 - (Math.min(y, dynamicYMax) / dynamicYMax) * (graphH - 50);
+
+    // Update dynamic Y grid
+    yGridGroup.replaceChildren();
+    const tickStep =
+      dynamicYMax <= 120
+        ? 25
+        : dynamicYMax <= 300
+        ? 50
+        : dynamicYMax <= 800
+        ? 150
+        : dynamicYMax <= 1600
+        ? 300
+        : 600;
+    for (let v = 0; v <= dynamicYMax; v += tickStep) {
+      const gy = mapY(v);
+      yGridGroup.append(
+        s('line', {
+          x1: graphX + 35,
+          y1: gy,
+          x2: graphX + graphW - 15,
+          y2: gy,
+          stroke: 'var(--border)',
+          opacity: 0.25,
+        }),
+        s('text', {
+          x: graphX + 30,
+          y: gy + 4,
+          class: 'exp-svg-label',
+          'text-anchor': 'end',
+          'font-size': '11px',
+        }, String(v)),
+      );
+    }
+
+    // Dynamic curve paths
+    const samples = 80;
+    const path1 = [];
+    const path3 = [];
+    const pathF = [];
+    for (let sIdx = 0; sIdx <= samples; sIdx++) {
+      const curT = (sIdx / samples) * tMax;
+      const yVal1 = Math.pow(2, curT);
+      const yVal3 = 3 * Math.pow(2, curT);
+      const yValF = Math.pow(6, curT);
+
+      const sx = mapT(curT).toFixed(1);
+      path1.push(`${sIdx === 0 ? 'M' : 'L'} ${sx} ${mapY(yVal1).toFixed(1)}`);
+      path3.push(`${sIdx === 0 ? 'M' : 'L'} ${sx} ${mapY(yVal3).toFixed(1)}`);
+      if (yValF <= dynamicYMax * 1.5) {
+        pathF.push(`${pathF.length === 0 ? 'M' : 'L'} ${sx} ${mapY(yValF).toFixed(1)}`);
+      }
+    }
+    curve1.setAttribute('d', path1.join(' '));
+    curve3.setAttribute('d', path3.join(' '));
+    curveFallacy.setAttribute('d', pathF.join(' '));
 
     // Visibility of curves based on mode
     const show1 = state.mode === 1 || state.mode === 'both';
@@ -323,8 +349,8 @@ export function initWidget(container, options = {}) {
     timeProbeLine.setAttribute('x1', String(px));
     timeProbeLine.setAttribute('x2', String(px));
 
-    const isOver3 = y3 > yMax;
-    const isOverF = yF > yMax;
+    const isOver3 = y3 > dynamicYMax;
+    const isOverF = yF > dynamicYMax;
 
     const text1 = `2^${t} = ${y1}`;
     const text3 = isOver3 ? `↑ 3·2^${t} = ${y3} (fuera de escala)` : `3·2^${t} = ${y3}`;

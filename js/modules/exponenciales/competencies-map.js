@@ -203,8 +203,23 @@ export const EXP_DIAGNOSTIC_TAXONOMY = Object.freeze({
   },
 });
 
+const COMPETENCY_ALIASES = Object.freeze({
+  'exponentials.table_discrimination_additive_vs_multiplicative': 'exponentials.tables_additive_vs_multiplicative',
+  'exponentials.neutral_exponent_zero_and_hierarchy_k_a_x': 'exponentials.neutral_and_order_of_operations',
+  'exponentials.continuous_bridge_rational_density_and_base_restrictions': 'exponentials.rational_density_and_base_restrictions',
+  'exponentials.base_reflection_symmetry_and_decay': 'exponentials.base_reflection_and_asymptote',
+  'exponentials.four_quadrants_k_a_and_monotonicity': 'exponentials.four_quadrants_monotonicity',
+  'exponentials.two_point_reconstruction': 'exponentials.analytical_reconstruction_two_points',
+  'exponentials.time_models_percentages_and_base_e': 'exponentials.time_models_rates_and_euler_base',
+  'exponentials.shifts_and_open_asymptote': 'exponentials.shifts_and_horizontal_asymptote',
+  'exponentials.full_function_analysis': 'exponentials.full_analytical_study',
+  'exponentials.exponential_equations_three_methods': 'exponentials.equations_three_methods_in_reals',
+});
+
 export function getCompetencyById(id) {
-  return EXP_COMPETENCIES.find((c) => c.id === id) || null;
+  if (!id) return null;
+  const canonicalId = COMPETENCY_ALIASES[id] || id;
+  return EXP_COMPETENCIES.find((c) => c.id === canonicalId) || null;
 }
 
 export function getCompetenciesForSection(sectionId) {

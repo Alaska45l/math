@@ -119,7 +119,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     presetOptions,
     store.get().preset,
-    (key) => store.set({ preset: key }),
+    (key) => {
+      predictBox.notifyInteraction();
+      store.set({ preset: key });
+    },
     'Funciones para Analizar',
   );
 
@@ -127,7 +130,10 @@ export function initWidget(container, options = {}) {
     board.controls,
     HIGHLIGHTS,
     store.get().highlight,
-    (h) => store.set({ highlight: h }),
+    (h) => {
+      predictBox.notifyInteraction();
+      store.set({ highlight: h });
+    },
     'Enfocar en Gráfica',
   );
 

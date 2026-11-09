@@ -236,6 +236,7 @@ export function initWidget(container, options = {}) {
     presetOptions,
     store.get().presetKey,
     (key) => {
+      predictBox.notifyInteraction();
       const nextModel = PRESETS[key] || PRESETS.talio;
       // Reconfigure plane limits
       plane.cfg.xMax = nextModel.tMax;
@@ -263,12 +264,14 @@ export function initWidget(container, options = {}) {
   );
 
   timeSlider.addEventListener('input', () => {
+    predictBox.notifyInteraction();
     const curModel = PRESETS[store.get().presetKey] || PRESETS.talio;
     timeOutput.textContent = `${timeSlider.value} ${curModel.unitT}`;
   });
 
   // Target Button
   const targetBtn = button('Ir al punto clave', 'target', () => {
+    predictBox.notifyInteraction();
     const curModel = PRESETS[store.get().presetKey];
     store.set({ t: curModel.targetT });
   });
