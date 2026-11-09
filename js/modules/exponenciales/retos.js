@@ -537,27 +537,26 @@ function createTrainer(root) {
     // Modo seguro sin localStorage
   }
 
-  let problemIndex = 0;
-  const problemsState = {};
-  let current = makeChallenge(seed, null, problemIndex);
   let failStreak = 0;
   let successStreak = 0;
-  let hintStep = 0;
-  let solutionRevealed = false;
-  let contrastSubIndex = 0;
+  const problemsState = {};
 
   const contrastPairs = [
     {
-      label: "Par contrastivo: Salto aditivo vs razón multiplicativa",
+      label: "Salto aditivo vs razón multiplicativa",
       types: ["razon_tabla_vs_salto", "evaluacion_k_a_x"],
     },
     {
-      label: "Par contrastivo: Ancla puntual vs Intervalo asintótico",
+      label: "Ancla puntual vs Intervalo asintótico",
       types: ["asintota_imagen_desplazamiento", "imagen_intervalo_asintota"],
     },
     {
-      label: "Par contrastivo: Reconstrucción numérica vs Fórmula analítica",
+      label: "Reconstrucción numérica vs Fórmula analítica",
       types: ["reconstruccion_dos_puntos", "formula_desde_dos_puntos"],
+    },
+    {
+      label: "Base inversa/espejo vs Balanza de ecuaciones",
+      types: ["espejo_base_inversa", "ecuacion_igualacion_factor_comun"],
     },
   ];
 
@@ -566,25 +565,35 @@ function createTrainer(root) {
     min: "0",
     step: "1",
     value: String(seed),
+    class: "exp-seed-input",
     "aria-label": "Semilla del generador",
+    style: { width: "120px" },
   });
 
   const typeSelect = h(
     "select",
     { "aria-label": "Familia de reto" },
     [
-      ["aleatorio", "Aleatorio"],
-      ["adaptativo", "Inteligente (Reforzar mis puntos débiles)"],
-      ["contrastivo", "Pares Contrastivos (Discriminación conceptual)"],
+      ["aleatorio", "Todas las familias (Aleatorio)"],
+      ["adaptativo", "Modo Adaptativo (Refuerzo de errores)"],
+      ["contrastivo", "Modo Contrastivo (Pares conceptuales)"],
       ...CHALLENGE_TYPES.map((type) => [type, type.replaceAll("_", " ")]),
     ].map(([value, label]) => h("option", { value }, label)),
   );
 
-  const problemSelector = h("div", {
-    class: "exp-problem-selector pr-chip-row",
-    role: "tablist",
-    "aria-label": "Batería de retos de la semilla",
-  });
+  const seedField = h(
+    "label",
+    { class: "exp-trainer-field" },
+    h("span", null, "Semilla PRNG"),
+    seedInput,
+  );
+
+  const typeField = h(
+    "label",
+    { class: "exp-trainer-field exp-trainer-field--grow" },
+    h("span", null, "Modo / Familia de reto"),
+    typeSelect,
+  );
 
   const copySeedText = h("span", { class: "copy-seed-text" }, " Copiar semilla");
   const copySeedBtn = h(
@@ -614,9 +623,9 @@ function createTrainer(root) {
     "button",
     {
       type: "button",
-      class: "btn btn--ghost btn--icon-only",
-      "aria-label": "Generar nueva semilla",
-      title: "Generar nueva semilla",
+      class: "btn btn--ghost",
+      "aria-label": "Nueva Semilla (Semilla aleatoria)",
+      title: "Nueva Semilla (Semilla aleatoria)",
       on: {
         click: () => {
           seed = Math.floor(Math.random() * 1000000) >>> 0;
@@ -624,370 +633,416 @@ function createTrainer(root) {
           try {
             localStorage.setItem("exponenciales:seed", String(seed));
           } catch {}
-          contrastSubIndex = 0;
-          problemIndex = 0;
-          newChallenge();
+          renderCascade();
         },
       },
     },
     chalkIcon("reset"),
+    " ↻ Nueva Semilla (Semilla aleatoria)",
   );
 
-  const seedLabel = h(
-    "label",
-    { class: "exp-control pr-control" },
-    h("span", null, "Semilla PRNG"),
-    seedInput,
+  const toolbarBtns = h(
+    "div",
+    { class: "exp-trainer-toolbar__btns" },
+    randomizeBtn,
+    copySeedBtn,
   );
 
-  const typeLabel = h(
-    "label",
-    { class: "exp-control pr-control" },
-    h("span", null, "Familia de reto"),
-    typeSelect,
+  const progressPill = h("div", { class: "exp-trainer-progress-pill" });
+  const meta = h("p", { class: "muted exp-muted pr-muted", style: { display: "none" } });
+
+  const toolbar = h(
+    "div",
+    { class: "exp-trainer-toolbar" },
+    seedField,
+    typeField,
+    toolbarBtns,
+    progressPill,
   );
 
   const adaptiveNote = h("div", { class: "exp-challenge__adaptive-note", hidden: true });
-  const prompt = h("p", { class: "exp-challenge__prompt pr-challenge__prompt" });
-  const input = h("input", {
-    type: "text",
-    inputmode: "text",
-    autocomplete: "off",
-    "aria-label": "Tu respuesta al reto",
-  });
-  const preview = h(
-    "p",
-    { class: "exp-check__preview pr-check__preview", "aria-live": "polite" },
-    "Interpretado como: —",
-  );
-  const feedback = h("p", {
-    class: "exp-check__feedback pr-check__feedback",
-    "aria-live": "polite",
-  });
-  const hintText = h("p", { class: "exp-check__hint pr-check__hint", hidden: true });
-  const solution = h("div", { class: "exp-check__solution pr-check__solution", hidden: true });
-  const meta = h("p", { class: "muted exp-muted pr-muted" });
+  const cascadeList = h("ol", { class: "exp-challenges-cascade seq-check" });
 
-  const revise = h(
-    "button",
-    {
-      type: "button",
-      class: "btn",
-      on: {
-        click: () => {
-          const raw = input.value.trim();
-          if (!raw) {
-            feedback.textContent = "Ingresá una respuesta antes de revisar.";
-            feedback.className = "exp-check__feedback pr-check__feedback is-warning";
-            return;
-          }
-          const valNum = Number(raw.replace(",", "."));
-          let isCorrect = typeof current.answer === "number" && Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
-
-          let intervalSyntaxError = null;
-          if (!isCorrect && typeof current.answer === "string") {
-            try {
-              const expectedIv = parseIntervalExactas(current.answer);
-              const userIv = parseIntervalExactas(raw);
-              if (
-                expectedIv &&
-                userIv &&
-                expectedIv.loOpen === userIv.loOpen &&
-                expectedIv.hiOpen === userIv.hiOpen &&
-                (expectedIv.lo === userIv.lo || Math.abs(expectedIv.lo - userIv.lo) < 1e-4) &&
-                (expectedIv.hi === userIv.hi || Math.abs(expectedIv.hi - userIv.hi) < 1e-4)
-              ) {
-                isCorrect = true;
-              }
-            } catch (err) {
-              if (err && err.code === "missing_semicolon") {
-                intervalSyntaxError = "En Exactas los intervalos se separan con punto y coma ';' (la coma se reserva para decimales).";
-              }
-            }
-            if (!isCorrect) {
-              try {
-                if (equivalentExp(raw, current.answer)) {
-                  isCorrect = true;
-                }
-              } catch {}
-            }
-          }
-
-          const diagnosis = diagnoseExp(raw, {
-            ...current.spec,
-            expected: current.answer,
-          });
-
-          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
-
-          if (isCorrect) {
-            const wasAssisted = hintStep > 0 || solutionRevealed;
-            const mode = wasAssisted ? "assisted" : "independent";
-            feedback.textContent = wasAssisted
-              ? `Correcto: ${current.displayAnswer}. Resuelto con apoyo (asistido).`
-              : `Correcto: ${current.displayAnswer}. Resuelto de forma independiente.`;
-            feedback.className = `exp-check__feedback pr-check__feedback is-correct is-${mode} check-feedback--${mode} state-solved`;
-            saveProgress("challenge:last", { seed, type: current.type, mode, solved: true });
-
-            if (current.competencyId) {
-              recordCompetencyAttempt({
-                competencyId: current.competencyId,
-                correct: true,
-                mode,
-              });
-            }
-
-            input.disabled = true;
-            revise.disabled = true;
-            reveal.disabled = true;
-            hint.disabled = true;
-
-            problemsState[pKey] = {
-              solved: true,
-              mode,
-              userAnswer: raw,
-              previewText: preview.textContent,
-              feedbackText: feedback.textContent,
-              feedbackClass: feedback.className,
-              hintStep,
-              solutionRevealed: false,
-            };
-            updateProblemSelector();
-
-            if (wasAssisted) {
-              if (failStreak > 0) {
-                playScript([STREAK_REACTIONS.recovered]);
-              }
-            } else {
-              if (failStreak > 0) {
-                playScript([STREAK_REACTIONS.recovered]);
-                successStreak = 1;
-              } else {
-                successStreak++;
-                if (successStreak >= 3) {
-                  playScript([STREAK_REACTIONS.flawlessRun]);
-                } else {
-                  playScript([STREAK_REACTIONS.firstTry]);
-                }
-              }
-            }
-            failStreak = 0;
-          } else {
-            successStreak = 0;
-            failStreak++;
-            const wasAssisted = hintStep > 0 || solutionRevealed;
-            if (current.competencyId) {
-              recordCompetencyAttempt({
-                competencyId: current.competencyId,
-                correct: false,
-                mode: wasAssisted ? "assisted" : "independent",
-                diagnosticId: diagnosis?.id || null,
-              });
-            }
-            feedback.textContent =
-              diagnosis?.message ||
-              intervalSyntaxError ||
-              "Todavía no coincide. Consultá una pista y revisá las operaciones paso a paso.";
-            feedback.className = "exp-check__feedback pr-check__feedback is-error";
-
-            problemsState[pKey] = {
-              solved: false,
-              mode: null,
-              userAnswer: raw,
-              previewText: preview.textContent,
-              feedbackText: feedback.textContent,
-              feedbackClass: feedback.className,
-              hintStep,
-              solutionRevealed: false,
-            };
-
-            const id = diagnosis?.id;
-            if (id && DIAGNOSE_REACTIONS[id]) {
-              playScript([DIAGNOSE_REACTIONS[id]]);
-            } else if (failStreak >= 2) {
-              playScript([STREAK_REACTIONS.repeatedError]);
-            }
-          }
-        },
-      },
-    },
-    chalkIcon("check"),
-    " Revisar",
-  );
-
-  const hint = h(
-    "button",
-    {
-      type: "button",
-      class: "btn btn--ghost",
-      on: {
-        click: () => {
-          hintStep = Math.min(3, hintStep + 1);
-          hintText.hidden = false;
-          hintText.textContent = `Pista ${fmt(hintStep)} de 3: ${current.hints[hintStep - 1]}`;
-
-          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
-          if (!problemsState[pKey]) problemsState[pKey] = {};
-          problemsState[pKey].hintStep = hintStep;
-          problemsState[pKey].hintText = hintText.textContent;
-
-          playScript([
-            {
-              pose: ["base", "pensativa", "explicando"][hintStep - 1],
-              tag: `Pista ${fmt(hintStep)} de 3`,
-              html: current.hints[hintStep - 1],
-            },
-          ]);
-        },
-      },
-    },
-    chalkIcon("hint"),
-    " Pista (1/3)",
-  );
-
-  const reveal = h(
-    "button",
-    {
-      type: "button",
-      class: "btn btn--ghost",
-      on: {
-        click: () => {
-          solutionRevealed = true;
-          successStreak = 0;
-          solution.hidden = false;
-          input.disabled = true;
-          revise.disabled = true;
-          reveal.disabled = true;
-          hint.disabled = true;
-
-          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
-          problemsState[pKey] = {
-            solved: false,
-            mode: null,
-            userAnswer: input.value,
-            previewText: preview.textContent,
-            feedbackText: "",
-            feedbackClass: "",
-            hintStep,
-            solutionRevealed: true,
-          };
-
-          mount(
-            solution,
-            h("strong", null, "Resolución paso a paso"),
-            h(
-              "ol",
-              null,
-              ...current.solution.map((step) =>
-                h("li", null, ...inlineMathNodes(step)),
-              ),
-            ),
-          );
-          playScript([
-            STREAK_REACTIONS.showSolution,
-            STREAK_REACTIONS.solutionAfter,
-          ]);
-        },
-      },
-    },
-    chalkIcon("book"),
-    " ¡Estoy atorado! Mostrame la solución",
-  );
-
-  const prevRetoBtn = h(
-    "button",
-    {
-      type: "button",
-      class: "btn btn--ghost",
-      on: {
-        click: () => {
-          if (typeSelect.value !== "contrastivo" && problemIndex > 0) {
-            problemIndex -= 1;
-            newChallenge();
-          }
-        },
-      },
-    },
-    chalkIcon("compass"),
-    " Reto anterior",
-  );
-
-  const next = h(
-    "button",
-    {
-      type: "button",
-      class: "btn btn--ghost",
-      on: {
-        click: () => {
-          if (typeSelect.value === "contrastivo") {
-            if (contrastSubIndex === 0) {
-              contrastSubIndex = 1;
-            } else {
-              contrastSubIndex = 0;
-              seed = (seed + 1) >>> 0;
-              problemIndex = 0;
-              seedInput.value = String(seed);
-              try {
-                localStorage.setItem("exponenciales:seed", String(seed));
-              } catch {}
-            }
-          } else {
-            if (problemIndex < 7) {
-              problemIndex += 1;
-            } else {
-              problemIndex = 0;
-              seed = (seed + 1) >>> 0;
-              seedInput.value = String(seed);
-              try {
-                localStorage.setItem("exponenciales:seed", String(seed));
-              } catch {}
-            }
-          }
-          newChallenge();
-        },
-      },
-    },
-    chalkIcon("reset"),
-    " Otro reto",
-  );
-
-  const updateProblemSelector = () => {
-    clear(problemSelector);
-    if (typeSelect.value === "contrastivo") {
-      problemSelector.hidden = true;
-      return;
-    }
-    problemSelector.hidden = false;
-    for (let i = 0; i < 8; i++) {
-      const key = `${seed}-${typeSelect.value}-${i}`;
-      const isSolved = !!problemsState[key]?.solved;
-      const isActive = problemIndex === i;
-      const chip = h(
-        "button",
-        {
-          type: "button",
-          class: `chip exp-problem-chip ${isActive ? "is-active" : "chip--ghost"} ${isSolved ? "is-solved" : ""}`,
-          "aria-selected": String(isActive),
-          role: "tab",
-          on: {
-            click: () => {
-              problemIndex = i;
-              newChallenge();
-            },
-          },
-        },
-        chalkIcon(isSolved ? "check" : "target", 13),
-        ` Reto ${i + 1}/8`,
-      );
-      problemSelector.appendChild(chip);
-    }
+  const updateProgressPill = () => {
+    const solvedInSeed = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+      (i) => problemsState[`${seed}-${typeSelect.value}-${i}`]?.solved,
+    ).length;
+    progressPill.textContent = `Semilla actual (Semilla #${seed}): ${solvedInSeed}/8 resueltos`;
+    meta.textContent = `Semilla actual (Semilla #${seed}): ${solvedInSeed}/8 resueltos`;
   };
 
-  const newChallenge = () => {
-    let requested =
-      typeSelect.value === "aleatorio" ? null : typeSelect.value;
+  function createChallengeCard(current, problemIndex) {
+    const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
+    let hintStep = 0;
+    let solutionRevealed = false;
+
+    const badgeText = current._contrastBadge
+      ? `Reto #${problemIndex + 1} (${current._contrastBadge})`
+      : `Reto #${problemIndex + 1}`;
+    const badgeEl = h("span", { class: "exp-challenge-card__badge" }, badgeText);
+
+    let familyLabel = current.type.replaceAll("_", " ");
+    if (current._contrastLabel) {
+      familyLabel = current._contrastLabel;
+    } else if (current._targetComp) {
+      familyLabel = `Refuerza: ${current._targetComp.title}`;
+    }
+    const familyEl = h("span", { class: "exp-challenge-card__family" }, familyLabel);
+
+    const statusEl = h("span", { class: "exp-challenge-card__status" }, "Pendiente");
+
+    const headerEl = h(
+      "div",
+      { class: "exp-challenge-card__header" },
+      badgeEl,
+      familyEl,
+      statusEl,
+    );
+
+    const promptEl = h("p", { class: "exp-challenge__prompt pr-challenge__prompt" });
+    mount(promptEl, ...inlineMathNodes(current.prompt));
+
+    let cardAdaptiveNote = null;
+    if (typeSelect.value === "adaptativo" && current._targetComp) {
+      cardAdaptiveNote = h(
+        "div",
+        { class: "exp-challenge__adaptive-note" },
+        `Motivo de selección: Reforzar «${current._targetComp.title}» (pendiente de resolución independiente / se detectó confusión previa).`,
+      );
+    }
+
+    const inputEl = h("input", {
+      type: "text",
+      inputmode: "text",
+      autocomplete: "off",
+      class: "pr-check-input exp-challenge-input",
+      "aria-label": "Tu respuesta al reto",
+      placeholder: "Tu respuesta...",
+      style: { maxWidth: "360px" },
+    });
+
+    const previewEl = h(
+      "p",
+      { class: "exp-check__preview pr-check__preview", "aria-live": "polite" },
+      "Interpretado como: —",
+    );
+
+    const inputRow = h(
+      "div",
+      { class: "exp-challenge-card__input-row" },
+      h("label", { class: "exp-control pr-control" }, h("span", null, "Tu respuesta"), inputEl),
+      previewEl,
+    );
+
+    const reviseBtn = h(
+      "button",
+      { type: "button", class: "btn" },
+      chalkIcon("check"),
+      " Revisar",
+    );
+
+    const hintBtn = h(
+      "button",
+      { type: "button", class: "btn btn--ghost" },
+      chalkIcon("hint"),
+      " Pista (0/3)",
+    );
+
+    const revealBtn = h(
+      "button",
+      { type: "button", class: "btn btn--ghost exp-solution-btn" },
+      chalkIcon("book"),
+      " Ver solución paso a paso",
+    );
+
+    const actionsEl = h(
+      "div",
+      { class: "exp-check__actions pr-check__actions" },
+      reviseBtn,
+      hintBtn,
+      revealBtn,
+    );
+
+    const hintTextEl = h("p", { class: "exp-check__hint pr-check__hint", hidden: true });
+    const feedbackEl = h("p", {
+      class: "exp-check__feedback pr-check__feedback",
+      "aria-live": "polite",
+    });
+    const solutionEl = h("div", { class: "exp-check__solution pr-check__solution", hidden: true });
+
+    inputEl.addEventListener("input", () => {
+      previewEl.textContent = `Interpretado como: ${inputEl.value.trim() || "—"}`;
+    });
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        reviseBtn.click();
+      }
+    });
+
+    reviseBtn.addEventListener("click", () => {
+      const raw = inputEl.value.trim();
+      if (!raw) {
+        feedbackEl.textContent = "Ingresá una respuesta antes de revisar.";
+        feedbackEl.className = "exp-check__feedback pr-check__feedback is-warning";
+        return;
+      }
+      const valNum = Number(raw.replace(",", "."));
+      let isCorrect = typeof current.answer === "number" && Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
+
+      let intervalSyntaxError = null;
+      if (!isCorrect && typeof current.answer === "string") {
+        try {
+          const expectedIv = parseIntervalExactas(current.answer);
+          const userIv = parseIntervalExactas(raw);
+          if (
+            expectedIv &&
+            userIv &&
+            expectedIv.loOpen === userIv.loOpen &&
+            expectedIv.hiOpen === userIv.hiOpen &&
+            (expectedIv.lo === userIv.lo || Math.abs(expectedIv.lo - userIv.lo) < 1e-4) &&
+            (expectedIv.hi === userIv.hi || Math.abs(expectedIv.hi - userIv.hi) < 1e-4)
+          ) {
+            isCorrect = true;
+          }
+        } catch (err) {
+          if (err && err.code === "missing_semicolon") {
+            intervalSyntaxError = "En Exactas los intervalos se separan con punto y coma ';' (la coma se reserva para decimales).";
+          }
+        }
+        if (!isCorrect) {
+          try {
+            if (equivalentExp(raw, current.answer)) {
+              isCorrect = true;
+            }
+          } catch {}
+        }
+      }
+
+      const diagnosis = diagnoseExp(raw, {
+        ...current.spec,
+        expected: current.answer,
+      });
+
+      if (isCorrect) {
+        const wasAssisted = hintStep > 0 || solutionRevealed;
+        const mode = wasAssisted ? "assisted" : "independent";
+        feedbackEl.textContent = wasAssisted
+          ? `Correcto: ${current.displayAnswer}. Resuelto con apoyo (asistido).`
+          : `Correcto: ${current.displayAnswer}. Resuelto de forma independiente.`;
+        feedbackEl.className = `exp-check__feedback pr-check__feedback is-correct is-${mode} check-feedback--${mode} state-solved`;
+        saveProgress("challenge:last", { seed, type: current.type, mode, solved: true });
+
+        if (current.competencyId) {
+          recordCompetencyAttempt({
+            competencyId: current.competencyId,
+            correct: true,
+            mode,
+          });
+        }
+
+        inputEl.disabled = true;
+        reviseBtn.disabled = true;
+        revealBtn.disabled = true;
+        hintBtn.disabled = true;
+
+        statusEl.textContent = wasAssisted ? "Resuelto (Con apoyo)" : "Resuelto (Independiente)";
+        statusEl.className = `exp-challenge-card__status ${wasAssisted ? "is-solved-assisted" : "is-solved-indep"}`;
+
+        problemsState[pKey] = {
+          solved: true,
+          mode,
+          userAnswer: raw,
+          previewText: previewEl.textContent,
+          feedbackText: feedbackEl.textContent,
+          feedbackClass: feedbackEl.className,
+          hintStep,
+          hintText: hintTextEl.textContent,
+          solutionRevealed: false,
+        };
+
+        updateProgressPill();
+
+        if (wasAssisted) {
+          if (failStreak > 0) {
+            playScript([STREAK_REACTIONS.recovered]);
+          }
+        } else {
+          if (failStreak > 0) {
+            playScript([STREAK_REACTIONS.recovered]);
+            successStreak = 1;
+          } else {
+            successStreak++;
+            if (successStreak >= 3) {
+              playScript([STREAK_REACTIONS.flawlessRun]);
+            } else {
+              playScript([STREAK_REACTIONS.firstTry]);
+            }
+          }
+        }
+        failStreak = 0;
+      } else {
+        successStreak = 0;
+        failStreak++;
+        const wasAssisted = hintStep > 0 || solutionRevealed;
+        if (current.competencyId) {
+          recordCompetencyAttempt({
+            competencyId: current.competencyId,
+            correct: false,
+            mode: wasAssisted ? "assisted" : "independent",
+            diagnosticId: diagnosis?.id || null,
+          });
+        }
+        feedbackEl.textContent =
+          diagnosis?.message ||
+          intervalSyntaxError ||
+          "Todavía no coincide. Consultá una pista y revisá las operaciones paso a paso.";
+        feedbackEl.className = "exp-check__feedback pr-check__feedback is-error";
+
+        problemsState[pKey] = {
+          solved: false,
+          mode: null,
+          userAnswer: raw,
+          previewText: previewEl.textContent,
+          feedbackText: feedbackEl.textContent,
+          feedbackClass: feedbackEl.className,
+          hintStep,
+          hintText: hintTextEl.textContent,
+          solutionRevealed: false,
+        };
+
+        const id = diagnosis?.id;
+        if (id && DIAGNOSE_REACTIONS[id]) {
+          playScript([DIAGNOSE_REACTIONS[id]]);
+        } else if (failStreak >= 2) {
+          playScript([STREAK_REACTIONS.repeatedError]);
+        }
+      }
+    });
+
+    hintBtn.addEventListener("click", () => {
+      hintStep = Math.min(3, hintStep + 1);
+      hintBtn.replaceChildren(chalkIcon("hint"), ` Pista (${fmt(hintStep)}/3)`);
+      hintTextEl.hidden = false;
+      hintTextEl.textContent = `Pista ${fmt(hintStep)} de 3: ${current.hints[hintStep - 1]}`;
+
+      if (!problemsState[pKey]) problemsState[pKey] = {};
+      problemsState[pKey].hintStep = hintStep;
+      problemsState[pKey].hintText = hintTextEl.textContent;
+
+      playScript([
+        {
+          pose: ["base", "pensativa", "explicando"][hintStep - 1],
+          tag: `Pista ${fmt(hintStep)} de 3`,
+          html: current.hints[hintStep - 1],
+        },
+      ]);
+    });
+
+    revealBtn.addEventListener("click", () => {
+      solutionRevealed = true;
+      successStreak = 0;
+      solutionEl.hidden = false;
+      inputEl.disabled = true;
+      reviseBtn.disabled = true;
+      revealBtn.disabled = true;
+      hintBtn.disabled = true;
+
+      statusEl.textContent = "Resuelto (Con apoyo)";
+      statusEl.className = "exp-challenge-card__status is-solution";
+
+      problemsState[pKey] = {
+        solved: false,
+        mode: null,
+        userAnswer: inputEl.value,
+        previewText: previewEl.textContent,
+        feedbackText: "",
+        feedbackClass: "",
+        hintStep,
+        hintText: hintTextEl.textContent,
+        solutionRevealed: true,
+      };
+
+      mount(
+        solutionEl,
+        h("strong", null, "Resolución paso a paso"),
+        h(
+          "ol",
+          null,
+          ...current.solution.map((step) =>
+            h("li", null, ...inlineMathNodes(step)),
+          ),
+        ),
+      );
+      playScript([
+        STREAK_REACTIONS.showSolution,
+        STREAK_REACTIONS.solutionAfter,
+      ]);
+    });
+
+    const pState = problemsState[pKey];
+    if (pState) {
+      inputEl.value = pState.userAnswer || "";
+      inputEl.disabled = !!pState.solved || !!pState.solutionRevealed;
+      reviseBtn.disabled = !!pState.solved || !!pState.solutionRevealed;
+      revealBtn.disabled = !!pState.solved || !!pState.solutionRevealed;
+      hintBtn.disabled = !!pState.solved || !!pState.solutionRevealed;
+      previewEl.textContent = pState.previewText || "Interpretado como: —";
+      feedbackEl.textContent = pState.feedbackText || "";
+      feedbackEl.className = pState.feedbackClass || "exp-check__feedback pr-check__feedback";
+      hintStep = pState.hintStep || 0;
+      hintBtn.replaceChildren(chalkIcon("hint"), ` Pista (${fmt(hintStep)}/3)`);
+      solutionRevealed = !!pState.solutionRevealed;
+      hintTextEl.hidden = !pState.hintText;
+      hintTextEl.textContent = pState.hintText || "";
+      solutionEl.hidden = !pState.solutionRevealed;
+      if (pState.solved) {
+        statusEl.textContent = pState.mode === "assisted" ? "Resuelto (Con apoyo)" : "Resuelto (Independiente)";
+        statusEl.className = `exp-challenge-card__status ${pState.mode === "assisted" ? "is-solved-assisted" : "is-solved-indep"}`;
+      } else if (pState.solutionRevealed) {
+        statusEl.textContent = "Resuelto (Con apoyo)";
+        statusEl.className = "exp-challenge-card__status is-solution";
+        mount(
+          solutionEl,
+          h("strong", null, "Resolución paso a paso"),
+          h(
+            "ol",
+            null,
+            ...current.solution.map((step) =>
+              h("li", null, ...inlineMathNodes(step)),
+            ),
+          ),
+        );
+      }
+    }
+
+    const card = h(
+      "li",
+      {
+        class: `exp-challenge-card exp-check__item seq-check__card${pState?.solved ? " is-solved" : ""}`,
+        "data-problem-index": String(problemIndex),
+      },
+      headerEl,
+      promptEl,
+      cardAdaptiveNote,
+      inputRow,
+      actionsEl,
+      feedbackEl,
+      hintTextEl,
+      solutionEl,
+    );
+
+    return card;
+  }
+
+  function renderCascade() {
+    clear(cascadeList);
     adaptiveNote.hidden = true;
     adaptiveNote.textContent = "";
+
+    const requested = typeSelect.value === "aleatorio" ? null : typeSelect.value;
+    let challenges = [];
 
     if (requested === "adaptativo") {
       const report = getCompetencyReport();
@@ -1000,9 +1055,6 @@ function createTrainer(root) {
       if (candidates.length === 0) {
         candidates = report.list;
       }
-      const candidateIndex = (Math.abs(seed) + problemIndex) % candidates.length;
-      const targetItem = candidates[candidateIndex];
-      const targetComp = targetItem?.competency;
       const compMap = {
         "exponentials.tables_additive_vs_multiplicative": "razon_tabla_vs_salto",
         "exponentials.neutral_and_order_of_operations": "evaluacion_k_a_x",
@@ -1015,75 +1067,43 @@ function createTrainer(root) {
         "exponentials.full_analytical_study": "imagen_intervalo_asintota",
         "exponentials.equations_three_methods_in_reals": "ecuacion_igualacion_factor_comun",
       };
-      const fam = (targetComp && compMap[targetComp.id]) || "razon_tabla_vs_salto";
-      requested = fam;
+
+      challenges = Array.from({ length: 8 }, (_, i) => {
+        const candidateIndex = (Math.abs(seed) + i) % candidates.length;
+        const targetItem = candidates[candidateIndex];
+        const targetComp = targetItem?.competency;
+        const fam = (targetComp && compMap[targetComp.id]) || "razon_tabla_vs_salto";
+        const ch = makeChallenge(seed, fam, i);
+        ch._targetComp = targetComp;
+        return ch;
+      });
+
       adaptiveNote.hidden = false;
-      const title = targetComp?.title || "Competencia clave";
-      adaptiveNote.textContent = `Motivo de selección: Reforzar «${title}» (pendiente de resolución independiente / se detectó confusión previa).`;
+      const firstTitle = challenges[0]?._targetComp?.title || "Competencia clave";
+      adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}» (pendiente de resolución independiente / se detectó confusión previa).`;
     } else if (requested === "contrastivo") {
-      const pair = contrastPairs[Math.abs(seed) % contrastPairs.length];
-      requested = pair.types[contrastSubIndex];
-    }
-
-    current = makeChallenge(seed, requested, problemIndex);
-    mount(prompt, ...inlineMathNodes(current.prompt));
-    if (typeSelect.value === "contrastivo") {
-      const pair = contrastPairs[Math.abs(seed) % contrastPairs.length];
-      meta.textContent = `${pair.label} (Par contrastivo ${contrastSubIndex + 1}/2) · Semilla ${fmt(seed)}`;
+      challenges = Array.from({ length: 8 }, (_, i) => {
+        const pairIdx = Math.floor(i / 2) % contrastPairs.length;
+        const pair = contrastPairs[pairIdx];
+        const subStep = i % 2; // 0 = A, 1 = B
+        const stepLetter = subStep === 0 ? "A" : "B";
+        const fam = pair.types[subStep];
+        const ch = makeChallenge(seed, fam, i);
+        ch._contrastBadge = `Par ${pairIdx + 1} ${stepLetter}`;
+        ch._contrastLabel = `${pair.label} · Paso ${stepLetter}`;
+        return ch;
+      });
     } else {
-      const solvedInSeed = [0, 1, 2, 3, 4, 5, 6, 7].filter(
-        (i) => problemsState[`${seed}-${typeSelect.value}-${i}`]?.solved
-      ).length;
-      meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} (Reto ${problemIndex + 1}/8 · ${solvedInSeed}/8 resueltos) · Semilla ${fmt(seed)}`;
+      challenges = makeChallenges(seed, requested, 8);
     }
 
-    updateProblemSelector();
-    prevRetoBtn.hidden = typeSelect.value === "contrastivo" || problemIndex === 0;
+    challenges.forEach((current, idx) => {
+      const card = createChallengeCard(current, idx);
+      cascadeList.appendChild(card);
+    });
 
-    const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
-    const pState = problemsState[pKey];
-    if (pState) {
-      input.value = pState.userAnswer || "";
-      input.disabled = !!pState.solved || !!pState.solutionRevealed;
-      revise.disabled = !!pState.solved || !!pState.solutionRevealed;
-      reveal.disabled = !!pState.solved || !!pState.solutionRevealed;
-      hint.disabled = !!pState.solved || !!pState.solutionRevealed;
-      preview.textContent = pState.previewText || "Interpretado como: —";
-      feedback.textContent = pState.feedbackText || "";
-      feedback.className = pState.feedbackClass || "exp-check__feedback pr-check__feedback";
-      hintStep = pState.hintStep || 0;
-      solutionRevealed = !!pState.solutionRevealed;
-      hintText.hidden = !pState.hintText;
-      hintText.textContent = pState.hintText || "";
-      solution.hidden = !pState.solutionRevealed;
-      if (solutionRevealed) {
-        mount(
-          solution,
-          h("strong", null, "Resolución paso a paso"),
-          h(
-            "ol",
-            null,
-            ...current.solution.map((step) =>
-              h("li", null, ...inlineMathNodes(step)),
-            ),
-          ),
-        );
-      }
-    } else {
-      input.value = "";
-      input.disabled = false;
-      revise.disabled = false;
-      reveal.disabled = false;
-      hint.disabled = false;
-      preview.textContent = "Interpretado como: —";
-      feedback.textContent = "";
-      feedback.className = "exp-check__feedback pr-check__feedback";
-      hintText.hidden = true;
-      solution.hidden = true;
-      hintStep = 0;
-      solutionRevealed = false;
-    }
-  };
+    updateProgressPill();
+  }
 
   seedInput.addEventListener("change", () => {
     seed = Number(seedInput.value) >>> 0;
@@ -1091,9 +1111,7 @@ function createTrainer(root) {
     try {
       localStorage.setItem("exponenciales:seed", String(seed));
     } catch {}
-    contrastSubIndex = 0;
-    problemIndex = 0;
-    newChallenge();
+    renderCascade();
   });
 
   seedInput.addEventListener("keydown", (e) => {
@@ -1104,20 +1122,7 @@ function createTrainer(root) {
   });
 
   typeSelect.addEventListener("change", () => {
-    contrastSubIndex = 0;
-    problemIndex = 0;
-    newChallenge();
-  });
-
-  input.addEventListener("input", () => {
-    preview.textContent = `Interpretado como: ${input.value.trim() || "—"}`;
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      revise.click();
-    }
+    renderCascade();
   });
 
   mount(
@@ -1126,26 +1131,14 @@ function createTrainer(root) {
       "section",
       { class: "exp-trainer pr-trainer" },
       h("h3", null, "Entrenador infinito por semilla PRNG"),
-      h("div", { class: "exp-widget__controls pr-widget__controls" }, seedLabel, typeLabel, randomizeBtn, copySeedBtn),
-      problemSelector,
-      meta,
+      toolbar,
       adaptiveNote,
-      prompt,
-      h(
-        "label",
-        { class: "exp-control pr-control" },
-        h("span", null, "Tu respuesta"),
-        input,
-      ),
-      preview,
-      h("div", { class: "exp-check__actions pr-check__actions" }, revise, hint, reveal, prevRetoBtn, next),
-      feedback,
-      hintText,
-      solution,
+      meta,
+      cascadeList,
     ),
   );
 
-  newChallenge();
+  renderCascade();
 }
 
 /**

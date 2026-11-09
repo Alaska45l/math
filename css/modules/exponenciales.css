@@ -63,7 +63,6 @@
 
 .exp-page .seq-sidebar::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--muted) 58%, transparent);
-  border-radius: 99px;
 }
 
 .exp-page.is-sidebar-collapsed .seq-layout {
@@ -81,7 +80,6 @@
   min-height: 36px;
   padding: 6px 10px;
   border: 1px solid var(--line, var(--border));
-  border-radius: 8px;
   background: var(--surface, var(--bg));
   color: var(--yellow);
   font: 700 0.82rem var(--font-hand);
@@ -356,7 +354,6 @@
     padding: 0 !important;
     place-items: center;
     border: 1px solid var(--line, var(--border));
-    border-radius: 50%;
     background: var(--surface, var(--bg));
     color: var(--ink);
     font: 700 0.9rem var(--font-body);
@@ -549,7 +546,6 @@
 .exp-page .exp-token {
   background: transparent;
   border: 1px dashed var(--yellow);
-  border-radius: var(--radius, 6px);
   font: inherit;
   padding: 6px 12px;
   min-height: 46px;
@@ -932,7 +928,6 @@
 .exp-page [data-widget="detective-tablas"] .exp-ratio-tag {
   display: inline-block;
   padding: 2px 6px;
-  border-radius: 4px;
   font-weight: 700;
   font-size: 0.82rem;
 }
@@ -1019,7 +1014,6 @@
 /* Widget 7: Reloj de Semidesintegración */
 .exp-page [data-widget="reloj-semidesintegracion"] .exp-clock-bar {
   height: 12px;
-  border-radius: 6px;
   background: var(--bg);
   border: 1px solid var(--line, var(--border));
   overflow: hidden;
@@ -1186,7 +1180,6 @@
   padding: 0;
   border: 0;
   border-bottom: 1.5px dashed var(--yellow);
-  border-radius: 0;
   color: var(--yellow);
   background: none;
   font: inherit;
@@ -1347,7 +1340,6 @@
   padding: 20px;
   background: var(--panel, #24322b);
   border: 1px solid var(--border, rgba(236, 242, 232, 0.28));
-  border-radius: 8px;
 }
 
 .exp-dashboard-header {
@@ -1373,7 +1365,6 @@
   padding: 12px 16px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border, rgba(236, 242, 232, 0.15));
-  border-radius: 6px;
   border-left: 4px solid var(--muted, #888);
 }
 
@@ -1415,7 +1406,6 @@
   padding: 14px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border, rgba(236, 242, 232, 0.2));
-  border-radius: 6px;
   transition: border-color 0.2s ease;
 }
 
@@ -1450,7 +1440,6 @@
 .exp-dashboard-badge {
   font-size: 0.72rem;
   padding: 2px 6px;
-  border-radius: 4px;
   white-space: nowrap;
   font-weight: 500;
 }
@@ -1486,7 +1475,6 @@
   color: var(--orange, #f4a261);
   background: rgba(244, 162, 97, 0.1);
   padding: 4px 8px;
-  border-radius: 4px;
   border-left: 2px solid var(--orange, #f4a261);
 }
 
@@ -1510,9 +1498,172 @@
   padding: 10px 14px;
   background: rgba(42, 157, 143, 0.15);
   border: 1px solid var(--green, #2a9d8f);
-  border-radius: 6px;
   font-size: 0.88rem;
   line-height: 1.4;
   color: var(--text, #ecf2e8);
 }
+
+/* Barra de herramientas superior del Entrenador */
+.exp-trainer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line, rgba(236, 242, 232, 0.22));
+  margin-top: 20px;
+}
+
+.exp-trainer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.exp-trainer-field > span {
+  font-size: 0.82rem;
+  color: var(--muted, #a7b8ae);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.exp-trainer-field input[type="number"] {
+  width: 130px;
+}
+
+.exp-trainer-field--grow {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+.exp-trainer-field--grow select {
+  width: 100%;
+}
+
+.exp-trainer-toolbar__btns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.exp-trainer-toolbar__btns .btn,
+.exp-trainer-toolbar__btns .pr-btn {
+  width: auto !important;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.exp-trainer-progress-pill {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: rgba(230, 211, 138, 0.12);
+  border: 1px solid rgba(230, 211, 138, 0.35);
+  color: var(--yellow, #e6d38a);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Cascada vertical de los 8 retos */
+.exp-challenges-cascade {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.exp-challenge-card {
+  padding: 18px 20px;
+  border: 1px solid var(--line, rgba(236, 242, 232, 0.22));
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.exp-challenge-card.is-solved {
+  border-color: rgba(142, 219, 159, 0.55);
+  background: rgba(142, 219, 159, 0.05);
+}
+
+.exp-challenge-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(236, 242, 232, 0.15);
+}
+
+.exp-challenge-card__badge {
+  font-weight: 700;
+  color: var(--yellow, #e6d38a);
+  font-size: 0.92rem;
+}
+
+.exp-challenge-card__family {
+  color: var(--muted, #a7b8ae);
+  font-size: 0.85rem;
+}
+
+.exp-challenge-card__status {
+  padding: 3px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted, #a7b8ae);
+  border: 1px solid rgba(236, 242, 232, 0.15);
+}
+
+.exp-challenge-card__status.is-solved-indep {
+  background: rgba(142, 219, 159, 0.15);
+  color: var(--green, #8edb9f);
+  border-color: rgba(142, 219, 159, 0.4);
+}
+
+.exp-challenge-card__status.is-solved-assisted {
+  background: rgba(230, 211, 138, 0.15);
+  color: var(--yellow, #e6d38a);
+  border-color: rgba(230, 211, 138, 0.4);
+}
+
+.exp-challenge-card__status.is-solution {
+  background: rgba(235, 120, 100, 0.15);
+  color: #eb7864;
+  border-color: rgba(235, 120, 100, 0.4);
+}
+
+.exp-challenge-card__input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.exp-challenge-card__input-row input {
+  max-width: 360px;
+}
+
+.exp-challenge-card .exp-check__actions,
+.exp-challenge-card .quad-reto-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.exp-challenge-card .exp-check__actions .btn,
+.exp-challenge-card .exp-check__actions .pr-btn,
+.exp-challenge-card .quad-reto-actions .btn,
+.exp-challenge-card .quad-reto-actions .pr-btn {
+  width: auto !important;
+  flex: 0 0 auto;
+}
+
 
