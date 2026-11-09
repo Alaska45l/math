@@ -16,6 +16,7 @@ import {
   s,
   setText,
   setVisible,
+  createPredictBox,
 } from './board-kit.js';
 
 function toSuperscripts(str) {
@@ -257,6 +258,32 @@ export function initWidget(container, options = {}) {
     tiltTrap: false,
   });
 
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Si al aplicar sustitución u = 3ˣ obtenés u₁ = 9 y u₂ = −3, ¿cuál es el conjunto solución S?',
+    options: [
+      {
+        label: 'S = { 2 } (se descarta u₂ = −3 porque 3ˣ > 0 siempre en ℝ)',
+        correct: true,
+        explanation: '¡Exacto! 3ˣ nunca puede ser negativo ni cero en ℝ. La rama 3ˣ = −3 carece de solución real; sólo sobrevive u = 9 = 3² ⟹ x = 2.',
+      },
+      {
+        label: 'S = { 2; −1 } (asumiendo que 3⁻¹ = −3)',
+        correct: false,
+        explanation: '¡Cuidado! 3⁻¹ = 1/3, jamás un número negativo. La función exponencial con base positiva nunca corta ni cruza el eje horizontal.',
+      },
+      {
+        label: 'S = ∅ (se anula toda la ecuación si una raíz auxiliar da negativa)',
+        correct: false,
+        explanation: 'No, que una raíz auxiliar quede fuera de Im(f) = (0; +∞) sólo anula a esa rama particular, no a la solución positiva u = 9.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ method: 'quadratic_sub', eqIndex: 0, step: 3, tiltTrap: false });
+    },
+  });
+  board.controls.prepend(predictBox);
+
   // 1. Controls
   const updateMethodChips = addChips(
     board.controls,
@@ -344,7 +371,7 @@ export function initWidget(container, options = {}) {
 
   const fulcrumX = 320;
   const fulcrumY = 175;
-  const beamLength = 260; // total width of beam
+  const beamLength = 320; // total width of beam: widened to prevent pan text overlap with center
 
   // Balance Base & Pedestal
   scene.append(
@@ -508,8 +535,19 @@ export function initWidget(container, options = {}) {
     rightPanGroup.setAttribute('transform', `translate(${curRightX - rightX}, ${curRightY - fulcrumY})`);
 
     // Pan texts
-    setText(leftText, isTilted ? '2ˣ = −1' : toSuperscripts(stepData.lhs));
-    setText(rightText, isTilted ? '¡Imposible!' : toSuperscripts(stepData.rhs));
+    const leftStr = isTilted ? '2ˣ = −1' : toSuperscripts(stepData.lhs);
+    const rightStr = isTilted ? '¡Imposible!' : toSuperscripts(stepData.rhs);
+    setText(leftText, leftStr);
+    setText(rightText, rightStr);
+
+    const calcFontSize = (str) => {
+      if (str.length > 22) return '11px';
+      if (str.length > 16) return '12.5px';
+      return '14.5px';
+    };
+    leftText.setAttribute('font-size', calcFontSize(leftStr));
+    rightText.setAttribute('font-size', calcFontSize(rightStr));
+
     setText(equalBadge, isTilted ? '≠' : '=');
     equalBadge.setAttribute('fill', isTilted ? 'var(--pink)' : 'var(--green)');
 

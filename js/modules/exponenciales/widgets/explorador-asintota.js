@@ -6,6 +6,8 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
+  clampToPlane,
   createStore,
   addChips,
   addRange,
@@ -86,6 +88,27 @@ export function initWidget(container, options = {}) {
     probeX: 5,
     showTrapChallenge: false,
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Para f(x) = 2 · 3^(x−1) + 4, ¿el piso y = 4 pertenece al conjunto imagen?',
+    options: [
+      {
+        label: 'No, la imagen es (4; +∞) con paréntesis abierto',
+        correct: true,
+        explanation: '¡Exacto! Como 3^(x−1) > 0 para todo x, la función es estrictamente mayor que 4 y nunca toca la recta asíntota.',
+      },
+      {
+        label: 'Sí, la imagen es [4; +∞) con corchete cerrado',
+        correct: false,
+        explanation: '¡Cazabobos clásico de examen! Para valer 4 la potencia debería dar 0, pero una exponencial positiva jamás se anula.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ preset: 'traslacion_arriba', k: 2, a: 3, h: 1, c: 4 });
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const presetOptions = [
@@ -202,7 +225,15 @@ export function initWidget(container, options = {}) {
     stroke: 'var(--blue)',
     'stroke-width': 2,
   });
-  plane.layers.under.append(imageBand, openCircle);
+  const openCircleLabel = s('text', {
+    x: 0,
+    y: 0,
+    class: 'exp-svg-label',
+    'text-anchor': 'end',
+    'font-size': '11px',
+    fill: 'var(--blue)',
+  }, '∉ Im(f)');
+  plane.layers.under.append(imageBand, openCircle, openCircleLabel);
 
   // Asymptote line y = c
   const asymptoteLine = s('line', {
@@ -284,15 +315,22 @@ export function initWidget(container, options = {}) {
     const pathD = plane.fnPath((x) => k * Math.pow(a, x - h) + c, -6, 6);
     curvePath.setAttribute('d', pathD);
 
-    // Intercept (0, f(0))
+    // Intercept (0, f(0)) clamped to plane box
     const y0 = k * Math.pow(a, -h) + c;
     const sx0 = plane.sx(0);
     const sy0 = plane.sy(y0);
-    ptIntercept.setAttribute('cx', String(sx0));
-    ptIntercept.setAttribute('cy', String(sy0));
-    labelIntercept.setAttribute('x', String(sx0 + 8));
-    labelIntercept.setAttribute('y', String(sy0 - 6));
+    const clampedInt = clampToPlane(plane, sx0, sy0, 6);
+    ptIntercept.setAttribute('cx', String(clampedInt.cx));
+    ptIntercept.setAttribute('cy', String(clampedInt.cy));
+    const labelY = clampedInt.isClampedY && sy0 < plane.box.y ? clampedInt.cy + 14 : clampedInt.cy - 6;
+    labelIntercept.setAttribute('x', String(clampedInt.cx + 8));
+    labelIntercept.setAttribute('y', String(labelY));
     setText(labelIntercept, `(0; ${fmt(y0)})`);
+
+    // Position open circle label
+    openCircle.setAttribute('cx', String(plane.sx(0)));
+    openCircleLabel.setAttribute('x', String(plane.sx(0) - 8));
+    openCircleLabel.setAttribute('y', String(syC + 4));
 
     // Probe point
     const px = Math.max(-5.5, Math.min(5.5, state.probeX));

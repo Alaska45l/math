@@ -2,9 +2,9 @@
  * components.js — Componentes transversales para Laboratorio 7: Exponenciales.
  * Unidad 08 de Alaska Math Lab.
  * Reutiliza la arquitectura de potencias-raices y valor-absoluto:
- * 1. Progreso en localStorage y barra visual.
+ * 1. Progreso en localStorage y barra visual (independiente vs asistido).
  * 2. Fórmula matemática interactiva anotada (annotatedExpFormula).
- * 3. Bloques de chequeos conceptuales con 3 pistas numéricas y soluciones.
+ * 3. Bloques de chequeos conceptuales con 3 pistas progresivas y soluciones.
  * 4. Disparadores de tutoría de Alaska (bindTutorButtons).
  */
 
@@ -12,79 +12,58 @@ import { h, mount, chalkIcon } from "../../core/dom.js";
 import { fmt, frac, MINUS } from "../../core/math-format.js";
 import { diagnoseExp } from "./logic.js";
 import { playScript, react } from "../../core/vn.js";
+import {
+  VN_SCRIPTS,
+  DIAGNOSE_REACTIONS,
+  STREAK_REACTIONS,
+} from "./vn-scripts.js";
 
-// Reacciones predeterminadas de Alaska para el ciclo de retroalimentación pedagógica
-export let STREAK_REACTIONS = {
-  firstTry: {
-    pose: "feliz",
-    tag: "¡Excelente!",
-    html: "¡Resolviste el ejercicio al primer intento! La deducción matemática fue impecable.",
-  },
-  recovered: {
-    pose: "orgullosa",
-    tag: "¡Bien pensado!",
-    html: "Revisaste el paso y diste con el resultado correcto. Así se construye el álgebra.",
-  },
-  repeatedError: {
-    pose: "pensativa",
-    tag: "Detengámonos un segundo",
-    html: "Analicemos la estructura antes de probar otro número. Mirá con atención las pistas.",
-  },
-  flawlessRun: {
-    pose: "eureka",
-    tag: "¡Impecable!",
-    html: "Dominaste toda la serie de este bloque conceptual sin tropezar.",
-  },
-  showSolution: {
-    pose: "explicando",
-    tag: "Paso a paso",
-    html: "Repasemos juntos la deducción completa para entender el porqué de cada paso.",
-  },
-  solutionAfter: {
-    pose: "base",
-    tag: "Continuemos",
-    html: "Ahora probá aplicar esta misma lógica en el siguiente paso o en el próximo ejercicio.",
-  },
-};
-
-export let DIAGNOSE_REACTIONS = {};
-export let VN_SCRIPTS = {};
-
-// Carga asíncrona de guiones y reacciones cuando vn-scripts.js esté disponible
-import("./vn-scripts.js")
-  .then((mod) => {
-    if (mod.VN_SCRIPTS) VN_SCRIPTS = mod.VN_SCRIPTS;
-    if (mod.DIAGNOSE_REACTIONS) DIAGNOSE_REACTIONS = mod.DIAGNOSE_REACTIONS;
-    if (mod.STREAK_REACTIONS) {
-      STREAK_REACTIONS = { ...STREAK_REACTIONS, ...mod.STREAK_REACTIONS };
-    }
-  })
-  .catch(() => {
-    // vn-scripts.js será provisto en el Milestone correspondiente
-  });
+export { STREAK_REACTIONS, DIAGNOSE_REACTIONS, VN_SCRIPTS };
 
 export const PROGRESS_KEY = "exponenciales:progreso:v1";
 
 export function getProgress() {
   try {
-    return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
+    if (typeof localStorage === "undefined" || !localStorage.getItem) return {};
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed;
+    }
+    return {};
   } catch {
     return {};
   }
 }
 
-export function saveProgress(key, value = true) {
+export function saveProgress(key, value = "independent") {
   const state = getProgress();
   state[key] = value;
   try {
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    if (typeof localStorage !== "undefined" && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
   } catch {
     // La sesión continúa aunque se exceda la cuota de almacenamiento
   }
   updateProgressUI();
+  return state;
+}
+
+export function markSectionCompleted(sectionId) {
+  try {
+    const state = getProgress();
+    state[sectionId] = true;
+    if (typeof localStorage !== "undefined" && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
+    updateProgressUI();
+  } catch {}
 }
 
 function updateProgressUI() {
+  if (typeof document === "undefined" || typeof document.getElementById !== "function") return;
   const state = getProgress();
   const complete = Object.keys(state).filter(
     (key) => /^sec-\d+$/.test(key) && state[key],
@@ -98,55 +77,49 @@ function updateProgressUI() {
     (key) => /^sec-\d+:\d+$/.test(key) && state[key],
   ).length;
   document.querySelectorAll("[data-progress]").forEach((node) => {
-    node.textContent = `Chequeos resueltos: ${fmt(totalAnswers)}/30`;
-  });
-
-  document.querySelectorAll(".seq-sidebar__link[data-sec]").forEach((link) => {
-    const done = Boolean(state[link.dataset.sec]);
-    const icon = link.querySelector(".seq-sidebar__status");
-    if (!icon) return;
-    icon.replaceChildren(
-      done
-        ? chalkIcon("check", { width: 14, height: 14 })
-        : document.createTextNode(""),
-    );
-    icon.classList.toggle("is-done", done);
+    node.textContent = `${totalAnswers}/30`;
   });
 }
 
-function makeToken(symbolNode, subLabel, explanation, noteBox, colour = "yellow") {
-  const token = h(
+function inlineMathNodes(text) {
+  if (typeof text !== "string") return [String(text ?? "")];
+  const parts = text.split(/`([^`]+)`/g);
+  return parts.map((part, index) =>
+    index % 2 === 1
+      ? h("span", { class: "eq" }, part)
+      : document.createTextNode(part),
+  );
+}
+
+function makeToken(symbol, label, detail, noteBox, colour = "yellow") {
+  const isNode = typeof symbol === "object" && symbol !== null;
+  const button = h(
     "button",
     {
       type: "button",
-      class: `seq-token exp-token af-token af-token--${colour}`,
-      tabindex: "0",
-      "aria-label": `${subLabel}: ${typeof explanation === "string" ? explanation : subLabel}`,
+      class: `seq-annotated__token seq-annotated__token--${colour}`,
+      "aria-label": `${label}: ${typeof symbol === "string" ? symbol : "término"}`,
       on: {
-        mouseenter: () => showNote(noteBox, explanation),
-        focus: () => showNote(noteBox, explanation),
-        click: () => showNote(noteBox, explanation),
+        click: () => {
+          mount(
+            noteBox,
+            h("strong", null, `${label}: `),
+            ...inlineMathNodes(detail),
+          );
+          noteBox.classList.remove("is-visible");
+          void noteBox.offsetWidth;
+          noteBox.classList.add("is-visible");
+        },
       },
     },
-    h("span", { class: "exp-token__main af-token__main eq" }, symbolNode),
-    h("span", { class: "exp-token__sub af-token__sub" }, subLabel),
+    isNode ? symbol : h("span", { class: "eq" }, symbol),
+    h("span", { class: "seq-annotated__label" }, label),
   );
-  return token;
+  return button;
 }
 
-function showNote(noteBox, message) {
-  if (typeof message === "string") {
-    mount(noteBox, h("p", { class: "seq-annotated__note" }, message));
-  } else {
-    mount(noteBox, h("div", { class: "seq-annotated__note" }, message));
-  }
-}
-
-function formatBaseNode(a) {
-  if (a === "e") return h("var", { class: "eq" }, "e");
-  if (typeof a === "object" && a !== null && "n" in a && "d" in a) {
-    return h("span", { class: "eq" }, "(", frac(String(a.n), String(a.d)), ")");
-  }
+function formatBaseDisplay(a) {
+  if (a === Math.E) return "e";
   if (typeof a === "number") {
     if (Math.abs(a - 0.5) < 1e-9) return h("span", { class: "eq" }, "(", frac("1", "2"), ")");
     if (Math.abs(a - 0.25) < 1e-9) return h("span", { class: "eq" }, "(", frac("1", "4"), ")");
@@ -185,63 +158,86 @@ export function annotatedExpFormula(root, config = {}) {
   function render() {
     const sId = state.sectionId;
 
-    // 1. Presets contextuales si se pasa sectionId sin parámetros directos
     if (sId === "sec-1") {
-      const expToken = token("k · aˣ", "exponencial", "Razón constante: al avanzar Δx = 1, la función se multiplica por a. Cada paso escala el valor anterior.", "yellow");
-      const linToken = token("m · x + b", "lineal", "Diferencia constante: al avanzar Δx = 1, la función suma una cantidad fija m. Cada paso suma el mismo salto aditivo.", "blue");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", expToken, "   frente a   y = ", linToken));
+      const kToken = token("k", "partida f(0)", "Punto de partida temporal: en x = 0 la potencia vale a⁰ = 1, por lo que f(0) = k · 1 = k es el valor inicial de la tabla.", "pink");
+      const aToken = token("aˣ", "razón constante", "Motor multiplicativo: al avanzar Δx = 1 regular, la función se multiplica por el factor a. Si dividís términos consecutivos y da constante, es exponencial.", "yellow");
+      const linToken = token("m · x + b", "salto aditivo", "Modelo lineal comparativo: una recta avanza sumando una diferencia fija m en cada paso regular (y₂ − y₁ = cte).", "blue");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", kToken, " · ", aToken, "   frente a   y = ", linToken));
       return;
     }
+
     if (sId === "sec-2") {
-      const kTok = token("3", "escala k", "Factor inicial f(0) = 3: en x = 0 la potencia vale 2⁰ = 1, por lo que f(0) = 3 · 1 = 3.", "pink");
-      const aTok = token("2ˣ", "duplicación", "La base 2 se eleva a la x. ¡No multipliques 3 · 2 = 6! La potencia tiene mayor jerarquía: 3 · 2ˣ ≠ 6ˣ.", "yellow");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", kTok, " · ", aTok, h("span", { class: "eq" }, " ≠ 6ˣ")));
+      const kTok = token("3", "anclaje k", "Factor inicial f(0) = 3: al comenzar (x = 0), hay 3 colonias independientes de amebas. Como 2⁰ = 1, f(0) = 3 · 1 = 3.", "pink");
+      const aTok = token("2ˣ", "duplicación", "La base 2 se eleva al tiempo x. Cada hora transcurrida duplica en paralelo cada una de las 3 colonias.", "yellow");
+      const difTok = token("≠ 6ˣ", "jerarquía de potencias", "La potenciación precede estrictamente a la multiplicación: 3 · 2² = 3 · 4 = 12, mientras que 6² = 36. ¡Jamás multipliques k por la base!", "blue");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", kTok, " · ", aTok, " ", difTok));
       return;
     }
+
     if (sId === "sec-3") {
-      const aRestr = token("a > 0 ∧ a ≠ 1", "restricción de base", "En ℝ la base debe ser positiva y distinta de 1. Si a < 0, (-2)^(1/2) colapsa; si a = 1, la curva es una recta plana.", "yellow");
-      const kRestr = token("k ≠ 0", "factor no nulo", "Si k = 0, la función se anula idénticamente y no describe crecimiento ni decaimiento.", "pink");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = k · aˣ   con   ", aRestr, "   y   ", kRestr));
+      const kRestr = token("k ≠ 0", "escala no nula", "Si k = 0 la función colapsa en la recta nula f(x) = 0 y pierde toda dinámica de crecimiento o decaimiento.", "pink");
+      const aPos = token("a > 0", "base positiva", "En los reales la base debe ser positiva. Si a < 0, potencias con exponente fraccionario como (−2)^(1/2) = √−2 no existen en ℝ y la curva se despedaza.", "yellow");
+      const aNotOne = token("a ≠ 1", "base no trivial", "Si a = 1, 1ˣ = 1 para todo x real y la función degenera en la recta horizontal constante f(x) = k.", "blue");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", kRestr, " · aˣ   con   ", aPos, "   ∧   ", aNotOne));
       return;
     }
+
     if (sId === "sec-4") {
-      const fracTok = token(h("span", null, "(", frac("1", "2"), ")ˣ"), "base 1/2", "Decaimiento al 50%: cada paso divide por 2 o multiplica por 1/2.", "yellow");
-      const symmTok = token("2⁻ˣ", "simetría", "Regla de exponentes: (1/a)ˣ = a⁻ˣ. La gráfica de (1/2)ˣ es el reflejo especular de 2ˣ respecto al eje Y.", "blue");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, fracTok, " = ", symmTok, "   (asíntota horizontal y = 0)"));
+      const fracTok = token(h("span", null, "(", frac("1", "2"), ")ˣ"), "base 1/2", "Decaimiento exponencial: como 0 < a < 1, cada paso divide por 2 o multiplica por 1/2, aproximándose a cero.", "yellow");
+      const symmTok = token("2⁻ˣ", "simetría reflexiva", "Propiedad de potencias: (1/a)ˣ = a⁻ˣ. La gráfica de (1/2)ˣ es el reflejo especular exacto de 2ˣ respecto al eje Y.", "blue");
+      const asymTok = token("y = 0", "asíntota horizontal", "Eje magnético inalcanzable: (1/2)ˣ > 0 para todo x ∈ ℝ. La curva se acerca infinitamente al eje X sin tocarlo jamás.", "green");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, fracTok, " = ", symmTok, "   (asíntota   ", asymTok, ")"));
       return;
     }
+
     if (sId === "sec-5") {
-      const negK = token(`${MINUS}3`, "k < 0", "Al ser k negativo, la gráfica se refleja bajo el eje X: la imagen es (−∞; 0).", "pink");
-      const fracA = token(h("span", null, "(", frac("1", "2"), ")ˣ"), "a = 1/2 < 1", "Como a < 1 pero k < 0, ¡la función es estrictamente CRECIENTE en ℝ! Al avanzar, se hace menos negativa.", "yellow");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "g(x) = ", negK, " · ", fracA, "   (creciente en ℝ)"));
+      const negK = token(`${MINUS}3`, "k < 0", "Coeficiente negativo: refleja toda la curva bajo el eje X hacia el sótano. La imagen pasa a ser (−∞; 0).", "pink");
+      const fracA = token(h("span", null, "(", frac("1", "2"), ")ˣ"), "a = 1/2 < 1", "Potencia que decrece hacia cero con valores positivos (+4, +2, +1, +0.5...).", "yellow");
+      const crecTok = token("Creciente en ℝ", "efecto multiplicativo", "Al multiplicar por −3, los valores pasan a ser −12, −6, −3, −1.5... ¡Se hacen menos negativos y suben hacia cero! La función es estrictamente creciente.", "green");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "g(x) = ", negK, " · ", fracA, " ⟹ ", crecTok));
       return;
     }
+
     if (sId === "sec-6") {
-      const ratioTok = token(frac("f(x₂)", "f(x₁)"), "razón vertical", "Cociente entre valores de ordenadas: cancela el factor k y deja una potencia de a.", "blue");
-      const powerTok = token("aˣ²⁻ˣ¹", "salto de exponente", "La diferencia de abscisas x₂ − x₁ indica cuántos saltos multiplicativos ocurrieron.", "yellow");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, ratioTok, " = ", powerTok, " ⟹ a = (y₂ / y₁)^(1 / (x₂ − x₁))"));
+      const ratioTok = token(frac("y₂", "y₁"), "cociente vertical", "Al dividir f(x₂) entre f(x₁), el factor k se cancela por completo, dejando únicamente la razón pura de las potencias.", "blue");
+      const dxTok = token("Δx = x₂ − x₁", "paso horizontal", "La diferencia de abscisas indica cuántos ciclos multiplicativos separan a los dos puntos observados.", "yellow");
+      const baseTok = token("a = (y₂/y₁)^(1/Δx)", "base exacta", "Extracción de raíz para despejar la base multiplicativa exacta, preservando fracciones sin truncar a decimales.", "pink");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, ratioTok, " = a^(", dxTok, ") ⟹ ", baseTok));
       return;
     }
+
     if (sId === "sec-7") {
-      const initTok = token("M₀", "masa inicial", "Cantidad en t = 0.", "pink");
-      const periodTok = token(h("span", null, "(", frac("1", "2"), ")", h("sup", null, frac("t", "T"))), "período compuesto", "El tiempo t se mide en múltiplos del período característico T (ej. vida media 3 min).", "yellow");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "M(t) = ", initTok, " · ", periodTok, "   frente a   A(t) = A₀ · e^(kt)"));
+      const initTok = token("M₀", "masa inicial", "Cantidad medida en el instante t = 0 (gramos de isótopo o población inicial de partida).", "pink");
+      const factorTok = token(h("span", null, "(", frac("1", "2"), ")"), "factor por ciclo", "Factor de decaimiento (1/2 en vida media) o 1 ± r en crecimiento porcentual (ej. 1 + 0.12 = 1.12 al +12%).", "yellow");
+      const cycleTok = token(h("sup", null, frac("t", "T")), "ciclos t/T", "Exponente normalizado: el tiempo t se divide por el período característico T para contar cuántas transformaciones completas ocurrieron.", "blue");
+      const eTok = token("e^(kt)", "modelo continuo", "Procesos continuos acumulados instantáneamente con la constante de Napier e.", "green");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "M(t) = ", initTok, " · ", factorTok, cycleTok, "   frente a   ", eTok));
       return;
     }
+
     if (sId === "sec-8") {
-      const shiftH = token("x − h", "desplazamiento H", "Traslada la curva horizontalmente h unidades: el ancla f(0) pasa a f(h) = k + c.", "teal");
-      const asymC = token("+ c", "asíntota horizontal", "La asíntota se desplaza a y = c. Imagen abierta: (c; +∞) si k > 0. ¡Nunca lleva corchete cerrado!", "green");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = k · a^(", shiftH, ") ", asymC));
+      const shiftTok = token("x − h", "traslación horizontal", "Desplaza la curva rígidamente h unidades en el eje X: el punto de anclaje f(0) pasa a f(h) = k + c.", "blue");
+      const asymTok = token("+ c", "asíntota y = c", "Desplaza verticalmente la recta asíntota a y = c. Es un límite inalcanzable al que la función tiende asintóticamente.", "green");
+      const imTok = token("Im = (c; +∞)", "imagen abierta", "Como a^(x−h) > 0 estrictamente, la función nunca toma el valor c. La imagen lleva SIEMPRE paréntesis abierto, jamás corchete.", "pink");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = k · a^(", shiftTok, ") ", asymTok, "   con   ", imTok));
       return;
     }
+
     if (sId === "sec-9") {
-      const fullFn = token("2 − (1/2)ˣ", "función examen", "k = −1, a = 1/2, c = 2. Asíntota y = 2, Im = (−∞; 2), raíz x₀ = −1, C⁺ = (−∞; −1), C⁻ = (−1; +∞).", "pink");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", fullFn));
+      const asymTok = token("2", "asíntota y = 2", "Techo magnético superior: la recta horizontal y = 2 actúa como asíntota. Con k = −1 < 0, la imagen es el intervalo abierto (−∞; 2).", "green");
+      const termTok = token("−(1/2)ˣ", "término k·aˣ", "Con k = −1 y base a = 1/2, la curva queda por debajo de la asíntota y es estrictamente creciente en todo su dominio ℝ.", "pink");
+      const rootTok = token("x₀ = −1", "corte en x", "Raíz por despeje exacto: 2 − (1/2)ˣ = 0 ⟹ (1/2)ˣ = 2 ⟹ 2⁻ˣ = 2¹ ⟹ x = −1. El punto de corte es (−1; 0).", "yellow");
+      const signTok = token("C⁺ = (−1; +∞), C⁻ = (−∞; −1)", "conjuntos de signos", "Signos verificados: al ser creciente con raíz en −1, f(x) > 0 para x > −1 (positividad C⁺ = (−1; +∞)) y f(x) < 0 para x < −1 (negatividad C⁻ = (−∞; −1)).", "blue");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "f(x) = ", asymTok, " ", termTok, "   |   ", rootTok, "   |   ", signTok));
       return;
     }
+
     if (sId === "sec-10") {
-      const subTok = token("u = aˣ > 0", "cambio u", "La sustitución convierte la ecuación exponencial en cuadrática. Las raíces u ≤ 0 se descartan obligatoriamente.", "yellow");
-      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, "3²ˣ − 4 · 3ˣ⁺¹ : 9 + 1/3 = 0 ⟹ ", subTok));
+      const eqTok = token("3²ˣ − 4·3ˣ⁺¹ : 9 + 1/3 = 0", "ecuación examen", "Ecuación exponencial de examen con potencias de base 3 y operaciones compuestas.", "blue");
+      const baseTok = token("3ˣ⁺¹ : 3² = 3ˣ⁻¹", "igualar bases", "Propiedad de potencias: al dividir potencias de igual base se restan exponentes, cuidando paréntesis: (x+1) − 2 = x − 1.", "yellow");
+      const subTok = token("u = 3ˣ > 0", "cambio cuadrático", "Sustitución que convierte la ecuación exponencial en una cuadrática. Como 3ˣ > 0 en ℝ, se exige estrictamente u > 0.", "pink");
+      const discardTok = token("descarte u ≤ 0", "filtro de existencia", "Cualquier raíz cuadrática con u ≤ 0 se descarta de inmediato porque 3ˣ jamás da un valor negativo ni cero en ℝ.", "green");
+      mount(formulaHost, h("span", { class: "seq-annotated__equation" }, eqTok, " ⟹ ", baseTok, " ⟹ ", subTok, " (", discardTok, ")"));
       return;
     }
 
@@ -258,92 +254,73 @@ export function annotatedExpFormula(root, config = {}) {
     nodes.push(token(kStr, "escala k", kExpl, "pink"));
     nodes.push(" · ");
 
-    // Token a
-    const aNode = formatBaseNode(a);
+    // Token base a
     const aExpl = state.tokens.a ||
-      `Base a = ${typeof a === "number" ? fmt(a) : a}: razón multiplicativa. ${Number(a) > 1 ? "Como a > 1, representa crecimiento exponencial." : "Como 0 < a < 1, representa decaimiento exponencial."} En los números reales, la base debe ser positiva y distinta de 1 para evitar raíces complejas y rectas constantes.`;
+      `Base multiplicativa a = ${fmt(a)}: exige en ℝ que a > 0 y a ≠ 1. ${a > 1 ? "Como a > 1, la potencia pura es estrictamente creciente hacia +∞." : "Como 0 < a < 1, la potencia pura es estrictamente decreciente hacia 0."}`;
+    nodes.push(token(formatBaseDisplay(a), "base a", aExpl, "yellow"));
 
-    // Exponente b*x - h
-    const expChildren = [];
-    if (b !== 1) expChildren.push(`${fmt(b)}·`);
-    expChildren.push(varName);
-    if (hVal !== 0) expChildren.push(` ${hVal > 0 ? MINUS : "+"} ${fmt(Math.abs(hVal))}`);
+    // Exponente b·x - h
+    const expParts = [];
+    if (b !== 1) expParts.push(`${fmt(b)} · `);
+    expParts.push(varName);
+    if (hVal > 0) expParts.push(` − ${fmt(hVal)}`);
+    else if (hVal < 0) expParts.push(` + ${fmt(-hVal)}`);
 
-    const hExpl = state.tokens.h ||
-      `Desfasaje horizontal h = ${fmt(hVal)}: traslada la curva ${hVal > 0 ? "hacia la derecha" : "hacia la izquierda"}. En ${varName} = ${fmt(hVal)}, el exponente vale 0.`;
-    const expToken = token(h("span", { class: "eq" }, ...expChildren), "exponente", hExpl, "teal");
-
+    const expExpl = state.tokens.h ||
+      `Exponente con traslación: desplaza la curva h = ${fmt(hVal)} unidades ${hVal >= 0 ? "hacia la derecha" : "hacia la izquierda"}. El ancla de cálculo rápido ocurre cuando el exponente se anula.`;
     nodes.push(
-      h("span", { class: "exp-power" },
-        token(aNode, "base a", aExpl, "yellow"),
-        h("sup", null, expToken),
+      h(
+        "sup",
+        null,
+        token(h("span", { class: "eq" }, ...expParts), "exponente", expExpl, "blue"),
       ),
     );
 
-    // Token c (asíntota)
-    if (cVal !== 0 || config.showC) {
-      const cSign = cVal >= 0 ? "+" : MINUS;
-      const cAbs = fmt(Math.abs(cVal));
+    // Desplazamiento c
+    if (cVal !== 0 || state.tokens.c) {
+      const cSign = cVal >= 0 ? " + " : " − ";
+      const cStr = fmt(Math.abs(cVal));
       const cExpl = state.tokens.c ||
-        `Asíntota horizontal y = ${fmt(cVal)}: recta a la que se aproxima la curva. La imagen es ${k > 0 ? `(${fmt(cVal)}; +∞)` : `(−∞; ${fmt(cVal)})`}. ¡Nunca lleva corchete cerrado!`;
-      nodes.push(" ");
-      nodes.push(token(`${cSign} ${cAbs}`, "asíntota y = c", cExpl, "green"));
+        `Término independiente c = ${fmt(cVal)}: traslada la asíntota horizontal a la recta y = ${fmt(cVal)}. La imagen de la función es (${fmt(cVal)}; +∞) si k > 0 o (−∞; ${fmt(cVal)}) si k < 0 (siempre con paréntesis abierto).`;
+      nodes.push(cSign);
+      nodes.push(token(cStr, "asíntota y = c", cExpl, "green"));
     }
 
     mount(formulaHost, h("span", { class: "seq-annotated__equation" }, ...nodes));
   }
 
-  mount(root,
-    h("div", { class: "seq-annotated exp-annotated" },
-      formulaHost,
-      note,
-    ),
-  );
-
-  mount(note,
-    h("p", { class: "seq-annotated__hint-text muted small" },
-      "Tocá o enfocá cada símbolo para que Alaska te explique qué controla en la curva y qué condición matemática necesita para existir en los reales.",
-    ),
-  );
-
+  mount(root, formulaHost, note);
   render();
 
   return {
-    update(nextConfig = {}) {
-      state = { ...state, ...nextConfig };
+    update(newState) {
+      state = { ...state, ...newState };
       render();
     },
-    formula: formulaHost,
-    note,
+    element: root,
   };
 }
 
-function inlineMathNodes(value) {
-  const text = String(value ?? "");
-  const pattern = /\[\[frac:([^|\]]+)\|([^\]]+)\]\]|([^\s()]+)\s*\/\s*([^\s()]+)/g;
-  const nodes = [];
-  let cursor = 0;
-  for (const match of text.matchAll(pattern)) {
-    if (match.index > cursor) nodes.push(text.slice(cursor, match.index));
-    nodes.push(frac(match[1] ?? match[3], match[2] ?? match[4]));
-    cursor = match.index + match[0].length;
-  }
-  if (cursor < text.length) nodes.push(text.slice(cursor));
-  return nodes;
-}
-
 function mountQuestionPrompt(question) {
-  return h("p", { class: "seq-check__prompt exp-check__prompt" }, question.prompt);
+  return h(
+    "div",
+    { class: "exp-check__prompt seq-check__prompt" },
+    ...inlineMathNodes(question.prompt),
+  );
 }
 
 function buildAnswerControl(question, questionIndex) {
   if (question.type === "choice") {
     const selected = { value: null };
-    const buttons = question.options.map((option, index) => {
+    const buttons = question.options.map((optionText, index) => {
       const button = h(
         "button",
-        { type: "button", class: "chip chip--ghost", "aria-pressed": "false" },
-        option,
+        {
+          type: "button",
+          class: "chip chip--ghost exp-choice-btn",
+          "aria-pressed": "false",
+        },
+        ...inlineMathNodes(optionText),
       );
       button.addEventListener("click", () => {
         selected.value = index;
@@ -368,6 +345,9 @@ function buildAnswerControl(question, questionIndex) {
       value: () => (selected.value === null ? "" : String(selected.value)),
       preview: () =>
         selected.value === null ? "Elegí una opción" : question.options[selected.value],
+      disable: () => {
+        buttons.forEach((b) => { b.disabled = true; });
+      },
     };
   }
   if (question.type === "pair") {
@@ -392,6 +372,10 @@ function buildAnswerControl(question, questionIndex) {
       preview: () =>
         `${question.firstLabel}: ${first.value || "—"}; ${question.secondLabel}: ${second.value || "—"}`,
       inputs: [first, second],
+      disable: () => {
+        first.disabled = true;
+        second.disabled = true;
+      },
     };
   }
   const answer = h("input", {
@@ -405,6 +389,9 @@ function buildAnswerControl(question, questionIndex) {
     value: () => answer.value,
     preview: () => answer.value || "—",
     inputs: [answer],
+    disable: () => {
+      answer.disabled = true;
+    },
   };
 }
 
@@ -451,6 +438,9 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
   const cards = questions.map((question, index) => {
     let failStreak = 0;
     let hintStep = 0;
+    let solutionRevealed = false;
+    let solved = false;
+
     const answer = buildAnswerControl(question, index);
     const preview = h(
       "p",
@@ -517,7 +507,11 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
     });
 
     show.addEventListener("click", () => {
+      solutionRevealed = true;
+      successStreak = 0; // Revelar solución reinicia racha a 0
       solutionBox.hidden = false;
+      show.disabled = true;
+      hint.disabled = true;
       mount(
         solutionBox,
         h("strong", null, "Resolución paso a paso"),
@@ -526,49 +520,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
       playScript([STREAK_REACTIONS.showSolution, STREAK_REACTIONS.solutionAfter]);
     });
 
-    review.addEventListener("click", () => {
-      const result = assess(question, answer.value());
-      if (result.correct) {
-        saveProgress(`${sectionId}:${index}`);
-        feedback.textContent =
-          "Correcto: la explicación coincide con el resultado y quedó guardada.";
-        feedback.className = "exp-check__feedback seq-check__feedback is-correct";
-        if (failStreak > 0) {
-          playScript([STREAK_REACTIONS.recovered]);
-          successStreak = 1;
-        } else {
-          successStreak += 1;
-          if (successStreak >= 3) {
-            playScript([STREAK_REACTIONS.flawlessRun]);
-          } else {
-            playScript([STREAK_REACTIONS.firstTry]);
-          }
-        }
-        failStreak = 0;
-        if (questions.every((_, position) => getProgress()[`${sectionId}:${position}`])) {
-          saveProgress(sectionId);
-          onComplete?.(sectionId);
-        }
-      } else {
-        successStreak = 0;
-        failStreak += 1;
-        const diagnostic = result.diagnostics?.[0];
-        feedback.textContent =
-          diagnostic?.message || "Todavía no: mirá las pistas y justificá un paso por vez.";
-        feedback.className = "exp-check__feedback seq-check__feedback is-error";
-        const reaction = diagnostic && DIAGNOSE_REACTIONS[diagnostic.id];
-        if (failStreak >= 2) playScript([STREAK_REACTIONS.repeatedError]);
-        else if (reaction) playScript([reaction]);
-        else
-          react({
-            pose: diagnostic?.pose || "sospecha",
-            tag: "Revisemos el paso",
-            html: feedback.textContent,
-          });
-      }
-    });
-
-    return h(
+    const card = h(
       "li",
       {
         class: "exp-check__item seq-check__card",
@@ -582,6 +534,92 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
       hintBox,
       solutionBox,
     );
+
+    // Restauración de estado persistido en localStorage
+    const savedStatus = getProgress()[`${sectionId}:${index}`];
+    if (savedStatus) {
+      solved = true;
+      card.classList.add("is-solved");
+      card.classList.add(savedStatus === "independent" ? "is-independent" : "is-assisted");
+      feedback.textContent =
+        savedStatus === "independent"
+          ? "Resuelto de forma independiente."
+          : "Resuelto con apoyo (asistido).";
+      feedback.className = `exp-check__feedback seq-check__feedback is-correct ${savedStatus === "independent" ? "is-independent" : "is-assisted"}`;
+      hint.disabled = true;
+      show.disabled = true;
+      answer.disable?.();
+    }
+
+    review.addEventListener("click", () => {
+      const result = assess(question, answer.value());
+      if (result.correct) {
+        const isIndependent = hintStep === 0 && !solutionRevealed;
+        const status = isIndependent ? "independent" : "assisted";
+        solved = true;
+        saveProgress(`${sectionId}:${index}`, status);
+
+        card.classList.add("is-solved");
+        card.classList.remove("is-independent", "is-assisted");
+        card.classList.add(isIndependent ? "is-independent" : "is-assisted");
+
+        if (isIndependent) {
+          feedback.textContent =
+            "Correcto: deducción independiente impecable.";
+          feedback.className = "exp-check__feedback seq-check__feedback is-correct is-independent";
+          if (failStreak > 0) {
+            playScript([STREAK_REACTIONS.recovered]);
+            successStreak = 1;
+          } else {
+            successStreak += 1;
+            if (successStreak >= 3) {
+              playScript([STREAK_REACTIONS.flawlessRun]);
+            } else {
+              playScript([STREAK_REACTIONS.firstTry]);
+            }
+          }
+        } else {
+          // Asistido: JAMÁS incrementa successStreak ni dispara firstTry o flawlessRun
+          feedback.textContent =
+            "Resuelto con apoyo (asistido). El razonamiento analítico quedó verificado.";
+          feedback.className = "exp-check__feedback seq-check__feedback is-correct is-assisted";
+        }
+
+        failStreak = 0;
+        hint.disabled = true;
+        show.disabled = true;
+        answer.disable?.();
+
+        if (questions.every((_, position) => getProgress()[`${sectionId}:${position}`])) {
+          saveProgress(sectionId);
+          markSectionCompleted(sectionId);
+          onComplete?.(sectionId);
+        }
+      } else {
+        successStreak = 0;
+        failStreak += 1;
+        const diagnostic = result.diagnostics?.[0];
+        feedback.textContent =
+          diagnostic?.message || "Todavía no: mirá las pistas y justificá un paso por vez.";
+        feedback.className = "exp-check__feedback seq-check__feedback is-error";
+        const reaction = diagnostic?.id && DIAGNOSE_REACTIONS[diagnostic.id];
+
+        // Priorizar SIEMPRE el mensaje y reacción del diagnóstico específico
+        if (reaction) {
+          playScript([reaction]);
+        } else if (failStreak >= 2) {
+          playScript([STREAK_REACTIONS.repeatedError]);
+        } else {
+          react({
+            pose: diagnostic?.pose || "sospecha",
+            tag: "Revisemos el paso",
+            html: feedback.textContent,
+          });
+        }
+      }
+    });
+
+    return card;
   });
   mount(host, h("ol", { class: "exp-check seq-check" }, cards));
   return cards;

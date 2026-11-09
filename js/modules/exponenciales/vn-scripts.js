@@ -13,11 +13,15 @@
  * - Cero emojis Unicode.
  * - Cada línea posee >= 20 palabras; promedio global >= 30 palabras.
  * - Poses del catálogo de 17 sprites en 4 tiers de frecuencia.
+ * - Soporte para highlightSelector en globos de interacción.
  */
 
-const line = (pose, tag, html) => ({ pose, tag, html });
-const fraction = (top, bottom) =>
-  `<span class="fr"><span class="top">${top}</span><span class="bar" aria-hidden="true"></span><span class="bot">${bottom}</span></span>`;
+const line = (pose, tag, html, highlightSelector = null) => ({
+  pose,
+  tag,
+  html,
+  ...(highlightSelector ? { highlightSelector } : {}),
+});
 
 // =============================================================================
 // REACCIONES A DIAGNÓSTICOS COGNITIVOS (10 IDs de logic.js)
@@ -142,34 +146,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec1-tablas": [
     line(
-      "base",
-      "Dos maneras de avanzar en una tabla",
-      `¡Te doy la bienvenida al laboratorio de exponenciales! Mirá la pantalla con ojos de detective analítico: cuando te entregan una tabla de valores con pasos horizontales regulares, lo primero que mirás no es la última fila, sino la relación exacta entre dos renglones consecutivos. Vamos a descubrir si estamos sumando o multiplicando.`
-    ),
-    line(
       "pensativa",
-      "El paso constante de la recta",
-      `Fijate en la primera columna: cada vez que la variable horizontal avanza tres pasos iguales, la salida salta exactamente siete unidades. Sumar siempre la misma cantidad fija en cada tramo es la firma inconfundible de una función lineal <span class="eq">y = mx + b</span>, donde la pendiente mide ese escalón constante.`
+      "La primera mirada a los datos",
+      `¡Buenas! Te doy la bienvenida al laboratorio de exponenciales de Exactas. Cuando te tiran una tabla en un parcial o en un práctico, lo primero que mirás no es la última fila para asustarte: mirás la relación entre dos renglones seguidos para cazar el patrón.`
     ),
     line(
       "explicando",
-      "La escala multiplicativa",
-      `En cambio, en la segunda tabla las diferencias se descontrolan a toda velocidad. Pero si dividís cada casillero por el anterior, el cociente siempre da tres clavado. No estás sumando ladrillos iguales: estás triplicando lo acumulado con una razón multiplicativa fija <span class="eq">a = 3</span>.`
+      "El paso fijo de las rectas",
+      `Fijate en la primera tabla: cada vez que la variable x avanza un casillero, la salida y suma siempre tres unidades fijas. Sumar siempre el mismo número es la marca registrada de las rectas y de la función lineal clásica.`
+    ),
+    line(
+      "feliz",
+      "La aceleración multiplicativa",
+      `En la segunda tabla pasa algo completamente distinto: las diferencias entre filas se agrandan cada vez más. Pero si dividís cada número por el anterior, el cociente siempre da tres clavado: estamos multiplicando por un factor constante a igual a tres.`
     ),
     line(
       "unamused",
-      "La trampa cuadrática",
-      `¡Mucho cuidado con la tercera tabla! Cuando la entrada avanza de dos en dos, las salidas van dando cuatro, nueve, dieciséis y veinticinco. Ni las restas dan diferencias fijas ni las divisiones arrojan cocientes constantes. ¡No es lineal ni exponencial! Es una parábola de cuadrados <span class="eq">y = x<sup>2</sup></span>: no caigas en la trampa de forzar un modelo donde no encaja.`
+      "La emboscada de las cuadráticas",
+      `¡Cuidado con la tercera tabla! Ahí las diferencias no son iguales ni los cocientes dan lo mismo, porque son los cuadrados de x. No cometas el error de encajar una exponencial a la fuerza cuando en realidad tenés una parábola cuadrática.`
     ),
     line(
       "complice",
-      "El reflejo del buen detective",
-      `Anotate este secreto de supervivencia para cualquier tabla: primero probás si los valores suman una diferencia constante. Si las restas cambian, dividís términos consecutivos para ver si multiplican. Ese cociente limpio es el motor de la potencia y te regala la base <span class="eq">a</span> sin vueltas.`
+      "El machete mental del detective",
+      `Anotate este reflejo de supervivencia para cualquier ejercicio: primero probás si las filas se restan con un salto fijo. Si las restas cambian, dividís los valores para buscar la razón multiplicativa limpia de la potencia.`
     ),
     line(
       "evaluando",
-      "Tu turno con las tablas",
-      `Probá los tres botones del tablero interactivo, modificá los valores numéricos y observá cómo el velocímetro de tiza clasifica el modelo analítico en tiempo real. Yo me quedo acá mirando cómo inspeccionás los datos; asegurate de verificar los cocientes antes de confirmar tu deducción en los chequeos.`
+      "Inspeccioná las columnas",
+      `Probá los tres botones del tablero, cambiá los valores y mirá cómo el clasificador detecta la familia de curvas al instante. Mirá con atención los cocientes en el panel antes de contestar los chequeos que vienen.`,
+      "#exp-widget-1"
     ),
   ],
 
@@ -178,34 +183,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec2-amebas": [
     line(
-      "base",
-      "El experimento del frasco térmico",
-      `Imaginate un frasco térmico con un medio nutritivo perfecto y una colonia de amebas que se duplica puntualmente cada sesenta minutos. Este cultivo biológico es el escenario ideal para ver nacer la matemática de la duplicación desde sus raíces físicas y entender qué controla cada parámetro.`
+      "feliz",
+      "Un cultivo en la mesada",
+      `Imaginate un tubo de ensayo sobre la mesada del laboratorio con un cultivo de amebas que se duplica puntualmente cada hora. Este crecimiento biológico nos sirve para entender qué rol cumple cada número en la fórmula general.`
     ),
     line(
       "pensativa",
       "El momento cero y el neutro uno",
-      `¿Qué sucede exactamente al comenzar el experimento en el momento inicial? Si arrancamos con tres amebas, evaluamos <span class="eq">f(0) = 3 &middot; 2<sup>0</sup></span>. Como todo número no nulo elevado a la cero vale uno, nos queda <span class="eq">f(0) = 3</span>. Ese número inicial que multiplica adelante representa siempre la población en el origen.`
+      `Pensá qué pasa en el instante inicial con tres amebas: calculamos <span class="eq">f(0) = 3 &middot; 2<sup>0</sup></span>. Como cualquier número distinto de cero elevado a la cero da uno, nos queda <span class="eq">f(0) = 3</span>: el número que multiplica adelante siempre marca la población en el origen.`
     ),
     line(
       "colapso",
-      "El gran sacrilegio: 3 · 2ˣ ≠ 6ˣ",
-      `¡Ay, no! El error más sangriento en los exámenes es multiplicar el tres por el dos y escribir <span class="eq">6<sup>x</sup></span>. Si pasaran dos horas, esa fórmula errónea inventaría treinta y seis amebas, cuando en el frasco real sólo contamos doce porque <span class="eq">3 &middot; 2<sup>2</sup> = 12</span>. ¡Inventaste veinticuatro amebas mágicas de la nada por violar la jerarquía!`
+      "El sacrilegio de juntar números",
+      `¡Cuidado con juntar el tres y el dos! Si multiplicás tres por dos y ponés <span class="eq">6<sup>x</sup></span>, a las dos horas tendrías treinta y seis amebas, cuando en el cultivo real sólo hay <span class="eq">3 &middot; 2<sup>2</sup> = 12</span>. ¡Inventaste veinticuatro amebas de la nada por apurarte con las cuentas!`
     ),
     line(
       "explicando",
-      "Jerarquía terca pero sabia",
-      `La regla algebraica es inflexible: la potencia tiene mayor jerarquía que la multiplicación. En la expresión <span class="eq">3 &middot; 2<sup>x</sup></span>, el exponente sólo tiene autoridad sobre la base dos que tiene pegada al lado. La escala inicial <span class="eq">k = 3</span> espera afuera con paciencia y recién multiplica al resultado final cuando la potencia ya terminó de actuar.`
+      "La jerarquía manda en Exactas",
+      `En álgebra las potencias van primero y las multiplicaciones después. En la fórmula <span class="eq">3 &middot; 2<sup>x</sup></span>, el exponente sólo manda sobre la base contigua dos; el tres espera afuera su turno hasta que la potencia termine de calcularse.`
     ),
     line(
       "complice",
-      "El truco mental del laboratorio",
-      `Para no meter la pata jamás al modelar, imaginate tres frascos separados sobre la mesada. En cada frasco ponés una sola ameba que se duplica siguiendo la ley <span class="eq">2<sup>x</sup></span>. Al final sumás las tres colonias independientes y obtenés <span class="eq">f(x) = 3 &middot; 2<sup>x</sup></span>, jamás un monstruo mutante que se sextuplica por hora.`
+      "Tres tubos independientes",
+      `Para no pifiarle nunca más, imaginate tres tubos de ensayo separados. En cada tubo ponés una sola ameba que se duplica según <span class="eq">2<sup>x</sup></span>. Al final sumás los tres tubos y tenés <span class="eq">3 &middot; 2<sup>x</sup></span>, sin inventar mutaciones raras.`
     ),
     line(
       "evaluando",
-      "Seguí el cultivo hora por hora",
-      `Deslizá el control de tiempo de cero a diez horas en el simulador. Compará la curva celeste de una sola ameba <span class="eq">2<sup>x</sup></span> contra la dorada del cultivo triple <span class="eq">3 &middot; 2<sup>x</sup></span> y comprobá que la razón vertical entre ambas siempre se mantiene clavada en tres en todo el recorrido.`
+      "Seguí la curva en el tiempo",
+      `Deslizá el control de tiempo de cero a diez horas en el gráfico. Compará la curva de una sola colonia contra la del cultivo triple y comprobá que la altura se mantiene siempre al triple en todo el recorrido.`,
+      "#exp-widget-2"
     ),
   ],
 
@@ -214,34 +220,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec3-continuo": [
     line(
-      "base",
-      "El pasaporte de la base en los reales",
-      `Una función exponencial real tiene la forma canónica <span class="eq">f(x) = k &middot; a<sup>x</sup></span>, pero la base viene con un pasaporte estricto: debe ser estrictamente positiva y distinta de uno. ¿Por qué ponemos aduanas tan rígidas a la entrada de los números reales? Vamos a descubrirlo.`
-    ),
-    line(
       "pensativa",
-      "Pisar entre los enteros",
-      `Si únicamente utilizáramos exponentes enteros positivos como <span class="eq">x = 1, 2, 3</span>, la gráfica de la función serían puntos aislados flotando en el plano cartesiano. Para trazar un trazo suave y continuo necesitamos poder calcular qué ocurre en los números intermedios, por ejemplo cuando <span class="eq">x = 0,5 = 1/2</span>.`
-    ),
-    line(
-      "explicando",
-      "El puente del radical",
-      `Por las leyes de los exponentes, elevar a un medio equivale a calcular la raíz cuadrada principal. Si nuestra base es nueve y evaluamos en un medio, la función vale <span class="eq">9<sup>1/2</sup> = &radic;9 = 3</span>. Los números racionales rellenan los huecos infinitos entre enteros y tienden un puente continuo sobre la recta real <span class="eq">&reals;</span>.`
-    ),
-    line(
-      "panico",
-      "¡Colapso con base negativa!",
-      `Pero mirá la catástrofe que ocurre si elegís una base negativa como <span class="eq">a = &minus;2</span>: al querer evaluar la función en un medio tendrías <span class="eq">(&minus;2)<sup>1/2</sup> = &radic;(&minus;2) &notin; &reals;</span>, ¡un cálculo prohibido en los números reales! La curva se desintegra en puntos que saltan sin sentido y rompen la continuidad física del trazo.`
-    ),
-    line(
-      "unamused",
-      "Las dos bases aburridas: 0 y 1",
-      `Tampoco permitimos una base igual a uno porque la potencia <span class="eq">1<sup>x</sup> = 1</span> vale siempre uno: la gráfica degeneraría en una recta horizontal constante. Y si la base fuera cero, al calcular una potencia negativa tendrías <span class="eq">0<sup>&minus;1</sup> = 1/0</span>, rompiendo la matemática al dividir por cero de forma inadmisible.`
+      "El pasaporte de la base",
+      `En la fórmula general <span class="eq">f(x) = k &middot; a<sup>x</sup></span>, la base a no puede ser cualquier número: tiene que ser estrictamente positiva y distinta de uno. No es una manía de los profesores para desaprobarte, sino una exigencia lógica para que el gráfico exista.`
     ),
     line(
       "evaluando",
-      "Conectá los puntos en el simulador",
-      `Utilizá el selector de densidad del pizarrón para pasar de la nube de números naturales a los racionales y luego al continuo real. Observá cómo la curva verde cobra vida de forma suave y sin fisuras únicamente cuando la base cumple todas las exigencias impuestas por la teoría formal.`
+      "Más allá de los enteros",
+      `Si sólo usáramos números enteros como uno, dos o tres, el gráfico serían puntos sueltos flotando en el aire. Para trazar una curva continua y sin baches necesitamos calcular valores intermedios, por ejemplo cuando <span class="eq">x = 1/2</span>.`
+    ),
+    line(
+      "explicando",
+      "El puente de los racionales",
+      `Elevar a un medio equivale a calcular la raíz cuadrada principal. Si nuestra base es nueve, la función vale <span class="eq">9<sup>1/2</sup> = &radic;9 = 3</span>. Los números fraccionarios llenan los huecos infinitos entre los enteros y tienden un puente continuo sobre la recta real.`
+    ),
+    line(
+      "panico",
+      "La catástrofe de la base negativa",
+      `Mirá el desastre si elegís una base negativa como menos dos: en <span class="eq">x = 1/2</span> tendrías <span class="eq">(&minus;2)<sup>1/2</sup> = &radic;(&minus;2) &notin; &reals;</span>, que no existe en los reales. La curva se rompería en pedazos y no se podría dibujar con trazo continuo.`
+    ),
+    line(
+      "unamused",
+      "Bases que no tienen gracia",
+      `Tampoco admitimos una base igual a uno porque <span class="eq">1<sup>x</sup> = 1</span> siempre: te quedaría una recta horizontal aburrida. Y si la base fuera cero, al poner un exponente negativo dividirías por cero, destruyendo las reglas de la matemática elemental.`
+    ),
+    line(
+      "feliz",
+      "Cambiá la densidad de puntos",
+      `Usá el selector de densidad en el pizarrón para pasar de puntos naturales a racionales y luego a la curva continua. Observá cómo el trazo verde se vuelve suave y perfecto únicamente cuando la base cumple todas las condiciones requeridas.`,
+      "#exp-widget-3"
     ),
   ],
 
@@ -252,32 +259,33 @@ export const VN_SCRIPTS = {
     line(
       "base",
       "La mitad que sobrevive",
-      `Pensá en una muestra de material radiactivo de un kilo que pierde exactamente la mitad de su masa en cada año que transcurre. Al cabo de cada ciclo conservás la mitad de lo que tenías: la masa restante responde a la curva de decaimiento <span class="eq">f(x) = (1/2)<sup>x</sup></span>.`
+      `Pensá en una muestra de sustancia radiactiva en el laboratorio que pierde la mitad de su masa en cada ciclo regular. La cantidad restante va cayendo a la mitad a cada paso siguiendo la función de decaimiento <span class="eq">f(x) = (1/2)<sup>x</sup></span>.`
     ),
     line(
       "pensativa",
-      "El puente del espejo algebraico",
-      `Mirá esta identidad con ojos de lince matemático: <span class="eq">(1/2)<sup>x</sup> = (2<sup>&minus;1</sup>)<sup>x</sup> = 2<sup>&minus;x</sup></span>. Cambiar la base por su inversa fraccionaria equivale algebraicamente a cambiar el signo del exponente: <span class="eq">(1/a)<sup>x</sup> = a<sup>&minus;x</sup></span>. Esa es la clave analítica de la simetría.`
+      "El truco del espejo algebraico",
+      `Mirá esta igualdad con atención: <span class="eq">(1/2)<sup>x</sup> = 2<sup>&minus;x</sup></span>. Invertir la fracción equivale a cambiarle el signo al exponente: <span class="eq">(1/a)<sup>x</sup> = a<sup>&minus;x</sup></span>. Esa propiedad es el motor matemático de toda la simetría del gráfico.`
     ),
     line(
       "explicando",
-      "Geometría del reflejo",
-      `Como cambiar de signo al exponente produce una reflexión geométrica respecto al eje vertical de ordenadas, la gráfica de <span class="eq">(1/2)<sup>x</sup></span> es exactamente la misma curva de <span class="eq">2<sup>x</sup></span> pero vista a través de un espejo perfecto. Lo que antes crecía vertiginosamente, ahora decae suavemente hacia el piso del cero.`
+      "Geometría de la reflexión",
+      `Como cambiar de signo a la variable x produce una reflexión respecto al eje vertical, el gráfico de <span class="eq">(1/2)<sup>x</sup></span> es la misma curva de <span class="eq">2<sup>x</sup></span> reflejada como en un espejo. Lo que antes subía rápido, ahora decae suavemente hacia el suelo.`
     ),
     line(
       "lentes-brillo",
       "El cruce de las potencias",
-      `Si comparás potencias como <span class="eq">2<sup>x</sup></span> y <span class="eq">3<sup>x</sup></span>, para valores positivos la base mayor trepa más empinada hacia el cielo. Pero al cruzar al lado negativo del eje, ¡el orden se invierte por completo! Dividir por dos deja más cantidad que dividir por tres, así que la base menor queda por arriba.`
+      `Si comparás <span class="eq">2<sup>x</sup></span> y <span class="eq">3<sup>x</sup></span>, para valores positivos la base mayor sube más empinada. Pero al pasar al lado negativo, ¡el orden se da vuelta! Dividir por dos deja más cantidad que dividir por tres, así que la curva de base dos queda arriba.`
     ),
     line(
       "complice",
-      "La recta que nunca se toca",
-      `Fijate que la masa radiactiva se reduce sucesivamente a un medio, un cuarto, un octavo y una dieciseisava parte. Por más años que dejes pasar, jamás llegará a valer cero absoluto ni será negativa. La recta horizontal <span class="eq">y = 0</span> es la asíntota horizontal formal: la imagen es el intervalo abierto <span class="eq">(0; +&infin;)</span>.`
+      "El límite que nunca se toca",
+      `Fijate que la cantidad se reduce sucesivamente a un medio, un cuarto, un octavo y así siguiendo. Por más tiempo que pase, nunca va a ser cero ni negativa. La recta horizontal <span class="eq">y = 0</span> es la asíntota y la imagen es el intervalo abierto <span class="eq">(0; +&infin;)</span>.`
     ),
     line(
-      "evaluando",
-      "Activá el modo espejo",
-      `Tocá el interruptor de reflexión en el widget interactivo. Comprobá cómo la curva de decaimiento radiactivo se superpone punto por punto con la curva de crecimiento al reflejarla horizontalmente, y verificá la asíntota horizontal acercando los valores hacia el infinito positivo.`
+      "feliz",
+      "Probá la simetría en el lienzo",
+      `Activá el modo espejo en el widget interactivo. Comprobá cómo los puntos reflejados coinciden exactamente a la misma altura en ambos lados del eje y verificá cómo la curva abraza a la asíntota sin llegar a cortarla jamás.`,
+      "#exp-widget-4"
     ),
   ],
 
@@ -287,33 +295,34 @@ export const VN_SCRIPTS = {
   "sec5-cuadrantes": [
     line(
       "base",
-      "El mapa de los cuatro cuadrantes",
-      `El comportamiento global y la silueta de la curva exponencial dependen de dos interruptores independientes: si la base multiplica hacia arriba o reparte en fracciones, y si el coeficiente inicial es positivo o negativo. Dos llaves de paso que abren cuatro familias de curvas completamente distintas.`
+      "Los cuatro caminos de la curva",
+      `La silueta y el rumbo de la curva exponencial dependen de dos datos clave: si la base es mayor o menor que uno, y si el coeficiente inicial k es positivo o negativo. Esas dos elecciones arman cuatro familias bien distintas.`
     ),
     line(
       "enojada",
       "La trampa de la base fraccionaria",
-      `Hay un tropiezo clásico que hace caer a muchísima gente en la trampa: mirar la función <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>, ver la base fraccionaria un medio y cantar sin pensar que es decreciente. ¡Frená la mano! El signo del coeficiente exterior altera toda la física del problema.`
+      `Hay una equivocación que veo todos los años en los parciales: mirar <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>, ver la fracción un medio y decir a las apuradas que decrece. ¡No te confíes! El signo de k cambia por completo la dirección del recorrido.`
     ),
     line(
       "pensativa",
-      "Pensalo como saldo bancario",
-      `Hagamos las cuentas sin repetir recetas: en el momento cero debés tres pesos. Al siguiente paso tu deuda baja a un peso con cincuenta, y después debés setenta y cinco centavos. Como tus pérdidas se van achicando, tu situación financiera está subiendo con claridad hacia el nivel del mar.`
+      "Pensalo con tu saldo bancario",
+      `Imaginátelo con dinero: en el momento cero debés tres mil pesos. Al siguiente paso tu deuda baja a mil quinientos, y luego a setecientos cincuenta. Como debés cada vez menos plata, tu saldo en la cuenta está subiendo con claridad hacia el cero.`
     ),
     line(
       "explicando",
       "Subiendo desde el sótano",
-      `Preguntate mirando la recta numérica real: ¿quién está más a la derecha, menos tres o menos uno y medio? ¡Estar en menos uno y medio es estar más arriba! Y menos cero setenta y cinco es todavía mayor: <span class="eq">&minus;0,75 &gt; &minus;1,5 &gt; &minus;3</span>. A medida que avanzamos hacia la derecha las imágenes van trepando hacia el cero: la función es estrictamente creciente en todo <span class="eq">&reals;</span>.`
+      `Miralo en la recta numérica: menos setenta y cinco centavos es mayor que menos un peso con cincuenta, que a su vez es mayor que menos tres: <span class="eq">&minus;0,75 &gt; &minus;1,5 &gt; &minus;3</span>. A medida que avanzamos hacia la derecha los números van subiendo: la función es estrictamente creciente en todo su dominio.`
     ),
     line(
       "complice",
-      "La regla de los dos signos",
-      `El misterio se resuelve entendiendo las transformaciones del plano: multiplicar por una constante negativa como <span class="eq">k = &minus;3</span> refleja toda la curva respecto al eje horizontal. Una curva que antes caía, al darla vuelta verticalmente... ¡empieza a subir! Por eso la función resulta creciente y su imagen es el intervalo abierto <span class="eq">(&minus;&infin;; 0)</span>.`
+      "El reflejo vertical de k",
+      `La explicación visual es muy clara: multiplicar por un número negativo como <span class="eq">k = &minus;3</span> da vuelta la curva verticalmente respecto al eje horizontal. Una curva que antes caía, al invertirla boca abajo... ¡pasa a subir! Por eso su imagen es el intervalo abierto <span class="eq">(&minus;&infin;; 0)</span>.`
     ),
     line(
       "evaluando",
-      "Inspeccioná los cuatro cuadrantes",
-      `Recorré los cuatro cuadrantes interactivos en el tablero de mandos. Observá la tabla viva de valores y confirmá cómo el signo del coeficiente multiplicador y el tamaño de la base colaboran de manera estricta para definir si la curva sube o baja en la recta real.`
+      "Explorá los cuatro cuadrantes",
+      `Tocá los cuatro cuadrantes en el panel de control. Mirá la tabla viva de valores y confirmá cómo el signo de k y el tamaño de la base deciden juntos si la curva trepa o se hunde en el plano.`,
+      "#exp-widget-5"
     ),
   ],
 
@@ -322,34 +331,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec6-constructor": [
     line(
-      "base",
-      "Detectives del plano cartesiano",
-      `En el laboratorio real casi nadie te regala la fórmula matemática ya cocinada: solo disponés de dos mediciones aisladas sobre el gráfico y necesitás deducir qué función exponencial exacta pasó por esos dos puntos. Vamos a actuar como auténticos peritos forenses del plano cartesiano.`
-    ),
-    line(
       "pensativa",
-      "El truco de la división",
-      `Cuando trabajabas con rectas calculabas la pendiente restando las coordenadas de ambos puntos. Pero en las exponenciales la magia se logra dividiendo: al armar el cociente <span class="eq">f(x<sub>2</sub>) / f(x<sub>1</sub>)</span>, la escala inicial del numerador y del denominador se cancela limpiamente y te queda una potencia pura <span class="eq">a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup></span>.`
+      "De las mediciones a la fórmula",
+      `En un trabajo práctico o en un problema real casi nunca te dan la fórmula lista: tenés dos puntos de una medición y tenés que reconstruir la función exponencial exacta que pasa por ellos. Vamos a deducirla paso a paso con herramientas analíticas.`
     ),
     line(
       "explicando",
+      "El cociente que cancela k",
+      `Con las rectas restabas las alturas para sacar la pendiente. En las exponenciales el truco es dividir las ordenadas: al calcular <span class="eq">f(x<sub>2</sub>) / f(x<sub>1</sub>)</span>, la constante inicial se cancela y te queda una potencia pura <span class="eq">a<sup>x<sub>2</sub> &minus; x<sub>1</sub></sup></span> lista para despejar.`
+    ),
+    line(
+      "feliz",
       "Descubrir la base y el origen",
-      `Si una curva pasa por los puntos (1; 1) y (2; 3), en un único paso horizontal la altura se triplicó, así que la base multiplicativa vale tres. Reemplazando en el primer punto deducís que en el origen arrancó en un tercio: la fórmula completa es <span class="eq">f(x) = (1/3) &middot; 3<sup>x</sup></span>.`
+      `Si la curva pasa por los puntos (1; 1) y (2; 3), en un solo paso horizontal la altura se triplica, con lo cual la base vale tres. Reemplazando en el primer punto deducís que en el origen arrancó en un tercio: la fórmula completa es <span class="eq">f(x) = (1/3) &middot; 3<sup>x</sup></span>.`
     ),
     line(
       "lentes-brillo",
-      "El ancla en el eje vertical",
-      `Si uno de los puntos conocidos corta al eje vertical en <span class="eq">x = 0</span>, tenés medio trabajo resuelto. Como cualquier base positiva elevada a la cero da uno, esa coordenada vertical te entrega el coeficiente inicial en bandeja sin tener que despejar ningún sistema complicado.`
+      "El atajo en el eje vertical",
+      `Si uno de los puntos que te dan es la ordenada al origen en <span class="eq">x = 0</span>, tenés medio ejercicio adentro. Como cualquier base elevada a la cero da uno, esa coordenada vertical te regala directamente el coeficiente k sin despejar nada raro.`
     ),
     line(
       "complice",
-      "La condición de mismo signo",
-      `Fijate en una sutileza de rigor formal que distingue a un estudiante senior: las dos alturas de los puntos dados deben tener estrictamente el mismo signo. Si una fuera positiva y la otra negativa, el cociente daría negativo y no podrías calcular raíces pares para despejar la base en el conjunto de los números reales <span class="eq">&reals;</span>.`
+      "La regla del mismo signo",
+      `Fijate en un detalle que siempre toman en los exámenes: las dos alturas tienen que tener obligatoriamente el mismo signo. Si una fuera positiva y la otra negativa, el cociente daría negativo y no podrías calcular raíces pares en los números reales.`
     ),
     line(
       "evaluando",
-      "Arrastrá los puntos en el pizarrón",
-      `Agarrá los dos puntos de control <span class="eq">P</span> y <span class="eq">Q</span> con el cursor sobre el lienzo interactivo. Llevalos a nuevas posiciones del plano cartesiano y comprobá cómo el calculador deduce la base multiplicativa y la escala inicial de forma inmediata sin destruir ningún elemento visual.`
+      "Arrastrá los puntos en el gráfico",
+      `Mové los puntos de control P y Q sobre el lienzo interactivo. Observá cómo el calculador deduce la base fraccionaria y el coeficiente inicial exacto al instante, mostrando el escalón y el factor multiplicativo en el plano.`,
+      "#exp-widget-6"
     ),
   ],
 
@@ -359,33 +369,34 @@ export const VN_SCRIPTS = {
   "sec7-modelos": [
     line(
       "base",
-      "La matemática aplicada a fenómenos reales",
-      `En las aplicaciones reales no te van a tirar una variable <span class="eq">x</span> abstracta sin contexto: te vas a encontrar con gramos de sustancia radiactiva que decaen, poblaciones que se expanden a ritmo constante o cultivos medidos en laboratorio a lo largo de varias jornadas continuas.`
+      "Fenómenos del mundo real",
+      `En la vida real las fórmulas no son letras abstractas sueltas: modelan gramos de un isótopo que decae en medicina nuclear, bacterias que se reproducen en un cultivo o poblaciones medidas a lo largo de los años.`
     ),
     line(
       "pensativa",
       "El reloj de la vida media",
-      `Si disponés de cincuenta gramos de talio radiactivo con una vida media de tres minutos, a la media hora transcurrieron diez vidas medias completas. El exponente fraccionario cuenta exactamente cuántas rondas de reducción a la mitad ocurrieron: la masa restante es <span class="eq">M(t) = 50 &middot; (1/2)<sup>t/3</sup></span>.`
+      `Si tenés cincuenta gramos de talio con una vida media de tres minutos, a la media hora transcurrieron diez ciclos completos. El exponente cuenta exactamente esas rondas de división por dos: la masa restante responde a <span class="eq">M(t) = 50 &middot; (1/2)<sup>t/3</sup></span>.`
     ),
     line(
       "lentes-brillo",
-      "El porcentaje acumulado",
-      `Cuando una población de cincuenta y cinco millones crece un doce por ciento cada cinco años, la base multiplicativa no es cero coma doce: es uno coma doce porque conserva el total y le suma el extra. La escala temporal divide los años por cinco para contar períodos reales transcurridos.`
+      "La trampa del porcentaje",
+      `Cuando una población crece al doce por ciento cada cinco años, la base multiplicativa no es cero coma doce: es uno coma doce, porque conservás el cien por ciento original y le sumás el incremento. El exponente divide los años por cinco para contar períodos reales.`
     ),
     line(
       "explicando",
-      "La trampa de unidades de las bacterias",
-      `¡Mucho ojo con la escala temporal de los enunciados! Si un cultivo bacteriano crece al 3,5% cada diez horas y al cabo de cinco días pesa doscientos gramos, no mezcles días con horas: cinco días equivalen a ciento veinte horas, es decir doce ciclos de diez horas. La masa inicial en el origen se despeja como <span class="eq">k = 200 / (1,035)<sup>12</sup> &asymp; 132,36 g</span>.`
+      "Cuidado con mezclar unidades",
+      `¡Mucho ojo con las unidades de tiempo! Si un cultivo crece al 3,5% cada diez horas y pasaron cinco días, no pongas cinco en el exponente: cinco días son ciento veinte horas, o sea doce ciclos. Despejás la masa inicial haciendo <span class="eq">k = 200 / (1,035)<sup>12</sup> &asymp; 132,36 g</span>.`
     ),
     line(
       "complice",
-      "La base natural e de Euler",
-      `En procesos continuos de física o finanzas como la desintegración de isótopos con <span class="eq">A(t) = 120 &middot; e<sup>&minus;0,05t</sup></span>, la base es la constante de Euler <span class="eq">e &asymp; 2,71828</span>. Funciona con las mismas leyes exactas que cualquier otra base mayor que uno, sin ningún secreto místico oculto.`
+      "La base natural de Euler",
+      `En procesos continuos de física donde el cambio ocurre en cada instante, la base natural es el número <span class="eq">e &asymp; 2,71828</span>. La fórmula <span class="eq">A(t) = 120 &middot; e<sup>&minus;0,05t</sup></span> sigue las mismas reglas que cualquier otra exponencial con base mayor a uno.`
     ),
     line(
-      "evaluando",
-      "Probá los 4 modelos en el simulador",
-      `Alterná entre los cuatro escenarios en el selector del panel interactivo. Observá con atención cómo el exponente compuesto <span class="eq">t / T</span> traduce el paso del tiempo real a ciclos de transformación biológica o física sin perder la precisión decimal.`
+      "feliz",
+      "Probá los escenarios en el panel",
+      `Cambiá de escenario en el selector interactivo. Prestá atención a cómo el cociente del exponente traduce los minutos, horas o años a ciclos de decaimiento sin perder rigor numérico en ningún paso.`,
+      "#exp-widget-7"
     ),
   ],
 
@@ -395,33 +406,34 @@ export const VN_SCRIPTS = {
   "sec8-asintotas": [
     line(
       "base",
-      "La anatomía completa de la función",
-      `Hasta acá estudiamos la curva centrada en el origen. Ahora la soltamos en el plano agregándole desplazamientos horizontales y verticales en su forma completa: <span class="eq">f(x) = k &middot; a<sup>x&minus;h</sup> + c</span>. El parámetro h la traslada lateralmente y la constante c traslada el piso o techo del gráfico.`
+      "Curvas que se mudan en el plano",
+      `Hasta acá miramos curvas con asíntota en el eje horizontal. Ahora sumamos corrimientos laterales y verticales en la forma general: <span class="eq">f(x) = k &middot; a<sup>x&minus;h</sup> + c</span>. La constante h mueve el gráfico de costado y el número c sube o baja el piso.`
     ),
     line(
       "pensativa",
-      "La asíntota se muda con c",
-      `Como la potencia positiva se aproxima a cero cuando nos alejamos hacia el infinito adecuado, ese término tiende a desaparecer y la función se aproxima a <span class="eq">k &middot; 0 + c = c</span>. La recta horizontal <span class="eq">y = c</span> es la nueva asíntota que delimita la frontera del conjunto imagen.`
+      "La nueva altura de la asíntota",
+      `Cuando nos vamos muy lejos hacia el infinito, el término con la potencia se acerca a cero sin llegar a tocarlo jamás. Por eso la función se aproxima a c, convirtiendo a la recta horizontal <span class="eq">y = c</span> en la nueva asíntota de la curva.`
     ),
     line(
       "lentes-brillo",
-      "La trampa del corchete cerrado",
-      `Prestá muchísima atención a esta trampa clásica: te piden la imagen de la función <span class="eq">f(x) = 2 &middot; 3<sup>x&minus;1</sup> + 4</span>. Como el piso está en cuatro y la curva sube, muchos anotan cuatro cerrado con corchete. ¡Error conceptual grave! Para que la función toque el piso cuatro la potencia debería anularse, lo cual es imposible. Va siempre con paréntesis abierto <span class="eq">(4; +&infin;)</span>.`
+      "La trampa del corchete en la imagen",
+      `Anotate esto bien grande en la carpeta: si te piden la imagen de <span class="eq">f(x) = 2 &middot; 3<sup>x&minus;1</sup> + 4</span>, muchos ponen cuatro con corchete cerrado. ¡Error grave de concepto! Para tocar el cuatro la potencia tendría que dar cero, y eso es imposible: va con paréntesis abierto <span class="eq">(4; +&infin;)</span>.`
     ),
     line(
       "explicando",
-      "El punto de anclaje h",
-      `Para graficar la curva a mano alzada con total precisión sin hacer tablas eternas, buscá el punto donde el exponente se anula con <span class="eq">x = h</span>. En nuestro ejemplo anterior, evaluando en uno obtenemos de forma inmediata el valor seis: el punto de anclaje <span class="eq">P(1; 6)</span> te ubica toda la gráfica sobre la cuadrícula.`
+      "El ancla fácil en x = h",
+      `Para graficar la curva a mano alzada sin hacer tablas interminables, buscá el punto donde el exponente se hace cero con <span class="eq">x = h</span>. En nuestro ejemplo evaluás en uno y te da directamente seis: el punto clave (1; 6) te ubica la gráfica al instante.`
     ),
     line(
       "complice",
-      "¿Tiene o no tiene raíces reales?",
-      `Para hallar los ceros de la función igualás la fórmula a cero: <span class="eq">k &middot; a<sup>x&minus;h</sup> + c = 0</span>. Al despejar te queda la potencia igualada a menos c sobre k. Si ese cociente resulta ser menor o igual a cero, la ecuación no tiene ninguna solución real y el conjunto de ceros es el conjunto vacío <span class="eq">C<sub>0</sub> = &empty;</span>.`
+      "¿Tiene o no tiene raíces?",
+      `Para buscar los ceros igualás la función a cero: <span class="eq">k &middot; a<sup>x&minus;h</sup> + c = 0</span>. Al despejar te queda la potencia igual a menos c sobre k. Si ese cociente da negativo o cero, no hay soluciones reales y el conjunto de ceros es vacío.`
     ),
     line(
       "evaluando",
-      "Manipulá los deslizadores h y c",
-      `Modificá los controles de desplazamiento en el pizarrón. Mirá cómo la línea punteada de la asíntota acompaña fielmente a la constante <span class="eq">c</span> y cómo el intervalo del conjunto imagen se actualiza en tiempo real manteniendo siempre su extremo abierto <span class="eq">(c; +&infin;)</span>.`
+      "Mové los controles h y c",
+      `Probá mover los deslizadores de corrimiento en el pizarrón. Mirá cómo la línea punteada acompaña a la constante c y cómo la imagen se actualiza en tiempo real manteniendo siempre su extremo con paréntesis abierto.`,
+      "#exp-widget-8"
     ),
   ],
 
@@ -430,34 +442,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec9-radiografia": [
     line(
-      "base",
-      "La ficha técnica de una función",
-      `Hacer el estudio analítico completo de una función es como levantar una ficha técnica exhaustiva. No alcanza con tirar un bosquejo al voleo: tenés que determinar su dominio, su imagen, su asíntota horizontal, dónde corta a los ejes y en qué tramos es estrictamente positiva o creciente.`
-    ),
-    line(
       "pensativa",
-      "Análisis de una curva trasladada",
-      `Tomemos la función trasladada <span class="eq">f(x) = 2 &minus; (1/2)<sup>x</sup></span>. Su término independiente traslada el techo horizontal a la recta <span class="eq">y = 2</span>. Como el factor que acompaña a la potencia es negativo, la gráfica vive enteramente por debajo del techo, con imagen abierta hasta el dos.`
+      "La ficha completa de la curva",
+      `Hacer la radiografía analítica de una función es como armar su ficha técnica de punta a punta. Hay que determinar su dominio, su imagen, su asíntota horizontal, los cortes con los ejes y sus conjuntos de positividad y negatividad.`
     ),
     line(
       "explicando",
-      "El cruce por el eje horizontal",
-      `Para encontrar los ceros igualamos la fórmula a cero y buscamos qué exponente equilibra las potencias de base dos. El despeje nos revela que en <span class="eq">x = &minus;1</span> la curva perfora el suelo horizontal, formando el conjunto de ceros con un único elemento aislado.`
+      "Estudiemos una curva con corrimiento",
+      `Analicemos la función <span class="eq">f(x) = 2 &minus; (1/2)<sup>x</sup></span>. El dos de afuera fija la asíntota horizontal en dos. Como la potencia está restando con un signo menos adelante, la curva vive por debajo de ese techo, con imagen abierta <span class="eq">(&minus;&infin;; 2)</span>.`
     ),
     line(
       "lentes-brillo",
-      "Los intervalos de signos con punto y coma",
-      `Como el coeficiente exterior es negativo y la base es menor que uno, la función resulta estrictamente creciente en toda la recta real. Viene subiendo desde valores negativos, cruza el suelo en menos uno y sigue trepando hacia la asíntota dos. Por lo tanto, los signos quedan divididos en <span class="eq">C&minus; = (&minus;&infin;; &minus;1)</span> y <span class="eq">C+ = (&minus;1; +&infin;)</span>.`
+      "El despeje exacto de la raíz",
+      `Para encontrar el corte con el eje horizontal igualamos la fórmula a cero: <span class="eq">2 &minus; (1/2)<sup>x</sup> = 0 &rArr; (1/2)<sup>x</sup> = 2</span>. Como dos es lo mismo que un medio a la menos uno, deducimos de inmediato que <span class="eq">x = &minus;1</span>: la curva cruza el suelo en ese único punto.`
+    ),
+    line(
+      "feliz",
+      "Signos sin adivinar",
+      `Como la función viene subiendo desde valores negativos y cruza el eje en menos uno hacia la asíntota dos, el conjunto de negatividad es <span class="eq">C&minus; = (&minus;&infin;; &minus;1)</span> y el de positividad es <span class="eq">C+ = (&minus;1; +&infin;)</span>. ¡Cuidado con no dar vuelta los intervalos!`
     ),
     line(
       "complice",
       "El caso del corte en el origen",
-      `Si ajustamos la asíntota al valor uno, tenemos la curva gemela <span class="eq">f(x) = 1 &minus; (1/2)<sup>x</sup></span>. Al buscar su raíz vemos que la potencia vale uno exactamente en cero: la gráfica pasa justo por el origen de coordenadas, compartiendo la raíz y la ordenada al origen.`
+      `Si cambiamos la asíntota al valor uno, tenemos la función <span class="eq">f(x) = 1 &minus; (1/2)<sup>x</sup></span>. Al buscar su raíz vemos que da cero exacto: la curva pasa justo por el origen de coordenadas, coincidiendo la raíz con la ordenada al origen.`
     ),
     line(
       "evaluando",
-      "Comparación en el tablero",
-      `Alterná entre los dos casos representativos en el tablero interactivo. Cotejá cada una de las ocho tarjetas de la radiografía y confirmá cómo cada intervalo algebraico concuerda punto por punto con el trazo dibujado en el pizarrón de tiza.`
+      "Revisá las ocho tarjetas",
+      `Pasadéate por los casos en el panel interactivo. Mirá las ocho tarjetas del análisis y comprobá cómo cada intervalo formal coincide exactamente con la región sombreada en el pizarrón de tiza.`,
+      "#exp-widget-9"
     ),
   ],
 
@@ -466,34 +479,35 @@ export const VN_SCRIPTS = {
   // ---------------------------------------------------------------------------
   "sec10-ecuaciones": [
     line(
-      "base",
-      "Ecuaciones exponenciales sin logaritmos",
-      `Cuando te encontrás con la incógnita atrapada en el exponente y querés resolver la ecuación sin recurrir a logaritmos, disponés de tres caminos analíticos puros. Todos se apoyan con firmeza en las propiedades de las potencias y en la inyectividad de la función exponencial.`
+      "feliz",
+      "Tres caminos sin logaritmos",
+      `Cuando la incógnita x está atrapada en el exponente y querés resolver la ecuación sin recurrir a logaritmos, disponés de tres métodos algebraicos exactos que se apoyan en las propiedades de potencias y en la inyectividad de la función.`
     ),
     line(
       "pensativa",
-      "Camino 1: La balanza de igualación",
-      `El primer método transforma todos los términos a una base común, como expresar dieciséis en potencias de dos. Al restar exponentes en el cociente con paréntesis protectores, igualamos potencias gemelas y despejamos limpiamente la solución única <span class="eq">x = 17</span>.`
+      "Método 1: Bases gemelas y cocientes",
+      `En una ecuación como <span class="eq">2<sup>3x+1</sup> : 16<sup>x&minus;4</sup> = 1</span>, pasamos dieciséis a base dos sabiendo que dieciséis a la x menos cuatro es dos a la cuatro x menos dieciséis. Al restar exponentes con paréntesis protectores nos queda <span class="eq">(3x + 1) &minus; (4x &minus; 16) = 0</span>, y despejamos limpiamente que equis vale diecisiete.`
     ),
     line(
       "explicando",
-      "Camino 2: El factor común salvador",
-      `Cuando aparecen potencias sumadas como en <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup> = 12</span>, desarmamos el exponente y extraemos la potencia repetida como factor común. El paréntesis se reduce a un número simple, y al dividir nos queda una potencia elemental cuya solución es <span class="eq">x = 2</span>.`
+      "Método 2: El factor común salvador",
+      `Cuando aparecen potencias sumadas como en <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup> = 12</span>, desarmamos el exponente y sacamos la potencia repetida como factor común. El paréntesis se transforma en tres, y al dividir doce por tres nos queda <span class="eq">2<sup>x</sup> = 4</span>, despejando que equis vale dos.`
     ),
     line(
       "panico",
-      "Camino 3: El disfraz cuadrático",
-      `Si reconocés una potencia doble frente a una simple, como nueve a la equis frente a tres a la equis, aplicás la sustitución <span class="eq">u = 3<sup>x</sup></span>. Eso transforma la ecuación en una cuadrática común, pero con una condición innegociable: esa variable auxiliar debe ser estrictamente positiva.`
+      "Método 3: El disfraz cuadrático",
+      `Si ves una potencia doble como cuatro a la equis junto a dos a la equis, usamos la sustitución <span class="eq">u = 2<sup>x</sup></span>. La ecuación se transforma en una cuadrática común, pero con una condición innegociable: esa variable auxiliar u debe ser estrictamente positiva.`
     ),
     line(
       "complice",
-      "El filtro de raíces auxiliares",
-      `Al resolver la resolvente cuadrática obtenés dos valores auxiliares. Si ambos son positivos, recuperás las soluciones originales; pero si alguna raíz auxiliar fuera menor o igual a cero, la descartás sin titubear porque una potencia positiva jamás puede dar un resultado negativo en los reales.`
+      "El filtro de raíces negativas",
+      `Al resolver la ecuación cuadrática auxiliar podés obtener una raíz positiva y otra negativa. A la negativa la tachás con lápiz rojo sin dudar: una potencia positiva jamás puede dar un resultado negativo en los reales, así que sólo recuperás la solución con la u positiva.`
     ),
     line(
       "evaluando",
-      "Resolvé paso a paso en la balanza",
-      `Seleccioná cualquiera de los tres métodos algebraicos en el tablero de ecuaciones. Seguí cada paso de simplificación en la balanza interactiva y observá cómo cada ecuación colapsa con total elegancia hacia su conjunto solución en los reales.`
+      "Operá los tres métodos en el pizarrón",
+      `Elegí cualquiera de las tres ecuaciones en el panel interactivo. Seguí la simplificación renglón por renglón en la balanza y mirá cómo cada expresión se reduce paso a paso hasta llegar a su solución final.`,
+      "#exp-widget-10"
     ),
   ],
 
@@ -507,28 +521,28 @@ export const VN_SCRIPTS = {
   "sec1-base": [
     line(
       "empatia",
-      "Tranqui, que nadie nace sabiendo tablas",
-      `Si ves una tabla repleta de números y sentís que te marea la vista, respirá hondo y relajate. No sos vos: en el colegio nos acostumbraron a calcular cuentas sueltas de memoria sin enseñarnos la historia viva que cuenta cada columna de datos.`
+      "Tranqui, nadie nace sabiendo",
+      `Si ves una tabla repleta de números y sentís que te marea la vista, respirá hondo y relajate. En la secundaria nos acostumbraron a calcular cuentas sueltas sin mostrarnos la relación que esconden los datos entre un casillero y el siguiente.`
     ),
     line(
       "pensativa",
-      "La alcancía vs el interés",
-      `Pensalo con esta comparación cotidiana: si guardás quinientos pesos fijos en una alcancía todas las semanas, tu dinero crece sumando siempre la misma cuota semana a semana. Siempre el mismo salto aditivo constante: eso es una función lineal <span class="eq">f(x) = mx + b</span>.`
+      "La alcancía frente a la inversión",
+      `Pensalo con esta comparación: si guardás quinientos pesos fijos en una alcancía cada semana, tu dinero crece sumando siempre la misma cuota fija. Ese salto constante es una función lineal clásica de la forma <span class="eq">f(x) = mx + b</span>.`
     ),
     line(
       "explicando",
-      "El crecimiento que se acelera",
-      `En cambio, si ponés una inversión que se duplica cada semana, al principio parece poca plata: un peso salta a dos, dos salta a cuatro. Pero en pocos pasos estás en ocho, dieciséis, treinta y dos y sesenta y cuatro. Cada paso multiplica por dos el valor anterior siguiendo una ley exponencial como <span class="eq">f(x) = 2<sup>x</sup></span>.`
+      "La duplicación que se dispara",
+      `En cambio, si ponés una inversión que se duplica cada semana, al principio parece poco: un peso pasa a dos, luego a cuatro. Pero en pocos pasos estás en ocho, dieciséis y treinta y dos, siguiendo una ley exponencial como <span class="eq">f(x) = 2<sup>x</sup></span>.`
     ),
     line(
       "base",
-      "La prueba del lápiz",
-      `Para descubrir qué tenés adelante hacé una sola cuenta con lápiz: restá dos renglones consecutivos <span class="eq">y<sub>2</sub> &minus; y<sub>1</sub></span>. Si la resta da siempre la misma constante, es una recta. Si la resta cambia, calculá el cociente <span class="eq">y<sub>2</sub> / y<sub>1</sub></span>: si da el mismo factor, estás ante una función exponencial.`
+      "La prueba rápida con el lápiz",
+      `Para descubrir qué tenés adelante hacé una sola cuenta: restá dos renglones consecutivos <span class="eq">y<sub>2</sub> &minus; y<sub>1</sub></span>. Si la resta da siempre lo mismo, es una recta; si la resta cambia pero la división da un número fijo, es una función exponencial.`
     ),
     line(
       "feliz",
-      "¡Ya tenés el detector!",
-      `Con esa simple división de dos términos consecutivos ya tenés en la mano el detector infalible para clasificar cualquier tabla de datos o de desafíos analíticos sin dudar jamás de tu deducción.`
+      "El detector en tus manos",
+      `Con esa simple división entre dos valores seguidos ya tenés un detector infalible para clasificar cualquier tabla de datos sin tener que adivinar nada de memoria.`
     ),
   ],
 
@@ -538,28 +552,28 @@ export const VN_SCRIPTS = {
   "sec2-base": [
     line(
       "empatia",
-      "La tentación de multiplicar 3 por 2",
-      `Es súper común ver la expresión <span class="eq">3 &middot; 2<sup>x</sup></span> y sentir la tentación automática de multiplicar tres por dos y escribir <span class="eq">6<sup>x</sup></span>. Nuestro cerebro ve el signo por y quiere liquidar la cuenta rápido para sacarse números de encima.`
+      "La tentación de juntar números",
+      `Es súper común ver la expresión <span class="eq">3 &middot; 2<sup>x</sup></span> y tener ganas de multiplicar el tres por el dos para escribir seis a la x. Nuestro cerebro ve el signo por y quiere liquidar la cuenta rápido para sacarse números de encima.`
     ),
     line(
       "pensativa",
-      "Tres platos en la mesa",
-      `Miralo con esta imagen: imaginate que tenés tres platos hondos sobre la mesa de la cocina. En cada plato colocás una sola porción de levadura que duplica su tamaño cada hora: una porción pasa a dos, luego a cuatro, luego a ocho siguiendo la ley de potencias <span class="eq">2<sup>x</sup></span>.`
+      "Tres platos en la cocina",
+      `Miralo con esta imagen cotidiana: imaginate que tenés tres platos hondos sobre la mesa. En cada plato ponés una porción de masa que duplica su tamaño cada hora: una porción pasa a dos, luego a cuatro, siguiendo la ley de potencias <span class="eq">2<sup>x</sup></span>.`
     ),
     line(
       "explicando",
       "La cuenta por separado",
-      `En cada plato la levadura crece según la fórmula <span class="eq">2<sup>x</sup></span>. Como tenés tres platos sobre la mesa, al final sumás las masas multiplicando por tres: <span class="eq">3 &middot; 2<sup>x</sup></span>. A las dos horas tenés doce porciones en total, porque tres por cuatro da doce.`
+      `En cada plato la masa crece según la fórmula <span class="eq">2<sup>x</sup></span>. Como tenés tres platos sobre la mesa, al final sumás las porciones multiplicando por tres: <span class="eq">3 &middot; 2<sup>x</sup></span>. A las dos horas tenés doce porciones en total, porque tres por cuatro da doce.`
     ),
     line(
       "base",
-      "Por qué seis a la equis es una locura",
-      `Si multiplicaras tres por dos y escribieras <span class="eq">6<sup>x</sup></span>, estarías diciendo que en cada plato la levadura se sextuplica: a las dos horas tendrías <span class="eq">6<sup>2</sup> = 36</span> porciones. ¡Aparecieron veinticuatro porciones mágicas de la nada por saltarte el orden de las operaciones!`
+      "Por qué seis a la x es un disparate",
+      `Si multiplicaras tres por dos y pusieras <span class="eq">6<sup>x</sup></span>, estarías diciendo que la masa se sextuplica a cada paso: a las dos horas tendrías <span class="eq">6<sup>2</sup> = 36</span> porciones. ¡Aparecieron veinticuatro porciones mágicas de la nada por saltearte el orden algebraico!`
     ),
     line(
       "orgullosa",
-      "El orden que te salva",
-      `El exponente manda únicamente sobre su base vecina; el coeficiente que está adelante multiplica después al resultado final. Grabate este orden de operaciones en la memoria y nunca más te van a confundir en un ejercicio.`
+      "El orden que te cuida",
+      `El exponente manda únicamente sobre su base vecina; el coeficiente que está adelante multiplica después al resultado final. Acordate de ese orden y no te vas a equivocar nunca más en los exámenes.`
     ),
   ],
 
@@ -569,28 +583,28 @@ export const VN_SCRIPTS = {
   "sec3-base": [
     line(
       "empatia",
-      "¿Por qué tantas restricciones con la base?",
-      `Te dicen que la base debe ser positiva con <span class="eq">a &gt; 0</span> y que no puede valer uno con <span class="eq">a &ne; 1</span>, y parece un capricho aburrido de profesores que quieren complicarte la vida. Vamos a entender juntos de dónde sale esta exigencia física.`
+      "¿Por qué tantas reglas para la base?",
+      `Te dicen que la base debe ser positiva con <span class="eq">a &gt; 0</span> y que no puede valer uno con <span class="eq">a &ne; 1</span>, y parece un capricho aburrido de los profesores. Vamos a entender de dónde sale esta exigencia matemática fundamental.`
     ),
     line(
       "pensativa",
-      "El signo loco de los negativos",
-      `Si la base fuera negativa, por ejemplo con <span class="eq">a = &minus;2</span>, hacé las cuentas: a la uno da menos dos, al cuadrado da cuatro positivo, y al cubo da menos ocho. Los valores alternan de signo permanentemente según la ley <span class="eq">(&minus;2)<sup>x</sup></span>: van saltando de arriba a abajo como una pelota fuera de control.`
+      "El salto loco de los negativos",
+      `Si la base fuera negativa, por ejemplo menos dos, fijate qué pasa: a la uno da menos dos, al cuadrado da cuatro positivo, y al cubo da menos ocho. Los valores van saltando de signo como una pelota loca según la potencia <span class="eq">(&minus;2)<sup>x</sup></span>.`
     ),
     line(
       "explicando",
-      "El agujero del medio",
-      `Una función matemática real necesita poder dibujarse con un trazo continuo sin agujeros sobre la hoja. ¿Qué pasaría en el punto medio, en <span class="eq">x = 1/2</span>? Elevar a un medio es calcular la raíz cuadrada <span class="eq">&radic;(&minus;2)</span>, que no existe en el conjunto de los números reales.`
+      "El pozo en el medio",
+      `Una curva real necesita poder dibujarse con un trazo continuo sobre la hoja. ¿Qué pasaría en el punto medio, en <span class="eq">x = 1/2</span>? Elevar a un medio es calcular la raíz cuadrada <span class="eq">&radic;(&minus;2)</span>, que no existe en los números reales.`
     ),
     line(
       "base",
-      "El freno de mano en los reales",
-      `Como no podés calcular la raíz cuadrada de un número negativo en el conjunto de los números reales <span class="eq">&reals;</span>, en ese lugar la gráfica no se puede dibujar: se abre un pozo negro sin fondo que rompe la continuidad de la curva.`
+      "El freno en los reales",
+      `Como no se puede calcular la raíz cuadrada de un número negativo en el conjunto de los números reales <span class="eq">&reals;</span>, en ese lugar la curva no se puede dibujar: se abre un pozo vacío que rompe el trazo continuo.`
     ),
     line(
       "feliz",
       "La base positiva es tu garantía",
-      `Exigir que la base sea estrictamente positiva con <span class="eq">a &gt; 0</span> y distinta de uno con <span class="eq">a &ne; 1</span> no es una manía reglamentaria: es el escudo protector que asegura que la función exista para cualquier número real que metas en el exponente.`
+      `Exigir que la base sea estrictamente positiva y distinta de uno no es una regla caprichosa: es la condición necesaria para que la función exista para cualquier número real que pongas en el exponente.`
     ),
   ],
 
@@ -600,28 +614,28 @@ export const VN_SCRIPTS = {
   "sec4-base": [
     line(
       "empatia",
-      "Decaimiento radiactivo sin pánico",
-      `La expresión desintegración radiactiva suena a física atómica hiper pesada de película de ciencia ficción, pero en realidad la matemática de fondo es tan sencilla como cortar una pizza por la mitad una y otra vez.`
+      "Decaimiento radiactivo sin miedo",
+      `La frase desintegración radiactiva suena a física pesadísima de película de ciencia ficción, pero en el fondo la matemática es tan sencilla como ir cortando una pizza por la mitad una y otra vez sobre la mesa.`
     ),
     line(
       "pensativa",
-      "Siempre queda una porción",
-      `Empezás con una pizza entera. Al año te queda media pizza; al año siguiente, un cuarto de pizza; al siguiente, un octavo. En cada ciclo vas cortando por la mitad la porción que te había quedado del año anterior, siguiendo la ley de decaimiento <span class="eq">(1/2)<sup>x</sup></span>.`
+      "Siempre queda un pedacito",
+      `Empezás con una pizza entera. Al año te queda media pizza; al año siguiente, un cuarto de pizza; al siguiente, un octavo. En cada ciclo vas cortando por la mitad lo que te había quedado, siguiendo la ley de decaimiento <span class="eq">(1/2)<sup>x</sup></span>.`
     ),
     line(
       "explicando",
-      "Nunca llegás a cero absoluto",
-      `Fijate en este detalle fascinante: por más que cortes mil veces la porción con el cuchillo más afilado del mundo, siempre te va a quedar una miga microscópica positiva. Jamás te vas a quedar con cero absoluto <span class="eq">y = 0</span> y mucho menos con una pizza negativa.`
+      "Nunca llegás al cero absoluto",
+      `Fijate en este detalle: por más que cortes mil veces la porción con el cuchillo más afilado del mundo, siempre te va a quedar una miga microscópica positiva. Jamás te vas a quedar con cero absoluto <span class="eq">y = 0</span> y mucho menos con una pizza negativa.`
     ),
     line(
       "base",
-      "El concepto de asíntota",
-      `Esa línea invisible a la que te vas acercando infinitamente en la mesa sin llegar a tocarla jamás es lo que en matemática universitaria llamamos asíntota horizontal, que en este caso es la recta horizontal <span class="eq">y = 0</span>.`
+      "La idea detrás de la asíntota",
+      `Esa línea invisible a la que te vas acercando infinitamente sin llegar a tocarla jamás es lo que en matemática llamamos asíntota horizontal, que en este caso es la recta horizontal <span class="eq">y = 0</span>.`
     ),
     line(
       "feliz",
-      "Crecer o achicar",
-      `Una base mayor que uno como <span class="eq">a = 2 &gt; 1</span> duplica y sube hacia el cielo; una base fraccionaria como <span class="eq">a = 1/2 &lt; 1</span> divide y cae suavemente hacia la mesa. Son dos caras de la misma moneda exponencial que ya sabés dominar.`
+      "Dos caras de la misma moneda",
+      `Una base mayor a uno como <span class="eq">a = 2 &gt; 1</span> duplica y sube hacia arriba; una base fraccionaria como <span class="eq">a = 1/2 &lt; 1</span> divide y cae suavemente hacia la mesa. Son dos caras de la misma idea que ahora ya dominás.`
     ),
   ],
 
@@ -631,28 +645,28 @@ export const VN_SCRIPTS = {
   "sec5-base": [
     line(
       "empatia",
-      "Los números negativos y la trampa del ojo",
-      `Cuando aparece un signo menos adelante de una función exponencial, como en <span class="eq">f(x) = &minus;a<sup>x</sup></span>, la intuición visual nos suele traicionar porque estamos acostumbrados a pensar en cantidades físicas que se acumulan hacia arriba.`
+      "Los números negativos y la vista",
+      `Cuando aparece un signo menos adelante de una función exponencial, como en <span class="eq">f(x) = &minus;a<sup>x</sup></span>, la intuición nos suele jugar una mala pasada porque estamos acostumbrados a pensar en cantidades que crecen hacia arriba.`
     ),
     line(
       "pensativa",
-      "Menos deuda es ir para arriba",
-      `Pensalo con el saldo de una cuenta bancaria: si hoy debés tres mil pesos y mañana tu deuda se reduce a mil quinientos pesos, ¿tu situación económica subió o empeoró? ¡Subió claramente! Como <span class="eq">&minus;1500 &gt; &minus;3000</span>, estás más cerca de salir del pozo.`
+      "Menos deuda significa mejorar",
+      `Pensalo con tu billetera: si hoy debés tres mil pesos y mañana tu deuda baja a mil quinientos pesos, ¿tu situación mejoró o empeoró? ¡Mejoró claramente! Como <span class="eq">&minus;1500 &gt; &minus;3000</span>, estás más cerca de salir del pozo.`
     ),
     line(
       "explicando",
-      "La curva de -3 · (1/2)^x",
-      `Eso es exactamente lo que ocurre en la función <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>: en el origen arranca en menos tres, en el siguiente paso sube a menos uno y medio, y luego a menos cero setenta y cinco. Los valores se acercan al cero desde abajo y satisfacen la desigualdad <span class="eq">&minus;0,75 &gt; &minus;1,5 &gt; &minus;3</span>.`
+      "La curva de -3 por un medio a la x",
+      `Eso mismo pasa en <span class="eq">g(x) = &minus;3 &middot; (1/2)<sup>x</sup></span>: en el origen arranca en menos tres, luego sube a menos uno y medio, y después a menos cero setenta y cinco. Los valores se acercan al cero desde abajo: <span class="eq">&minus;0,75 &gt; &minus;1,5 &gt; &minus;3</span>.`
     ),
     line(
       "base",
-      "Creciente en el sótano",
-      `Como al avanzar hacia la derecha en el gráfico los valores de <span class="eq">y</span> se mueven hacia arriba en el eje vertical, la función es estrictamente CRECIENTE en todo su dominio, a pesar de que todos sus valores numéricos sean negativos.`
+      "Creciente en los números negativos",
+      `Como al avanzar hacia la derecha en el gráfico los valores de y se mueven hacia arriba en el eje vertical, la función es estrictamente creciente en todo su dominio, aunque todos sus valores sean negativos.`
     ),
     line(
       "orgullosa",
-      "Probá siempre dos números",
-      `Si en algún examen tenés dudas de si una curva crece o decrece, calculá dos puntos fáciles en <span class="eq">x = 0</span> y <span class="eq">x = 1</span>. Comparás los dos números en la recta real y la duda se termina en diez segundos sin discutir con nadie.`
+      "Probá siempre dos valores",
+      `Si en algún ejercicio tenés dudas de si una curva crece o decrece, calculá dos puntos fáciles en <span class="eq">x = 0</span> y <span class="eq">x = 1</span>. Comparás los dos números en la recta y la duda se despeja al instante sin complicaciones.`
     ),
   ],
 
@@ -663,27 +677,27 @@ export const VN_SCRIPTS = {
     line(
       "empatia",
       "De dos puntos a una fórmula",
-      `Reconstruir una fórmula matemática a partir de dos puntos aislados en el plano parece un truco de magia negra, pero en realidad es como seguir dos huellas en el barro para deducir quién pasó caminando.`
+      `Reconstruir una fórmula matemática a partir de dos puntos aislados en el plano parece un truco misterioso, pero en realidad es como seguir dos huellas en el barro para descubrir quién pasó caminando por ahí.`
     ),
     line(
       "pensativa",
       "La distancia entre las huellas",
-      `Cuando trabajabas con una recta medías cuántos metros avanzabas y cuántos metros subías con una regla. En una función exponencial, te fijás por qué número se multiplicó la altura al dar un paso hacia adelante.`
+      `Cuando trabajabas con una recta medías cuántos metros avanzabas y cuántos subías con una regla. En una función exponencial te fijás por qué número se multiplicó la altura al dar un paso hacia adelante.`
     ),
     line(
       "explicando",
-      "Dividir para descubrir la base",
-      `Si en x igual a uno la función vale dos, y en x igual a dos la función vale seis, el paso multiplicó la salida por tres porque <span class="eq">6 / 2 = 3</span>. ¡Esa es tu base multiplicativa <span class="eq">a = 3</span> sin ninguna vuelta complicada!`
+      "Dividir para hallar la base",
+      `Si en x igual a uno la función vale dos, y en x igual a dos vale seis, el paso multiplicó la salida por tres porque <span class="eq">6 / 2 = 3</span>. ¡Esa es tu base multiplicativa <span class="eq">a = 3</span> sin ninguna vuelta rara!`
     ),
     line(
       "base",
       "El punto de partida k",
-      `Una vez que sabés que la base multiplica por tres a cada paso, retrocedés un paso hacia el momento inicial cero para descubrir de dónde arrancó la cuenta. Al dividir por tres obtenés directamente tu coeficiente inicial <span class="eq">k = 2/3</span>.`
+      `Una vez que sabés que la base multiplica por tres a cada paso, retrocedés un paso hacia el momento cero para ver de dónde arrancó. Al dividir por tres obtenés directamente tu coeficiente inicial <span class="eq">k = 2/3</span>.`
     ),
     line(
       "feliz",
-      "Sin memorizar fórmulas",
-      `Dividir las dos alturas <span class="eq">y<sub>2</sub> / y<sub>1</sub></span> te revela el factor multiplicativo, y retroceder al momento cero te da la escala inicial <span class="eq">k</span>. Con esos dos pasos simples resolvés cualquier problema de reconstrucción que te pongan enfrente.`
+      "Sin fórmulas de memoria",
+      `Dividir las dos salidas <span class="eq">y<sub>2</sub> / y<sub>1</sub></span> te entrega la base multiplicativa, y retroceder al momento cero te da la constante k. Con esos dos pasos resolvés cualquier problema de reconstrucción que te pongan enfrente.`
     ),
   ],
 
@@ -693,28 +707,28 @@ export const VN_SCRIPTS = {
   "sec7-base": [
     line(
       "empatia",
-      "Problemas de enunciado sin miedo",
-      `Los enunciados largos de examen con bacterias, sustancias radiactivas e inflación parecen un trabalenguas imposible de descifrar. Pero todos los modelos exponenciales se arman con exactamente tres piezas básicas.`
+      "Enunciados largos sin miedo",
+      `Los enunciados largos de examen con bacterias, sustancias radiactivas y porcentajes parecen un trabalenguas imposible. Pero todos los modelos exponenciales se arman con exactamente tres piezas básicas bien reconocibles.`
     ),
     line(
       "pensativa",
-      "Ladrillo 1: El punto de partida",
-      `La primera pieza es responder: ¿con cuánto arrancás al inicio? ¿Con cincuenta gramos de material o cincuenta y cinco millones de habitantes? Ese valor inicial medido en el instante <span class="eq">t = 0</span> va colocado adelante de todo: es el coeficiente <span class="eq">k</span>.`
+      "Pieza 1: El punto de partida",
+      `La primera pieza responde a la pregunta inicial: ¿con cuánto arrancás al principio? ¿Con cincuenta gramos o con cincuenta millones de personas? Ese valor medido en el instante <span class="eq">t = 0</span> va adelante de todo: es el coeficiente k.`
     ),
     line(
       "explicando",
-      "Ladrillo 2: La tasa de cambio",
-      `La segunda pieza es responder: ¿qué le pasa a esa cantidad a cada paso? Si se corta por la mitad, ponés <span class="eq">a = 1/2</span>. Si aumenta un doce por ciento, sumás el porcentaje al entero y ponés <span class="eq">a = 1,12</span> como base de acumulación.`
+      "Pieza 2: El factor de cambio",
+      `La segunda pieza responde: ¿qué le pasa a esa cantidad a cada paso? Si se divide por la mitad, ponés <span class="eq">a = 1/2</span>. Si aumenta un doce por ciento, sumás el porcentaje al entero y ponés <span class="eq">a = 1,12</span> como base de acumulación.`
     ),
     line(
       "base",
-      "Ladrillo 3: El ritmo del reloj",
-      `La tercera pieza es responder: ¿cada cuánto tiempo ocurre esa transformación? Si la cantidad se duplica cada tres minutos, el tiempo transcurrido se divide por tres: escribís <span class="eq">t / 3</span> arriba en el exponente fraccionario para contar los ciclos reales.`
+      "Pieza 3: El ritmo del reloj",
+      `La tercera pieza responde: ¿cada cuánto tiempo ocurre esa transformación? Si la cantidad decae cada tres minutos, el tiempo se divide por tres: escribís <span class="eq">t / 3</span> en el exponente para contar las rondas reales.`
     ),
     line(
       "feliz",
-      "Ensamblado final",
-      `Juntás las tres piezas en su lugar correspondiente: <span class="eq">M(t) = 50 &middot; (1/2)<sup>t/3</sup></span>. Listo, acabás de armar el modelo formal analítico sin transpirar ni dudar un solo instante.`
+      "El modelo completo en su lugar",
+      `Juntás las tres piezas en su lugar correspondiente: <span class="eq">M(t) = 50 &middot; (1/2)<sup>t/3</sup></span>. Listo, acabás de armar el modelo analítico completo sin transpirar ni dudar en ningún paso.`
     ),
   ],
 
@@ -724,59 +738,59 @@ export const VN_SCRIPTS = {
   "sec8-base": [
     line(
       "empatia",
-      "Trasladar curvas como una transparencia",
-      `Imaginate que dibujaste la curva exponencial en una lámina de acetato transparente y ahora podés deslizar esa lámina libremente sobre la superficie de tu mesa hacia arriba, hacia abajo o hacia los costados.`
+      "Curvas como acetatos transparentes",
+      `Imaginate que dibujaste la curva exponencial en una lámina de plástico transparente y ahora podés deslizar esa lámina libremente sobre la mesa hacia arriba, hacia abajo o hacia los costados sin deformarla.`
     ),
     line(
       "pensativa",
       "Subir el piso con el número de afuera",
-      `Si a la fórmula le sumás un término <span class="eq">+4</span> al final, como en <span class="eq">f(x) = 2 &middot; 3<sup>x</sup> + 4</span>, estás levantando toda la lámina cuatro unidades hacia arriba respecto a la superficie horizontal de referencia.`
+      `Si a la fórmula le sumás un cuatro al final, como en <span class="eq">f(x) = 2 &middot; 3<sup>x</sup> + 4</span>, estás levantando toda la lámina cuatro unidades hacia arriba respecto a la superficie horizontal de referencia.`
     ),
     line(
       "explicando",
       "El piso nuevo que llamamos asíntota",
-      `El piso de la curva, que antes descansaba en la línea <span class="eq">y = 0</span>, ahora subió y flota a cuatro unidades de altura en <span class="eq">y = 4</span>. La curva se acerca a esa recta horizontal pero nunca llega a tocarla ni a cruzarla.`
+      `El piso de la curva, que antes descansaba en la recta <span class="eq">y = 0</span>, ahora subió y flota a cuatro unidades de altura en <span class="eq">y = 4</span>. La curva se acerca a esa recta pero nunca llega a tocarla ni a cruzarla.`
     ),
     line(
       "base",
       "Por qué usamos paréntesis y no corchetes",
-      `Como la curva jamás llega a tocar exactamente el valor <span class="eq">y = 4</span>, ese número es una frontera de aproximación asintótica. Por eso escribimos paréntesis redondo abierto en el conjunto imagen: <span class="eq">Im(f) = (4; +&infin;)</span>.`
+      `Como la curva jamás llega a tocar exactamente la recta <span class="eq">y = 4</span>, ese valor es una frontera de aproximación. Por eso escribimos paréntesis abierto al anotar el conjunto imagen: <span class="eq">Im(f) = (4; +&infin;)</span>.`
     ),
     line(
       "orgullosa",
-      "Un detalle de rigor analítico",
-      `Poner un paréntesis redondo <span class="eq">(4; +&infin;)</span> o un corchete cerrado <span class="eq">[4; +&infin;)</span> al escribir la imagen es la diferencia entre tener la deducción matemáticamente impecable o cometer un error conceptual grave. Ahora ya sabés la razón geométrica de por qué va abierto.`
+      "El detalle que suma puntos",
+      `Poner un paréntesis redondo <span class="eq">(4; +&infin;)</span> en vez de un corchete cerrado es la diferencia entre tener el ejercicio impecable o tropezar con un error conceptual. Ahora ya sabés la razón gráfica de por qué va abierto.`
     ),
   ],
 
   // ---------------------------------------------------------------------------
-  // SECCIÓN 9: Base desde cero (La VTV o chequeo médico)
+  // SECCIÓN 9: Base desde cero (La ficha médica de una función)
   // ---------------------------------------------------------------------------
   "sec9-base": [
     line(
       "empatia",
-      "Una radiografía no es más que una ficha médica",
-      `Hacer el estudio analítico completo de una función puede parecer a primera vista un cuestionario infinito y agotador. Miralo como hacerle la verificación técnica al auto: vas revisando pieza por pieza con una lista de control metódica.`
+      "Una radiografía es una lista de chequeo",
+      `Hacer el estudio analítico completo de una función puede parecer un cuestionario infinito y cansador. Miralo como hacerle la verificación técnica al auto: vas revisando pieza por pieza con una lista metódica.`
     ),
     line(
       "pensativa",
-      "Las tres preguntas básicas",
-      `Pregunta uno: ¿qué valores de la variable independiente puedo ingresar a la máquina? Todos los números reales sin ninguna excepción: <span class="eq">Dom(f) = &reals;</span>. Pregunta dos: ¿dónde está el piso o techo de la curva? En la recta asíntota horizontal <span class="eq">y = c</span>.`
+      "Las dos preguntas iniciales",
+      `Pregunta uno: ¿qué valores de x puedo ingresar a la fórmula? Todos los reales sin excepción: <span class="eq">Dom(f) = &reals;</span>. Pregunta dos: ¿dónde está el piso o techo de la curva? En la recta horizontal <span class="eq">y = c</span>.`
     ),
     line(
       "explicando",
-      "La frontera del suelo: el cero",
-      `Pregunta tres: ¿en qué lugar exacto la curva cruza la línea del suelo? Igualás la fórmula a cero: <span class="eq">f(x) = 0</span> y despejás la raíz. Ese número de corte divide el mapa entre lo que queda sobre el nivel del suelo y lo que queda bajo tierra.`
+      "La frontera del corte con el eje",
+      `Pregunta tres: ¿en qué lugar exacto la curva cruza la línea del suelo? Igualás la fórmula a cero: <span class="eq">f(x) = 0</span> y despejás la raíz. Ese valor de corte divide el mapa entre lo positivo y lo negativo.`
     ),
     line(
       "base",
-      "Anotar con notación formal",
-      `En matemática rigurosa cuidamos la caligrafía formal: los intervalos van siempre separados con punto y coma <span class="eq">(a; b)</span> para no confundirlos jamás con números decimales, y los cortes aislados con el eje van escritos entre llaves <span class="eq">C<sub>0</sub> = { x<sub>0</sub> }</span>.`
+      "Anotar con la notación de Exactas",
+      `En Exactas cuidamos la notación: los intervalos van siempre separados con punto y coma <span class="eq">(a; b)</span> para no confundirlos jamás con números decimales, y las raíces aisladas van escritas entre llaves <span class="eq">C<sub>0</sub> = { x<sub>0</sub> }</span>.`
     ),
     line(
       "feliz",
-      "Completar la ficha",
-      `Vas completando cada casillero de la ficha técnica siguiendo el orden metódico y tenés la radiografía analítica de la curva resuelta de punta a punta con total elegancia y sin dejar ningún hueco sin justificar.`
+      "La ficha completa y ordenada",
+      `Vas completando cada renglón de la lista metódica y tenés la radiografía analítica de la curva resuelta de punta a punta con total claridad y sin dejar ningún cabo suelto.`
     ),
   ],
 
@@ -786,28 +800,28 @@ export const VN_SCRIPTS = {
   "sec10-base": [
     line(
       "empatia",
-      "Bajar la x que quedó atrapada arriba",
-      `Ver la incógnita <span class="eq">x</span> colgada arriba en el exponente genera cierta impotencia al principio porque parece que no la podés alcanzar con las operaciones comunes de despeje que aprendiste en la escuela secundaria.`
+      "Bajar la incógnita del exponente",
+      `Ver la incógnita x colgada arriba en el exponente genera cierta desconfianza al principio porque parece inalcanzable con los despejes comunes que nos enseñaron en la escuela secundaria.`
     ),
     line(
       "pensativa",
-      "Bases gemelas a los dos lados",
-      `El secreto más poderoso de todo el álgebra es lograr que ambos platillos de la balanza tengan exactamente la misma base numérica. Si lográs escribir <span class="eq">2<sup>x</sup> = 2<sup>5</sup></span>, la respuesta salta a la vista sola: <span class="eq">x = 5</span>.`
+      "Bases idénticas a los dos lados",
+      `El secreto más elegante de todo el álgebra es lograr que ambos platillos de la balanza tengan la misma base numérica. Si lográs escribir <span class="eq">2<sup>x</sup> = 2<sup>5</sup></span>, la respuesta salta sola a la vista: <span class="eq">x = 5</span>.`
     ),
     line(
       "explicando",
-      "Igualar las alturas",
-      `Si las bases son idénticas en ambos lados de la igualdad, los exponentes tienen que ser obligatoriamente iguales entre sí para que la balanza no se desequilibre: <span class="eq">a<sup>u</sup> = a<sup>v</sup> &rArr; u = v</span>. Hacés a un lado las bases y te queda una ecuación sencilla de resolver.`
+      "Igualar los exponentes",
+      `Si las bases son idénticas en ambos miembros, los exponentes tienen que ser obligatoriamente iguales entre sí para que la balanza se mantenga en equilibrio: <span class="eq">a<sup>u</sup> = a<sup>v</sup> &rArr; u = v</span>. Descartás las bases y te queda una ecuación común.`
     ),
     line(
       "base",
-      "El truco de sacar factor común",
-      `Si te aparecen potencias sumadas como <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup></span>, desarmás el primer exponente en una multiplicación y extraés la potencia común afuera del paréntesis, obteniendo <span class="eq">2<sup>x</sup> &middot; (2 + 1)</span> para reducir todo a una cuenta simple.`
+      "El truco del factor común",
+      `Si te aparecen potencias sumadas como <span class="eq">2<sup>x+1</sup> + 2<sup>x</sup></span>, desarmás el primer exponente en una multiplicación y extraés la potencia común afuera del paréntesis, reduciendo todo a una cuenta muy simple.`
     ),
     line(
       "orgullosa",
-      "Las tres llaves maestras",
-      `Igualar bases en la balanza con <span class="eq">a<sup>u</sup> = a<sup>v</sup></span>, sacar factor común de la potencia repetida y aplicar una sustitución cuadrática positiva como <span class="eq">u = a<sup>x</sup> &gt; 0</span>: esas son las tres llaves maestras que abren cualquier ecuación exponencial que te pongan enfrente.`
+      "Las tres llaves del álgebra",
+      `Igualar bases en la balanza con <span class="eq">a<sup>u</sup> = a<sup>v</sup></span>, sacar factor común de la potencia repetida y aplicar una sustitución cuadrática positiva: esas son las tres llaves maestras para resolver cualquier ecuación exponencial.`
     ),
   ],
 };
@@ -815,8 +829,6 @@ export const VN_SCRIPTS = {
 // =============================================================================
 // ALIASING UNIVERSAL DE GUIONES
 // =============================================================================
-// Asegura que sec1-why, sec1-tablas y sec-1 resuelvan al mismo objeto,
-// y análogamente para sec1-base y sec-1-basico.
 
 const MAIN_ALIASES = [
   ["sec1-tablas", ["sec1-why", "sec-1"]],

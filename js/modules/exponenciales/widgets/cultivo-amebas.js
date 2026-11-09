@@ -7,6 +7,7 @@
 
 import {
   createBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -25,6 +26,28 @@ export function initWidget(container, options = {}) {
     mode: options.mode || 'both', // 1 | 3 | 'both'
     showFallacy: false,
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'En un cultivo con f(t) = 3 · 2ᵗ amebas, ¿cuántas amebas habrá a las 2 horas?',
+    options: [
+      {
+        label: '36 amebas, porque 3 · 2 = 6 y 6² = 36',
+        correct: false,
+        explanation: '¡Colapso algebraico! La potencia tiene prioridad: 2² = 4, y 3 · 4 = 12 amebas.',
+      },
+      {
+        label: '12 amebas, porque 2² = 4 y 3 · 4 = 12',
+        correct: true,
+        explanation: '¡Exacto! El coeficiente inicial k = 3 espera afuera y multiplica al final.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ t: 2 });
+      timeSlider.value = '2';
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const modeOptions = [
@@ -58,7 +81,7 @@ export function initWidget(container, options = {}) {
     't',
     'Tiempo transcurrido (horas)',
     0,
-    6,
+    10,
     store.get().t,
     1,
     (v) => `${v} h`,
@@ -159,7 +182,7 @@ export function initWidget(container, options = {}) {
 
   // Axes ticks and grid
   const yMax = 100;
-  const tMax = 6;
+  const tMax = 10;
 
   const mapT = (t) => graphX + 40 + (t / tMax) * (graphW - 60);
   const mapY = (y) => graphY + graphH - 30 - (Math.min(y, yMax) / yMax) * (graphH - 50);

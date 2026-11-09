@@ -7,6 +7,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   renderReadout,
@@ -90,6 +91,27 @@ export function initWidget(container, options = {}) {
     preset: defaultPreset,
     highlight: 'all',
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Para f(x) = 2 − (1/2)ˣ, ¿dónde cruza la curva al eje horizontal X?',
+    options: [
+      {
+        label: 'En x = −1, porque 2 − (1/2)⁻¹ = 2 − 2 = 0',
+        correct: true,
+        explanation: '¡Exacto! (1/2)ˣ = 2 ⟹ 2⁻ˣ = 2¹ ⟹ x = −1.',
+      },
+      {
+        label: 'En x = 1, porque 2 − 1 = 1',
+        correct: false,
+        explanation: 'En x = 1 la función vale 2 − 1/2 = 1,5, no se anula.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ preset: 'ej14', highlight: 'root' });
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const presetOptions = Object.entries(PRESETS).map(([k, p]) => [k, p.label]);
@@ -249,48 +271,73 @@ export function initWidget(container, options = {}) {
       setVisible(ptRoot, showRoot);
       setVisible(labelRoot, showRoot);
 
-      // Shade C+ and C-
+      function makeCurveShade(xStart, xEnd) {
+        const pts = [];
+        const nSteps = 30;
+        for (let i = 0; i <= nSteps; i++) {
+          const cx = xStart + (i / nSteps) * (xEnd - xStart);
+          const cy = Math.max(-5, Math.min(5, k * Math.pow(a, cx - h) + c));
+          pts.push(`L ${plane.sx(cx).toFixed(1)} ${plane.sy(cy).toFixed(1)}`);
+        }
+        return `M ${plane.sx(xStart).toFixed(1)} ${plane.sy(0).toFixed(1)} ${pts.join(' ')} L ${plane.sx(xEnd).toFixed(1)} ${plane.sy(0).toFixed(1)} Z`;
+      }
+
+      const isCrec = analysis.isGrowth;
+      const posStartsAtRoot = (k < 0 && a < 1) || (k > 0 && a > 1);
+
       if (hl === 'cpos' || hl === 'all') {
-        const isCrec = analysis.isGrowth;
-        const xLo = isCrec ? x0 : -5;
-        const xHi = isCrec ? 5 : x0;
-        const shadeD = [
-          `M ${plane.sx(xLo)} ${plane.sy(0)}`,
-          `L ${plane.sx(xLo)} ${plane.sy(isCrec ? c : y0)}`,
-          `L ${plane.sx(xHi)} ${plane.sy(isCrec ? c : 0)}`,
-          `L ${plane.sx(xHi)} ${plane.sy(0)}`,
-          'Z',
-        ].join(' ');
-        shadeGroupPos.setAttribute('d', shadeD);
+        const xStart = posStartsAtRoot ? x0 : -5;
+        const xEnd = posStartsAtRoot ? 5 : x0;
+        shadeGroupPos.setAttribute('d', makeCurveShade(xStart, xEnd));
         setVisible(shadeGroupPos, true);
       } else {
         setVisible(shadeGroupPos, false);
       }
 
       if (hl === 'cneg' || hl === 'all') {
-        const isCrec = analysis.isGrowth;
-        const xLo = isCrec ? -5 : x0;
-        const xHi = isCrec ? x0 : 5;
-        const shadeD = [
-          `M ${plane.sx(xLo)} ${plane.sy(0)}`,
-          `L ${plane.sx(xLo)} ${plane.sy(-5)}`,
-          `L ${plane.sx(xHi)} ${plane.sy(-5)}`,
-          `L ${plane.sx(xHi)} ${plane.sy(0)}`,
-          'Z',
-        ].join(' ');
-        shadeGroupNeg.setAttribute('d', shadeD);
+        const xStart = posStartsAtRoot ? -5 : x0;
+        const xEnd = posStartsAtRoot ? x0 : 5;
+        shadeGroupNeg.setAttribute('d', makeCurveShade(xStart, xEnd));
         setVisible(shadeGroupNeg, true);
       } else {
         setVisible(shadeGroupNeg, false);
       }
     } else {
+      function makeFullCurveShade() {
+        const pts = [];
+        const nSteps = 40;
+        for (let i = 0; i <= nSteps; i++) {
+          const cx = -5 + (i / nSteps) * 10;
+          const cy = Math.max(-5, Math.min(5, k * Math.pow(a, cx - h) + c));
+          pts.push(`L ${plane.sx(cx).toFixed(1)} ${plane.sy(cy).toFixed(1)}`);
+        }
+        return `M ${plane.sx(-5).toFixed(1)} ${plane.sy(0).toFixed(1)} ${pts.join(' ')} L ${plane.sx(5).toFixed(1)} ${plane.sy(0).toFixed(1)} Z`;
+      }
+
       labelIntercept.setAttribute('x', String(sx0 + 8));
       labelIntercept.setAttribute('y', String(sy0 - 6));
       setText(labelIntercept, `P_y(0; ${fmt(y0)})`);
       setVisible(ptRoot, false);
       setVisible(labelRoot, false);
-      setVisible(shadeGroupPos, hl === 'cpos' || hl === 'all');
-      setVisible(shadeGroupNeg, false);
+
+      const isEntirelyPositive = y0 > 0 && c >= 0;
+      if (isEntirelyPositive) {
+        if (hl === 'cpos' || hl === 'all') {
+          shadeGroupPos.setAttribute('d', makeFullCurveShade());
+          setVisible(shadeGroupPos, true);
+        } else {
+          setVisible(shadeGroupPos, false);
+        }
+        setVisible(shadeGroupNeg, false);
+      } else {
+        if (hl === 'cneg' || hl === 'all') {
+          shadeGroupNeg.setAttribute('d', makeFullCurveShade());
+          setVisible(shadeGroupNeg, true);
+        } else {
+          setVisible(shadeGroupNeg, false);
+        }
+        setVisible(shadeGroupPos, false);
+      }
     }
 
     // Build the 9 official properties for readout

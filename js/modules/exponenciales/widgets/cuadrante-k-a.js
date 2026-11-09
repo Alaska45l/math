@@ -7,6 +7,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -50,6 +51,27 @@ export function initWidget(container, options = {}) {
     a: 0.5,
     showLiveTable: true,
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Para g(x) = −3 · (1/2)ˣ, al avanzar de x = 0 a x = 1, ¿la función sube o baja?',
+    options: [
+      {
+        label: 'Baja, porque la base 1/2 es menor que 1',
+        correct: false,
+        explanation: '¡Trampa clásica! g(0) = −3 y g(1) = −1,5. Como −1,5 > −3, los valores van subiendo hacia el cero.',
+      },
+      {
+        label: 'Sube, porque pasa de −3 a −1,5 (−1,5 > −3)',
+        correct: true,
+        explanation: '¡Exacto! El coeficiente negativo k = −3 refleja la curva verticalmente, convirtiéndola en estrictamente creciente.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ quadrant: 'q4', k: -3, a: 0.5 });
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const updateQuadChips = addChips(
@@ -267,38 +289,47 @@ export function initWidget(container, options = {}) {
     const px2 = plane.sx(x2);
     const py2 = plane.sy(y2);
 
+    const minYBound = plane.box.y + 12;
+    const maxYBound = plane.box.y + plane.box.h - 12;
+    const cPy1 = Math.max(minYBound, Math.min(maxYBound, py1));
+    const cPy2 = Math.max(minYBound, Math.min(maxYBound, py2));
+
     ptP1.setAttribute('cx', String(px1));
-    ptP1.setAttribute('cy', String(py1));
+    ptP1.setAttribute('cy', String(cPy1));
     ptP2.setAttribute('cx', String(px2));
-    ptP2.setAttribute('cy', String(py2));
+    ptP2.setAttribute('cy', String(cPy2));
 
     const isIncreasing = y2 > y1;
     const arrowColor = isIncreasing ? 'var(--green)' : 'var(--pink)';
 
     arrowLine.setAttribute('x1', String(px2 + 15));
-    arrowLine.setAttribute('y1', String(py1));
+    arrowLine.setAttribute('y1', String(cPy1));
     arrowLine.setAttribute('x2', String(px2 + 15));
-    arrowLine.setAttribute('y2', String(py2));
+    arrowLine.setAttribute('y2', String(cPy2));
     arrowLine.setAttribute('stroke', arrowColor);
 
-    const arrowY = isIncreasing ? py2 - 4 : py2 + 4;
     arrowHead.setAttribute('fill', arrowColor);
     if (isIncreasing) {
-      arrowHead.setAttribute('points', `${px2 + 11},${py2 + 4} ${px2 + 19},${py2 + 4} ${px2 + 15},${py2 - 4}`);
+      arrowHead.setAttribute('points', `${px2 + 11},${cPy2 + 4} ${px2 + 19},${cPy2 + 4} ${px2 + 15},${cPy2 - 4}`);
     } else {
-      arrowHead.setAttribute('points', `${px2 + 11},${py2 - 4} ${px2 + 19},${py2 - 4} ${px2 + 15},${py2 + 4}`);
+      arrowHead.setAttribute('points', `${px2 + 11},${cPy2 - 4} ${px2 + 19},${cPy2 - 4} ${px2 + 15},${cPy2 + 4}`);
     }
 
     arrowText.setAttribute('x', String(px2 + 25));
-    arrowText.setAttribute('y', String((py1 + py2) / 2 + 4));
+    arrowText.setAttribute('y', String((cPy1 + cPy2) / 2 + 4));
     arrowText.setAttribute('fill', arrowColor);
     setText(arrowText, isIncreasing ? 'CRECIENTE' : 'DECRECIENTE');
 
     // Run exact mathematical logic analysis
     const analysis = analyzeExponential({ k, a, h: 0, c: 0 });
 
+    const liveTableCells = [-1, 0, 1, 2]
+      .map((vx) => `x=${vx}: ${fmt(k * Math.pow(a, vx))}`)
+      .join(' | ');
+
     const rows = [
       ['Función Analizada', `f(x) = ${fmt(k)} · ${a === 0.5 ? '(1/2)' : fmt(a)}ˣ`],
+      ['Tabla Viva de Valores', liveTableCells],
       ['Comportamiento de Monotonía', `Estrictamente ${analysis.monotonicity.toUpperCase()} en todo ℝ`],
       ['Conjunto Imagen', `Im(f) = ${analysis.image} con asíntota horizontal y = 0`],
     ];

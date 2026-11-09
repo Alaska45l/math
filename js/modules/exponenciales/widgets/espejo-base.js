@@ -6,6 +6,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -58,6 +59,27 @@ export function initWidget(container, options = {}) {
     decayYear: 2,
     probeX: 1,
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: '¿Cómo se relaciona la gráfica de (1/2)ˣ con la de 2ˣ?',
+    options: [
+      {
+        label: 'Es su reflexión simétrica respecto al eje Y, porque (1/2)ˣ = 2⁻ˣ',
+        correct: true,
+        explanation: '¡Exacto! Cambiar x por −x produce una reflexión geométrica respecto al eje vertical de ordenadas.',
+      },
+      {
+        label: 'Es su reflexión simétrica respecto al eje X',
+        correct: false,
+        explanation: 'Reflejar respecto al eje horizontal cambia el signo exterior (−2ˣ), no la base inversa.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ mode: 'mirror', mirrorBase: 2, probeX: 1 });
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const updateModeChips = addChips(
@@ -160,6 +182,8 @@ export function initWidget(container, options = {}) {
   const labelA = s('text', { class: 'exp-svg-label', 'font-size': '11px', fill: 'var(--blue)' }, '');
   const labelB = s('text', { class: 'exp-svg-label', 'font-size': '11px', fill: 'var(--yellow)' }, '');
   const labelC = s('text', { class: 'exp-svg-label', 'font-size': '11px', fill: 'var(--green)', visibility: 'hidden' }, '');
+  const ptReflected = s('circle', { r: 5.5, fill: 'var(--yellow)', stroke: 'var(--bg)', 'stroke-width': 2, visibility: 'hidden' });
+  const labelReflected = s('text', { class: 'exp-svg-label', 'font-size': '11px', fill: 'var(--yellow)', visibility: 'hidden' }, '');
 
   // Vertical probe line
   const vProbe = s('line', {
@@ -173,7 +197,7 @@ export function initWidget(container, options = {}) {
     visibility: 'hidden',
   });
 
-  plane.layers.marks.append(vProbe, ptA, ptB, ptC, labelA, labelB, labelC);
+  plane.layers.marks.append(vProbe, ptA, ptB, ptC, labelA, labelB, labelC, ptReflected, labelReflected);
 
   // 3. Render pipeline
   const render = (state) => {
@@ -248,6 +272,17 @@ export function initWidget(container, options = {}) {
       labelB.setAttribute('text-anchor', textAnchor);
       setText(labelB, `(1/${a})^(${fmt(x)}) = ${fmt(yB)}`);
 
+      // Reflected point at (-x, yA) on (1/a)^x curve
+      setVisible(ptReflected, true);
+      setVisible(labelReflected, true);
+      ptReflected.setAttribute('cx', String(pNegX));
+      ptReflected.setAttribute('cy', String(pyA));
+      const refNearLeft = pNegX < 120;
+      labelReflected.setAttribute('x', String(refNearLeft ? pNegX + 8 : pNegX - 8));
+      labelReflected.setAttribute('y', String(pyA - 6));
+      labelReflected.setAttribute('text-anchor', refNearLeft ? 'start' : 'end');
+      setText(labelReflected, `(-${fmt(x)}; ${fmt(yA)})`);
+
       rows.push([
         'Teorema de Reflexión Axial',
         `Al sustituir x por −x: (1/${a})ˣ = (${a}⁻¹)ˣ = ${a}⁻ˣ. Invertir la base equivale geométricamente a reflejar la gráfica respecto al eje Y.`,
@@ -260,6 +295,8 @@ export function initWidget(container, options = {}) {
         'Simetría de Alturas',
         `Para x = ${fmt(x)}: la curva ${a}ˣ tiene altura ${fmt(yA)}, exactamente igual a la altura de (1/${a})ˣ en x = ${fmt(-x)}.`,
       ]);
+      setVisible(ptReflected, false);
+      setVisible(labelReflected, false);
     } else if (isDecay) {
       // Radioactive decay: 1 kg vs 2 kg
       const t = state.decayYear;
@@ -360,18 +397,22 @@ export function initWidget(container, options = {}) {
       labelA.setAttribute('text-anchor', textAnchor);
       setText(labelA, `2ˣ = ${fmt(y2)}`);
 
+      setVisible(ptReflected, false);
+      setVisible(labelReflected, false);
+
       ptC.setAttribute('cx', String(px));
       ptC.setAttribute('cy', String(pye));
-      labelC.setAttribute('x', labelX);
+      // Alternate side: e^x on the left of probe, 3^x on the right
+      labelC.setAttribute('x', String(px - 10));
       labelC.setAttribute('y', String(pye - 6));
-      labelC.setAttribute('text-anchor', textAnchor);
+      labelC.setAttribute('text-anchor', 'end');
       setText(labelC, `eˣ = ${fmt(ye)}`);
 
       ptB.setAttribute('cx', String(px));
       ptB.setAttribute('cy', String(py3));
-      labelB.setAttribute('x', labelX);
+      labelB.setAttribute('x', String(px + 10));
       labelB.setAttribute('y', String(py3 - 6));
-      labelB.setAttribute('text-anchor', textAnchor);
+      labelB.setAttribute('text-anchor', 'start');
       setText(labelB, `3ˣ = ${fmt(y3)}`);
 
       rows.push([

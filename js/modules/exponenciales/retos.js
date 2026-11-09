@@ -23,6 +23,7 @@ import { playScript } from "../../core/vn.js";
 import { diagnoseExp } from "./logic.js";
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from "./vn-scripts.js";
 import { saveProgress } from "./components.js";
+import { parseIntervalExactas, equivalentExp } from "./expr.js";
 
 export const CHALLENGE_TYPES = [
   "razon_tabla_vs_salto",
@@ -96,7 +97,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Calculá el cociente entre dos renglones consecutivos: dividí el valor de y en x = 1 por el valor en x = 0.",
           `Comprobá que esa división se mantenga constante: ${y2} / ${y1} = ${a} y ${y1} / ${y0} = ${a}. No restes los valores.`,
-          `La razón multiplicativa es ${fmt(a)}, que coincide con la base de la función exponencial f(x) = ${y0} · ${a}ˣ.`,
+          `Ese cociente constante y_(i+1) / y_i entre términos consecutivos es exactamente la base exponencial buscada.`,
         ],
         solution: [
           "En una función exponencial con paso Δx = 1, la razón multiplicativa es a = y_(i+1) / y_i.",
@@ -130,7 +131,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Por jerarquía de operaciones, calculá primero la potencia aˣ antes de multiplicar por el coeficiente k.",
           `Elevá la base ${a} al exponente ${x}: ${a}^${x} = ${powerVal}. El coeficiente ${k} espera afuera.`,
-          `Multiplicá el resultado de la potencia por ${k}: ${k} · ${powerVal} = ${correctVal}.`,
+          `Multiplicá ahora la escala inicial ${k} por el valor calculado de la potencia para obtener f(${x}).`,
         ],
         solution: [
           `Separamos respetando la jerarquía algebraica: f(${x}) = ${k} · (${a}^${x}).`,
@@ -154,7 +155,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Recordá que elevar a la 1/2 equivale a calcular la raíz cuadrada principal del número: a^(1/2) = √a.",
           `Calculá la raíz cuadrada principal de ${base}: √${base} = ${root}.`,
-          `Multiplicá el coeficiente inicial ${k} por esa raíz: ${k} · ${root} = ${correctVal}.`,
+          `Multiplicá ahora el coeficiente inicial ${k} por el valor de la raíz calculada en el paso anterior (${root}).`,
         ],
         solution: [
           `Aplicamos la propiedad del exponente racional: ${base}^(1/2) = √${base}.`,
@@ -177,7 +178,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Invertir la base fraccionaria cambia el signo del exponente: (1/b)⁻ᵐ = bᵐ.",
           `Al dar vuelta la fracción 1/${b}, el exponente pasa de −${m} a +${m}: nos queda ${b}^${m}.`,
-          `Calculá la potencia entera positiva: ${b}^${m} = ${correctVal}.`,
+          `Calculá la potencia entera positiva resultante ${b}^${m} tras invertir la base fraccionaria.`,
         ],
         solution: [
           `Por propiedad de la potencia de una fracción: (1/${b})⁻${m} = (${b}/1)^${m}.`,
@@ -202,7 +203,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Dividí las ordenadas de los puntos dados para cancelar k: f(2) / f(1) = a^(2−1) = a.",
           `${y2} / ${y1} = ${a}, por lo que la base es a = ${a}. Luego hallá k usando P(1; ${y1}): k · ${a} = ${y1} ⟹ k = ${k}.`,
-          `Con la fórmula f(x) = ${k} · ${a}ˣ completa, evaluá en x = 3: f(3) = ${k} · ${a}³.`,
+          `Con la fórmula f(x) = ${k} · ${a}ˣ deducida, calculá el valor final evaluando f(3) = ${k} · ${a}³.`,
         ],
         solution: [
           `Dividimos las salidas: f(2)/f(1) = (${k}·${a}²) / (${k}·${a}) = ${a}. Deducimos que a = ${a}.`,
@@ -228,7 +229,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Calculá primero cuántas vidas medias transcurrieron dividiendo el tiempo total por el período: t / T.",
           `En t = ${t} minutos pasaron ${t} / ${T} = ${cycles} períodos completos. La fracción restante es (1/2)^${cycles} = 1/${divisor}.`,
-          `Multiplicá la masa inicial por esa fracción: ${M0} / ${divisor} = ${correctVal} g.`,
+          `Multiplicá la masa inicial ${M0} por la fracción de decaimiento (1/2)^${cycles} para hallar la masa restante.`,
         ],
         solution: [
           `El exponente compuesto mide los ciclos de decaimiento: n = t/T = ${t}/${T} = ${cycles} vidas medias.`,
@@ -253,7 +254,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Al evaluar en x = h, el exponente de la base se anula: x − h = 0.",
           `Cualquier base positiva elevada a la cero vale uno: ${a}⁰ = 1.`,
-          `Queda f(${hVal}) = ${k} · 1 + ${c} = ${anchorVal}.`,
+          `Efectuá la suma final f(${hVal}) = ${k} · 1 + ${c} para determinar la ordenada del ancla.`,
         ],
         solution: [
           `Sustituimos x = ${hVal} en la función: f(${hVal}) = ${k} · ${a}^(${hVal}−${hVal}) + ${c}.`,
@@ -276,7 +277,7 @@ export function makeChallenge(seed, requestedType = null) {
         hints: [
           "Desarmá 2^(x+1) como 2ˣ · 2¹ usando la propiedad del producto de potencias de igual base.",
           `Extraé 2ˣ de factor común: 2ˣ · (2 + 1) = ${rhs} ⟹ 2ˣ · 3 = ${rhs}.`,
-          `Dividí por 3 ambos miembros: 2ˣ = ${powerVal}, e igualá los exponentes sabiendo que ${powerVal} = 2^${m}.`,
+          `Dividí por 3 ambos miembros para obtener 2ˣ = ${powerVal}, y buscá la potencia de 2 que iguala esa cantidad.`,
         ],
         solution: [
           `Descomponemos: 2^(x+1) + 2ˣ = 2ˣ · 2 + 2ˣ · 1 = 2ˣ · (2 + 1) = 2ˣ · 3.`,
@@ -424,6 +425,7 @@ function createTrainer(root) {
   let failStreak = 0;
   let successStreak = 0;
   let hintStep = 0;
+  let solutionRevealed = false;
 
   const seedInput = h("input", {
     type: "number",
@@ -530,7 +532,31 @@ function createTrainer(root) {
         click: () => {
           const raw = input.value.trim().replace(",", ".");
           const valNum = Number(raw);
-          const isCorrect = Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
+          let isCorrect = Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
+
+          if (!isCorrect && typeof current.answer === "string") {
+            try {
+              const expectedIv = parseIntervalExactas(current.answer);
+              const userIv = parseIntervalExactas(raw);
+              if (
+                expectedIv &&
+                userIv &&
+                expectedIv.openLeft === userIv.openLeft &&
+                expectedIv.openRight === userIv.openRight &&
+                Math.abs(expectedIv.left - userIv.left) < 1e-4 &&
+                Math.abs(expectedIv.right - userIv.right) < 1e-4
+              ) {
+                isCorrect = true;
+              }
+            } catch {}
+            if (!isCorrect) {
+              try {
+                if (equivalentExp(raw, current.answer)) {
+                  isCorrect = true;
+                }
+              } catch {}
+            }
+          }
 
           const diagnosis = diagnoseExp(raw, {
             ...current.spec,
@@ -538,18 +564,34 @@ function createTrainer(root) {
           });
 
           if (isCorrect) {
-            feedback.textContent = `Correcto: ${current.displayAnswer}. El razonamiento analítico quedó guardado.`;
-            feedback.className = "exp-check__feedback pr-check__feedback is-correct";
-            saveProgress("challenge:last", { seed, type: current.type });
-            if (failStreak > 0) {
-              playScript([STREAK_REACTIONS.recovered]);
-              successStreak = 1;
+            const wasAssisted = hintStep > 0 || solutionRevealed;
+            const mode = wasAssisted ? "assisted" : "independent";
+            feedback.textContent = wasAssisted
+              ? `Correcto: ${current.displayAnswer}. Resuelto con apoyo (asistido).`
+              : `Correcto: ${current.displayAnswer}. Resuelto de forma independiente.`;
+            feedback.className = `exp-check__feedback pr-check__feedback is-correct is-${mode} check-feedback--${mode} state-solved`;
+            saveProgress("challenge:last", { seed, type: current.type, mode, solved: true });
+
+            input.disabled = true;
+            revise.disabled = true;
+            reveal.disabled = true;
+            hint.disabled = true;
+
+            if (wasAssisted) {
+              if (failStreak > 0) {
+                playScript([STREAK_REACTIONS.recovered]);
+              }
             } else {
-              successStreak++;
-              if (successStreak >= 3) {
-                playScript([STREAK_REACTIONS.flawlessRun]);
+              if (failStreak > 0) {
+                playScript([STREAK_REACTIONS.recovered]);
+                successStreak = 1;
               } else {
-                playScript([STREAK_REACTIONS.firstTry]);
+                successStreak++;
+                if (successStreak >= 3) {
+                  playScript([STREAK_REACTIONS.flawlessRun]);
+                } else {
+                  playScript([STREAK_REACTIONS.firstTry]);
+                }
               }
             }
             failStreak = 0;
@@ -561,9 +603,11 @@ function createTrainer(root) {
               "Todavía no coincide. Consultá una pista y revisá las operaciones paso a paso.";
             feedback.className = "exp-check__feedback pr-check__feedback is-error";
             const id = diagnosis?.id;
-            if (failStreak >= 2) playScript([STREAK_REACTIONS.repeatedError]);
-            else if (id && DIAGNOSE_REACTIONS[id])
+            if (id && DIAGNOSE_REACTIONS[id]) {
               playScript([DIAGNOSE_REACTIONS[id]]);
+            } else if (failStreak >= 2) {
+              playScript([STREAK_REACTIONS.repeatedError]);
+            }
           }
         },
       },
@@ -603,7 +647,13 @@ function createTrainer(root) {
       class: "btn btn--ghost",
       on: {
         click: () => {
+          solutionRevealed = true;
+          successStreak = 0;
           solution.hidden = false;
+          input.disabled = true;
+          revise.disabled = true;
+          reveal.disabled = true;
+          hint.disabled = true;
           mount(
             solution,
             h("strong", null, "Resolución paso a paso"),
@@ -653,11 +703,17 @@ function createTrainer(root) {
     mount(prompt, ...inlineMathNodes(current.prompt));
     meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} · Semilla ${fmt(seed)}`;
     input.value = "";
+    input.disabled = false;
+    revise.disabled = false;
+    reveal.disabled = false;
+    hint.disabled = false;
     preview.textContent = "Interpretado como: —";
     feedback.textContent = "";
+    feedback.className = "exp-check__feedback pr-check__feedback";
     hintText.hidden = true;
     solution.hidden = true;
     hintStep = 0;
+    solutionRevealed = false;
   };
 
   seedInput.addEventListener("change", () => {

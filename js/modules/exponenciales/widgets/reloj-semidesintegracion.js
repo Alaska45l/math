@@ -7,6 +7,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -190,6 +191,7 @@ export function initWidget(container, options = {}) {
     {
       width: 640,
       height: 340,
+      pad: { l: 52, r: 92, t: 22, b: 36 },
       xMin: 0,
       xMax: initialModel.tMax,
       yMin: 0,
@@ -205,6 +207,27 @@ export function initWidget(container, options = {}) {
     presetKey: defaultPreset,
     t: 0,
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Una muestra de 50 g de talio tiene vida media T = 3 min. A los 30 min, ¿cuántos ciclos de decaimiento ocurrieron?',
+    options: [
+      {
+        label: '90 ciclos, porque 30 · 3 = 90',
+        correct: false,
+        explanation: '¡Trampa de escala temporal! El tiempo total transcurrido se divide por la duración de cada ciclo: 30 / 3 = 10 ciclos.',
+      },
+      {
+        label: '10 ciclos, porque 30 / 3 = 10',
+        correct: true,
+        explanation: '¡Exacto! El exponente t/T divide el tiempo por el período para contar cuántas veces se dividió a la mitad.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ presetKey: 'talio', t: 30 });
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const presetOptions = Object.entries(PRESETS).map(([k, p]) => [k, p.label]);

@@ -6,6 +6,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   renderReadout,
@@ -77,6 +78,30 @@ export function initWidget(container, options = {}) {
     p2: { ...initialData.p2 },
   });
 
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: 'Si una curva f(x) = k · aˣ pasa por P(1; 1) y Q(2; 3), ¿cuánto vale su base a?',
+    options: [
+      {
+        label: 'a = 2, porque 3 − 1 = 2',
+        correct: false,
+        explanation: '¡Cuidado con restar! En las exponenciales las ordenadas se dividen para cancelar k: f(2)/f(1) = 3/1 = 3.',
+      },
+      {
+        label: 'a = 3, porque al dividir las ordenadas 3 / 1 = 3',
+        correct: true,
+        explanation: '¡Exacto! El cociente entre dos pasos consecutivos f(2)/f(1) = a^(2−1) = a = 3.',
+      },
+    ],
+    onVerify: () => {
+      const p = PRESETS['7c'];
+      markerP.setPos(p.p1.x, p.p1.y);
+      markerQ.setPos(p.p2.x, p.p2.y);
+      store.set({ preset: '7c', p1: { ...p.p1 }, p2: { ...p.p2 } });
+    },
+  });
+  board.controls.prepend(predictBox);
+
   // 1. Controls
   const presetOptions = [
     ...Object.entries(PRESETS).map(([k, p]) => [k, p.label]),
@@ -115,7 +140,29 @@ export function initWidget(container, options = {}) {
   // Projection dashed lines for Q
   const projLineQX = s('line', { stroke: 'var(--yellow)', 'stroke-dasharray': '3 3', opacity: 0.6 });
   const projLineQY = s('line', { stroke: 'var(--yellow)', 'stroke-dasharray': '3 3', opacity: 0.6 });
-  plane.layers.under.append(projLinePX, projLinePY, projLineQX, projLineQY);
+  const stepLineH = s('line', {
+    stroke: 'var(--blue)',
+    'stroke-width': 1.5,
+    'stroke-dasharray': '3 3',
+  });
+  const stepLineV = s('line', {
+    stroke: 'var(--yellow)',
+    'stroke-width': 1.5,
+    'stroke-dasharray': '3 3',
+  });
+  const stepTextH = s('text', {
+    class: 'exp-svg-label',
+    'font-size': '11px',
+    fill: 'var(--blue)',
+    'text-anchor': 'middle',
+  }, '');
+  const stepTextV = s('text', {
+    class: 'exp-svg-label',
+    'font-size': '11px',
+    fill: 'var(--yellow)',
+    'text-anchor': 'start',
+  }, '');
+  plane.layers.under.append(projLinePX, projLinePY, projLineQX, projLineQY, stepLineH, stepLineV, stepTextH, stepTextV);
 
   // Draggable Markers P and Q
   const markerP = addDraggableMarker(board, plane, store.get().p1.x, store.get().p1.y, {
@@ -210,6 +257,31 @@ export function initWidget(container, options = {}) {
       const deltaX = p2.x - p1.x;
       const ratioY = p2.y / p1.y;
 
+      stepLineH.setAttribute('x1', String(sx1));
+      stepLineH.setAttribute('y1', String(sy1));
+      stepLineH.setAttribute('x2', String(sx2));
+      stepLineH.setAttribute('y2', String(sy1));
+
+      stepLineV.setAttribute('x1', String(sx2));
+      stepLineV.setAttribute('y1', String(sy1));
+      stepLineV.setAttribute('x2', String(sx2));
+      stepLineV.setAttribute('y2', String(sy2));
+
+      stepTextH.setAttribute('x', String((sx1 + sx2) / 2));
+      stepTextH.setAttribute('y', String(sy1 + (sy1 < sy2 ? -6 : 14)));
+      setText(stepTextH, `Δx = ${fmt(deltaX)}`);
+
+      stepTextV.setAttribute('x', String(sx2 + 6));
+      stepTextV.setAttribute('y', String((sy1 + sy2) / 2));
+      setText(stepTextV, `× a^(${fmt(deltaX)})`);
+
+      setVisible(stepLineH, true);
+      setVisible(stepLineV, true);
+      setVisible(stepTextH, true);
+      setVisible(stepTextV, true);
+
+      const exactFormula = fit.formula ? fit.formula.replace('f(x) = ', '') : `${fit.exactK || fmt(fit.k)} · ${fit.exactA || fmt(fit.a)}ˣ`;
+
       const rows = [
         [
           '1. Cociente de Ordenadas',
@@ -217,16 +289,20 @@ export function initWidget(container, options = {}) {
         ],
         [
           '2. Despeje de la Base a',
-          `Paso horizontal Δx = x₂ − x₁ = ${fmt(deltaX)} ⟹ a = (${fmt(ratioY)})^(1/${fmt(deltaX)}) = ${fmt(fit.a)}.`,
+          `Paso horizontal Δx = x₂ − x₁ = ${fmt(deltaX)} ⟹ a = (${fmt(ratioY)})^(1/${fmt(deltaX)}) = ${fit.exactA || fmt(fit.a)}.`,
         ],
         [
           '3. Coeficiente y Modelo Final',
-          `k = y₁ / a^(x₁) = ${fmt(p1.y)} / (${fmt(fit.a)})^(${fmt(p1.x)}) = ${fmt(fit.k)} ⟹ f(x) = ${fmt(fit.k)} · ${fit.a === 0.5 ? '(1/2)' : fmt(fit.a)}ˣ.`,
+          `k = y₁ / a^(x₁) = ${fit.exactK || fmt(fit.k)} ⟹ f(x) = ${exactFormula}.`,
         ],
       ];
       renderReadout(board.readout, 'Reconstrucción Analítica Completa', rows);
     } else {
       setVisible(curvePath, false);
+      setVisible(stepLineH, false);
+      setVisible(stepLineV, false);
+      setVisible(stepTextH, false);
+      setVisible(stepTextV, false);
       const rows = [
         ['Imposibilidad en ℝ', errorMsg || 'Configuración no válida para una exponencial elemental.'],
         ['Condición de Existencia', 'Para f(x) = k · aˣ se requiere x₁ ≠ x₂, y₁ · y₂ > 0 (mismo signo) e y₁ ≠ y₂.'],

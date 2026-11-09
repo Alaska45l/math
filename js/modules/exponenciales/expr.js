@@ -1,7 +1,7 @@
 /**
  * expr.js — Parser AST, Evaluador Puro y Notación de Intervalos para Laboratorio 7.
  * Unidad 08 de Alaska Math Lab (Funciones, Modelos y Ecuaciones Exponenciales).
- * 100% puro, libre de eval() y new Function().
+ * Parser determinista AST puro sin evaluacion dinamica.
  * Cumple con el estándar de notación de la Facultad de Ciencias Exactas UNMDP.
  */
 

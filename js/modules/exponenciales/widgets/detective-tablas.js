@@ -5,6 +5,7 @@
 
 import {
   createBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -19,7 +20,7 @@ import { classifyTable } from '../logic.js';
 
 const PRESETS = {
   khan_linear: {
-    label: '1. Lineal (Khan Δx = 3)',
+    label: '1. Lineal (Δx = 3)',
     xs: [12, 15, 18, 21],
     ys: [-2, 5, 12, 19],
     model: 'Lineal: y = (7/3)x − 30',
@@ -27,7 +28,7 @@ const PRESETS = {
     note: 'El paso horizontal es Δx = +3 constante y las diferencias son Δy = +7 constantes. Pendiente m = 7/3.',
   },
   khan_exp: {
-    label: '2. Exponencial (Khan ×3)',
+    label: '2. Exponencial (×3)',
     xs: [0, 1, 2, 3],
     ys: [1, 3, 9, 27],
     model: 'Exponencial: y = 1 · 3ˣ',
@@ -35,7 +36,7 @@ const PRESETS = {
     note: 'El paso horizontal es Δx = +1 y las razones consecutivas son yᵢ₊₁/yᵢ = 3 constantes.',
   },
   khan_quad: {
-    label: '3. Cuadrática (Khan Δ²y = 2)',
+    label: '3. Cuadrática (Δ²y = 2)',
     xs: [2, 4, 6, 8],
     ys: [4, 9, 16, 25],
     model: 'Cuadrática: y = (x/2 + 1)²',
@@ -68,6 +69,28 @@ export function initWidget(container, options = {}) {
     analysisMode: 'all', // 'diff' | 'ratio' | 'second_diff' | 'all'
     revealedRows: 4,     // 2 a 4
   });
+
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: '¿Alcanzan 2 puntos en una tabla para saber si la función es lineal o exponencial?',
+    options: [
+      {
+        label: 'Sí, 2 puntos determinan cualquier curva',
+        correct: false,
+        explanation: 'Dos puntos sólo determinan una recta; por dos puntos pasan infinitas funciones de distintas familias.',
+      },
+      {
+        label: 'No, hacen falta al menos 3 puntos para ver si se mantiene la diferencia o la razón',
+        correct: true,
+        explanation: '¡Exacto! Con 2 puntos podés trazar tanto una recta como una curva exponencial; el tercer punto es el que desempata.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ revealedRows: 2 });
+      rangeInput.value = '2';
+    },
+  });
+  board.controls.prepend(predictBox);
 
   // 1. Controls
   const presetOptions = Object.entries(PRESETS).map(([k, p]) => [k, p.label]);
@@ -205,17 +228,17 @@ export function initWidget(container, options = {}) {
     'stroke-width': 2,
   });
   const secBadgeBg = s('rect', {
-    x: 245,
-    y: 195,
-    width: 60,
+    x: 255,
+    y: 129,
+    width: 65,
     height: 22,
     fill: 'var(--panel)',
     stroke: 'var(--pink)',
     rx: 6,
   });
   const secBadgeText = s('text', {
-    x: 275,
-    y: 210,
+    x: 287,
+    y: 144,
     class: 'exp-svg-label',
     'text-anchor': 'middle',
     'font-size': '11px',
@@ -264,6 +287,15 @@ export function initWidget(container, options = {}) {
   }
 
   // Curve path and points
+  const candidateLinePath = s('path', {
+    fill: 'none',
+    stroke: 'var(--green)',
+    'stroke-width': 2,
+    'stroke-dasharray': '5 3',
+    style: 'pointer-events: none;',
+  });
+  planeGroup.append(candidateLinePath);
+
   const curvePath = s('path', {
     fill: 'none',
     stroke: 'var(--yellow)',
@@ -440,7 +472,7 @@ export function initWidget(container, options = {}) {
       }
     }
 
-    // Interpolate curve
+    // Interpolate curve and candidate line when n === 2
     let curveD = '';
     const numSamples = 60;
     const curvePoints = [];
@@ -465,7 +497,23 @@ export function initWidget(container, options = {}) {
     }
     curveD = curvePoints.join(' ');
     curvePath.setAttribute('d', curveD);
-    setText(planeLegend, preset.model);
+
+    if (n === 2) {
+      // Draw competing candidate line passing through first 2 points
+      const m = (preset.ys[1] - preset.ys[0]) / (preset.xs[1] - preset.xs[0]);
+      const linePts = [];
+      for (let sIdx = 0; sIdx <= numSamples; sIdx++) {
+        const cx = minX + (sIdx / numSamples) * (maxX - minX);
+        const cy = preset.ys[0] + m * (cx - preset.xs[0]);
+        linePts.push(`${sIdx === 0 ? 'M' : 'L'} ${mapX(cx).toFixed(1)} ${mapY(cy).toFixed(1)}`);
+      }
+      candidateLinePath.setAttribute('d', linePts.join(' '));
+      setVisible(candidateLinePath, true);
+      setText(planeLegend, `Con 2 puntos: ¿Recta (verde) o Curva? ¡Falta el 3°!`);
+    } else {
+      setVisible(candidateLinePath, false);
+      setText(planeLegend, preset.model);
+    }
 
     // Readout
     const classification = classifyTable(activeXs, activeYs);

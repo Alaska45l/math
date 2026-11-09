@@ -24,6 +24,7 @@ import {
   formatSet,
 } from '../../../core/math-format.js';
 import { createPlane, bindSvgDrag, snapTo } from '../../../core/plot.js';
+import { playClick, playError, playSliderTick, playSuccess } from '../../../core/sound.js';
 
 export {
   h,
@@ -44,6 +45,10 @@ export {
   createPlane,
   bindSvgDrag,
   snapTo,
+  playClick,
+  playError,
+  playSliderTick,
+  playSuccess,
 };
 
 let boardClipUid = 0;
@@ -612,7 +617,13 @@ export function addDraggableMarker(
   const hitArea = s('circle', {
     r: radius + 14,
     fill: 'transparent',
-    style: 'cursor: grab; touch-action: none;',
+    tabindex: '0',
+    role: 'slider',
+    'aria-label': label || 'Punto interactivo',
+    'aria-valuemin': String(plane.cfg.xMin),
+    'aria-valuemax': String(plane.cfg.xMax),
+    'aria-valuenow': String(initialX),
+    style: 'cursor: grab; touch-action: none; outline: none;',
   });
   const dot = s('circle', {
     r: radius,
@@ -641,6 +652,7 @@ export function addDraggableMarker(
     hitArea.setAttribute('cy', String(cy));
     dot.setAttribute('cx', String(cx));
     dot.setAttribute('cy', String(cy));
+    hitArea.setAttribute('aria-valuenow', String(x));
 
     const labelText = label
       ? `${label}(${fmt(x)}; ${fmt(y)})`
@@ -704,6 +716,41 @@ export function addDraggableMarker(
   hitArea.addEventListener('pointerup', stopDrag);
   hitArea.addEventListener('pointercancel', stopDrag);
 
+  hitArea.addEventListener('keydown', (e) => {
+    let handled = false;
+    let nextX = currentX;
+    let nextY = currentY;
+    const step = snapStep > 0 ? snapStep : 0.5;
+
+    if (e.key === 'ArrowRight') {
+      nextX += step;
+      handled = true;
+    } else if (e.key === 'ArrowLeft') {
+      nextX -= step;
+      handled = true;
+    } else if (e.key === 'ArrowUp') {
+      nextY += step;
+      handled = true;
+    } else if (e.key === 'ArrowDown') {
+      nextY -= step;
+      handled = true;
+    }
+
+    if (handled) {
+      e.preventDefault();
+      nextX = Math.max(plane.cfg.xMin, Math.min(plane.cfg.xMax, Number(nextX.toFixed(2))));
+      nextY = Math.max(plane.cfg.yMin, Math.min(plane.cfg.yMax, Number(nextY.toFixed(2))));
+      setPos(nextX, nextY);
+      if (typeof playSliderTick === 'function') {
+        try { playSliderTick(1); } catch {}
+      }
+      if (typeof onDrag === 'function') {
+        onDrag({ x: nextX, y: nextY, phase: 'move' });
+        onDrag({ x: nextX, y: nextY, phase: 'end' });
+      }
+    }
+  });
+
   return {
     group,
     hitArea,
@@ -738,3 +785,109 @@ export function formatExpFormula({ k, a, h = 0, c = 0, b = 1 }) {
 
   return s;
 }
+
+
+/**
+ * Componente interactivo de predicción en 2 etapas (Predict-Observe-Explain).
+ * 1. El estudiante selecciona su hipótesis (sin veredicto prematuro).
+ * 2. Mueve el control en el pizarrón o pulsa "Comprobar en el pizarrón" para verificar.
+ */
+export function createPredictBox({ prompt, options = [], onSelect, onVerify } = {}) {
+  const box = h('div', { class: 'exp-predict-box pr-predict-box quad-predict-box' });
+  const titleEl = h('p', { class: 'exp-predict-prompt pr-predict-prompt quad-predict-prompt' }, [
+    chalkIcon('spark', 15),
+    ` Predicción previa: ${prompt}`,
+  ]);
+  const optionsRow = h('div', { class: 'pr-chip-row exp-predict-options quad-predict-options' });
+  const actionsRow = h('div', { class: 'exp-predict-actions quad-predict-actions', style: 'margin-top: 8px;' });
+  const verifyBtn = h(
+    'button',
+    {
+      type: 'button',
+      class: 'pr-chip exp-predict-verify-btn quad-predict-verify-btn',
+      hidden: '',
+      disabled: '',
+    },
+    'Comprobar en el pizarrón'
+  );
+  actionsRow.appendChild(verifyBtn);
+
+  const feedbackEl = h('div', {
+    class: 'exp-predict-feedback quad-predict-feedback',
+    hidden: '',
+    role: 'status',
+    'aria-live': 'polite',
+  });
+
+  let selectedOpt = null;
+  let verified = false;
+
+  const runVerification = (opt = selectedOpt) => {
+    if (!opt) return;
+    verified = true;
+    verifyBtn.disabled = true;
+    verifyBtn.classList.remove('is-active');
+
+    if (typeof onVerify === 'function') {
+      onVerify(opt);
+    } else if (typeof onSelect === 'function') {
+      onSelect(opt);
+    }
+
+    feedbackEl.removeAttribute('hidden');
+    if (opt.correct) {
+      if (typeof playSuccess === 'function') {
+        try { playSuccess(); } catch {}
+      }
+      feedbackEl.textContent = `¡Bien anticipado! ${opt.explanation}`;
+      feedbackEl.style.color = 'var(--green)';
+    } else {
+      if (typeof playClick === 'function') {
+        try { playClick(); } catch {}
+      }
+      feedbackEl.textContent = `Interesante apuesta: ${opt.explanation}`;
+      feedbackEl.style.color = 'var(--yellow)';
+    }
+  };
+
+  options.forEach((opt) => {
+    const btn = h('button', { type: 'button', class: 'pr-chip' }, opt.label);
+    btn.addEventListener('click', () => {
+      selectedOpt = opt;
+      verified = false;
+      for (const b of optionsRow.querySelectorAll('button')) {
+        b.classList.remove('is-active');
+      }
+      btn.classList.add('is-active');
+
+      feedbackEl.removeAttribute('hidden');
+      feedbackEl.style.color = 'var(--muted, #a7b8ae)';
+      feedbackEl.textContent =
+        'Hipótesis registrada: ahora mové el control en el pizarrón o pulsá "Comprobar en el pizarrón" para verificar qué ocurre';
+
+      verifyBtn.removeAttribute('hidden');
+      verifyBtn.removeAttribute('disabled');
+      verifyBtn.classList.add('is-active');
+      if (typeof playClick === 'function') {
+        try { playClick(); } catch {}
+      }
+    });
+    optionsRow.appendChild(btn);
+  });
+
+  verifyBtn.addEventListener('click', () => {
+    if (selectedOpt) {
+      runVerification(selectedOpt);
+    }
+  });
+
+  box.append(titleEl, optionsRow, actionsRow, feedbackEl);
+
+  box.verify = runVerification;
+  box.getSelectedOption = () => selectedOpt;
+  box.isVerified = () => verified;
+
+  return box;
+}
+
+export const createPredictorBanner = createPredictBox;

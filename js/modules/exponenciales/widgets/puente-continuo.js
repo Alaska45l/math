@@ -6,6 +6,7 @@
 
 import {
   createCartesianBoard,
+  createPredictBox,
   createStore,
   addChips,
   addRange,
@@ -50,12 +51,42 @@ export function initWidget(container, options = {}) {
   const plane = board.plane;
 
   const store = createStore({
+    k: options.k !== undefined ? options.k : 1,
     a: options.a !== undefined ? options.a : 2,
     density: options.density || 2, // 1 to 4
     probeX: options.probeX !== undefined ? options.probeX : 1.5,
   });
 
+  // 0. Predict-Observe-Explain
+  const predictBox = createPredictBox({
+    prompt: '¿Qué ocurre al calcular f(1/2) si elegimos base negativa a = −2: (−2)^(1/2)?',
+    options: [
+      {
+        label: 'Da 0, porque no sube ni baja',
+        correct: false,
+        explanation: '¡No da cero! (−2)^(1/2) = √(−2), que no existe en el conjunto de los números reales ℝ.',
+      },
+      {
+        label: 'No existe en ℝ, porque en los reales no hay raíces cuadradas de números negativos',
+        correct: true,
+        explanation: '¡Exacto! Al tomar exponentes racionales con denominador par caemos fuera de ℝ, destruyendo la curva continua.',
+      },
+    ],
+    onVerify: () => {
+      store.set({ a: -2, density: 2, probeX: 0.5 });
+    },
+  });
+  board.controls.prepend(predictBox);
+
   // 1. Controls
+  const updateKChips = addChips(
+    board.controls,
+    [[1, 'k = 1'], [2, 'k = 2'], [-1, 'k = −1'], [0, 'k = 0 (degenerada)']],
+    store.get().k,
+    (val) => store.set({ k: Number(val) }),
+    'Coeficiente k',
+  );
+
   const updateBaseChips = addChips(
     board.controls,
     BASES,
@@ -205,6 +236,7 @@ export function initWidget(container, options = {}) {
     updateDensityChips(state.density);
     probeSlider.value = String(state.probeX);
 
+    const k = state.k !== undefined ? state.k : 1;
     const a = state.a;
     const density = state.density;
     const pxVal = state.probeX;
@@ -332,15 +364,9 @@ export function initWidget(container, options = {}) {
               setVisible(dot, true);
             }
           } else {
-            // Fractional rational power collapses in R: show collapse marker on x-axis
+            // Fractional power of negative base does NOT exist in R: do NOT draw fake points at y = 0
             const dot = pointDots[dotIdx++];
-            dot.setAttribute('cx', String(plane.sx(x)));
-            dot.setAttribute('cy', String(plane.sy(0)));
-            dot.setAttribute('r', '3');
-            dot.setAttribute('fill', 'none');
-            dot.setAttribute('stroke', 'var(--pink)');
-            dot.setAttribute('stroke-width', '1.5');
-            setVisible(dot, true);
+            setVisible(dot, false);
           }
         }
       } else {
