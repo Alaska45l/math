@@ -4,13 +4,17 @@
  * Redacción conversacional en voseo rioplatense, con símbolos Unicode limpios y cero texto de manual.
  */
 
-const balloon = (pose, tag, content) => ({
-  pose,
-  tag,
-  speaker: 'Alaska',
-  html: content,
-  text: content,
-});
+const balloon = (pose, tag, content, highlightSelector = null) => {
+  const b = {
+    pose,
+    tag,
+    speaker: 'Alaska',
+    html: content,
+    text: content,
+  };
+  if (highlightSelector) b.highlightSelector = highlightSelector;
+  return b;
+};
 
 export const VN_SCRIPTS = {
   /* ========================================================================
@@ -25,15 +29,16 @@ export const VN_SCRIPTS = {
     balloon(
       'explicando',
       'Las cuatro parcelas',
-      'Mirá el rectángulo del pizarrón: si la base mide x + 3 y la altura mide x + 2, al trazar las líneas divisorias aparecen cuatro regiones bien distintas: el cuadrado grande x², dos rectángulos laterales de 3x y 2x, y la esquina numérica de 3 · 2 = 6.'
+      'Mirá el rectángulo del pizarrón: si la base mide x + 3 y la altura mide x + 2, al trazar las líneas divisorias aparecen cuatro regiones bien distintas: el cuadrado grande x², dos rectángulos laterales de 3x y 2x, y la esquina numérica de 3 · 2 = 6.',
+      '[data-widget="modelo-area-binomios"]'
     ),
     balloon(
-      'lentes-brillo',
+      'unamused',
       'El secreto del doble producto',
       'Por eso cuando elevás un binomio al cuadrado como (x + 3)², jamás da x² + 9. En las esquinas diagonales viven dos rectángulos gemelos de área 3x cada uno, y juntos forman el famoso doble producto +6x.'
     ),
     balloon(
-      'eureka',
+      'complice',
       'Diferencia de cuadrados',
       'En cambio, cuando multiplicás una suma por una resta como (x + 3)·(x − 3), un rectángulo suma +3x y el otro descuenta −3x: se neutralizan exactamente a cero y sobrevive limpia la diferencia de cuadrados x² − 9.'
     ),
@@ -51,17 +56,17 @@ export const VN_SCRIPTS = {
       'Si hace mucho que no tocás álgebra y ver letras con exponentes te pone a la defensiva, respirá hondo que arrancamos desde el piso. Una letra como x es simplemente una medida que todavía podemos estirar o encoger.'
     ),
     balloon(
-      'base',
+      'pensativa',
       'Por qué x² no se junta con 2x',
       'Cuando multiplicamos x por x escribimos x² porque coincide con el área de un cuadrado de lado x. En cambio, 2x significa sumar dos tiras de largo x una al lado de la otra: son especies distintas y no se pueden mezclar en una sola bolsa.'
     ),
     balloon(
-      'pensativa',
+      'explicando',
       'Áreas con restas',
       '¿Y qué significa tener un número negativo como (x − 4) si en la carpintería nadie vende maderas de menos cuatro metros? Pensalo como una contabilidad de áreas: primero calculás el terreno completo y después descontás la franja de ancho 4.'
     ),
     balloon(
-      'explicando',
+      'evaluando',
       'Menos por menos en la esquina',
       'Al cruzar dos descuentos negativos, como −4 por −3, aplicamos la regla de signos: descontar tres veces una deuda de cuatro equivale a recuperar +12 unidades a favor en la esquina inferior derecha del tablero.'
     ),
@@ -81,7 +86,8 @@ export const VN_SCRIPTS = {
     balloon(
       'explicando',
       'Las dos pistas del detective',
-      'Si los lados buscados son (x + m) y (x + n), al multiplicarlos queda x² + (m + n)x + m · n. Ahí tenés las dos huellas dactilares: el término independiente c es el producto m · n y el coeficiente lineal b es la suma m + n.'
+      'Si los lados buscados son (x + m) y (x + n), al multiplicarlos queda x² + (m + n)x + m · n. Ahí tenés las dos huellas dactilares: el término independiente c es el producto m · n y el coeficiente lineal b es la suma m + n.',
+      '[data-widget="balanza-suma-producto"]'
     ),
     balloon(
       'lentes-brillo',
@@ -107,7 +113,7 @@ export const VN_SCRIPTS = {
       'Vamos a aclarar una duda súper común: ¿qué diferencia hay entre un término y un factor? Cuando tenés x² + 5x + 6, las tres piezas están separadas por sumas y se llaman términos; cuando lo reescribís como (x + 2)·(x + 3), pasan a multiplicarse y se llaman factores.'
     ),
     balloon(
-      'base',
+      'evaluando',
       'Para qué sirve factorizar',
       '¿Y para qué nos tomamos el trabajo de transformar sumas en una multiplicación? Porque si querés saber cuándo una expresión vale cero, con sumas es difícil, pero con una multiplicación basta con que cualquiera de los paréntesis valga cero.'
     ),
@@ -117,7 +123,7 @@ export const VN_SCRIPTS = {
       'Antes de buscar paréntesis dobles, fijate siempre si todos los términos comparten un número o una letra repetida. Por ejemplo, en 3x² + 15x + 18 todos son múltiplos de 3, así que podés aliviar la cuenta sacando el 3 adelante: 3·(x² + 5x + 6).'
     ),
     balloon(
-      'eureka',
+      'complice',
       'Achicar el problema',
       'Ese primer paso se llama extraer factor común y es como sacar el zoom de una foto: deja adentro del paréntesis números mucho más chicos y manejables para tu cabeza.'
     ),
@@ -137,7 +143,8 @@ export const VN_SCRIPTS = {
     balloon(
       'evaluando',
       'El producto maestro a · c',
-      'El secreto está en multiplicar primero los extremos a · c: acá hacemos 2 · 3 = 6. Ahora sí buscamos dos números m y n cuyo producto sea 6 y cuya suma sea el 7 del medio: claramente son 1 y 6.'
+      'El secreto está en multiplicar primero los extremos a · c: acá hacemos 2 · 3 = 6. Ahora sí buscamos dos números m y n cuyo producto sea 6 y cuya suma sea el 7 del medio: claramente son 1 y 6.',
+      '[data-widget="agrupacion-estrategia"]'
     ),
     balloon(
       'explicando',
@@ -196,7 +203,8 @@ export const VN_SCRIPTS = {
     balloon(
       'evaluando',
       'Por qué cambia el signo de xᵥ',
-      '¿Por qué la coordenada horizontal del vértice xᵥ se lee con el signo cambiado respecto al interior del paréntesis? Porque cualquier número real al cuadrado da cero o positivo; entonces (x − xᵥ)² toca su piso mínimo de cero recién cuando x vale exactamente xᵥ.'
+      '¿Por qué la coordenada horizontal del vértice xᵥ se lee con el signo cambiado respecto al interior del paréntesis? Porque cualquier número real al cuadrado da cero o positivo; entonces (x − xᵥ)² toca su piso mínimo de cero recién cuando x vale exactamente xᵥ.',
+      '[data-widget="canonica-vertice"]'
     ),
     balloon(
       'explicando',
@@ -209,7 +217,7 @@ export const VN_SCRIPTS = {
       'El coeficiente principal "a" maneja dos cosas a la vez: su signo define la concavidad (si a > 0 abre hacia arriba con mínimo; si a < 0 abre hacia abajo con máximo) y su módulo marca los escalones cuadráticos 1a, 4a, 9a al alejarte 1, 2 o 3 unidades del vértice.'
     ),
     balloon(
-      'eureka',
+      'complice',
       'Despejar sin desarrollar',
       'Y cuando quieras hallar las raíces desde la forma canónica, no hace falta que desarrolles todo el cuadrado: igualás a cero, despejás (x − xᵥ)² y aplicás raíz cuadrada en ambos lados recordando que √((x − xᵥ)²) = |x − xᵥ| abre dos ramas simétricas ±.'
     ),
@@ -222,7 +230,7 @@ export const VN_SCRIPTS = {
       'Pausemos un segundo en la pregunta del millón: ¿por qué la gráfica de y = x² se curva cada vez más empinada en lugar de subir derechito como una rampa lineal?'
     ),
     balloon(
-      'base',
+      'pensativa',
       'Los cuadrados aceleran',
       'En una recta subís en escalones constantes: avanzás 1 a la derecha y subís 1; avanzás 2 y subís 2. Pero al elevar al cuadrado, cuando te alejás 1 unidad del origen la altura es 1² = 1; cuando te alejás 2 unidades salta a 2² = 4; y a las 3 unidades ya trepó a 3² = 9.'
     ),
@@ -252,10 +260,11 @@ export const VN_SCRIPTS = {
     balloon(
       'explicando',
       'Propiedad del producto cero',
-      'Funciona gracias a la Propiedad del Producto Cero: como tenés tres piezas multiplicándose, la única manera de que toda la cuenta dé cero es que el primer paréntesis valga cero (cuando x = x₁) o que el segundo paréntesis valga cero (cuando x = x₂).'
+      'Funciona gracias a la Propiedad del Producto Cero: como tenés tres piezas multiplicándose, la única manera de que toda la cuenta dé cero es que el primer paréntesis valga cero (cuando x = x₁) o que el segundo paréntesis valga cero (cuando x = x₂).',
+      '[data-widget="factorizada-simetria"]'
     ),
     balloon(
-      'enojada',
+      'unamused',
       'Prohibido tachar la x',
       'Por eso mismo, cuando tengas una cuadrática incompleta como x² − 4x = 0, jamás pases el 4x al otro lado para tachar una x de cada lado. Si dividís por x estás prohibiendo en secreto que x valga cero y asesinás la raíz x₁ = 0; lo correcto es sacar factor común x·(x − 4) = 0.'
     ),
@@ -278,7 +287,7 @@ export const VN_SCRIPTS = {
       'Vamos a asegurarnos de que el cálculo del punto medio entre dos raíces te salga sin dudar, incluso cuando una o las dos raíces son negativas.'
     ),
     balloon(
-      'base',
+      'evaluando',
       'Sumar y dividir por dos',
       'Promediar dos números sobre la recta numérica es siempre sumarlos con su signo y dividir el resultado por 2. Por ejemplo, si las raíces son x₁ = −2 y x₂ = 6, hacés (−2 + 6) / 2 = 4 / 2 = 2.'
     ),
@@ -308,7 +317,8 @@ export const VN_SCRIPTS = {
     balloon(
       'evaluando',
       'Abrir la caja negra',
-      'Muchos memorizan xᵥ = −b / (2a) como un loro sin saber de dónde sale. Hoy vamos a abrir la caja negra con el método geométrico de Completar el Cuadrado sobre x² − 6x + 2.'
+      'Muchos memorizan xᵥ = −b / (2a) como un loro sin saber de dónde sale. Hoy vamos a abrir la caja negra con el método geométrico de Completar el Cuadrado sobre x² − 6x + 2.',
+      '[data-widget="completar-cuadrado"]'
     ),
     balloon(
       'explicando',
@@ -367,7 +377,8 @@ export const VN_SCRIPTS = {
     balloon(
       'evaluando',
       'Eje más/menos distancia',
-      'Si en vez de escribir todo sobre una raya larga la separás en dos bloques como x = −b/(2a) ± √(b² − 4ac)/(2a), la fórmula te habla en castellano: parate en el eje de simetría xᵥ = −b/(2a) y caminá la misma distancia a izquierda y derecha.'
+      'Si en vez de escribir todo sobre una raya larga la separás en dos bloques como x = −b/(2a) ± √(b² − 4ac)/(2a), la fórmula te habla en castellano: parate en el eje de simetría xᵥ = −b/(2a) y caminá la misma distancia a izquierda y derecha.',
+      '[data-widget="discriminante-vieta"]'
     ),
     balloon(
       'lentes-brillo',
@@ -393,7 +404,7 @@ export const VN_SCRIPTS = {
       'El noventa por ciento de los errores al usar la fórmula resolvente no son por no saber la fórmula, sino por dos emboscadas de signos cuando el coeficiente b es negativo, por ejemplo en x² − 6x + 2 = 0.'
     ),
     balloon(
-      'colapso',
+      'unamused',
       'Cuidado con −b y con (−b)²',
       'Primera emboscada: la fórmula arranca con "−b", que significa "el opuesto de b". Si b vale −6, entonces −b es −(−6) = +6 positivo. Segunda emboscada: adentro de la raíz va (−6)² con paréntesis, que da +36 positivo, ¡jamás −36!'
     ),
@@ -423,7 +434,8 @@ export const VN_SCRIPTS = {
     balloon(
       'explicando',
       'El piso horizontal (Eje X)',
-      'Crecimiento, decrecimiento, positividad C⁺ y negatividad C⁻ son preguntas sobre el recorrido horizontal: se responden SIEMPRE leyendo intervalos sobre el piso del eje X. Jamás metas la altura yᵥ adentro de un intervalo de crecimiento.'
+      'Crecimiento, decrecimiento, positividad C⁺ y negatividad C⁻ son preguntas sobre el recorrido horizontal: se responden SIEMPRE leyendo intervalos sobre el piso del eje X. Jamás metas la altura yᵥ adentro de un intervalo de crecimiento.',
+      '[data-widget="radiografia-cuadratica"]'
     ),
     balloon(
       'lentes-brillo',
@@ -449,12 +461,12 @@ export const VN_SCRIPTS = {
       'Si todavía te marea decidir cuándo una curva crece y cuándo decrece, imaginá una persona chiquita caminando sobre el dibujo de la parábola avanzando siempre de izquierda a derecha, desde −∞ hacia +∞.'
     ),
     balloon(
-      'base',
+      'evaluando',
       'Subiendo la colina',
       'Tomemos f(x) = −(x + 3)² + 1, que tiene su cumbre máxima en el vértice (−3; 1). Mientras nuestro caminante avanza desde la izquierda hasta el kilómetro x = −3 del piso, va subiendo la colina: por eso crece en (−∞; −3).'
     ),
     balloon(
-      'evaluando',
+      'pensativa',
       'Bajando del otro lado',
       'Apenas pasa el kilómetro x = −3 hacia la derecha, empieza a bajar la pendiente rumbo a +∞: por eso decrece en (−3; +∞). Fijate que el número 1 de la altura no participó en ninguno de los dos intervalos.'
     ),
@@ -479,7 +491,8 @@ export const VN_SCRIPTS = {
     balloon(
       'explicando',
       'La ecuación diferencia',
-      'Planteamos la igualdad ax² + bx + c = mx + d y pasamos los términos de la recta restando al primer miembro para dejar un cero a la derecha: nos queda una nueva ecuación cuadrática limpia, ax² + (b − m)x + (c − d) = 0.'
+      'Planteamos la igualdad ax² + bx + c = mx + d y pasamos los términos de la recta restando al primer miembro para dejar un cero a la derecha: nos queda una nueva ecuación cuadrática limpia, ax² + (b − m)x + (c − d) = 0.',
+      '[data-widget="interseccion-recta-parabola"]'
     ),
     balloon(
       'lentes-brillo',
@@ -538,7 +551,8 @@ export const VN_SCRIPTS = {
     balloon(
       'evaluando',
       'Detectar el modelo cuadrático',
-      'Apenas traducís el enunciado a una fórmula y ves que la variable aparece elevada al cuadrado, ya ganaste la mitad de la batalla: el gráfico es una parábola y su máximo o mínimo vive en el vértice (xᵥ; yᵥ).'
+      'Apenas traducís el enunciado a una fórmula y ves que la variable aparece elevada al cuadrado, ya ganaste la mitad de la batalla: el gráfico es una parábola y su máximo o mínimo vive en el vértice (xᵥ; yᵥ).',
+      '[data-widget="optimizacion-extremos"]'
     ),
     balloon(
       'explicando',
@@ -564,7 +578,7 @@ export const VN_SCRIPTS = {
       'Antes de meternos con fórmulas de optimización geométrica, repasemos desde cero qué dice el Teorema de Pitágoras y por qué encaja tan limpio con las funciones cuadráticas.'
     ),
     balloon(
-      'base',
+      'complice',
       'Catetos e hipotenusa',
       'En cualquier triángulo rectángulo —esos que tienen una esquina en escuadra de noventa grados—, los dos lados que forman la esquina recta se llaman catetos y el lado inclinado más largo que los une se llama hipotenusa.'
     ),
@@ -579,7 +593,7 @@ export const VN_SCRIPTS = {
       'En nuestro cuadrado de 16 cm, un cateto mide x y el pedazo restante de borde mide 16 − x. Al sumar x² + (16 − x)² y desarrollar el binomio como x² + 256 − 32x + x², nace el modelo cuadrático 2x² − 32x + 256.'
     ),
     balloon(
-      'eureka',
+      'orgullosa',
       'Girando el cuadrado interior',
       'Arrastrá el punto de corte sobre el cuadrado en el pizarrón para ver cómo el cuadrado interior gira y se encoge hasta la mitad exacta del área cuando x pasa por el punto medio.'
     ),

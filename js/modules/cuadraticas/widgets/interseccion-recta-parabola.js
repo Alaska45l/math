@@ -33,6 +33,8 @@ export function initInterseccionRectaParabola(host) {
     d: -1,
   };
 
+  let applyPreset = null;
+
   const predictBox = createPredictBox({
     prompt:
       'Al igualar la parábola y = x² + 2x + 3 con la recta y = kx − 1, queda la ecuación diferencia x² + (2 − k)x + 4 = 0. ¿Qué condición sobre Δ_int hace que la recta sea tangente?',
@@ -40,22 +42,30 @@ export function initInterseccionRectaParabola(host) {
       {
         label: 'Δ_int > 0 (para que cruce con fuerza)',
         correct: false,
+        presetIdx: 2,
         explanation:
           'Si Δ_int > 0 hay dos soluciones distintas y la recta corta en dos puntos (es secante).',
       },
       {
         label: 'Δ_int = (2 − k)² − 16 = 0 (un único punto de contacto)',
         correct: true,
+        presetIdx: 0,
         explanation:
           '¡Exacto! Cuando Δ_int = 0 las dos intersecciones se funden en una sola (dando k = 6 o k = −2).',
       },
       {
         label: 'Que la pendiente k sea igual a 2',
         correct: false,
+        presetIdx: 3,
         explanation:
           'Si k = 2 queda x² + 4 = 0 (Δ_int = −16 < 0), por lo que la recta pasa por debajo sin tocar la parábola.',
       },
     ],
+    onVerify: (opt) => {
+      if (typeof applyPreset === 'function') {
+        applyPreset(opt.presetIdx ?? 0);
+      }
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });
@@ -72,6 +82,18 @@ export function initInterseccionRectaParabola(host) {
     height: 340,
     ariaLabel: 'Sistema parábola-recta y función diferencia sincronizada',
   });
+
+  // Dos clipPath independientes para aislar estrictamente leftBox y rightBox
+  board.defs.appendChild(
+    s('clipPath', { id: 'inter-clip-left' }, [
+      s('rect', { x: 38, y: 38, width: 288, height: 268, rx: 6 }),
+    ])
+  );
+  board.defs.appendChild(
+    s('clipPath', { id: 'inter-clip-right' }, [
+      s('rect', { x: 368, y: 38, width: 288, height: 268, rx: 6 }),
+    ])
+  );
 
   const sliderM = createSliderField({
     label: 'Pendiente de la recta m (o parámetro k)',
@@ -106,6 +128,23 @@ export function initInterseccionRectaParabola(host) {
   const readoutLine2 = h('div', { class: 'muted small' });
   const readout = h('div', { class: 'pr-readout' }, [readoutLine1, readoutLine2]);
 
+  const presetButtons = [];
+  applyPreset = (idx) => {
+    const p = presets[idx];
+    if (!p) return;
+    presetButtons.forEach((b, i) => {
+      b.classList.toggle('is-active', i === idx);
+    });
+    state.a = p.a;
+    state.b = p.b;
+    state.c = p.c;
+    state.m = p.m;
+    state.d = p.d;
+    sliderM.setValue(p.m);
+    sliderD.setValue(p.d);
+    render();
+  };
+
   presets.forEach((p, idx) => {
     const btn = h(
       'button',
@@ -114,20 +153,10 @@ export function initInterseccionRectaParabola(host) {
     );
     btn.addEventListener('click', () => {
       playClick();
-      for (const b of presetsRow.querySelectorAll('button')) {
-        b.classList.remove('is-active');
-      }
-      btn.classList.add('is-active');
-      state.a = p.a;
-      state.b = p.b;
-      state.c = p.c;
-      state.m = p.m;
-      state.d = p.d;
-      sliderM.setValue(p.m);
-      sliderD.setValue(p.d);
-      render();
+      applyPreset(idx);
     });
     presetsRow.appendChild(btn);
+    presetButtons.push(btn);
   });
 
   function render() {
@@ -182,6 +211,11 @@ export function initInterseccionRectaParabola(host) {
     const fnG = (x) => state.m * x + state.d;
     const fnH = (x) => fnF(x) - fnG(x);
 
+    // Contenedores recortados independientemente para evitar desbordes sobre encabezados y divisor
+    const leftClipped = s('g', { 'clip-path': 'url(#inter-clip-left)' });
+    const rightClipped = s('g', { 'clip-path': 'url(#inter-clip-right)' });
+    board.clippedLayer.append(leftClipped, rightClipped);
+
     // Curvas en el panel izquierdo: f(x) en azul y recta g(x) en amarillo/verde/rosa
     const lineColor =
       inter.classification === 'tangent'
@@ -190,7 +224,7 @@ export function initInterseccionRectaParabola(host) {
         ? 'var(--green)'
         : 'var(--pink)';
 
-    board.clippedLayer.appendChild(
+    leftClipped.appendChild(
       s('path', {
         d: sampleCurvePath(fnF, leftMapper, 90),
         fill: 'none',
@@ -198,7 +232,7 @@ export function initInterseccionRectaParabola(host) {
         'stroke-width': 2.6,
       })
     );
-    board.clippedLayer.appendChild(
+    leftClipped.appendChild(
       s('path', {
         d: sampleCurvePath(fnG, leftMapper, 40),
         fill: 'none',
@@ -208,7 +242,7 @@ export function initInterseccionRectaParabola(host) {
     );
 
     // Curva diferencia h(x) = f(x) - g(x) en el panel derecho
-    board.clippedLayer.appendChild(
+    rightClipped.appendChild(
       s('path', {
         d: sampleCurvePath(fnH, rightMapper, 90),
         fill: 'none',
@@ -224,7 +258,7 @@ export function initInterseccionRectaParabola(host) {
       const rx = rightMapper.toX(pt.x);
       const ry0 = rightMapper.toY(0);
 
-      board.clippedLayer.appendChild(
+      leftClipped.appendChild(
         s('circle', {
           cx: lx,
           cy: ly,
@@ -234,7 +268,7 @@ export function initInterseccionRectaParabola(host) {
           'stroke-width': 1.8,
         })
       );
-      board.clippedLayer.appendChild(
+      rightClipped.appendChild(
         s('circle', {
           cx: rx,
           cy: ry0,

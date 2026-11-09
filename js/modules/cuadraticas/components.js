@@ -34,7 +34,56 @@ function triggerVnScript(vn, script, title = '') {
   }
 }
 
+export const PROGRESS_KEY = 'cuadraticas:progreso:v1';
+
 let globalStreak = 0;
+
+export function getProgress() {
+  try {
+    if (typeof localStorage === 'undefined' || !localStorage.getItem) return {};
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
+    return {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveProgress(itemId, status = 'independent') {
+  const state = getProgress();
+  state[itemId] = status;
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
+  } catch {
+    // La sesión continúa aunque se exceda la cuota de almacenamiento
+  }
+  return state;
+}
+
+export function markSectionCompleted(sectionId) {
+  try {
+    const state = getProgress();
+    state[sectionId] = true;
+    if (typeof localStorage !== 'undefined' && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
+  } catch {}
+}
+
+export function getGlobalStreak() {
+  return globalStreak;
+}
+
+export function setGlobalStreak(val = 0) {
+  globalStreak = val;
+  return globalStreak;
+}
 
 const TOKEN_NOTES = {
   a: {
@@ -127,13 +176,21 @@ export function annotatedQuadFormula(spec = {}) {
       h('span', {}, 'f(x) = '),
       makeToken('a', [fmtNumClean(model.a)], 'tok-pink'),
       h('span', {}, 'x'),
-      h('sup', {}, '2'),
-      h('span', {}, model.b >= 0 ? ' + ' : ' − '),
-      makeToken('b', [fmtNumClean(Math.abs(model.b))], 'tok-blue'),
-      h('span', {}, 'x'),
-      h('span', {}, model.c >= 0 ? ' + ' : ' − '),
-      makeToken('c', [fmtNumClean(Math.abs(model.c))], 'tok-green')
+      h('sup', {}, '2')
     );
+    if (Math.abs(model.b) > 1e-9) {
+      eqLine.append(
+        h('span', {}, model.b >= 0 ? ' + ' : ' − '),
+        makeToken('b', [fmtNumClean(Math.abs(model.b))], 'tok-blue'),
+        h('span', {}, 'x')
+      );
+    }
+    if (Math.abs(model.c) > 1e-9) {
+      eqLine.append(
+        h('span', {}, model.c >= 0 ? ' + ' : ' − '),
+        makeToken('c', [fmtNumClean(Math.abs(model.c))], 'tok-green')
+      );
+    }
   } else if (form === 'factored' && model.roots.length >= 1) {
     const r1 = model.roots[0];
     const r2 = model.roots.length === 2 ? model.roots[1] : model.roots[0];
@@ -165,15 +222,28 @@ export function annotatedQuadFormula(spec = {}) {
     const { xv, yv } = model.vertex;
     eqLine.append(
       h('span', {}, 'f(x) = '),
-      makeToken('a', [fmtNumClean(model.a)], 'tok-pink'),
-      h('span', {}, ' · (x '),
-      h('span', {}, xv >= 0 ? '− ' : '+ '),
-      makeToken('xv', [fmtNumClean(Math.abs(xv))], 'tok-yellow'),
-      h('span', {}, ')'),
-      h('sup', {}, '2'),
-      h('span', {}, yv >= 0 ? ' + ' : ' − '),
-      makeToken('yv', [fmtNumClean(Math.abs(yv))], 'tok-blue')
+      makeToken('a', [fmtNumClean(model.a)], 'tok-pink')
     );
+    if (Math.abs(xv) > 1e-9) {
+      eqLine.append(
+        h('span', {}, ' · (x '),
+        h('span', {}, xv >= 0 ? '− ' : '+ '),
+        makeToken('xv', [fmtNumClean(Math.abs(xv))], 'tok-yellow'),
+        h('span', {}, ')'),
+        h('sup', {}, '2')
+      );
+    } else {
+      eqLine.append(
+        h('span', {}, ' · x'),
+        h('sup', {}, '2')
+      );
+    }
+    if (Math.abs(yv) > 1e-9) {
+      eqLine.append(
+        h('span', {}, yv >= 0 ? ' + ' : ' − '),
+        makeToken('yv', [fmtNumClean(Math.abs(yv))], 'tok-blue')
+      );
+    }
   }
 
   wrap.append(eqLine, readout);
@@ -253,8 +323,9 @@ export function threeFormsRosettaStrip(state = { a: 1, b: -6, c: 5 }) {
 /**
  * Crea un bloque de pregunta individual dentro de los chequeos de cada sección.
  */
-function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
+export function buildSingleQuestionCard(item, idx, { vn, onItemSolved, sectionId = null, restoredStatus = null } = {}) {
   let hintCursor = 0;
+  let solutionRevealed = false;
   let solved = false;
 
   const card = h('article', {
@@ -283,6 +354,12 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
     [chalkIcon('bulb', 14), ` Pista (0/${item.hints.length})`]
   );
 
+  const solutionBtn = h(
+    'button',
+    { type: 'button', class: 'pr-btn pr-btn-secondary quad-solution-btn' },
+    [chalkIcon('spark', 14), ' Ver solución explicada']
+  );
+
   hintBtn.addEventListener('click', () => {
     playClick();
     if (hintCursor < item.hints.length) {
@@ -297,17 +374,32 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
     }
   });
 
+  let disableControls = () => {};
+
   const markSuccess = () => {
     playSuccess();
-    globalStreak += 1;
+    const isIndependent = hintCursor === 0 && !solutionRevealed;
+    const status = isIndependent ? 'independent' : 'assisted';
+    if (isIndependent) {
+      globalStreak += 1;
+    }
     card.classList.add('is-solved');
+    card.classList.add(isIndependent ? 'is-independent' : 'is-assisted');
     feedbackEl.className = 'pr-check-feedback is-ok';
-    feedbackEl.textContent = item.solution;
+    feedbackEl.replaceChildren(
+      chalkIcon(isIndependent ? 'spark' : 'bulb', 14),
+      h('strong', {}, isIndependent ? ' Logro independiente: ' : ' Logro asistido: '),
+      h('span', {}, item.solution)
+    );
+    hintBtn.disabled = true;
+    solutionBtn.disabled = true;
+    disableControls();
     if (!solved) {
       solved = true;
-      if (typeof onItemSolved === 'function') onItemSolved(item.id);
+      saveProgress(item.id, status);
+      if (typeof onItemSolved === 'function') onItemSolved(item.id, status);
     }
-    if (STREAK_REACTIONS[globalStreak]) {
+    if (isIndependent && STREAK_REACTIONS[globalStreak]) {
       triggerVnReaction(
         vn,
         STREAK_REACTIONS[globalStreak].pose,
@@ -316,6 +408,29 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
       );
     }
   };
+
+  const revealSolution = () => {
+    playClick();
+    solutionRevealed = true;
+    globalStreak = 0;
+    card.classList.add('is-solved', 'is-assisted');
+    feedbackEl.className = 'pr-check-feedback is-ok is-solution';
+    feedbackEl.replaceChildren(
+      chalkIcon('spark', 14),
+      h('strong', {}, ' Solución explicada: '),
+      h('span', {}, item.solution)
+    );
+    hintBtn.disabled = true;
+    solutionBtn.disabled = true;
+    disableControls();
+    if (!solved) {
+      solved = true;
+      saveProgress(item.id, 'assisted');
+      if (typeof onItemSolved === 'function') onItemSolved(item.id, 'assisted');
+    }
+  };
+
+  solutionBtn.addEventListener('click', revealSolution);
 
   const markFailure = (rawVal, explicitDiagnosticId = null) => {
     playError();
@@ -371,7 +486,20 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
       });
       optGroup.appendChild(optBtn);
     });
-    const actionBar = h('div', { class: 'pr-chip-row quad-check-bar' }, [hintBtn]);
+
+    disableControls = () => {
+      optGroup.querySelectorAll('.pr-option').forEach((b, bIdx) => {
+        b.disabled = true;
+        const opt = item.options[bIdx];
+        const isCorrect =
+          typeof opt === 'object' && 'correct' in opt
+            ? Boolean(opt.correct)
+            : bIdx === item.correctIndex;
+        if (isCorrect) b.classList.add('is-correct');
+      });
+    };
+
+    const actionBar = h('div', { class: 'pr-chip-row quad-check-bar' }, [hintBtn, solutionBtn]);
     controlsWrap.append(optGroup, actionBar);
   } else {
     const input = h('input', {
@@ -385,6 +513,14 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
       { type: 'button', class: 'pr-btn pr-check-submit' },
       [chalkIcon('check', 14), ' Comprobar']
     );
+
+    disableControls = () => {
+      if (item.expected != null) {
+        input.value = String(item.expected);
+      }
+      input.disabled = true;
+      submitBtn.disabled = true;
+    };
 
     const checkInput = () => {
       const raw = input.value.trim();
@@ -479,18 +615,35 @@ function buildSingleQuestionCard(item, idx, { vn, onItemSolved }) {
       input,
       submitBtn,
       hintBtn,
+      solutionBtn,
     ]);
     controlsWrap.appendChild(row);
+  }
+
+  if (restoredStatus) {
+    solved = true;
+    card.classList.add('is-solved');
+    card.classList.add(restoredStatus === 'independent' ? 'is-independent' : 'is-assisted');
+    hintBtn.disabled = true;
+    solutionBtn.disabled = true;
+    feedbackEl.className = 'pr-check-feedback is-ok';
+    feedbackEl.replaceChildren(
+      chalkIcon(restoredStatus === 'independent' ? 'spark' : 'bulb', 14),
+      h('strong', {}, restoredStatus === 'independent' ? ' Logro independiente: ' : ' Logro asistido: '),
+      h('span', {}, item.solution)
+    );
+    disableControls();
   }
 
   card.append(head, promptEl, controlsWrap, hintsContainer, feedbackEl);
   return card;
 }
 
-export function createCheckBlock(mountNode, questions = [], { vn, onSectionDone } = {}) {
+export function createCheckBlock(mountNode, questions = [], { vn, onSectionDone, sectionId = null } = {}) {
   if (!mountNode) return;
   clear(mountNode);
   const solvedIds = new Set();
+  const progress = getProgress();
 
   const header = h('div', { class: 'quad-checks-header' }, [
     h('h3', { class: 'quad-checks-title' }, [
@@ -504,22 +657,50 @@ export function createCheckBlock(mountNode, questions = [], { vn, onSectionDone 
     ),
   ]);
 
+  const updateProgressHeader = () => {
+    const el = header.querySelector('.quad-checks-progress');
+    if (el) el.textContent = `${solvedIds.size} / ${questions.length} completados`;
+  };
+
   const grid = h('div', { class: 'quad-checks-grid' });
   questions.forEach((q, idx) => {
+    const restoredStatus = progress[q.id] || null;
+    if (restoredStatus) {
+      solvedIds.add(q.id);
+    }
     const card = buildSingleQuestionCard(q, idx, {
       vn,
-      onItemSolved: (id) => {
+      sectionId,
+      restoredStatus,
+      onItemSolved: (id, status) => {
         solvedIds.add(id);
-        header.querySelector('.quad-checks-progress').textContent = `${solvedIds.size} / ${questions.length} completados`;
-        if (solvedIds.size === questions.length && typeof onSectionDone === 'function') {
-          onSectionDone();
+        updateProgressHeader();
+        const allSolved = questions.length > 0 && questions.every((it) => solvedIds.has(it.id));
+        if (allSolved) {
+          if (sectionId) {
+            markSectionCompleted(sectionId);
+          }
+          if (typeof onSectionDone === 'function') {
+            onSectionDone(sectionId);
+          }
         }
       },
     });
     grid.appendChild(card);
   });
 
+  updateProgressHeader();
   mountNode.append(header, grid);
+
+  const allSolved = questions.length > 0 && questions.every((it) => solvedIds.has(it.id));
+  if (allSolved) {
+    if (sectionId) {
+      markSectionCompleted(sectionId);
+    }
+    if (typeof onSectionDone === 'function') {
+      onSectionDone(sectionId);
+    }
+  }
 }
 
 export const mountCheckBlock = createCheckBlock;

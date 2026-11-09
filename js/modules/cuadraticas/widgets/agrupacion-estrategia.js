@@ -89,6 +89,23 @@ export function initAgrupacionEstrategia(host) {
           'El 8 no contiene la variable x, por lo que solo podemos extraer el factor numérico −4.',
       },
     ],
+    onVerify: () => {
+      state.mode = 'group';
+      state.groupIdx = 0;
+      state.stepIdx = 2;
+      btnModeGroup.classList.add('is-active');
+      btnModeTree.classList.remove('is-active');
+      groupControlsWrap.removeAttribute('hidden');
+      stepButtonsWrap.removeAttribute('hidden');
+      treeControlsWrap.setAttribute('hidden', '');
+      for (const [i, el] of groupControlsWrap.querySelectorAll('button').entries()) {
+        el.classList.toggle('is-active', i === 0);
+      }
+      for (const [i, el] of stepButtonsWrap.querySelectorAll('button').entries()) {
+        el.classList.toggle('is-active', i === 2);
+      }
+      render();
+    },
   });
 
   const modeRow = h('div', { class: 'pr-chip-row' });

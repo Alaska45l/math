@@ -215,3 +215,8 @@ export function getCompetenciesForSection(sectionId) {
 export function getDiagnosticTaxonomy(diagnosticId) {
   return QUAD_DIAGNOSTIC_TAXONOMY[diagnosticId] || null;
 }
+
+// Aliases para compatibilidad hacia atrás
+export const QUADRATICS_COMPETENCIES = QUAD_COMPETENCIES;
+export const ERROR_TAXONOMY = QUAD_DIAGNOSTIC_TAXONOMY;
+export const DIAGNOSTIC_TO_TAXONOMY = QUAD_DIAGNOSTIC_TAXONOMY;

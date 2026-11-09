@@ -600,8 +600,14 @@ export function equivalentQuadExpr(inputA, inputB, requireForm = null) {
       };
     }
 
+    const isZeroBCanonical =
+      Math.abs(parsedA.b) < 1e-9 &&
+      ((requireForm === 'canonical' && parsedA.form === 'polynomial') ||
+       (requireForm === 'polynomial' && parsedA.form === 'canonical'));
+
     const matchesForm =
       parsedA.form === requireForm ||
+      isZeroBCanonical ||
       (parsedA.isDoubleRootSquare && (requireForm === 'canonical' || requireForm === 'factored')) ||
       // Si c = 0 y b = 0 (ej. 3x^2), polinómica, canónica y factorizada coinciden
       (Math.abs(parsedA.b) < 1e-9 && Math.abs(parsedA.c) < 1e-9 && ['polynomial', 'canonical', 'factored'].includes(requireForm));

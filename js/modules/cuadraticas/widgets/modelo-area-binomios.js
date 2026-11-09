@@ -49,6 +49,22 @@ export function initModeloAreaBinomios(host) {
           'Al reunir las cuatro parcelas del área sumamos sus superficies, no las multiplicamos entre sí.',
       },
     ],
+    onVerify: () => {
+      state.A = 1;
+      state.B = 3;
+      state.C = 1;
+      state.D = -3;
+      state.scaleLead = 1;
+      state.extraX2 = 0;
+      sliderA.setValue(1);
+      sliderB.setValue(3);
+      sliderC.setValue(1);
+      sliderD.setValue(-3);
+      for (const b of presetsRow.querySelectorAll('button')) {
+        b.classList.remove('is-active');
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });

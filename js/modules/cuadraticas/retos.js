@@ -95,6 +95,10 @@ export function generateQuadChallenge(seed, forcedType = 'all') {
     if (r1 === r2) r2 += 1;
     const model = fromFactored({ a, x1: r1, x2: r2 });
     const prodAC = model.a * model.c;
+    const m = -model.a * r1;
+    const n = -model.a * r2;
+    const mStr = m >= 0 ? `+${m}` : `${m}`;
+    const nStr = n >= 0 ? `+${n}` : `${n}`;
 
     return {
       seed,
@@ -116,7 +120,7 @@ export function generateQuadChallenge(seed, forcedType = 'all') {
         `Pista 2 (Paso intermedio): ${
           model.a === 1
             ? `Los factores que multiplicados dan ${model.c} y sumados dan ${model.b} son ${-r1} y ${-r2}, por lo que las raíces son x₁ = ${r1} y x₂ = ${r2}.`
-            : `El producto a·c vale ${prodAC} y las raíces donde se anula el polinomio son x₁ = ${model.roots[0]} y x₂ = ${model.roots[1]}.`
+            : `El producto maestro a·c vale ${prodAC} y la suma b vale ${model.b}. Los dos enteros que multiplicados dan ${prodAC} y sumados dan ${model.b} son m = ${m} y n = ${n}; descomponé el término central ${model.b}x en (${mStr}x ${nStr}x) y agrupá por parejas.`
         }`,
         `Pista 3 (Remate): Armá el producto cambiando el signo de cada raíz dentro del paréntesis: ${model.forms.factored}.`,
       ],
@@ -801,6 +805,7 @@ export function mountQuadraticRetos(root, { vn } = {}) {
   function renderPrngChallenge() {
     state.currentChallenge = generateQuadChallenge(state.seed, state.family);
     state.hintIndex = 0;
+    let solutionRevealed = false;
     const ch = state.currentChallenge;
 
     seedBadge.textContent = `Semilla #${ch.seed} · Competencia: ${ch.competencyId}`;
@@ -829,10 +834,17 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       [chalkIcon('bulb', 15), ` Pedir pista (0/${ch.hints.length})`]
     );
 
+    const solutionBtn = h(
+      'button',
+      { type: 'button', class: 'pr-btn pr-btn-secondary quad-reto-solution-btn' },
+      [chalkIcon('spark', 15), ' Ver solución explicada']
+    );
+
     const inputRow = h('div', { class: 'pr-chip-row quad-reto-actions' }, [
       inputEl,
       verifyBtn,
       hintBtn,
+      solutionBtn,
     ]);
 
     const hintsBox = h('div', { class: 'quad-reto-hints', hidden: '' });
@@ -840,6 +852,22 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       class: 'pr-check-feedback',
       role: 'status',
       'aria-live': 'polite',
+    });
+
+    solutionBtn.addEventListener('click', () => {
+      playClick();
+      solutionRevealed = true;
+      inputEl.disabled = true;
+      verifyBtn.disabled = true;
+      solutionBtn.disabled = true;
+      state.streak = 0;
+      streakBadge.textContent = `Racha actual: 0 · Resueltos: ${state.solvedCount}`;
+      feedbackBox.className = 'pr-check-feedback is-ok is-solution';
+      feedbackBox.replaceChildren(
+        chalkIcon('spark', 14),
+        h('strong', {}, ' Solución explicada: '),
+        h('span', {}, ch.explanation)
+      );
     });
 
     hintBtn.addEventListener('click', () => {
@@ -857,6 +885,7 @@ export function mountQuadraticRetos(root, { vn } = {}) {
     });
 
     const onVerify = () => {
+      if (solutionRevealed || inputEl.disabled) return;
       const res = validateRetoAnswer(ch, inputEl.value);
       if (res.empty) {
         feedbackBox.className = 'pr-check-feedback is-warn';
@@ -865,12 +894,20 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       }
       if (res.ok) {
         playSuccess();
-        state.streak += 1;
+        const isIndependent = state.hintIndex === 0 && !solutionRevealed;
+        if (isIndependent) {
+          state.streak += 1;
+        }
         state.solvedCount += 1;
         streakBadge.textContent = `Racha actual: ${state.streak} · Resueltos: ${state.solvedCount}`;
+        const masteryTag = isIndependent ? '[Logro Independiente]' : '[Logro Asistido]';
         feedbackBox.className = 'pr-check-feedback is-ok';
-        feedbackBox.textContent = `¡Correcto! ${ch.explanation}`;
-        if (STREAK_REACTIONS[state.streak]) {
+        feedbackBox.replaceChildren(
+          chalkIcon(isIndependent ? 'spark' : 'bulb', 14),
+          h('strong', {}, ` ¡Correcto! ${masteryTag} `),
+          h('span', {}, ch.explanation)
+        );
+        if (isIndependent && STREAK_REACTIONS[state.streak]) {
           if (vn && typeof vn.react === 'function') {
             vn.react(STREAK_REACTIONS[state.streak].pose, STREAK_REACTIONS[state.streak].text);
           } else {

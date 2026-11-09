@@ -62,6 +62,17 @@ export function initRadiografiaCuadratica(host) {
           'A diferencia de la asíntota exponencial, la parábola sí alcanza y pisa su propio vértice en x = −3, por lo que lleva corchete cerrado.',
       },
     ],
+    onVerify: () => {
+      state.presetIdx = 3;
+      state.lens = 'image';
+      for (const [i, el] of presetsRow.querySelectorAll('button').entries()) {
+        el.classList.toggle('is-active', i === 3);
+      }
+      for (const [i, el] of lensesRow.querySelectorAll('button').entries()) {
+        el.classList.toggle('is-active', i === 0);
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });

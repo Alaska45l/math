@@ -5,7 +5,7 @@
  */
 
 import { h, s, clear, chalkIcon } from '../../../core/dom.js';
-import { playClick, playSuccess } from '../../../core/sound.js';
+import { playClick, playSuccess, playSliderTick } from '../../../core/sound.js';
 
 let clipCounter = 0;
 
@@ -70,6 +70,7 @@ export function createQuadBoardSvg({
 
   return {
     svg,
+    defs,
     plotBox,
     clipId,
     gridLayer,
@@ -270,9 +271,16 @@ export function sampleCurvePath(fn, mapper, steps = 140, xStart = null, xEnd = n
 
 /**
  * Conecta arrastre con PointerEvents sobre el SVG convirtiendo coordenadas de pantalla al viewBox.
+ * Soporta accesibilidad por teclado (tabindex="0", role="slider", aria-label y flechas de dirección).
  */
-export function attachSvgDrag(svg, handleNode, getMapper, onMove) {
+export function attachSvgDrag(svg, handleNode, getMapper, onMove, options = {}) {
   let dragging = false;
+
+  handleNode.setAttribute('tabindex', '0');
+  handleNode.setAttribute('role', 'slider');
+  if (!handleNode.getAttribute('aria-label')) {
+    handleNode.setAttribute('aria-label', options.ariaLabel || 'Control deslizable');
+  }
 
   const clientToSvg = (e) => {
     const rect = svg.getBoundingClientRect();
@@ -315,6 +323,66 @@ export function attachSvgDrag(svg, handleNode, getMapper, onMove) {
   };
   handleNode.addEventListener('pointerup', stop);
   handleNode.addEventListener('pointercancel', stop);
+
+  handleNode.addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+
+    const mapper = getMapper();
+    let px = null;
+    let py = null;
+    if (handleNode.hasAttribute('cx') && handleNode.hasAttribute('cy')) {
+      px = parseFloat(handleNode.getAttribute('cx'));
+      py = parseFloat(handleNode.getAttribute('cy'));
+    } else if (handleNode.hasAttribute('x') && handleNode.hasAttribute('y')) {
+      px = parseFloat(handleNode.getAttribute('x'));
+      py = parseFloat(handleNode.getAttribute('y'));
+    } else {
+      try {
+        const rect = svg.getBoundingClientRect();
+        const hRect = handleNode.getBoundingClientRect();
+        const vb = svg.viewBox.baseVal;
+        const scaleX = vb.width / Math.max(1, rect.width);
+        const scaleY = vb.height / Math.max(1, rect.height);
+        px = (hRect.left + hRect.width / 2 - rect.left) * scaleX;
+        py = (hRect.top + hRect.height / 2 - rect.top) * scaleY;
+      } catch {
+        // Fallback
+      }
+    }
+
+    let curX = px !== null && !isNaN(px) ? mapper.fromX(px) : 0;
+    let curY = py !== null && !isNaN(py) ? mapper.fromY(py) : 0;
+
+    const stepX = options.stepX ?? 0.5;
+    const stepY = options.stepY ?? 0.5;
+
+    if (e.key === 'ArrowRight') curX += stepX;
+    else if (e.key === 'ArrowLeft') curX -= stepX;
+    else if (e.key === 'ArrowUp') curY += stepY;
+    else if (e.key === 'ArrowDown') curY -= stepY;
+
+    const newPx = mapper.toX(curX);
+    const newPy = mapper.toY(curY);
+
+    if (typeof playSliderTick === 'function') {
+      try {
+        playSliderTick(1);
+      } catch {
+        // Ignore audio in test environments
+      }
+    }
+
+    onMove({ px: newPx, py: newPy, x: curX, y: curY });
+    if (handleNode.isConnected && typeof handleNode.focus === 'function') {
+      try {
+        handleNode.focus({ preventScroll: true });
+      } catch {
+        handleNode.focus();
+      }
+    }
+  });
 }
 
 /**
@@ -359,15 +427,30 @@ export function createSliderField({
 }
 
 /**
- * Crea un bloque liviano de Predicción Previa (Predict-Observe-Explain) de 1 clic.
+ * Crea un bloque de Predicción Previa (Predict-Observe-Explain) en dos etapas:
+ * Etapa 1: Selección de hipótesis (mensaje neutral + botón de comprobación).
+ * Etapa 2: Comprobación en pizarrón (aplica onVerify/onSelect/targetState + revelado de explicación formal).
  */
-export function createPredictBox({ prompt, options = [], onSelect } = {}) {
+export function createPredictBox({ prompt, options = [], onSelect, onVerify } = {}) {
   const box = h('div', { class: 'quad-predict-box' });
   const titleEl = h('p', { class: 'quad-predict-prompt' }, [
     chalkIcon('spark', 15),
-    ` Predicción rápida (1 clic): ${prompt}`,
+    ` Predicción previa: ${prompt}`,
   ]);
   const optionsRow = h('div', { class: 'pr-chip-row quad-predict-options' });
+  const actionsRow = h('div', { class: 'quad-predict-actions', style: 'margin-top: 8px;' });
+  const verifyBtn = h(
+    'button',
+    {
+      type: 'button',
+      class: 'pr-chip quad-predict-verify-btn',
+      hidden: '',
+      disabled: '',
+    },
+    'Comprobar en el pizarrón'
+  );
+  actionsRow.appendChild(verifyBtn);
+
   const feedbackEl = h('div', {
     class: 'quad-predict-feedback',
     hidden: '',
@@ -375,28 +458,68 @@ export function createPredictBox({ prompt, options = [], onSelect } = {}) {
     'aria-live': 'polite',
   });
 
+  let selectedOpt = null;
+  let verified = false;
+
+  const runVerification = (opt = selectedOpt) => {
+    if (!opt) return;
+    verified = true;
+    verifyBtn.disabled = true;
+    verifyBtn.classList.remove('is-active');
+
+    if (typeof onVerify === 'function') {
+      onVerify(opt);
+    } else if (typeof onSelect === 'function') {
+      onSelect(opt);
+    }
+
+    feedbackEl.removeAttribute('hidden');
+    if (opt.correct) {
+      playSuccess();
+      feedbackEl.textContent = `¡Bien anticipado! ${opt.explanation}`;
+      feedbackEl.style.color = 'var(--green)';
+    } else {
+      playClick();
+      feedbackEl.textContent = `Interesante apuesta: ${opt.explanation}`;
+      feedbackEl.style.color = 'var(--yellow)';
+    }
+  };
+
   options.forEach((opt) => {
     const btn = h('button', { type: 'button', class: 'pr-chip' }, opt.label);
     btn.addEventListener('click', () => {
+      selectedOpt = opt;
+      verified = false;
       for (const b of optionsRow.querySelectorAll('button')) {
         b.classList.remove('is-active');
       }
       btn.classList.add('is-active');
+
       feedbackEl.removeAttribute('hidden');
-      if (opt.correct) {
-        playSuccess();
-        feedbackEl.textContent = `¡Bien anticipado! ${opt.explanation}`;
-        feedbackEl.style.color = 'var(--green)';
-      } else {
-        playClick();
-        feedbackEl.textContent = `Interesante apuesta: ${opt.explanation}`;
-        feedbackEl.style.color = 'var(--yellow)';
-      }
-      if (typeof onSelect === 'function') onSelect(opt);
+      feedbackEl.style.color = 'var(--muted, #a7b8ae)';
+      feedbackEl.textContent =
+        'Hipótesis registrada: ahora probalo en el pizarrón o pulsá "Comprobar en el pizarrón" para verificar qué ocurre';
+
+      verifyBtn.removeAttribute('hidden');
+      verifyBtn.removeAttribute('disabled');
+      verifyBtn.classList.add('is-active');
     });
     optionsRow.appendChild(btn);
   });
 
-  box.append(titleEl, optionsRow, feedbackEl);
+  verifyBtn.addEventListener('click', () => {
+    if (selectedOpt) {
+      runVerification(selectedOpt);
+    }
+  });
+
+  box.append(titleEl, optionsRow, actionsRow, feedbackEl);
+
+  box.verify = runVerification;
+  box.getSelectedOption = () => selectedOpt;
+  box.isVerified = () => verified;
+
   return box;
 }
+
+export const createPredictorBanner = createPredictBox;

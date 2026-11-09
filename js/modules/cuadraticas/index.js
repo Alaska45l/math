@@ -12,7 +12,17 @@ import {
   createCheckBlock,
   bindTutorButtons,
   mountProgress,
+  PROGRESS_KEY,
+  getProgress,
+  saveProgress,
+  markSectionCompleted,
 } from './components.js';
+import {
+  QUAD_COMPETENCIES,
+  QUADRATICS_COMPETENCIES,
+  ERROR_TAXONOMY,
+  DIAGNOSTIC_TO_TAXONOMY,
+} from './competencies-map.js';
 import {
   VN_SCRIPTS,
   SCRIPTS,
@@ -111,7 +121,7 @@ export const CHECKS_DATA = {
       hints: [
         'Partí el rectángulo de lados (x − 4) y (x + 7) en sus cuatro parcelas: arriba a la izquierda tenés x·x = x² y abajo a la derecha el cruce numérico (−4)·(+7).',
         'En las dos parcelas cruzadas aparecen +7x y −4x; al juntarlas como términos semejantes te queda (+7 − 4)x = +3x.',
-        'La esquina de las constantes vale (−4)·7 = −28, así que al reunir las tres piezas queda x^2 + 3x - 28.',
+        'Sumá el término cuadrático x², la reducción lineal (+7 − 4)x y el producto constante (−4)·7 para ensamblar el trinomio final en potencias decrecientes.',
       ],
       solution:
         'Al sumar las cuatro parcelas obtenemos x² + 7x − 4x − 28 = x² + 3x − 28.',
@@ -134,7 +144,7 @@ export const CHECKS_DATA = {
       hints: [
         'Recordá que el exponente 2 nunca se reparte directo sobre la resta: en un cuadrado de lado (2 − 3x) hay dos cuadrados en la diagonal y dos rectángulos iguales en los cruces.',
         'Los cuadrados de las esquinas son 2² = 4 y (−3x)² = +9x² positivo (porque menos por menos da más), mientras que cada rectángulo lateral vale 2·(−3x) = −6x.',
-        'Sumando los dos rectángulos iguales (−6x − 6x = −12x) obtenés el trinomio 9x^2 - 12x + 4.',
+        'Reuní los dos cuadrados de las esquinas con el doble producto central (−6x − 6x) y ordená los términos de mayor a menor grado.',
       ],
       solution:
         'En (2 − 3x)² aparecen 2² = 4, el doble producto 2·2·(−3x) = −12x y (−3x)² = +9x², dando 9x² − 12x + 4.',
@@ -164,7 +174,7 @@ export const CHECKS_DATA = {
       hints: [
         'Para que una función sea genuinamente cuadrática, su coeficiente principal "a" luego de reducir términos semejantes tiene que ser distinto de cero.',
         'Desarrollá primero (n − 1)² = n² − 2n + 1 y multiplicá cada pieza por 2: te queda 2n² − 4n + 2.',
-        'Al restarle el −2n² del final, +2n² − 2n² da 0n², sobreviviendo únicamente la expresión lineal −4n + 2.',
+        'Al cancelar los términos cuadráticos opuestos (+2n² − 2n²), observá qué grado le queda a la variable en la expresión resultante.',
       ],
       solution:
         'Era una falsa cuadrática disfrazada: 2(n² − 2n + 1) − 2n² = 2n² − 4n + 2 − 2n² = −4n + 2 (grado 1).',
@@ -185,7 +195,7 @@ export const CHECKS_DATA = {
       hints: [
         'Buscamos dos números enteros m y n que multiplicados den el término independiente c = +6 y sumados den el coeficiente lineal b = −5.',
         'Como el producto +6 es positivo, ambos números tienen el mismo signo; y como la suma −5 es negativa, los dos números buscados son negativos.',
-        'Las parejas negativas que multiplican +6 son (−1, −6) y (−2, −3); la que suma −5 es (−2) + (−3) = −5, dando (x - 2)(x - 3).',
+        'Identificá cuál de los pares de divisores negativos de +6 suma exactamente −5 y armá el producto de dos factores (x + m)(x + n) con esos valores.',
       ],
       solution:
         'Como (−2)·(−3) = +6 y (−2) + (−3) = −5, el trinomio se factoriza exactamente como (x − 2)(x − 3).',
@@ -203,7 +213,7 @@ export const CHECKS_DATA = {
       hints: [
         'Acá el producto c = −42 es negativo, lo que garantiza que uno de los números es positivo y el otro es negativo.',
         'Como la suma es b = −1 (apenas a un paso del cero), necesitamos dos divisores de 42 que sean vecinos consecutivos y donde el más grande lleve signo menos.',
-        'Los divisores 6 y 7 cumplen (−7)·(+6) = −42 y (−7) + 6 = −1, por lo que escribimos (x - 7)(x + 6).',
+        'Como el producto es negativo (−42), los números tienen signos contrarios; asigná el signo negativo al de mayor valor absoluto para que la suma dé −1 y armá los binomios.',
       ],
       solution:
         'Con m = −7 y n = +6 verificamos (−7)·6 = −42 y −7 + 6 = −1, obteniendo (x − 7)(x + 6).',
@@ -221,7 +231,7 @@ export const CHECKS_DATA = {
       hints: [
         'Antes de buscar raíces, fijate que 3, 15 y 18 son todos múltiplos de 3: sacá el 3 adelante como factor común para aliviar los números.',
         'Al extraer el 3 te queda 3·(x² + 5x + 6), y adentro del paréntesis ahora tenés un trinomio mónico sencillo con suma +5 y producto +6.',
-        'Los números 2 y 3 suman 5 y multiplican 6, así que sin olvidarte del 3 de adelante queda 3(x + 2)(x + 3).',
+        'Factorizá el trinomio mónico interior buscando dos enteros que sumen 5 y multipliquen 6, manteniendo el factor común 3 multiplicando a todo el producto.',
       ],
       solution:
         'Sacando factor común 3 queda 3(x² + 5x + 6) y factorizando por suma-producto llegamos a 3(x + 2)(x + 3).',
@@ -242,7 +252,7 @@ export const CHECKS_DATA = {
       hints: [
         'Pregunta 1 de la brújula: ¿hay factor común en 5x² y −80? Sí, ambos son divisibles por 5.',
         'Al dividir ambos términos por 5 queda 5·(x² − 16), y adentro del paréntesis aparece una resta de dos cuadrados perfectos: x² − 4².',
-        'Desarmá la diferencia de cuadrados como suma por diferencia sin perder el 5 inicial: 5(x - 4)(x + 4).',
+        'Reconocé que adentro del paréntesis tenés una diferencia de cuadrados x² − 4² y factorizala como producto de binomios conjugados conservando el factor 5 exterior.',
       ],
       solution:
         'Extrayendo el factor común 5 obtenemos 5(x² − 16), que por diferencia de cuadrados se factoriza en 5(x − 4)(x + 4).',
@@ -260,7 +270,7 @@ export const CHECKS_DATA = {
       hints: [
         'Como a = 2 y c = 3, el producto maestro es a·c = 2·3 = 6; los dos números que multiplican 6 y suman b = 7 son 1 y 6.',
         'Reescribí el término del medio 7x como +1x + 6x para tener cuatro términos: 2x² + x + 6x + 3.',
-        'En la primera pareja sacás factor común x quedando x(2x + 1), y en la segunda sacás 3 quedando 3(2x + 1); uniendo el factor repetido obtenés (2x + 1)(x + 3).',
+        'Extraé factor común x de la primera pareja y 3 de la segunda; notarás que el paréntesis (2x + 1) se repite, permitiéndote extraerlo como factor común global.',
       ],
       solution:
         'Descomponiendo 7x = x + 6x agrupamos x(2x + 1) + 3(2x + 1) = (2x + 1)(x + 3).',
@@ -278,7 +288,7 @@ export const CHECKS_DATA = {
       hints: [
         'Mirá las dos puntas del trinomio: 4x² es el cuadrado exacto de 2x, y 9 es el cuadrado exacto de 3.',
         'Verificá si el término central coincide con el doble producto de esas dos bases: 2 · (2x) · 3 = 12x.',
-        'Como el doble producto da clavado +12x, las cuatro parcelas cierran un cuadrado de lado (2x + 3), es decir (2x + 3)^2.',
+        'Habiendo verificado las bases 2x y 3 y el doble producto central, escribí la expresión como el binomio suma de ambas bases elevado al cuadrado.',
       ],
       solution:
         'Al ser (2x)² + 2·(2x)·3 + 3², es un trinomio cuadrado perfecto que se compacta en (2x + 3)².',
@@ -298,7 +308,7 @@ export const CHECKS_DATA = {
       hints: [
         'En el molde canónico a(x − xᵥ)² + yᵥ, la abscisa del vértice xᵥ es el valor de x que hace que el interior del paréntesis valga exactamente cero.',
         'Preguntate: ¿qué número puesto en el lugar de x cumple x + 2 = 0? Despejando sale xᵥ = −2 (con signo opuesto al +2 visible).',
-        'Cuando x = −2 el término cuadrático se anula y queda la altura exterior yᵥ = 1, por lo que el vértice es (-2; 1).',
+        'Reuní la abscisa hallada donde el paréntesis se anula con el término independiente exterior en la notación de par ordenado (x; y).',
       ],
       solution:
         'El paréntesis (x + 2)² se anula en xᵥ = −2 y la altura mínima en ese punto es yᵥ = 1: vértice V(−2; 1).',
@@ -322,7 +332,7 @@ export const CHECKS_DATA = {
       hints: [
         '¡No caigas en la trampa de contestar −6! Ese −6 es la altura del vértice en x = −1, no el corte con el eje Y.',
         'La ordenada al origen se halla siempre reemplazando x = 0 en toda la fórmula: f(0) = −5·(0 + 1)² − 6.',
-        'Como (0 + 1)² = 1² = 1, multiplicás −5·1 = −5 y luego restás 6: −5 − 6 = -11.',
+        'Calculá el cuadrado (0 + 1)², multiplicalo por −5 y restale 6 para obtener el valor numérico final de la ordenada al origen.',
       ],
       solution:
         'Evaluando en x = 0 obtenemos f(0) = −5(0 + 1)² − 6 = −5(1) − 6 = −11. Corta al eje Y en (0; −11).',
@@ -339,7 +349,7 @@ export const CHECKS_DATA = {
       hints: [
         'Pasá el 4 sumando al miembro derecho para dejar solo al cuadrado: (x − 3)² = 4.',
         'Al aplicar raíz cuadrada en ambos lados aparece el valor absoluto: √((x − 3)²) = |x − 3| = √4 = 2, lo que abre dos caminos: x − 3 = −2 o x − 3 = +2.',
-        'Sumando 3 en cada camino obtenés x₁ = 3 − 2 = 1 y x₂ = 3 + 2 = 5; escribí el conjunto como {1; 5}.',
+        'Despejá la x en cada una de las dos ramas sumando 3 a ambos miembros (3 − 2 y 3 + 2) y escribí ambas soluciones separadas por punto y coma entre llaves.',
       ],
       solution:
         'De (x − 3)² = 4 deducimos x − 3 = ±2, luego x = 3 ± 2, entregando las dos raíces simétricas {1; 5}.',
@@ -359,7 +369,7 @@ export const CHECKS_DATA = {
       hints: [
         'Si pasás 4x al otro lado y dividís por x, matás una solución porque estás prohibiendo que x sea cero.',
         'Extraé factor común x en el primer miembro: la ecuación se reescribe como x · (x − 4) = 0.',
-        'Por propiedad del producto cero, o vale cero la primera pieza (x₁ = 0) o vale cero el paréntesis (x − 4 = 0 ⇒ x₂ = 4): conjunto {0; 4}.',
+        'Aplicá la propiedad del producto nulo igualando a cero cada factor por separado (x = 0 y x − 4 = 0) y presentá las dos raíces obtenidas entre llaves.',
       ],
       solution:
         'Factorizando x(x − 4) = 0 y aplicando la propiedad del producto nulo obtenemos las dos raíces: {0; 4}.',
@@ -376,7 +386,7 @@ export const CHECKS_DATA = {
       hints: [
         'Leé primero las raíces que anulan cada paréntesis: x + 1 = 0 da x₁ = −1, y x − 3 = 0 da x₂ = 3.',
         'Por simetría, la abscisa del vértice xᵥ cae justo en el promedio entre ambas raíces: xᵥ = (−1 + 3) / 2 = 2 / 2 = 1.',
-        'Ahora evaluá x = 1 en la fórmula original para hallar la altura: yᵥ = f(1) = −2·(1 + 1)·(1 − 3) = −2·(2)·(−2) = 8. El vértice es (1; 8).',
+        'Calculá el producto −2·(1 + 1)·(1 − 3) para encontrar la ordenada del vértice y armá el par ordenado con la abscisa hallada antes.',
       ],
       solution:
         'El punto medio entre las raíces x₁ = −1 y x₂ = 3 es xᵥ = 1, y su ordenada vale f(1) = −2(2)(−2) = 8: vértice (1; 8).',
@@ -394,7 +404,7 @@ export const CHECKS_DATA = {
       hints: [
         'Como conocés las dos raíces x₁ = −2 y x₂ = 4, armá el molde factorizado f(x) = a·(x + 2)·(x − 4) dejando el coeficiente principal "a" listo para despejar.',
         'Usá el dato de la ordenada al origen (0; 16) reemplazando x = 0 e igualando a 16: 16 = a·(0 + 2)·(0 − 4) = a·(−8).',
-        'Al dividir 16 por −8 obtenés a = −2; reemplazando ese factor adelante te queda -2(x + 2)(x - 4).',
+        'Despejá el valor de a dividiendo 16 por el producto de los dos factores evaluados en cero y colocá ese coeficiente delante de (x + 2)(x − 4).',
       ],
       solution:
         'En f(x) = a(x + 2)(x − 4), imponiendo f(0) = a(2)(−4) = 16 despejamos a = −2, por lo que f(x) = −2(x + 2)(x − 4).',
@@ -422,7 +432,7 @@ export const CHECKS_DATA = {
       hints: [
         'Partí a la mitad el coeficiente lineal −6: la mitad es −3, por lo que el cuadrado que necesitamos cerrar tiene lado (x − 3).',
         'Para completar el trinomio necesitamos sumar (−3)² = 9; para no alterar la función sumamos y restamos 9: (x² − 6x + 9) − 9 + 2.',
-        'Los tres primeros términos se pliegan en (x − 3)² y afuera juntás −9 + 2 = −7, obteniendo (x - 3)^2 - 7.',
+        'Compactá el trinomio cuadrado perfecto en el binomio al cuadrado y operá aritméticamente los términos numéricos restantes fuera del paréntesis.',
       ],
       solution:
         'Sumando y restando 3² = 9: x² − 6x + 9 − 9 + 2 = (x − 3)² − 7, con vértice en (3; −7).',
@@ -447,7 +457,7 @@ export const CHECKS_DATA = {
       hints: [
         'Sacá factor común 3 de los dos primeros términos dejando al −1 afuera del corchete: f(x) = 3 · [x² − 2x] − 1.',
         'Adentro del corchete la mitad de −2 es −1 y (−1)² = 1; sumá y restá 1 adentro: 3 · [(x² − 2x + 1) − 1] − 1.',
-        '¡Atención al sacar el −1 afuera del corchete! Sale multiplicado por el 3 de adelante como −3, y con el −1 externo suma −4: queda 3(x - 1)^2 - 4.',
+        'Distribuí el factor 3 sobre el término que resta dentro del corchete, sumalo al término independiente final y dejá armada la forma canónica.',
       ],
       solution:
         '3[x² − 2x + 1 − 1] − 1 = 3[(x − 1)² − 1] − 1 = 3(x − 1)² − 3 − 1 = 3(x − 1)² − 4.',
@@ -471,7 +481,7 @@ export const CHECKS_DATA = {
       hints: [
         'Identificá con cuidado los coeficientes con su signo: a = −1/2 y b = 2. Al calcular 2·a obtenés 2·(−1/2) = −1.',
         'Entonces la abscisa del vértice es xᵥ = −b / (2a) = −2 / (−1) = +2.',
-        'Reemplazando x = 2 en la función: f(2) = −1/2·(4) + 2·(2) − 9/2 = −2 + 4 − 9/2 = 2 − 9/2 = −5/2 (o −2,5). El vértice es (2; -5/2).',
+        'Evaluá f(2) sumando −2 + 4 − 9/2 con denominador común fraccionario y combiná el resultado con la abscisa en formato de par ordenado.',
       ],
       solution:
         'Con a = −1/2 y b = 2 resulta xᵥ = −2/(−1) = 2 e yᵥ = −2 + 4 − 9/2 = −5/2: vértice V(2; −5/2).',
@@ -491,7 +501,7 @@ export const CHECKS_DATA = {
       hints: [
         'Anotá los tres coeficientes con sus signos: a = 1, b = −6 y c = 2.',
         'Al elevar b = −6 al cuadrado encerralo entre paréntesis: (−6)² = (−6)·(−6) = +36 positivo.',
-        'Restá 4·a·c = 4·1·2 = 8: te queda Δ = 36 − 8 = 28 (como Δ > 0, tiene dos raíces reales irracionales 3 ± √7).',
+        'Efectuá la resta entre b² = (−6)² = 36 y el término 4·a·c = 4·1·2 para obtener el valor numérico exacto del discriminante.',
       ],
       solution:
         'Δ = (−6)² − 4·1·2 = 36 − 8 = 28 > 0 (y sus raíces exactas simplificadas son 3 − √7 y 3 + √7).',
@@ -508,7 +518,7 @@ export const CHECKS_DATA = {
       hints: [
         'Para que las dos raíces colisionen en una única raíz doble, el discriminante bajo la raíz cuadrada tiene que valer exactamente cero: Δ = 0.',
         'Planteá b² − 4ac = 0 con a = 1, b = −k y c = 9: te queda (−k)² − 4·1·9 = k² − 36 = 0.',
-        'De k² = 36 salen k = −6 y k = +6; como la consigna pide el valor positivo, la respuesta es 6.',
+        'Planteá la raíz cuadrada del término independiente para despejar el valor absoluto |k| y seleccioná la solución estrictamente positiva.',
       ],
       solution:
         'Exigiendo Δ = (−k)² − 4·1·9 = k² − 36 = 0 obtenemos |k| = 6; el valor positivo buscado es k = 6.',
@@ -525,7 +535,7 @@ export const CHECKS_DATA = {
       hints: [
         'Por las relaciones de Cardano-Vieta, la suma de las dos raíces de ax² + bx + c = 0 es siempre x₁ + x₂ = −b / a.',
         '¡Ojo con el doble signo menos! Acá el coeficiente lineal es b = −14 y el principal es a = 2.',
-        'Reemplazando queda x₁ + x₂ = −(−14) / 2 = +14 / 2 = 7.',
+        'Aplicá la regla de los signos para simplificar −(−14) en el numerador y dividilo por 2 para concluir el valor de la suma.',
       ],
       solution:
         'Por Cardano-Vieta, la suma de las raíces es x₁ + x₂ = −b/a = −(−14)/2 = 7.',
@@ -552,7 +562,7 @@ export const CHECKS_DATA = {
       hints: [
         'Reordená mentalmente la forma canónica como f(x) = −(x − 4)² + 16: su vértice está en V(4; 16) y su coeficiente principal es a = −1 < 0.',
         'Como a < 0, las ramas abren hacia abajo y la altura yᵥ = 16 es el techo máximo que alcanza la curva sobre el eje Y.',
-        'Como en x = 4 la parábola sí toca la altura 16, en 16 lleva corchete cerrado: (-inf; 16].',
+        'Escribí el intervalo que arranca en −inf y llega hasta la altura máxima del vértice yᵥ = 16, prestando atención a cerrar con corchete en el valor alcanzado.',
       ],
       solution:
         'Con vértice en (4; 16) y concavidad hacia abajo (a = −1 < 0), las alturas cubren desde −∞ hasta 16 inclusive: Im(f) = (−∞; 16].',
@@ -576,7 +586,7 @@ export const CHECKS_DATA = {
       hints: [
         '¡Prohibido usar el 1 de la altura! Los intervalos de crecimiento y decrecimiento se leen exclusivamente sobre el piso del eje X.',
         'El eje de simetría parte el dominio en la abscisa del vértice xᵥ = −3.',
-        'Como a = −1 < 0 (montaña ∩), al caminar de izquierda a derecha subís desde −∞ hasta llegar a la cumbre en x = −3: I↑ = (-inf; -3).',
+        'Considerá que la curva asciende desde el extremo izquierdo de la recta real hasta la abscisa del vértice xᵥ = −3 y expresalo en notación de intervalo abierto.',
       ],
       solution:
         'Mirando el eje X, la parábola sube desde la izquierda hasta la abscisa del vértice xᵥ = −3: I↑ = (−∞; −3).',
@@ -600,7 +610,7 @@ export const CHECKS_DATA = {
       hints: [
         'Preguntate qué signo tiene −2(x − 1)²: el cuadrado (x − 1)² es siempre positivo salvo en x = 1 donde vale exactamente cero.',
         'Al multiplicar por −2 negativo, la función queda estrictamente bajo el eje X (negativa) en todos los números reales excepto en x = 1 (donde vale 0 y no es negativa).',
-        'Por lo tanto, hay que excluir el punto de rebote x = 1 escribiendo (-inf; 1) U (1; +inf) o R - {1}.',
+        'Expresá la unión de los dos intervalos abiertos que cubren toda la recta real excepto el único punto x = 1 donde la función se hace cero.',
       ],
       solution:
         'En x = 1 vale 0 (pertenece a C₀) y en cualquier otro real es estrictamente negativa: C⁻ = (−∞; 1) ∪ (1; +∞) = ℝ − {1}.',
@@ -633,7 +643,7 @@ export const CHECKS_DATA = {
       hints: [
         'Que la parábola f(x) sola no corte al eje X no impide que se cruce con la recta g(x): lo que importa es la ecuación igualada f(x) = g(x).',
         'Igualá x² − 2x + 3 = 2x − 1 y pasá 2x restando y 1 sumando al primer miembro: te queda x² − 4x + 4 = 0.',
-        'El discriminante de esa ecuación diferencia es Δ_int = (−4)² − 4·1·4 = 16 − 16 = 0, por lo que se tocan en un único punto x = 2, y = g(2) = 3.',
+        'Calculá el discriminante Δ de la ecuación cuadrática diferencia x² − 4x + 4 = 0: un discriminante nulo indica exactamente un punto de contacto.',
       ],
       solution:
         'La ecuación diferencia es x² − 4x + 4 = (x − 2)² = 0 (Δ_int = 0), por lo que la recta es tangente a la parábola en el punto (2; 3).',
@@ -650,7 +660,7 @@ export const CHECKS_DATA = {
       hints: [
         'Igualá la parábola con la recta: x² + 2x + 3 = kx − 1, y pasá todo a la izquierda agrupando los términos con x: x² + (2 − k)x + 4 = 0.',
         'Exigí la condición de tangencia Δ_int = 0: el coeficiente lineal al cuadrado menos 4·a·c debe anularse, es decir (2 − k)² − 4·1·4 = (2 − k)² − 16 = 0.',
-        'De (2 − k)² = 16 despejás 2 − k = ±4: con +4 sale k = −2 y con −4 sale k = 6. Escribí el conjunto como {-2; 6}.',
+        'Despejá k en las dos ramas lineales 2 − k = 4 y 2 − k = −4 y anotá ambos valores entre llaves separados por punto y coma.',
       ],
       solution:
         'En x² + (2 − k)x + 4 = 0 imponemos Δ_int = (2 − k)² − 16 = 0 ⇒ |2 − k| = 4, obteniendo k₁ = −2 y k₂ = 6: conjunto {−2; 6}.',
@@ -667,7 +677,7 @@ export const CHECKS_DATA = {
       hints: [
         'Igualá ambas alturas: x² − 4x + 5 = 1, y restá 1 en ambos lados para obtener x² − 4x + 4 = 0.',
         'Reconocé el trinomio cuadrado perfecto (x − 2)² = 0, cuya única solución es la abscisa de contacto x = 2.',
-        'Como el punto pertenece a la recta horizontal y = 1 (y también a la parábola en su vértice), la coordenada completa del punto es (2; 1).',
+        'Uní la abscisa x = 2 con la altura constante y = 1 de la recta tangente en un par ordenado (x; y).',
       ],
       solution:
         'Igualando x² − 4x + 5 = 1 queda (x − 2)² = 0 ⇒ x = 2, con altura y = 1: punto de tangencia (2; 1).',
@@ -687,7 +697,7 @@ export const CHECKS_DATA = {
       hints: [
         'Mirá qué te pide la pregunta: te pide la medida del corte x (la coordenada horizontal xᵥ del vértice), no todavía el valor del área S.',
         'En S(x) = 2x² − 32x + 256 tenés a = 2 > 0 (abre hacia arriba, tiene mínimo) y b = −32.',
-        'Calculá xᵥ = −b / (2a) = −(−32) / (2·2) = 32 / 4 = 8 cm (justo en el punto medio del lado de 16 cm).',
+        'Efectuá la división de 32 por 2·a = 4 para obtener la longitud del corte en centímetros que minimiza el área interior.',
       ],
       solution:
         'El mínimo de S(x) = 2x² − 32x + 256 ocurre en la abscisa del vértice xᵥ = −(−32)/(2·2) = 8 cm.',
@@ -704,7 +714,7 @@ export const CHECKS_DATA = {
       hints: [
         'Ya sabés por la pregunta anterior que el área mínima se alcanza cuando el corte mide xᵥ = 8 cm.',
         'Para saber cuánto vale esa área mínima yᵥ, evaluá x = 8 en la función S(8) = 2·(8)² − 32·(8) + 256 (o usá Pitágoras con dos catetos de 8 cm: 8² + 8²).',
-        'Haciendo la cuenta obtenés 2·64 − 256 + 256 = 128 cm² (exactamente la mitad del área del cuadrado exterior de 256 cm²).',
+        'Calculá 2·(64) − 32·(8) + 256 realizando las sumas y restas para hallar el valor numérico en centímetros cuadrados.',
       ],
       solution:
         'Evaluando en el punto medio xᵥ = 8 cm obtenemos S(8) = 8² + (16 − 8)² = 64 + 64 = 128 cm².',
@@ -721,7 +731,7 @@ export const CHECKS_DATA = {
       hints: [
         'Como a = −5 < 0, la trayectoria altura-tiempo es una parábola cóncava hacia abajo cuya altura máxima es la coordenada vertical del vértice yᵥ.',
         'Primero encontrá en qué instante tᵥ llega a la cima: tᵥ = −b / (2a) = −20 / (2·(−5)) = −20 / (−10) = 2 segundos.',
-        'Ahora reemplazá t = 2 segundos en la fórmula de altura: h(2) = −5·(2)² + 20·(2) = −20 + 40 = 20 metros.',
+        'Reemplazá el tiempo t = 2 segundos en la ecuación de h(t) para sumar el término de desaceleración gravitatoria con el impulso lineal.',
       ],
       solution:
         'La pelota alcanza su cumbre a los tᵥ = 2 segundos, logrando una altura máxima de h(2) = −5(4) + 40 = 20 metros.',
@@ -956,11 +966,12 @@ export function initBlackboardController() {
       }
     });
     window.addEventListener('keydown', (event) => {
+      const activeEl = document.activeElement;
       if (
         !focused ||
-        ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(
-          document.activeElement?.tagName
-        )
+        ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(activeEl?.tagName) ||
+        activeEl?.getAttribute?.('role') === 'slider' ||
+        activeEl?.closest?.('svg')
       )
         return;
       if (!['ArrowRight', 'PageDown', 'ArrowLeft', 'PageUp'].includes(event.key))
@@ -986,7 +997,15 @@ export function initBlackboardController() {
 if (typeof document !== 'undefined') {
   renderNav();
 
+  const progress = getProgress();
   const solvedSections = new Set();
+  for (const sec of LESSON_SECTIONS) {
+    const qs = CHECKS_DATA[sec.id] || [];
+    const allQsSolved = qs.length > 0 && qs.every((q) => Boolean(progress[q.id]));
+    if (progress[sec.id] === true || allQsSolved) {
+      solvedSections.add(sec.id);
+    }
+  }
   const progressHost = document.getElementById('seq-progress-text');
 
   // 1. Montar los 10 widgets interactivos
@@ -1034,8 +1053,10 @@ if (typeof document !== 'undefined') {
     const host = document.querySelector(`[data-check="${sectionId}"]`);
     if (host) {
       createCheckBlock(host, questions, {
+        sectionId,
         onSectionDone: () => {
           solvedSections.add(sectionId);
+          markSectionCompleted(sectionId);
           mountProgress(progressHost, solvedSections, LESSON_SECTIONS.length);
           const link = document.querySelector(`.seq-sidebar__link[data-sec="${sectionId}"] .seq-sidebar__status`);
           if (link) {
@@ -1044,6 +1065,15 @@ if (typeof document !== 'undefined') {
           }
         },
       });
+    }
+  }
+
+  // Restaurar checkmarks de la barra lateral para secciones ya completadas
+  for (const sectionId of solvedSections) {
+    const link = document.querySelector(`.seq-sidebar__link[data-sec="${sectionId}"] .seq-sidebar__status`);
+    if (link) {
+      link.replaceChildren(chalkIcon('check', 14));
+      link.classList.add('is-done');
     }
   }
 
@@ -1080,4 +1110,12 @@ export {
   makeChallenge,
   TRAPS,
   mulberry32,
+  QUAD_COMPETENCIES,
+  QUADRATICS_COMPETENCIES,
+  ERROR_TAXONOMY,
+  DIAGNOSTIC_TO_TAXONOMY,
+  PROGRESS_KEY,
+  getProgress,
+  saveProgress,
+  markSectionCompleted,
 };

@@ -50,6 +50,18 @@ export function initCanonicaVertice(host) {
           'Los cambios dentro del paréntesis con x producen traslaciones horizontales; la altura yᵥ = −4 queda intacta.',
       },
     ],
+    onVerify: () => {
+      state.a = 1;
+      state.xv = -2;
+      state.yv = -4;
+      sliderA.setValue(1);
+      sliderXv.setValue(-2);
+      sliderYv.setValue(-4);
+      for (const b of presetsRow.querySelectorAll('button')) {
+        b.classList.remove('is-active');
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });

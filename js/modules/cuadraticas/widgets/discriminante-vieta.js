@@ -48,6 +48,18 @@ export function initDiscriminanteVieta(host) {
           'Si c = 0 queda Δ = 36 > 0, con dos raíces reales distintas (x = 0 y x = 6).',
       },
     ],
+    onVerify: () => {
+      state.a = 1;
+      state.b = -6;
+      state.c = 9;
+      sliderA.setValue(1);
+      sliderB.setValue(-6);
+      sliderC.setValue(9);
+      for (const [i, b] of presetsRow.querySelectorAll('button').entries()) {
+        b.classList.toggle('is-active', i === 1);
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });

@@ -6,7 +6,7 @@
 
 import { h, s, clear } from '../../../core/dom.js';
 import { playClick } from '../../../core/sound.js';
-import { fromFactored, fmtNumClean } from '../logic.js';
+import { fromFactored, fitQuadratic, fmtNumClean } from '../logic.js';
 import {
   createQuadBoardSvg,
   createCartesianMapper,
@@ -25,6 +25,8 @@ export function initFactorizadaSimetria(host) {
     a: -1,
     x1: -2,
     x2: 6,
+    x0: 1,
+    y0: 15,
   };
 
   const predictBox = createPredictBox({
@@ -50,6 +52,20 @@ export function initFactorizadaSimetria(host) {
           'Cambiar el coeficiente "a" estira la altura yᵥ del vértice, pero el eje de simetría xᵥ sigue clavado en el punto medio de las raíces.',
       },
     ],
+    onVerify: () => {
+      state.a = -1;
+      state.x1 = -2;
+      state.x2 = 6;
+      state.x0 = 1;
+      state.y0 = 15;
+      sliderA.setValue(-1);
+      sliderX1.setValue(-2);
+      sliderX2.setValue(6);
+      for (const [i, b] of presetsRow.querySelectorAll('button').entries()) {
+        b.classList.toggle('is-active', i === 0);
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });
@@ -100,6 +116,7 @@ export function initFactorizadaSimetria(host) {
     onInput: (v) => {
       state.a = Math.abs(v) < 0.25 ? (v >= 0 ? 0.5 : -0.5) : v;
       sliderA.setValue(state.a);
+      ensurePassPointValid();
       render();
     },
   });
@@ -132,6 +149,8 @@ export function initFactorizadaSimetria(host) {
       sliderA.setValue(p.a);
       sliderX1.setValue(p.x1);
       sliderX2.setValue(p.x2);
+      state.x0 = Math.round((p.x1 + p.x2) / 2) + 1;
+      ensurePassPointValid();
       render();
     });
     presetsRow.appendChild(btn);
@@ -149,13 +168,28 @@ export function initFactorizadaSimetria(host) {
     fill: 'var(--green)',
     stroke: '#111',
     'stroke-width': 2,
+    'aria-label': 'Raíz x1',
   });
   const rootHandle2 = s('circle', {
     r: 7,
     fill: 'var(--green)',
     stroke: '#111',
     'stroke-width': 2,
+    'aria-label': 'Raíz x2',
   });
+  const pointHandle = s('circle', {
+    r: 7,
+    fill: 'var(--yellow)',
+    stroke: '#111',
+    'stroke-width': 2,
+    'aria-label': 'Punto de paso P(x0, y0)',
+  });
+
+  const ensurePassPointValid = () => {
+    if (state.x0 === state.x1) state.x0 += state.x0 < state.x2 ? 1 : -1;
+    if (state.x0 === state.x2) state.x0 += state.x0 > state.x1 ? 1 : -1;
+    state.y0 = state.a * (state.x0 - state.x1) * (state.x0 - state.x2);
+  };
 
   attachSvgDrag(
     board.svg,
@@ -164,8 +198,10 @@ export function initFactorizadaSimetria(host) {
     ({ x }) => {
       state.x1 = Math.max(-6, Math.min(6, Math.round(x)));
       sliderX1.setValue(state.x1);
+      ensurePassPointValid();
       render();
-    }
+    },
+    { ariaLabel: 'Raíz x1', stepX: 1 }
   );
 
   attachSvgDrag(
@@ -175,8 +211,37 @@ export function initFactorizadaSimetria(host) {
     ({ x }) => {
       state.x2 = Math.max(-6, Math.min(6, Math.round(x)));
       sliderX2.setValue(state.x2);
+      ensurePassPointValid();
       render();
-    }
+    },
+    { ariaLabel: 'Raíz x2', stepX: 1 }
+  );
+
+  attachSvgDrag(
+    board.svg,
+    pointHandle,
+    () => currentMapper,
+    ({ x, y }) => {
+      let nx0 = Math.round(x);
+      if (nx0 === state.x1) nx0 += nx0 < state.x2 ? 1 : -1;
+      if (nx0 === state.x2) nx0 += nx0 > state.x1 ? 1 : -1;
+      let ny0 = Math.round(y * 2) / 2;
+      if (Math.abs(ny0) < 0.25) ny0 = ny0 >= 0 ? 0.5 : -0.5;
+      state.x0 = nx0;
+      state.y0 = ny0;
+      try {
+        const fit = fitQuadratic({
+          roots: [state.x1, state.x2],
+          point: { x: state.x0, y: state.y0 },
+        });
+        state.a = Math.max(-5, Math.min(5, Math.round(fit.a * 100) / 100));
+        sliderA.setValue(state.a);
+      } catch {
+        // Prevent division by zero
+      }
+      render();
+    },
+    { ariaLabel: 'Punto de paso P(x0; y0)', stepX: 1, stepY: 0.5 }
   );
 
   function render() {
@@ -256,12 +321,33 @@ export function initFactorizadaSimetria(host) {
       })
     );
 
+    const px0 = currentMapper.toX(state.x0);
+    const py0Pt = currentMapper.toY(state.y0);
+
     rootHandle1.setAttribute('cx', String(px1));
     rootHandle1.setAttribute('cy', String(py0));
     rootHandle2.setAttribute('cx', String(px2));
     rootHandle2.setAttribute('cy', String(py0));
+    pointHandle.setAttribute('cx', String(px0));
+    pointHandle.setAttribute('cy', String(py0Pt));
 
-    board.overlayLayer.append(rootHandle1, rootHandle2);
+    board.overlayLayer.append(rootHandle1, rootHandle2, pointHandle);
+
+    const pOnLeft = state.x0 <= xv;
+    board.overlayLayer.appendChild(
+      s(
+        'text',
+        {
+          x: pOnLeft ? px0 - 10 : px0 + 10,
+          y: Math.max(board.plotBox.y + 16, Math.min(board.plotBox.y + board.plotBox.h - 10, py0Pt + 4)),
+          fill: 'var(--yellow)',
+          'font-size': 11.5,
+          'font-weight': 'bold',
+          'text-anchor': pOnLeft ? 'end' : 'start',
+        },
+        `P(${fmtNumClean(state.x0)}; ${fmtNumClean(state.y0)})`
+      )
+    );
 
     board.overlayLayer.appendChild(
       s(
@@ -280,12 +366,14 @@ export function initFactorizadaSimetria(host) {
     const dist = Math.abs(state.x2 - state.x1) / 2;
     readoutLine1.textContent = `Factorizada: f(x) = ${model.forms.factored} · Raíces x₁ = ${fmtNumClean(
       state.x1
-    )}, x₂ = ${fmtNumClean(state.x2)}`;
-    readoutLine2.textContent = `Promedio del espejo: xᵥ = (${fmtNumClean(state.x1)} + (${fmtNumClean(
+    )}, x₂ = ${fmtNumClean(state.x2)} · Punto P(${fmtNumClean(state.x0)}; ${fmtNumClean(state.y0)})`;
+    readoutLine2.textContent = `Reconstrucción de a: a = y₀ / ((x₀ − x₁)·(x₀ − x₂)) = ${fmtNumClean(
+      state.y0
+    )} / ((${fmtNumClean(state.x0)} − (${fmtNumClean(state.x1)}))·(${fmtNumClean(state.x0)} − (${fmtNumClean(
       state.x2
-    )})) / 2 = ${fmtNumClean(xv)} (a distancia ${fmtNumClean(dist)} de cada raíz) ⇒ Altura yᵥ = f(${fmtNumClean(
+    )}))) = ${fmtNumClean(state.a)} · Espejo: xᵥ = (${fmtNumClean(state.x1)} + ${fmtNumClean(state.x2)}) / 2 = ${fmtNumClean(
       xv
-    )}) = ${fmtNumClean(yv)}.`;
+    )} (distancia ${fmtNumClean(dist)}) ⇒ V(${fmtNumClean(xv)}; ${fmtNumClean(yv)}).`;
   }
 
   render();

@@ -50,10 +50,19 @@ export function initCompletarCuadrado(host) {
           'Si solo sumás 9 sin restar 9, estás cambiando la altura de toda la parábola en 9 unidades.',
       },
     ],
+    onVerify: () => {
+      state.exIdx = 0;
+      state.stepIdx = 2; // Step 3 (+0 neutro)
+      for (const [i, btn] of presetsRow.querySelectorAll('button').entries()) {
+        btn.classList.toggle('is-active', i === 0);
+      }
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });
   const stepsRow = h('div', { class: 'pr-chip-row' });
+  const stepButtons = [];
 
   EXAMPLES.forEach((ex, i) => {
     const b = h(
@@ -73,29 +82,23 @@ export function initCompletarCuadrado(host) {
     presetsRow.appendChild(b);
   });
 
-  const stepNames = [
-    'Paso 1: Polinómica inicial',
-    'Paso 2: Partir en dos alas (b/2a)',
-    'Paso 3: Sumar neutro (+0)',
-    'Paso 4: Plegar cuadrado canónico',
-  ];
-  stepNames.forEach((lbl, idx) => {
+  for (let idx = 0; idx < 4; idx++) {
     const b = h(
       'button',
       { type: 'button', class: `pr-chip${idx === state.stepIdx ? ' is-active' : ''}` },
-      lbl
+      `Paso ${idx + 1}`
     );
     b.addEventListener('click', () => {
       playClick();
       state.stepIdx = idx;
-      for (const btn of stepsRow.querySelectorAll('button')) {
-        btn.classList.remove('is-active');
-      }
-      b.classList.add('is-active');
+      stepButtons.forEach((btn, i) => {
+        btn.classList.toggle('is-active', i === idx);
+      });
       render();
     });
     stepsRow.appendChild(b);
-  });
+    stepButtons.push(b);
+  }
 
   const board = createQuadBoardSvg({
     width: 680,
@@ -115,95 +118,153 @@ export function initCompletarCuadrado(host) {
     const halfAbs = fmtNumClean(Math.abs(data.halfLinear));
     const sqStr = fmtNumClean(data.squareAdded);
 
-    // Izquierda del SVG (x = 45..285): Rompecabezas Geométrico del Cuadrado
-    const gx = 55;
-    const gy = 50;
-    const mainS = 120;
-    const wingS = 54;
+    // Actualizar dinámicamente las etiquetas de los botones de pasos según data.steps
+    data.steps.forEach((st, idx) => {
+      if (stepButtons[idx]) {
+        stepButtons[idx].textContent = st.title;
+        stepButtons[idx].classList.toggle('is-active', idx === state.stepIdx);
+      }
+    });
+
+    // Izquierda del SVG (x = 35..245): Rompecabezas Geométrico del Cuadrado
+    const isNotMonic = Math.abs(ex.a - 1) > 1e-6;
+    const gx = 52;
+    const gy = 48;
+    const mainS = 108;
+    const wingS = 46;
 
     board.overlayLayer.appendChild(
       s(
         'text',
         {
           x: gx + (mainS + wingS) / 2,
-          y: 36,
+          y: 32,
           fill: 'var(--yellow)',
-          'font-size': 12.5,
+          'font-size': 12,
           'font-weight': 'bold',
           'text-anchor': 'middle',
         },
-        `Geometría del corchete (mitad = ${fmtNumClean(data.halfLinear)})`
+        isNotMonic
+          ? `Geometría dentro del corchete a·[...] (a = ${fmtNumClean(ex.a)})`
+          : `Geometría del corchete (mitad = ${fmtNumClean(data.halfLinear)})`
       )
     );
 
-    // Cuadrado x^2
-    board.overlayLayer.appendChild(
-      s('rect', {
-        x: gx,
-        y: gy,
-        width: mainS,
-        height: mainS,
-        rx: 5,
-        fill: 'rgba(132, 165, 157, 0.25)',
-        stroke: 'var(--blue)',
-        'stroke-width': 2,
-      })
-    );
-    board.overlayLayer.appendChild(
-      s(
-        'text',
-        {
-          x: gx + mainS / 2,
-          y: gy + mainS / 2 + 5,
-          fill: 'var(--ink)',
-          'font-size': 18,
-          'font-weight': 'bold',
-          'text-anchor': 'middle',
-        },
-        'x²'
-      )
-    );
-
-    if (state.stepIdx >= 1) {
-      // Dos alas iguales (b/2a)x
-      const wingText = `${data.halfLinear >= 0 ? '+' : '−'}${halfAbs}x`;
+    // Si a ≠ 1 y estamos en paso 2 o superior, dibujar el corchete exterior a · [ ... ]
+    if (isNotMonic && state.stepIdx >= 1) {
       board.overlayLayer.appendChild(
         s('rect', {
-          x: gx + mainS,
-          y: gy,
-          width: wingS,
-          height: mainS,
-          rx: 4,
-          fill: 'rgba(246, 189, 96, 0.2)',
+          x: gx - 10,
+          y: gy - 8,
+          width: mainS + wingS + 20,
+          height: mainS + wingS + 16,
+          rx: 6,
+          fill: 'rgba(230, 211, 138, 0.04)',
           stroke: 'var(--yellow)',
-          'stroke-width': 1.8,
+          'stroke-width': 1.6,
+          'stroke-dasharray': '5 4',
         })
       );
       board.overlayLayer.appendChild(
         s(
           'text',
           {
-            x: gx + mainS + wingS / 2,
-            y: gy + mainS / 2 + 4,
+            x: gx - 14,
+            y: gy + (mainS + wingS) / 2 + 5,
             fill: 'var(--yellow)',
-            'font-size': 12.5,
+            'font-size': 15,
             'font-weight': 'bold',
-            'text-anchor': 'middle',
+            'text-anchor': 'end',
           },
-          wingText
+          `${fmtNumClean(ex.a)} · [`
         )
       );
+      board.overlayLayer.appendChild(
+        s(
+          'text',
+          {
+            x: gx + mainS + wingS + 14,
+            y: gy + (mainS + wingS) / 2 + 5,
+            fill: 'var(--yellow)',
+            'font-size': 15,
+            'font-weight': 'bold',
+            'text-anchor': 'start',
+          },
+          ']'
+        )
+      );
+    }
 
+    if (isNotMonic && state.stepIdx === 3) {
+      // Paso 4 con a != 1: plegar cuadrado canónico y dibujar el "peaje" a·(b/2a)^2 fuera del corchete
       board.overlayLayer.appendChild(
         s('rect', {
           x: gx,
-          y: gy + mainS,
+          y: gy,
+          width: mainS + wingS,
+          height: mainS + wingS,
+          rx: 5,
+          fill: 'rgba(129, 178, 154, 0.25)',
+          stroke: 'var(--green)',
+          'stroke-width': 2,
+        })
+      );
+      board.overlayLayer.appendChild(
+        s(
+          'text',
+          {
+            x: gx + (mainS + wingS) / 2,
+            y: gy + (mainS + wingS) / 2 + 5,
+            fill: 'var(--green)',
+            'font-size': 14,
+            'font-weight': 'bold',
+            'text-anchor': 'middle',
+          },
+          `(x ${data.xv > 0 ? '−' : '+'} ${fmtNumClean(Math.abs(data.xv))})²`
+        )
+      );
+
+      const toll = -ex.a * data.squareAdded;
+      board.overlayLayer.appendChild(
+        s(
+          'text',
+          {
+            x: gx + (mainS + wingS) / 2,
+            y: gy + mainS + wingS + 24,
+            fill: 'var(--pink)',
+            'font-size': 11.5,
+            'font-weight': 'bold',
+            'text-anchor': 'middle',
+          },
+          `Peaje al salir: ${fmtNumClean(ex.a)} · (−${sqStr}) = ${fmtNumClean(toll)}`
+        )
+      );
+      board.overlayLayer.appendChild(
+        s(
+          'text',
+          {
+            x: gx + (mainS + wingS) / 2,
+            y: gy + mainS + wingS + 38,
+            fill: 'var(--yellow)',
+            'font-size': 11,
+            'font-weight': 'bold',
+            'text-anchor': 'middle',
+          },
+          `Constante yᵥ: ${fmtNumClean(toll)} + (${fmtNumClean(ex.c)}) = ${fmtNumClean(data.yv)}`
+        )
+      );
+    } else {
+      // Cuadrado x^2
+      board.overlayLayer.appendChild(
+        s('rect', {
+          x: gx,
+          y: gy,
           width: mainS,
-          height: wingS,
-          rx: 4,
-          fill: 'rgba(246, 189, 96, 0.2)',
-          stroke: 'var(--yellow)',
-          'stroke-width': 1.8,
+          height: mainS,
+          rx: 5,
+          fill: 'rgba(132, 165, 157, 0.25)',
+          stroke: 'var(--blue)',
+          'stroke-width': 2,
         })
       );
       board.overlayLayer.appendChild(
@@ -211,60 +272,118 @@ export function initCompletarCuadrado(host) {
           'text',
           {
             x: gx + mainS / 2,
-            y: gy + mainS + wingS / 2 + 4,
-            fill: 'var(--yellow)',
-            'font-size': 12.5,
+            y: gy + mainS / 2 + 5,
+            fill: 'var(--ink)',
+            'font-size': 18,
             'font-weight': 'bold',
             'text-anchor': 'middle',
           },
-          wingText
+          'x²'
         )
       );
-    }
 
-    if (state.stepIdx >= 2) {
-      // Esquina que completa el cuadrado: +(b/2a)^2 y su gemelo negativo -(b/2a)^2
-      board.overlayLayer.appendChild(
-        s('rect', {
-          x: gx + mainS,
-          y: gy + mainS,
-          width: wingS,
-          height: wingS,
-          rx: 4,
-          fill: 'rgba(129, 178, 154, 0.32)',
-          stroke: 'var(--green)',
-          'stroke-width': 2,
-          'stroke-dasharray': state.stepIdx === 2 ? '4 3' : '',
-        })
-      );
-      board.overlayLayer.appendChild(
-        s(
-          'text',
-          {
-            x: gx + mainS + wingS / 2,
-            y: gy + mainS + wingS / 2 - 2,
-            fill: 'var(--green)',
-            'font-size': 12,
-            'font-weight': 'bold',
-            'text-anchor': 'middle',
-          },
-          `+${sqStr}`
-        )
-      );
-      board.overlayLayer.appendChild(
-        s(
-          'text',
-          {
-            x: gx + mainS + wingS / 2,
-            y: gy + mainS + wingS / 2 + 13,
-            fill: 'var(--pink)',
-            'font-size': 10.5,
-            'font-weight': 'bold',
-            'text-anchor': 'middle',
-          },
-          `(−${sqStr})`
-        )
-      );
+      if (state.stepIdx >= 1) {
+        // Dos alas iguales (b/2a)x
+        const wingText = `${data.halfLinear >= 0 ? '+' : '−'}${halfAbs}x`;
+        board.overlayLayer.appendChild(
+          s('rect', {
+            x: gx + mainS,
+            y: gy,
+            width: wingS,
+            height: mainS,
+            rx: 4,
+            fill: 'rgba(246, 189, 96, 0.2)',
+            stroke: 'var(--yellow)',
+            'stroke-width': 1.8,
+          })
+        );
+        board.overlayLayer.appendChild(
+          s(
+            'text',
+            {
+              x: gx + mainS + wingS / 2,
+              y: gy + mainS / 2 + 4,
+              fill: 'var(--yellow)',
+              'font-size': 11.5,
+              'font-weight': 'bold',
+              'text-anchor': 'middle',
+            },
+            wingText
+          )
+        );
+
+        board.overlayLayer.appendChild(
+          s('rect', {
+            x: gx,
+            y: gy + mainS,
+            width: mainS,
+            height: wingS,
+            rx: 4,
+            fill: 'rgba(246, 189, 96, 0.2)',
+            stroke: 'var(--yellow)',
+            'stroke-width': 1.8,
+          })
+        );
+        board.overlayLayer.appendChild(
+          s(
+            'text',
+            {
+              x: gx + mainS / 2,
+              y: gy + mainS + wingS / 2 + 4,
+              fill: 'var(--yellow)',
+              'font-size': 11.5,
+              'font-weight': 'bold',
+              'text-anchor': 'middle',
+            },
+            wingText
+          )
+        );
+      }
+
+      if (state.stepIdx >= 2) {
+        // Esquina que completa el cuadrado: +(b/2a)^2 y su gemelo negativo -(b/2a)^2
+        board.overlayLayer.appendChild(
+          s('rect', {
+            x: gx + mainS,
+            y: gy + mainS,
+            width: wingS,
+            height: wingS,
+            rx: 4,
+            fill: 'rgba(129, 178, 154, 0.32)',
+            stroke: 'var(--green)',
+            'stroke-width': 2,
+            'stroke-dasharray': state.stepIdx === 2 ? '4 3' : '',
+          })
+        );
+        board.overlayLayer.appendChild(
+          s(
+            'text',
+            {
+              x: gx + mainS + wingS / 2,
+              y: gy + mainS + wingS / 2 - 2,
+              fill: 'var(--green)',
+              'font-size': 11,
+              'font-weight': 'bold',
+              'text-anchor': 'middle',
+            },
+            `+${sqStr}`
+          )
+        );
+        board.overlayLayer.appendChild(
+          s(
+            'text',
+            {
+              x: gx + mainS + wingS / 2,
+              y: gy + mainS + wingS / 2 + 13,
+              fill: 'var(--pink)',
+              'font-size': 10,
+              'font-weight': 'bold',
+              'text-anchor': 'middle',
+            },
+            `(−${sqStr})`
+          )
+        );
+      }
     }
 
     // Derecha del SVG (x = 255..635): Escalera de los 4 pasos algebraicos

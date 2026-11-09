@@ -1054,6 +1054,46 @@ const quadResults = await client.eval(`(async () => {
   const stepByStepSolutionWorks = Boolean(
     inputCheck?.querySelector('.pr-check-feedback.is-ok')?.textContent.length > 10
   );
+  const quadProgressStored = JSON.parse(localStorage.getItem('cuadraticas:progreso:v1') || '{}');
+  const progressSaved = Boolean(quadProgressStored['sec1-q1']);
+
+  // Verify two-stage prediction in createPredictBox
+  const firstPredictBox = document.querySelector('#sec-area-binomios .quad-predict-box');
+  const firstPredictOpt = firstPredictBox?.querySelector('.quad-predict-options button');
+  firstPredictOpt?.click();
+  const predictCommittedText = firstPredictBox?.querySelector('.quad-predict-feedback')?.textContent || '';
+  const predictCommittedWorks = predictCommittedText.includes('Hipótesis registrada');
+  const verifyPredictBtn = firstPredictBox?.querySelector('.quad-predict-verify-btn');
+  verifyPredictBtn?.click();
+  const predictVerifiedText = firstPredictBox?.querySelector('.quad-predict-feedback')?.textContent || '';
+  const predictVerifiedWorks = !predictVerifiedText.includes('Hipótesis registrada') && predictVerifiedText.length > 15;
+
+  // Verify dual clipPaths in interseccion-recta-parabola, 3 handles in factorizada-simetria, 3 scenarios in optimizacion-extremos
+  const interWidget = document.querySelector('[data-widget="interseccion-recta-parabola"]');
+  const dualClipPathsWork = Boolean(
+    interWidget?.querySelector('clipPath#inter-clip-left') &&
+    interWidget?.querySelector('clipPath#inter-clip-right')
+  );
+  const factWidget = document.querySelector('[data-widget="factorizada-simetria"]');
+  const thirdPointHandleWorks = (factWidget?.querySelectorAll('svg [role="slider"]').length || 0) === 3;
+  const optWidget = document.querySelector('[data-widget="optimizacion-extremos"]');
+  const threeOptScenariosWork = (optWidget?.querySelectorAll('.pr-presets button').length || 0) === 3;
+
+  // Verify keyboard ArrowRight on SVG handle preserves focus and does not change active section
+  document.querySelector('.seq-sidebar__link[data-sec="sec-canonica-vertice"]')?.click();
+  await new Promise((resolve) => setTimeout(resolve, 80));
+  const canonHandle = document.querySelector('[data-widget="canonica-vertice"] svg [role="slider"]');
+  let keyboardSvgHandleWorks = false;
+  if (canonHandle) {
+    canonHandle.focus();
+    const cxBefore = canonHandle.getAttribute('cx');
+    canonHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    const cxAfter = canonHandle.getAttribute('cx');
+    const secStillActive = document.getElementById('sec-canonica-vertice')?.classList.contains('is-active');
+    keyboardSvgHandleWorks = Boolean(cxBefore !== cxAfter && document.activeElement === canonHandle && secStillActive);
+  }
+  document.querySelector('.seq-sidebar__link[data-sec="sec-area-binomios"]')?.click();
+  await new Promise((resolve) => setTimeout(resolve, 80));
 
   const explain = document.querySelector('#sec-area-binomios [data-vn-trigger="sec1-area"]');
   if (explain) explain.click();
@@ -1092,6 +1132,13 @@ const quadResults = await client.eval(`(async () => {
     livePreviewWorks,
     progressiveHintsWork,
     stepByStepSolutionWorks,
+    progressSaved,
+    predictCommittedWorks,
+    predictVerifiedWorks,
+    dualClipPathsWork,
+    thirdPointHandleWorks,
+    threeOptScenariosWork,
+    keyboardSvgHandleWorks,
     stableControls: stable,
     practiceTabs: document.querySelectorAll('.quad-retos-tabs button').length,
     practicePanels: document.querySelectorAll('.quad-retos-pane').length,
@@ -1147,6 +1194,13 @@ const quadOk =
   quadResults.livePreviewWorks &&
   quadResults.progressiveHintsWork &&
   quadResults.stepByStepSolutionWorks &&
+  quadResults.progressSaved &&
+  quadResults.predictCommittedWorks &&
+  quadResults.predictVerifiedWorks &&
+  quadResults.dualClipPathsWork &&
+  quadResults.thirdPointHandleWorks &&
+  quadResults.threeOptScenariosWork &&
+  quadResults.keyboardSvgHandleWorks &&
   quadResults.practiceTabs === 2 &&
   quadResults.practicePanels === 2 &&
   quadResults.trainerPrompt &&

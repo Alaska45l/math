@@ -363,7 +363,7 @@ export const GLOSSARY_TERMS = {
   },
   parabola_matriz: {
     title: "Parábola matriz (y = x²)",
-    pose: "apuntando",
+    pose: "explicando",
     text: "En criollo, es el molde original de fábrica de todas las funciones cuadráticas: la curva f(x) = x² con vértice clavado en el origen (0; 0) y ramas que abren hacia arriba en escalones cuadráticos (1, 4, 9...). Cualquier otra parábola del universo es simplemente esta misma curva estirada, aplastada, dada vuelta o corrida de lugar en el plano.",
     example:
       "Si en y = x² te movés 1 unidad a la derecha o a la izquierda del (0; 0), subís 1; si te movés 2 unidades, subís 2² = 4; si te movés 3 unidades, subís 3² = 9.",
@@ -435,7 +435,7 @@ export const GLOSSARY_TERMS = {
   },
   forma_canonica: {
     title: "Forma canónica f(x) = a(x − xᵥ)² + yᵥ",
-    pose: "apuntando",
+    pose: "explicando",
     text: "Es la vestimenta de la función cuadrática que te muestra el vértice V(xᵥ; yᵥ) en bandeja de plata sin hacer cuentas. Se construye agrupando toda la variable x adentro de un único paréntesis elevado al cuadrado: cuando x = xᵥ ese paréntesis se anula y sobrevive únicamente la altura yᵥ.",
     example:
       "En f(x) = −2(x + 4)² + 7, como adentro dice x + 4 = x − (−4), leemos al instante el vértice en V(−4; 7) y concavidad hacia abajo (a = −2).",
@@ -467,7 +467,7 @@ export const GLOSSARY_TERMS = {
   },
   forma_polinomica: {
     title: "Forma polinómica f(x) = ax² + bx + c",
-    pose: "neutral",
+    pose: "base",
     text: "Es la expresión totalmente desarrollada término a término: el término cuadrático ax² (con a ≠ 0), el término lineal bx y el término independiente c. El dato geométrico que te regala gratis a simple vista es la ordenada al origen f(0) = c, es decir, la altura donde la parábola corta al eje vertical Y.",
     example:
       "En f(x) = 2x² − 8x + 6, sabemos sin calcular nada que corta al eje Y en (0; 6) y que abre hacia arriba porque a = 2 > 0.",
@@ -555,7 +555,7 @@ export const GLOSSARY_TERMS = {
   },
   recta_tangente_parabola: {
     title: "Recta tangente a una parábola",
-    pose: "apuntando",
+    pose: "explicando",
     text: "Una recta no vertical y = mx + d es tangente a una parábola cuando se tocan en un único punto del plano rozándose sin atravesarse. Analíticamente, al igualar ax² + bx + c = mx + d y pasar todo a un miembro, la ecuación cuadrática diferencia tiene raíz doble, es decir, su discriminante de intersección vale exactamente cero (Δ_int = 0).",
     example:
       "La recta y = 2x − 1 es tangente a la parábola y = x² porque al igualar queda x² − 2x + 1 = (x − 1)² = 0, con Δ_int = 0 y punto de contacto único (1; 1).",

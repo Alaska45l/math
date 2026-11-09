@@ -881,18 +881,32 @@ export function diagnoseQuad(userInput, context = {}) {
   // 3. distributed_square_over_sum: (p*x + q)^2 -> p^2*x^2 ± q^2 (sin término lineal 2pqx)
   if (
     context.target === 'expand_binomial_square' ||
+    context.target === 'false_quadratic' ||
     context.binomialSquare ||
     exprVal.ok
   ) {
-    if (exprVal.ok && model && Math.abs(model.b) > EPS) {
-      // Si el usuario puso b = 0 y c = ±(q^2) al desarrollar un cuadrado de binomio
-      if (
-        Math.abs(exprVal.coeffs.a - model.a) < 1e-6 &&
-        Math.abs(exprVal.coeffs.b) < 1e-6 &&
-        (Math.abs(exprVal.coeffs.c - model.c) < 1e-6 ||
-          Math.abs(exprVal.coeffs.c - -model.c) < 1e-6)
-      ) {
-        return { ...QUAD_DIAGNOSTICS.distributed_square_over_sum };
+    const expectedB = model ? model.b : b;
+    const expectedC = model ? model.c : c;
+    const expectedA = model ? model.a : a;
+
+    if (exprVal.ok && Math.abs(expectedB) > EPS) {
+      // El usuario omitió el término lineal (b = 0)
+      if (Math.abs(exprVal.coeffs.b) < 1e-6) {
+        const cMatches =
+          Math.abs(exprVal.coeffs.c - expectedC) < 1e-6 ||
+          Math.abs(exprVal.coeffs.c - -expectedC) < 1e-6;
+
+        if (cMatches) {
+          const aMatchesStandard =
+            Math.abs(expectedA) > EPS &&
+            Math.abs(exprVal.coeffs.a - expectedA) < 1e-6;
+          const isFalseQuadCancellation =
+            Math.abs(expectedA) <= EPS || context.target === 'false_quadratic';
+
+          if (aMatchesStandard || isFalseQuadCancellation) {
+            return { ...QUAD_DIAGNOSTICS.distributed_square_over_sum };
+          }
+        }
       }
     }
   }

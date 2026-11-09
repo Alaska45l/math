@@ -46,6 +46,19 @@ export function initBalanzaSumaProducto(host) {
           'Si tuvieran distinto signo, su producto m · n sería negativo (−6) en lugar de +6.',
       },
     ],
+    onVerify: () => {
+      state.targetM = -2;
+      state.targetN = -3;
+      state.candM = -2;
+      state.candN = -3;
+      sliderM.setValue(-2);
+      sliderN.setValue(-3);
+      for (const [i, b] of presetsRow.querySelectorAll('button').entries()) {
+        b.classList.toggle('is-active', i === 1);
+      }
+      rebuildCandidateChips();
+      render();
+    },
   });
 
   const presetsRow = h('div', { class: 'pr-chip-row pr-presets' });

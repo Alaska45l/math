@@ -341,6 +341,32 @@
   color: var(--ink);
 }
 
+.quad-predict-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quad-predict-verify-btn {
+  font-weight: 600;
+  border-color: var(--yellow, #e6d38a);
+  color: var(--yellow, #e6d38a);
+}
+
+.quad-predict-verify-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--yellow, #e6d38a) 20%, transparent);
+}
+
+/* Focus ring para manijas de arrastre SVG (accesibilidad por teclado) */
+.quad-board-svg [tabindex="0"]:focus-visible,
+.quad-board-svg circle[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--accent, #e6d38a);
+  outline-offset: 3px;
+  stroke: var(--yellow, #e6d38a) !important;
+  stroke-width: 3.5px !important;
+  filter: drop-shadow(0 0 6px var(--yellow, #e6d38a));
+}
+
 /* Workbench y estabilidad de altura en .pr-readout */
 .pr-workbench {
   padding: 16px;
