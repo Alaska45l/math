@@ -17,10 +17,23 @@ import {
   DIAGNOSE_REACTIONS,
   STREAK_REACTIONS,
 } from "./vn-scripts.js";
+import {
+  EXP_COMPETENCIES,
+  EXP_DIAGNOSTIC_TAXONOMY,
+} from "./competencies-map.js";
 
 export { STREAK_REACTIONS, DIAGNOSE_REACTIONS, VN_SCRIPTS };
 
 export const PROGRESS_KEY = "exponenciales:progreso:v1";
+
+const dashboardRenderers = new Set();
+function notifyCompetencyDashboardUpdate() {
+  dashboardRenderers.forEach((fn) => {
+    try {
+      fn();
+    } catch {}
+  });
+}
 
 export function getProgress() {
   try {
@@ -48,7 +61,264 @@ export function saveProgress(key, value = "independent") {
     // La sesión continúa aunque se exceda la cuota de almacenamiento
   }
   updateProgressUI();
+  notifyCompetencyDashboardUpdate();
   return state;
+}
+
+export function recordCompetencyAttempt({ competencyId, correct, mode = "independent", diagnosticId = null }) {
+  if (!competencyId) return null;
+  const state = getProgress();
+  if (!state.competencies || typeof state.competencies !== "object") {
+    state.competencies = {};
+  }
+  const entry = state.competencies[competencyId] || {
+    independentCount: 0,
+    assistedCount: 0,
+    errorCount: 0,
+    diagnostics: [],
+    status: "pending",
+  };
+  if (!Array.isArray(entry.diagnostics)) {
+    entry.diagnostics = [];
+  }
+
+  if (correct) {
+    if (mode === "independent") {
+      entry.independentCount = (entry.independentCount || 0) + 1;
+    } else {
+      entry.assistedCount = (entry.assistedCount || 0) + 1;
+    }
+  } else {
+    entry.errorCount = (entry.errorCount || 0) + 1;
+    if (diagnosticId && !entry.diagnostics.includes(diagnosticId)) {
+      entry.diagnostics.push(diagnosticId);
+    }
+  }
+
+  entry.attempts = (entry.independentCount || 0) + (entry.assistedCount || 0) + (entry.errorCount || 0);
+
+  // Actualizar status:
+  // "mastered": si independentCount >= 1 y el último intento fue independiente
+  // "assisted": si fue resuelto con pistas o tuvo errores recientes
+  // "pending": sin aciertos aún
+  const totalCorrect = (entry.independentCount || 0) + (entry.assistedCount || 0);
+  if (totalCorrect === 0) {
+    entry.status = "pending";
+  } else if (correct && mode === "independent") {
+    entry.status = "mastered";
+  } else {
+    entry.status = "assisted";
+  }
+
+  state.competencies[competencyId] = entry;
+
+  try {
+    if (typeof localStorage !== "undefined" && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
+  } catch {}
+
+  updateProgressUI();
+  notifyCompetencyDashboardUpdate();
+  return entry;
+}
+
+export function getCompetencyReport() {
+  const state = getProgress();
+  const rawComps = (state && typeof state.competencies === "object" && state.competencies) || {};
+
+  const report = {
+    summary: { mastered: 0, assisted: 0, pending: 0, total: EXP_COMPETENCIES.length },
+    competencies: {},
+    list: [],
+  };
+
+  EXP_COMPETENCIES.forEach((comp) => {
+    const raw = rawComps[comp.id] || {
+      independentCount: 0,
+      assistedCount: 0,
+      errorCount: 0,
+      diagnostics: [],
+      status: "pending",
+    };
+
+    const item = {
+      id: comp.id,
+      competency: comp,
+      title: comp.title,
+      sectionId: comp.sectionId,
+      order: comp.order,
+      independentCount: raw.independentCount || 0,
+      assistedCount: raw.assistedCount || 0,
+      errorCount: raw.errorCount || 0,
+      attempts: (raw.independentCount || 0) + (raw.assistedCount || 0) + (raw.errorCount || 0),
+      diagnostics: Array.isArray(raw.diagnostics) ? [...raw.diagnostics] : [],
+      status: ["mastered", "assisted", "pending"].includes(raw.status) ? raw.status : "pending",
+    };
+
+    report.competencies[comp.id] = item;
+    report[comp.id] = item;
+    report.list.push(item);
+
+    if (item.status === "mastered") report.summary.mastered++;
+    else if (item.status === "assisted") report.summary.assisted++;
+    else report.summary.pending++;
+  });
+
+  return report;
+}
+
+export function mountCompetencyDashboard(host, { onSelectSection, onPracticeCompetency } = {}) {
+  if (!host) return null;
+
+  const render = () => {
+    const report = getCompetencyReport();
+    host.innerHTML = "";
+
+    // 1. Resumen de dominio (KPIs)
+    const summaryCard = h(
+      "div",
+      { class: "exp-dashboard-summary" },
+      h(
+        "div",
+        { class: "exp-dashboard-kpi exp-dashboard-kpi--mastered" },
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.mastered)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "Consolidada (Independiente)"),
+      ),
+      h(
+        "div",
+        { class: "exp-dashboard-kpi exp-dashboard-kpi--assisted" },
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.assisted)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "Con apoyo (Asistida)"),
+      ),
+      h(
+        "div",
+        { class: "exp-dashboard-kpi exp-dashboard-kpi--pending" },
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.pending)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "Pendiente"),
+      ),
+    );
+
+    // 2. Grilla de las 10 competencias
+    const cards = report.list.map((item) => {
+      const comp = item.competency;
+      const statusLabels = {
+        mastered: "Consolidada (Independiente)",
+        assisted: "Con apoyo (Asistida)",
+        pending: "Pendiente",
+      };
+      const statusClasses = {
+        mastered: "badge badge--success is-independent",
+        assisted: "badge badge--warning is-assisted",
+        pending: "badge badge--neutral is-pending",
+      };
+
+      const statusBadge = h(
+        "span",
+        { class: `exp-dashboard-badge ${statusClasses[item.status]}` },
+        statusLabels[item.status],
+      );
+
+      const header = h(
+        "header",
+        { class: "exp-dashboard-card__header" },
+        h("h4", { class: "exp-dashboard-card__title" }, `${comp.order}. ${comp.title}`),
+        statusBadge,
+      );
+
+      // Si registró algún error diagnóstico recurrente
+      const diagnosticEls = [];
+      if (item.diagnostics && item.diagnostics.length > 0) {
+        item.diagnostics.forEach((diagId) => {
+          const tax = EXP_DIAGNOSTIC_TAXONOMY[diagId];
+          const label = tax ? tax.shortLabel : diagId;
+          diagnosticEls.push(
+            h(
+              "div",
+              { class: "exp-dashboard-error-alert" },
+              chalkIcon("hint"),
+              h("span", null, ` Error detectado: ${label}`),
+            ),
+          );
+        });
+      }
+
+      // Dos botones de acción: Ir al Pizarrón N y Practicar en Entrenador
+      const sectionNum = comp.sectionId.replace("sec-", "");
+      const btnGo = h(
+        "button",
+        {
+          type: "button",
+          class: "btn btn--subtle btn--sm exp-dashboard-btn-nav",
+          on: {
+            click: () => {
+              if (typeof onSelectSection === "function") {
+                onSelectSection(comp.sectionId);
+              } else {
+                const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+                if (link) link.click();
+                else location.hash = `#${comp.sectionId}`;
+              }
+            },
+          },
+        },
+        `Ir al Pizarrón ${sectionNum}`,
+      );
+
+      const btnPractice = h(
+        "button",
+        {
+          type: "button",
+          class: "btn btn--sm exp-dashboard-btn-practice",
+          on: {
+            click: () => {
+              if (typeof onPracticeCompetency === "function") {
+                onPracticeCompetency(comp.id);
+              } else {
+                location.hash = "#sec-retos";
+              }
+            },
+          },
+        },
+        chalkIcon("target"),
+        " Practicar en Entrenador",
+      );
+
+      const actions = h(
+        "div",
+        { class: "exp-dashboard-card__actions" },
+        btnGo,
+        btnPractice,
+      );
+
+      return h(
+        "article",
+        { class: `exp-dashboard-card exp-dashboard-card--${item.status}` },
+        header,
+        diagnosticEls.length > 0 ? h("div", { class: "exp-dashboard-errors" }, ...diagnosticEls) : null,
+        actions,
+      );
+    });
+
+    const grid = h("div", { class: "exp-dashboard-grid" }, ...cards);
+
+    const titleHeader = h(
+      "header",
+      { class: "exp-dashboard-header" },
+      h("h3", null, "Mapa de Competencias y Atlas de Errores"),
+      h("p", { class: "muted small" }, "Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad."),
+    );
+
+    mount(host, titleHeader, summaryCard, grid);
+  };
+
+  dashboardRenderers.add(render);
+  render();
+
+  return {
+    update: render,
+    destroy: () => dashboardRenderers.delete(render),
+  };
 }
 
 export function markSectionCompleted(sectionId) {
@@ -59,6 +329,7 @@ export function markSectionCompleted(sectionId) {
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
     }
     updateProgressUI();
+    notifyCompetencyDashboardUpdate();
   } catch {}
 }
 
@@ -342,7 +613,8 @@ function buildAnswerControl(question, questionIndex) {
         },
         buttons,
       ),
-      value: () => (selected.value === null ? "" : String(selected.value)),
+      value: () => selected.value,
+      hasSelection: () => selected.value !== null && Number.isInteger(selected.value),
       preview: () =>
         selected.value === null ? "Elegí una opción" : question.options[selected.value],
       disable: () => {
@@ -395,25 +667,27 @@ function buildAnswerControl(question, questionIndex) {
   };
 }
 
-function assess(question, value) {
+export function assess(question, value) {
   if (question.type === "choice") {
-    if (value === "" || value === null || value === undefined) {
+    if (value === null || value === undefined || value === "" || typeof value === "boolean") {
       return {
         correct: false,
         empty: true,
         diagnostics: [{ id: null, message: "Seleccioná una opción antes de revisar." }],
       };
     }
-    const correct = value !== "" && value !== null && Number(value) === question.expected;
+    const numVal = typeof value === "number" ? value : Number(String(value).trim());
+    const correct = Number.isInteger(numVal) && numVal >= 0 && numVal === question.expected;
     return {
       correct,
+      empty: false,
       diagnostics: correct
         ? []
         : [{ id: question.diagnosis, message: question.diagnosisMessage }],
     };
   }
   if (question.type === "pair") {
-    if (!Array.isArray(value) || value.some((entry) => String(entry).trim() === "")) {
+    if (!Array.isArray(value) || value.some((entry) => String(entry ?? "").trim() === "")) {
       return {
         correct: false,
         empty: true,
@@ -426,6 +700,7 @@ function assess(question, value) {
       actual.every((entry, index) => Math.abs(entry - question.expected[index]) < 1e-6);
     return {
       correct,
+      empty: false,
       diagnostics: correct
         ? []
         : [
@@ -438,7 +713,8 @@ function assess(question, value) {
           ],
     };
   }
-  if (typeof value === "string" && value.trim() === "") {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
     return {
       correct: false,
       empty: true,
@@ -446,10 +722,12 @@ function assess(question, value) {
     };
   }
   // Evalúa mediante el motor de diagnóstico cognitivo de exponenciales
-  const diag = diagnoseExp(value, question.spec || {});
-  const isCorrect = diag === null && question.checkCorrect ? question.checkCorrect(value) : (diag === null);
+  const diag = diagnoseExp(raw, question.spec || {});
+  const passedCheck = typeof question.checkCorrect === "function" ? Boolean(question.checkCorrect(raw)) : false;
+  const isCorrect = diag === null && passedCheck;
   return {
     correct: isCorrect,
+    empty: false,
     diagnostics: diag ? [diag] : [],
   };
 }
@@ -567,12 +845,23 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           ? "Resuelto de forma independiente."
           : "Resuelto con apoyo (asistido).";
       feedback.className = `exp-check__feedback seq-check__feedback is-correct ${savedStatus === "independent" ? "is-independent" : "is-assisted"}`;
+      review.disabled = true;
       hint.disabled = true;
       show.disabled = true;
       answer.disable?.();
     }
 
     review.addEventListener("click", () => {
+      if (question.type === "choice") {
+        const activeBtn = answer.node.querySelector?.('.exp-choice-btn.is-active, button[aria-pressed="true"]');
+        const hasSel = typeof answer.hasSelection === "function" ? answer.hasSelection() : (answer.value() !== null);
+        if (!activeBtn || answer.value() === null || !hasSel) {
+          feedback.textContent = "Seleccioná una opción antes de revisar.";
+          feedback.className = "exp-check__feedback seq-check__feedback is-warning";
+          return;
+        }
+      }
+
       const result = assess(question, answer.value());
       if (result.empty) {
         feedback.textContent = result.diagnostics[0]?.message || "Seleccioná o ingresá una respuesta antes de revisar.";
@@ -584,6 +873,12 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
         const status = isIndependent ? "independent" : "assisted";
         solved = true;
         saveProgress(`${sectionId}:${index}`, status);
+        recordCompetencyAttempt({
+          competencyId: question.competencyId,
+          correct: true,
+          mode: isIndependent ? "independent" : "assisted",
+          diagnosticId: null,
+        });
 
         card.classList.add("is-solved");
         card.classList.remove("is-independent", "is-assisted");
@@ -612,6 +907,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
         }
 
         failStreak = 0;
+        review.disabled = true;
         hint.disabled = true;
         show.disabled = true;
         answer.disable?.();
@@ -625,6 +921,12 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
         successStreak = 0;
         failStreak += 1;
         const diagnostic = result.diagnostics?.[0];
+        recordCompetencyAttempt({
+          competencyId: question.competencyId,
+          correct: false,
+          mode: (hintStep === 0 && !solutionRevealed) ? "independent" : "assisted",
+          diagnosticId: diagnostic?.id || null,
+        });
         feedback.textContent =
           diagnostic?.message || "Todavía no: mirá las pistas y justificá un paso por vez.";
         feedback.className = "exp-check__feedback seq-check__feedback is-error";

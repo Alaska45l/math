@@ -22,8 +22,9 @@ import { fmt, frac } from "../../core/math-format.js";
 import { playScript } from "../../core/vn.js";
 import { diagnoseExp } from "./logic.js";
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from "./vn-scripts.js";
-import { saveProgress } from "./components.js";
+import { saveProgress, recordCompetencyAttempt, getCompetencyReport } from "./components.js";
 import { parseIntervalExactas, equivalentExp } from "./expr.js";
+import { getCompetencyById } from "./competencies-map.js";
 
 export const CHALLENGE_TYPES = [
   "razon_tabla_vs_salto",
@@ -34,6 +35,8 @@ export const CHALLENGE_TYPES = [
   "modelo_tiempo_compuesto",
   "asintota_imagen_desplazamiento",
   "ecuacion_igualacion_factor_comun",
+  "formula_desde_dos_puntos",
+  "imagen_intervalo_asintota",
 ];
 
 export function mulberry32(seed) {
@@ -294,6 +297,90 @@ export function makeChallenge(seed, requestedType = null) {
         ],
       };
     },
+
+    formula_desde_dos_puntos() {
+      const k = int(rng, 2, 5);
+      const a = int(rng, 2, 4);
+      const useOrigin = int(rng, 0, 1) === 0;
+      let pX, pY, qX, qY;
+      if (useOrigin) {
+        pX = 0;
+        pY = k;
+        qX = 1;
+        qY = k * a;
+      } else {
+        pX = 1;
+        pY = k * a;
+        qX = 2;
+        qY = k * a * a;
+      }
+      const ansStr = `${k} * ${a}^x`;
+      return {
+        ...common,
+        competencyId: "exponentials.analytical_reconstruction_two_points",
+        prompt: `Hallá la fórmula f(x) = k · aˣ que pasa exactamente por los puntos P(${pX}; ${pY}) y Q(${qX}; ${qY}). Escribí la expresión algebraica (ej: 3 * 2^x).`,
+        answer: ansStr,
+        displayAnswer: `f(x) = ${k} · ${a}ˣ`,
+        spec: {
+          k,
+          a,
+          expected: ansStr,
+          expression: ansStr,
+          problemType: "formula",
+          context: "formula dos puntos",
+        },
+        hints: [
+          `Planteá el sistema evaluando en ambos puntos: f(${pX}) = k · a^${pX} = ${pY} y f(${qX}) = k · a^${qX} = ${qY}.`,
+          `Dividí miembro a miembro f(${qX})/f(${pX}) para cancelar k y despejar la base a: a^(${qX}−${pX}) = ${qY}/${pY}.`,
+          `Sustituí el valor de la base en cualquiera de los puntos para calcular la escala k, y armá la expresión canónica k * a^x.`,
+        ],
+        solution: [
+          `Planteamos el sistema con los puntos P(${pX}; ${pY}) y Q(${qX}; ${qY}): k · a^${pX} = ${pY} y k · a^${qX} = ${qY}.`,
+          `Dividiendo ambas ecuaciones miembro a miembro: a^(${qX} - ${pX}) = ${qY} / ${pY} = ${a} ⟹ a = ${a}.`,
+          `Reemplazando a = ${a} obtenemos k = ${k}. La fórmula buscada es f(x) = ${k} · ${a}ˣ (o ${k} * ${a}^x).`,
+        ],
+      };
+    },
+
+    imagen_intervalo_asintota() {
+      const kChoices = [-3, -2, 2, 3];
+      const k = kChoices[int(rng, 0, kChoices.length - 1)];
+      const a = int(rng, 2, 3);
+      const hVal = int(rng, 0, 2);
+      const cChoices = [-4, -2, 1, 3, 4];
+      const c = cChoices[int(rng, 0, cChoices.length - 1)];
+      const expSign = hVal === 0 ? "x" : `(x−${hVal})`;
+      const cSign = c >= 0 ? `+ ${c}` : `− ${Math.abs(c)}`;
+      const formulaStr = `f(x) = ${k} · ${a}^${expSign} ${cSign}`;
+      const ansStr = k > 0 ? `(${c}; +inf)` : `(-inf; ${c})`;
+      return {
+        ...common,
+        competencyId: "exponentials.shifts_and_horizontal_asymptote",
+        prompt: `Para la función ${formulaStr}, determiná el conjunto imagen en notación de intervalo Exactas UNMDP (usá ';' para separar extremos e 'inf' o '+inf' para infinito, ej: (2; +inf)).`,
+        answer: ansStr,
+        displayAnswer: `Im(f) = ${ansStr}`,
+        spec: {
+          c,
+          asymptote: c,
+          k,
+          a,
+          h: hVal,
+          type: "image",
+          target: "im",
+          expected: ansStr,
+        },
+        hints: [
+          `La función exponencial básica a^u es siempre estrictamente positiva: ${a}^${expSign} > 0 para todo x real.`,
+          `Multiplicar por k = ${k} determina hacia dónde se abren las imágenes: como k ${k > 0 ? ">" : "<"} 0, los valores quedan ${k > 0 ? "por encima" : "por debajo"} del nivel asintótico.`,
+          `El término independiente c = ${c} traslada la asíntota horizontal a la recta y = ${c}. La imagen nunca toca la asíntota (usá siempre paréntesis '(' o ')' para indicar la cota abierta).`,
+        ],
+        solution: [
+          `La recta y = ${c} es la asíntota horizontal de la función desplazada.`,
+          `Como la base exponencial es positiva y k = ${k} es ${k > 0 ? "positivo (k > 0)" : "negativo (k < 0)"}, los valores de la función son estrictamente ${k > 0 ? "mayores que" : "menores que"} ${c}.`,
+          `Por lo tanto, el conjunto imagen en notación de intervalos es Im(f) = ${ansStr}.`,
+        ],
+      };
+    },
   };
 
   const generator = cases[type] || cases.razon_tabla_vs_salto;
@@ -434,6 +521,22 @@ function createTrainer(root) {
   let successStreak = 0;
   let hintStep = 0;
   let solutionRevealed = false;
+  let contrastSubIndex = 0;
+
+  const contrastPairs = [
+    {
+      label: "Par contrastivo: Salto aditivo vs razón multiplicativa",
+      types: ["razon_tabla_vs_salto", "evaluacion_k_a_x"],
+    },
+    {
+      label: "Par contrastivo: Ancla puntual vs Intervalo asintótico",
+      types: ["asintota_imagen_desplazamiento", "imagen_intervalo_asintota"],
+    },
+    {
+      label: "Par contrastivo: Reconstrucción numérica vs Fórmula analítica",
+      types: ["reconstruccion_dos_puntos", "formula_desde_dos_puntos"],
+    },
+  ];
 
   const seedInput = h("input", {
     type: "number",
@@ -448,6 +551,8 @@ function createTrainer(root) {
     { "aria-label": "Familia de reto" },
     [
       ["aleatorio", "Aleatorio"],
+      ["adaptativo", "Inteligente (Reforzar mis puntos débiles)"],
+      ["contrastivo", "Pares Contrastivos (Discriminación conceptual)"],
       ...CHALLENGE_TYPES.map((type) => [type, type.replaceAll("_", " ")]),
     ].map(([value, label]) => h("option", { value }, label)),
   );
@@ -490,6 +595,7 @@ function createTrainer(root) {
           try {
             localStorage.setItem("exponenciales:seed", String(seed));
           } catch {}
+          contrastSubIndex = 0;
           newChallenge();
         },
       },
@@ -511,10 +617,11 @@ function createTrainer(root) {
     typeSelect,
   );
 
+  const adaptiveNote = h("div", { class: "exp-challenge__adaptive-note", hidden: true });
   const prompt = h("p", { class: "exp-challenge__prompt pr-challenge__prompt" });
   const input = h("input", {
     type: "text",
-    inputmode: "decimal",
+    inputmode: "text",
     autocomplete: "off",
     "aria-label": "Tu respuesta al reto",
   });
@@ -538,15 +645,16 @@ function createTrainer(root) {
       class: "btn",
       on: {
         click: () => {
-          const raw = input.value.trim().replace(",", ".");
+          const raw = input.value.trim();
           if (!raw) {
             feedback.textContent = "Ingresá una respuesta antes de revisar.";
             feedback.className = "exp-check__feedback pr-check__feedback is-warning";
             return;
           }
-          const valNum = Number(raw);
-          let isCorrect = Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
+          const valNum = Number(raw.replace(",", "."));
+          let isCorrect = typeof current.answer === "number" && Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
 
+          let intervalSyntaxError = null;
           if (!isCorrect && typeof current.answer === "string") {
             try {
               const expectedIv = parseIntervalExactas(current.answer);
@@ -561,7 +669,11 @@ function createTrainer(root) {
               ) {
                 isCorrect = true;
               }
-            } catch {}
+            } catch (err) {
+              if (err && err.code === "missing_semicolon") {
+                intervalSyntaxError = "En Exactas los intervalos se separan con punto y coma ';' (la coma se reserva para decimales).";
+              }
+            }
             if (!isCorrect) {
               try {
                 if (equivalentExp(raw, current.answer)) {
@@ -584,6 +696,14 @@ function createTrainer(root) {
               : `Correcto: ${current.displayAnswer}. Resuelto de forma independiente.`;
             feedback.className = `exp-check__feedback pr-check__feedback is-correct is-${mode} check-feedback--${mode} state-solved`;
             saveProgress("challenge:last", { seed, type: current.type, mode, solved: true });
+
+            if (current.competencyId) {
+              recordCompetencyAttempt({
+                competencyId: current.competencyId,
+                correct: true,
+                mode,
+              });
+            }
 
             input.disabled = true;
             revise.disabled = true;
@@ -611,8 +731,18 @@ function createTrainer(root) {
           } else {
             successStreak = 0;
             failStreak++;
+            const wasAssisted = hintStep > 0 || solutionRevealed;
+            if (current.competencyId) {
+              recordCompetencyAttempt({
+                competencyId: current.competencyId,
+                correct: false,
+                mode: wasAssisted ? "assisted" : "independent",
+                diagnosticId: diagnosis?.id || null,
+              });
+            }
             feedback.textContent =
               diagnosis?.message ||
+              intervalSyntaxError ||
               "Todavía no coincide. Consultá una pista y revisá las operaciones paso a paso.";
             feedback.className = "exp-check__feedback pr-check__feedback is-error";
             const id = diagnosis?.id;
@@ -696,11 +826,24 @@ function createTrainer(root) {
       class: "btn btn--ghost",
       on: {
         click: () => {
-          seed = (seed + 1) >>> 0;
-          seedInput.value = String(seed);
-          try {
-            localStorage.setItem("exponenciales:seed", String(seed));
-          } catch {}
+          if (typeSelect.value === "contrastivo") {
+            if (contrastSubIndex === 0) {
+              contrastSubIndex = 1;
+            } else {
+              contrastSubIndex = 0;
+              seed = (seed + 1) >>> 0;
+              seedInput.value = String(seed);
+              try {
+                localStorage.setItem("exponenciales:seed", String(seed));
+              } catch {}
+            }
+          } else {
+            seed = (seed + 1) >>> 0;
+            seedInput.value = String(seed);
+            try {
+              localStorage.setItem("exponenciales:seed", String(seed));
+            } catch {}
+          }
           newChallenge();
         },
       },
@@ -710,11 +853,55 @@ function createTrainer(root) {
   );
 
   const newChallenge = () => {
-    const requested =
+    let requested =
       typeSelect.value === "aleatorio" ? null : typeSelect.value;
+    adaptiveNote.hidden = true;
+    adaptiveNote.textContent = "";
+
+    if (requested === "adaptativo") {
+      const report = getCompetencyReport();
+      let candidates = report.list.filter(
+        (item) => (item.diagnostics && item.diagnostics.length > 0) || item.status === "pending"
+      );
+      if (candidates.length === 0) {
+        candidates = report.list.filter((item) => item.status === "assisted");
+      }
+      if (candidates.length === 0) {
+        candidates = report.list;
+      }
+      const candidateIndex = Math.abs(seed) % candidates.length;
+      const targetItem = candidates[candidateIndex];
+      const targetComp = targetItem?.competency;
+      const compMap = {
+        "exponentials.tables_additive_vs_multiplicative": "razon_tabla_vs_salto",
+        "exponentials.neutral_and_order_of_operations": "evaluacion_k_a_x",
+        "exponentials.rational_density_and_base_restrictions": "densidad_potencia_racional",
+        "exponentials.base_reflection_and_asymptote": "espejo_base_inversa",
+        "exponentials.four_quadrants_monotonicity": "evaluacion_k_a_x",
+        "exponentials.analytical_reconstruction_two_points": "formula_desde_dos_puntos",
+        "exponentials.time_models_rates_and_euler_base": "modelo_tiempo_compuesto",
+        "exponentials.shifts_and_horizontal_asymptote": "imagen_intervalo_asintota",
+        "exponentials.full_analytical_study": "imagen_intervalo_asintota",
+        "exponentials.equations_three_methods_in_reals": "ecuacion_igualacion_factor_comun",
+      };
+      const fam = (targetComp && compMap[targetComp.id]) || "razon_tabla_vs_salto";
+      requested = fam;
+      adaptiveNote.hidden = false;
+      const title = targetComp?.title || "Competencia clave";
+      adaptiveNote.textContent = `Motivo de selección: Reforzar «${title}» (pendiente de resolución independiente / se detectó confusión previa).`;
+    } else if (requested === "contrastivo") {
+      const pair = contrastPairs[Math.abs(seed) % contrastPairs.length];
+      requested = pair.types[contrastSubIndex];
+    }
+
     current = makeChallenge(seed, requested);
     mount(prompt, ...inlineMathNodes(current.prompt));
-    meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} · Semilla ${fmt(seed)}`;
+    if (typeSelect.value === "contrastivo") {
+      const pair = contrastPairs[Math.abs(seed) % contrastPairs.length];
+      meta.textContent = `${pair.label} (Par contrastivo ${contrastSubIndex + 1}/2) · Semilla ${fmt(seed)}`;
+    } else {
+      meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} · Semilla ${fmt(seed)}`;
+    }
     input.value = "";
     input.disabled = false;
     revise.disabled = false;
@@ -735,10 +922,15 @@ function createTrainer(root) {
     try {
       localStorage.setItem("exponenciales:seed", String(seed));
     } catch {}
+    contrastSubIndex = 0;
     newChallenge();
   });
 
-  typeSelect.addEventListener("change", newChallenge);
+  typeSelect.addEventListener("change", () => {
+    contrastSubIndex = 0;
+    newChallenge();
+  });
+
   input.addEventListener("input", () => {
     preview.textContent = `Interpretado como: ${input.value.trim() || "—"}`;
   });
@@ -751,6 +943,7 @@ function createTrainer(root) {
       h("h3", null, "Entrenador infinito por semilla PRNG"),
       h("div", { class: "exp-widget__controls pr-widget__controls" }, seedLabel, typeLabel, randomizeBtn, copySeedBtn),
       meta,
+      adaptiveNote,
       prompt,
       h(
         "label",

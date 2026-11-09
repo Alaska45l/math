@@ -16,6 +16,9 @@ import {
   getProgress,
   saveProgress,
   markSectionCompleted,
+  recordCompetencyAttempt,
+  getCompetencyReport,
+  mountCompetencyDashboard,
 } from "./components.js";
 import {
   EXP_COMPETENCIES,
@@ -23,6 +26,13 @@ import {
   getCompetencyById,
   getCompetenciesForSection,
 } from "./competencies-map.js";
+
+function checkNum(val, expected, tol = 1e-6) {
+  const s = String(val ?? "").trim().replace(",", ".");
+  if (!s) return false;
+  const n = Number(s);
+  return Number.isFinite(n) && Math.abs(n - expected) < tol;
+}
 
 export const LESSON_SECTIONS = [
   {
@@ -132,7 +142,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "En la tabla (0, 2), (1, 6), (2, 18), (3, 54), calculá la razón constante multiplicativa a = y_{i+1} / y_i.",
       spec: { value: 3, expected: 3, ratio: 3, problemType: "table", deltas: [4, 12, 36], linearDiff: 4, context: "razon multiplicativa en tabla exponencial" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 3) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 3),
       hints: [
         "Dividí el segundo término por el primero: 6 / 2.",
         "Verificá el siguiente cociente: 18 / 6. ¿Da el mismo resultado?",
@@ -150,7 +160,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para los puntos (0, 1), (1, 2), (2, 4), (3, 8) que siguen f(x) = 2ˣ, calculá el valor proyectado f(4).",
       spec: { value: 16, expected: 16, k: 1, a: 2, x: 4, problemType: "power", context: "evaluacion potencia 2^4" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 16) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 16),
       hints: [
         "En una progresión de duplicación, el siguiente término multiplica al anterior por 2.",
         "El término anterior en x = 3 vale 8. Multiplicá 8 · 2.",
@@ -170,7 +180,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "En el cultivo de amebas f(x) = 3 · 2ˣ, calculá la cantidad inicial de amebas f(0) en el momento cero.",
       spec: { value: 3, expected: 3, k: 3, a: 2, x: 0, context: "neutro multiplicativo en f(0)" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 3) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 3),
       hints: [
         "Reemplazá x = 0 en la fórmula: f(0) = 3 · 2⁰.",
         "Recordá el neutro multiplicativo: todo número no nulo elevado a la cero vale 1.",
@@ -188,7 +198,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Calculá la cantidad de amebas tras 3 horas: f(3) = 3 · 2³.",
       spec: { value: 24, expected: 24, k: 3, a: 2, x: 3, multipliedKandBase: 216, context: "evaluacion 3 * 2^3" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 24) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 24),
       hints: [
         "Por jerarquía de operaciones, calculá primero la potencia 2³.",
         "2³ = 2 · 2 · 2 = 8.",
@@ -233,7 +243,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para f(x) = 4 · 9ˣ, calculá el valor en x = 1/2 utilizando exponentes racionales: 4 · 9^(1/2).",
       spec: { value: 12, expected: 12, k: 4, a: 9, x: 0.5, context: "potencia fraccionaria 4 * 9^(1/2)" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 12) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 12),
       hints: [
         "Un exponente 1/2 equivale a la raíz cuadrada: 9^(1/2) = √9.",
         "Calculá √9 = 3.",
@@ -276,7 +286,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Si la curva f(x) = k · aˣ corta al eje vertical en el punto (0, 5), ¿cuánto vale el parámetro k?",
       spec: { value: 5, expected: 5, k: 5, a: 1, x: 0, context: "ordenada al origen k" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 5) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 5),
       hints: [
         "El corte con el eje vertical ocurre en x = 0.",
         "Evaluamos: f(0) = k · a⁰ = k · 1 = k.",
@@ -296,7 +306,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para una sustancia que decae según f(x) = 100 · (1/2)ˣ, calculá la masa restante tras 2 períodos: f(2).",
       spec: { value: 25, expected: 25, k: 100, a: 0.5, x: 2, context: "decaimiento 100 * (1/2)^2" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 25) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 25),
       hints: [
         "Evaluamos en x = 2: f(2) = 100 · (1/2)².",
         "Calculá la potencia: (1/2)² = 1/4 = 0,25.",
@@ -314,7 +324,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Aplicá la simetría (1/a)ˣ = a⁻ˣ para calcular (1/3)⁻².",
       spec: { value: 9, expected: 9, b: 3, m: 2, context: "simetria (1/3)^(-2) = 3^2 = 9" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 9) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 9),
       hints: [
         "Por propiedad de las potencias de una fracción: (1/a)⁻ⁿ = aⁿ.",
         "Invertí la base fraccionaria y cambiá el signo del exponente: (1/3)⁻² = 3².",
@@ -357,7 +367,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para g(x) = −3 · (1/2)ˣ, calculá g(0).",
       spec: { value: -3, expected: -3, k: -3, a: 0.5, x: 0, context: "g(0) con k negativo" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - -3) < 1e-6,
+      checkCorrect: (val) => checkNum(val, -3),
       hints: [
         "Evaluamos en x = 0: g(0) = −3 · (1/2)⁰.",
         "Cualquier número no nulo elevado a la cero da 1: (1/2)⁰ = 1.",
@@ -375,7 +385,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para la misma función g(x) = −3 · (1/2)ˣ, calculá g(1).",
       spec: { value: -1.5, expected: -1.5, k: -3, a: 0.5, x: 1, context: "g(1) = -3 * 0.5 = -1.5" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - -1.5) < 1e-6,
+      checkCorrect: (val) => checkNum(val, -1.5),
       hints: [
         "Evaluamos en x = 1: g(1) = −3 · (1/2)¹.",
         "(1/2)¹ = 0,5.",
@@ -420,7 +430,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Una función exponencial f(x) = k · aˣ pasa por (1, 1) y (2, 3). Calculamos a = 3 y k = 1/3, es decir f(x) = (1/3) · 3ˣ. Calculá f(3).",
       spec: { value: 9, expected: 9, k: 1/3, a: 3, x: 3, context: "reconstruccion f(3) = (1/3)*3^3 = 9" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 9) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 9),
       hints: [
         "Reemplazá x = 3 en la fórmula: f(3) = (1/3) · 3³.",
         "Calculá la potencia: 3³ = 27.",
@@ -438,7 +448,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Si una curva f(x) = k · aˣ pasa por (0, 4) y (1, 2), calculá f(2).",
       spec: { value: 1, expected: 1, k: 4, a: 0.5, x: 2, context: "f(2) = 4 * (1/2)^2 = 1" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 1) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 1),
       hints: [
         "Como pasa por (0, 4), el valor inicial es k = 4.",
         "En un paso de x = 0 a x = 1, la función pasa de 4 a 2: la razón es a = 2/4 = 1/2.",
@@ -456,7 +466,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Si f pasa por (0, −3) y (2, −0,75), ¿cuánto vale f(1)?",
       spec: { value: -1.5, expected: -1.5, k: -3, a: 0.5, x: 1, context: "f(1) = -3 * 0.5 = -1.5" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - -1.5) < 1e-6,
+      checkCorrect: (val) => checkNum(val, -1.5),
       hints: [
         "De (0, −3) sabemos que k = −3.",
         "f(2)/f(0) = a² = −0,75 / −3 = 0,25 = 1/4. Como a > 0, a = 1/2.",
@@ -476,7 +486,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Una sustancia de 50 g tiene vida media de 3 minutos: M(t) = 50 · (1/2)^(t/3). ¿Cuántos gramos quedan a los 6 minutos?",
       spec: { value: 12.5, expected: 12.5, M0: 50, T: 3, t: 6, period: 3, type: "period_count", context: "vida media 50 * (1/2)^2 = 12.5" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 12.5) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 12.5),
       hints: [
         "Calculá cuántas vidas medias pasaron: t/T = 6/3 = 2.",
         "Evaluamos: M(6) = 50 · (1/2)².",
@@ -494,7 +504,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Si una población crece al 12% por período, ¿cuál es la base multiplicativa a = 1 + r?",
       spec: { value: 1.12, expected: 1.12, rate: 0.12, type: "growth_rate", context: "base 1 + r = 1 + 0.12 = 1.12" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 1.12) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 1.12),
       hints: [
         "Un aumento del 12% equivale a una tasa r = 0,12.",
         "La base de acumulación es el total más el aumento: a = 1 + r.",
@@ -512,7 +522,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Un cultivo crece cada 10 horas. ¿Cuántos períodos de 10 horas hay en 5 días completos (5 días = 120 horas)?",
       spec: { value: 12, expected: 12, period: 10, t: 120, type: "period_count", context: "120 / 10 = 12 periodos" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 12) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 12),
       hints: [
         "Convertí los 5 días a horas: 5 · 24 = 120 horas.",
         "Dividí el tiempo total por la duración del período: t / T.",
@@ -557,7 +567,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "En la misma función f(x) = 2 · 3^(x−1) + 4, calculá el valor del punto de anclaje f(1).",
       spec: { value: 6, expected: 6, k: 2, a: 3, h: 1, c: 4, context: "f(1) = 2 * 3^0 + 4 = 6" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 6) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 6),
       hints: [
         "Reemplazá x = 1: f(1) = 2 · 3^(1−1) + 4.",
         "1 − 1 = 0, y 3⁰ = 1.",
@@ -602,7 +612,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para f(x) = 2 − (1/2)ˣ, hallá la raíz igualando a cero: 2 − (1/2)ˣ = 0. ¿Cuánto vale x?",
       spec: { value: -1, expected: -1, k: -1, a: 0.5, c: 2, context: "raiz 2 - (1/2)^x = 0 => x = -1" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - -1) < 1e-6,
+      checkCorrect: (val) => checkNum(val, -1),
       hints: [
         "Despejá la potencia: (1/2)ˣ = 2.",
         "Expresá ambos miembros en potencias de 2: (2⁻¹)ˣ = 2¹ ⟹ 2⁻ˣ = 2¹.",
@@ -620,7 +630,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para la misma función f(x) = 2 − (1/2)ˣ, calculá la ordenada al origen f(0).",
       spec: { value: 1, expected: 1, k: -1, a: 0.5, c: 2, x: 0, context: "f(0) = 2 - 1 = 1" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 1) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 1),
       hints: [
         "Reemplazá x = 0 en la función: f(0) = 2 − (1/2)⁰.",
         "Recordá que (1/2)⁰ = 1.",
@@ -638,7 +648,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Para la función f(x) = 1 − (1/2)ˣ, hallá su raíz igualando a cero.",
       spec: { value: 0, expected: 0, k: -1, a: 0.5, c: 1, context: "raiz 1 - (1/2)^x = 0 => x = 0" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 0) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 0),
       hints: [
         "Igualá a cero: 1 − (1/2)ˣ = 0 ⟹ (1/2)ˣ = 1.",
         "¿A qué exponente debemos elevar una base para que el resultado sea 1?",
@@ -658,7 +668,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Resolvé por igualación de bases: 2^(3x+1) : 16^(x−4) = 1. Llevá 16 a base 2 y hallá x.",
       spec: { value: 17, expected: 17, equation: "16^{x-4}", eq: "16", problemType: "quotient_equation", context: "ecuacion 2^(3x+1) : 16^(x-4) = 1 => x = 17" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 17) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 17),
       hints: [
         "Expresá 16 como potencia de 2: 16 = 2⁴, de modo que 16^(x−4) = (2⁴)^(x−4) = 2^(4x−16).",
         "En una división de potencias de igual base se restan los exponentes: 2^((3x+1) − (4x−16)) = 2⁰.",
@@ -676,7 +686,7 @@ export const CHECKS_DATA = {
       type: "number",
       prompt: "Resolvé sacando factor común: 2^(x+1) + 2ˣ = 12. Sacá 2ˣ de factor común y hallá x.",
       spec: { value: 2, expected: 2, rhs: 12, context: "ecuacion factor comun" },
-      checkCorrect: (val) => Math.abs(Number(String(val).replace(",", ".")) - 2) < 1e-6,
+      checkCorrect: (val) => checkNum(val, 2),
       hints: [
         "Desarmá 2^(x+1) como 2ˣ · 2¹.",
         "Extraé 2ˣ: 2ˣ · (2 + 1) = 12 ⟹ 2ˣ · 3 = 12.",
@@ -1002,6 +1012,45 @@ if (typeof document !== "undefined") {
       console.warn("[retos] initialization failed:", err);
     });
 
+  // Montaje del panel vivo de competencias en sec-repaso
+  const dashboardHost = document.querySelector("#exp-competency-dashboard");
+  if (dashboardHost) {
+    mountCompetencyDashboard(dashboardHost, {
+      onSelectSection: (sectionId) => {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${sectionId}"]`);
+        if (link) link.click();
+        else {
+          document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+        }
+      },
+      onPracticeCompetency: (competencyId) => {
+        const retosLink = document.querySelector(`.seq-sidebar__link[data-sec="sec-retos"]`);
+        if (retosLink) retosLink.click();
+        else {
+          document.getElementById("sec-retos")?.scrollIntoView({ behavior: "smooth" });
+        }
+        const trainerSelect = document.querySelector('#exp-challenges select[aria-label="Familia de reto"]');
+        if (trainerSelect) {
+          const compMap = {
+            "exponentials.tables_additive_vs_multiplicative": "razon_tabla_vs_salto",
+            "exponentials.neutral_and_order_of_operations": "evaluacion_k_a_x",
+            "exponentials.rational_density_and_base_restrictions": "densidad_potencia_racional",
+            "exponentials.base_reflection_and_asymptote": "espejo_base_inversa",
+            "exponentials.four_quadrants_monotonicity": "evaluacion_k_a_x",
+            "exponentials.analytical_reconstruction_two_points": "formula_desde_dos_puntos",
+            "exponentials.time_models_rates_and_euler_base": "modelo_tiempo_compuesto",
+            "exponentials.shifts_and_horizontal_asymptote": "imagen_intervalo_asintota",
+            "exponentials.full_analytical_study": "imagen_intervalo_asintota",
+            "exponentials.equations_three_methods_in_reals": "ecuacion_igualacion_factor_comun",
+          };
+          const targetFam = compMap[competencyId] || "adaptativo";
+          trainerSelect.value = targetFam;
+          trainerSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      },
+    });
+  }
+
   initGlossary();
   initBlackboardController();
 }
@@ -1029,4 +1078,7 @@ export {
   getProgress,
   saveProgress,
   markSectionCompleted,
+  recordCompetencyAttempt,
+  getCompetencyReport,
+  mountCompetencyDashboard,
 } from "./components.js";

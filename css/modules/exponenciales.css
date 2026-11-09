@@ -1338,3 +1338,181 @@
   min-height: 36px;
 }
 
+/* ==========================================================================
+   Dashboard de Competencias y Atlas de Errores (Fase 1)
+   ========================================================================== */
+
+#exp-competency-dashboard {
+  margin: 24px 0 36px;
+  padding: 20px;
+  background: var(--panel, #24322b);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.28));
+  border-radius: 8px;
+}
+
+.exp-dashboard-header {
+  margin-bottom: 20px;
+}
+
+.exp-dashboard-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  color: var(--yellow, #e9c46a);
+}
+
+.exp-dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.exp-dashboard-kpi {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.15));
+  border-radius: 6px;
+  border-left: 4px solid var(--muted, #888);
+}
+
+.exp-dashboard-kpi--mastered {
+  border-left-color: var(--green, #2a9d8f);
+}
+
+.exp-dashboard-kpi--assisted {
+  border-left-color: var(--yellow, #e9c46a);
+}
+
+.exp-dashboard-kpi--pending {
+  border-left-color: var(--pink, #e76f51);
+}
+
+.exp-dashboard-kpi__num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: var(--font-mono, monospace);
+  color: var(--text, #ecf2e8);
+}
+
+.exp-dashboard-kpi__label {
+  font-size: 0.82rem;
+  color: var(--text-muted, #a7b8ae);
+  margin-top: 4px;
+}
+
+.exp-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.exp-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.2));
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.exp-dashboard-card--mastered {
+  border-left: 3px solid var(--green, #2a9d8f);
+}
+
+.exp-dashboard-card--assisted {
+  border-left: 3px solid var(--yellow, #e9c46a);
+}
+
+.exp-dashboard-card--pending {
+  border-left: 3px solid rgba(236, 242, 232, 0.2);
+}
+
+.exp-dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.exp-dashboard-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text, #ecf2e8);
+}
+
+.exp-dashboard-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.exp-dashboard-badge.badge--success {
+  background: rgba(42, 157, 143, 0.2);
+  color: var(--green, #2a9d8f);
+  border: 1px solid var(--green, #2a9d8f);
+}
+
+.exp-dashboard-badge.badge--warning {
+  background: rgba(233, 196, 106, 0.2);
+  color: var(--yellow, #e9c46a);
+  border: 1px solid var(--yellow, #e9c46a);
+}
+
+.exp-dashboard-badge.badge--neutral {
+  background: rgba(236, 242, 232, 0.1);
+  color: var(--text-muted, #a7b8ae);
+  border: 1px solid rgba(236, 242, 232, 0.2);
+}
+
+.exp-dashboard-errors {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exp-dashboard-error-alert {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--orange, #f4a261);
+  background: rgba(244, 162, 97, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 2px solid var(--orange, #f4a261);
+}
+
+.exp-dashboard-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.exp-dashboard-card__actions .btn {
+  flex: 1;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 6px 8px;
+}
+
+/* Nota adaptativa en Retos */
+.exp-challenge__adaptive-note {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: rgba(42, 157, 143, 0.15);
+  border: 1px solid var(--green, #2a9d8f);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text, #ecf2e8);
+}
+
