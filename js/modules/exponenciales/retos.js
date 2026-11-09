@@ -17,7 +17,7 @@
  * - Cero emojis Unicode
  */
 
-import { h, mount, chalkIcon } from "../../core/dom.js";
+import { h, mount, clear, chalkIcon } from "../../core/dom.js";
 import { fmt, frac } from "../../core/math-format.js";
 import { playScript } from "../../core/vn.js";
 import { diagnoseExp } from "./logic.js";
@@ -69,11 +69,28 @@ function inlineMathNodes(text) {
 /**
  * Genera un reto reproducible a partir de una semilla numérica entera.
  */
-export function makeChallenge(seed, requestedType = null) {
-  const rng = mulberry32(seed);
+export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
+  const subSeed = problemIndex === 0 ? (seed >>> 0) : ((seed + problemIndex * 7919 + 1013) >>> 0);
+  const rng = mulberry32(subSeed);
   const typeIndex = int(rng, 0, CHALLENGE_TYPES.length - 1);
-  const type = requestedType || CHALLENGE_TYPES[typeIndex];
-  const common = { seed, type, vars: {} };
+  let type;
+  const isSpecificType =
+    requestedType &&
+    requestedType !== "aleatorio" &&
+    requestedType !== "all" &&
+    CHALLENGE_TYPES.includes(requestedType);
+
+  if (isSpecificType) {
+    type = requestedType;
+  } else if (problemIndex === 0) {
+    type = CHALLENGE_TYPES[typeIndex];
+  } else {
+    const baseRng = mulberry32(seed >>> 0);
+    const baseTypeIndex = int(baseRng, 0, CHALLENGE_TYPES.length - 1);
+    const chosenIndex = (baseTypeIndex + problemIndex) % CHALLENGE_TYPES.length;
+    type = CHALLENGE_TYPES[chosenIndex];
+  }
+  const common = { seed, problemIndex, totalProblems: 8, type, vars: {} };
 
   const cases = {
     razon_tabla_vs_salto() {
@@ -387,6 +404,10 @@ export function makeChallenge(seed, requestedType = null) {
   return generator();
 }
 
+export function makeChallenges(seed, requestedType = null, count = 8) {
+  return Array.from({ length: count }, (_, i) => makeChallenge(seed, requestedType, i));
+}
+
 // =============================================================================
 // LAS 5 TRAMPAS CLÁSICAS DE EXAMEN
 // =============================================================================
@@ -516,7 +537,9 @@ function createTrainer(root) {
     // Modo seguro sin localStorage
   }
 
-  let current = makeChallenge(seed);
+  let problemIndex = 0;
+  const problemsState = {};
+  let current = makeChallenge(seed, null, problemIndex);
   let failStreak = 0;
   let successStreak = 0;
   let hintStep = 0;
@@ -557,6 +580,12 @@ function createTrainer(root) {
     ].map(([value, label]) => h("option", { value }, label)),
   );
 
+  const problemSelector = h("div", {
+    class: "exp-problem-selector pr-chip-row",
+    role: "tablist",
+    "aria-label": "Batería de retos de la semilla",
+  });
+
   const copySeedText = h("span", { class: "copy-seed-text" }, " Copiar semilla");
   const copySeedBtn = h(
     "button",
@@ -596,6 +625,7 @@ function createTrainer(root) {
             localStorage.setItem("exponenciales:seed", String(seed));
           } catch {}
           contrastSubIndex = 0;
+          problemIndex = 0;
           newChallenge();
         },
       },
@@ -688,6 +718,8 @@ function createTrainer(root) {
             expected: current.answer,
           });
 
+          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
+
           if (isCorrect) {
             const wasAssisted = hintStep > 0 || solutionRevealed;
             const mode = wasAssisted ? "assisted" : "independent";
@@ -709,6 +741,18 @@ function createTrainer(root) {
             revise.disabled = true;
             reveal.disabled = true;
             hint.disabled = true;
+
+            problemsState[pKey] = {
+              solved: true,
+              mode,
+              userAnswer: raw,
+              previewText: preview.textContent,
+              feedbackText: feedback.textContent,
+              feedbackClass: feedback.className,
+              hintStep,
+              solutionRevealed: false,
+            };
+            updateProblemSelector();
 
             if (wasAssisted) {
               if (failStreak > 0) {
@@ -745,6 +789,18 @@ function createTrainer(root) {
               intervalSyntaxError ||
               "Todavía no coincide. Consultá una pista y revisá las operaciones paso a paso.";
             feedback.className = "exp-check__feedback pr-check__feedback is-error";
+
+            problemsState[pKey] = {
+              solved: false,
+              mode: null,
+              userAnswer: raw,
+              previewText: preview.textContent,
+              feedbackText: feedback.textContent,
+              feedbackClass: feedback.className,
+              hintStep,
+              solutionRevealed: false,
+            };
+
             const id = diagnosis?.id;
             if (id && DIAGNOSE_REACTIONS[id]) {
               playScript([DIAGNOSE_REACTIONS[id]]);
@@ -769,6 +825,12 @@ function createTrainer(root) {
           hintStep = Math.min(3, hintStep + 1);
           hintText.hidden = false;
           hintText.textContent = `Pista ${fmt(hintStep)} de 3: ${current.hints[hintStep - 1]}`;
+
+          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
+          if (!problemsState[pKey]) problemsState[pKey] = {};
+          problemsState[pKey].hintStep = hintStep;
+          problemsState[pKey].hintText = hintText.textContent;
+
           playScript([
             {
               pose: ["base", "pensativa", "explicando"][hintStep - 1],
@@ -797,6 +859,19 @@ function createTrainer(root) {
           revise.disabled = true;
           reveal.disabled = true;
           hint.disabled = true;
+
+          const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
+          problemsState[pKey] = {
+            solved: false,
+            mode: null,
+            userAnswer: input.value,
+            previewText: preview.textContent,
+            feedbackText: "",
+            feedbackClass: "",
+            hintStep,
+            solutionRevealed: true,
+          };
+
           mount(
             solution,
             h("strong", null, "Resolución paso a paso"),
@@ -819,6 +894,24 @@ function createTrainer(root) {
     " ¡Estoy atorado! Mostrame la solución",
   );
 
+  const prevRetoBtn = h(
+    "button",
+    {
+      type: "button",
+      class: "btn btn--ghost",
+      on: {
+        click: () => {
+          if (typeSelect.value !== "contrastivo" && problemIndex > 0) {
+            problemIndex -= 1;
+            newChallenge();
+          }
+        },
+      },
+    },
+    chalkIcon("compass"),
+    " Reto anterior",
+  );
+
   const next = h(
     "button",
     {
@@ -832,17 +925,23 @@ function createTrainer(root) {
             } else {
               contrastSubIndex = 0;
               seed = (seed + 1) >>> 0;
+              problemIndex = 0;
               seedInput.value = String(seed);
               try {
                 localStorage.setItem("exponenciales:seed", String(seed));
               } catch {}
             }
           } else {
-            seed = (seed + 1) >>> 0;
-            seedInput.value = String(seed);
-            try {
-              localStorage.setItem("exponenciales:seed", String(seed));
-            } catch {}
+            if (problemIndex < 7) {
+              problemIndex += 1;
+            } else {
+              problemIndex = 0;
+              seed = (seed + 1) >>> 0;
+              seedInput.value = String(seed);
+              try {
+                localStorage.setItem("exponenciales:seed", String(seed));
+              } catch {}
+            }
           }
           newChallenge();
         },
@@ -851,6 +950,38 @@ function createTrainer(root) {
     chalkIcon("reset"),
     " Otro reto",
   );
+
+  const updateProblemSelector = () => {
+    clear(problemSelector);
+    if (typeSelect.value === "contrastivo") {
+      problemSelector.hidden = true;
+      return;
+    }
+    problemSelector.hidden = false;
+    for (let i = 0; i < 8; i++) {
+      const key = `${seed}-${typeSelect.value}-${i}`;
+      const isSolved = !!problemsState[key]?.solved;
+      const isActive = problemIndex === i;
+      const chip = h(
+        "button",
+        {
+          type: "button",
+          class: `chip exp-problem-chip ${isActive ? "is-active" : "chip--ghost"} ${isSolved ? "is-solved" : ""}`,
+          "aria-selected": String(isActive),
+          role: "tab",
+          on: {
+            click: () => {
+              problemIndex = i;
+              newChallenge();
+            },
+          },
+        },
+        chalkIcon(isSolved ? "check" : "target", 13),
+        ` Reto ${i + 1}/8`,
+      );
+      problemSelector.appendChild(chip);
+    }
+  };
 
   const newChallenge = () => {
     let requested =
@@ -869,7 +1000,7 @@ function createTrainer(root) {
       if (candidates.length === 0) {
         candidates = report.list;
       }
-      const candidateIndex = Math.abs(seed) % candidates.length;
+      const candidateIndex = (Math.abs(seed) + problemIndex) % candidates.length;
       const targetItem = candidates[candidateIndex];
       const targetComp = targetItem?.competency;
       const compMap = {
@@ -894,26 +1025,64 @@ function createTrainer(root) {
       requested = pair.types[contrastSubIndex];
     }
 
-    current = makeChallenge(seed, requested);
+    current = makeChallenge(seed, requested, problemIndex);
     mount(prompt, ...inlineMathNodes(current.prompt));
     if (typeSelect.value === "contrastivo") {
       const pair = contrastPairs[Math.abs(seed) % contrastPairs.length];
       meta.textContent = `${pair.label} (Par contrastivo ${contrastSubIndex + 1}/2) · Semilla ${fmt(seed)}`;
     } else {
-      meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} · Semilla ${fmt(seed)}`;
+      const solvedInSeed = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+        (i) => problemsState[`${seed}-${typeSelect.value}-${i}`]?.solved
+      ).length;
+      meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} (Reto ${problemIndex + 1}/8 · ${solvedInSeed}/8 resueltos) · Semilla ${fmt(seed)}`;
     }
-    input.value = "";
-    input.disabled = false;
-    revise.disabled = false;
-    reveal.disabled = false;
-    hint.disabled = false;
-    preview.textContent = "Interpretado como: —";
-    feedback.textContent = "";
-    feedback.className = "exp-check__feedback pr-check__feedback";
-    hintText.hidden = true;
-    solution.hidden = true;
-    hintStep = 0;
-    solutionRevealed = false;
+
+    updateProblemSelector();
+    prevRetoBtn.hidden = typeSelect.value === "contrastivo" || problemIndex === 0;
+
+    const pKey = `${seed}-${typeSelect.value}-${problemIndex}`;
+    const pState = problemsState[pKey];
+    if (pState) {
+      input.value = pState.userAnswer || "";
+      input.disabled = !!pState.solved || !!pState.solutionRevealed;
+      revise.disabled = !!pState.solved || !!pState.solutionRevealed;
+      reveal.disabled = !!pState.solved || !!pState.solutionRevealed;
+      hint.disabled = !!pState.solved || !!pState.solutionRevealed;
+      preview.textContent = pState.previewText || "Interpretado como: —";
+      feedback.textContent = pState.feedbackText || "";
+      feedback.className = pState.feedbackClass || "exp-check__feedback pr-check__feedback";
+      hintStep = pState.hintStep || 0;
+      solutionRevealed = !!pState.solutionRevealed;
+      hintText.hidden = !pState.hintText;
+      hintText.textContent = pState.hintText || "";
+      solution.hidden = !pState.solutionRevealed;
+      if (solutionRevealed) {
+        mount(
+          solution,
+          h("strong", null, "Resolución paso a paso"),
+          h(
+            "ol",
+            null,
+            ...current.solution.map((step) =>
+              h("li", null, ...inlineMathNodes(step)),
+            ),
+          ),
+        );
+      }
+    } else {
+      input.value = "";
+      input.disabled = false;
+      revise.disabled = false;
+      reveal.disabled = false;
+      hint.disabled = false;
+      preview.textContent = "Interpretado como: —";
+      feedback.textContent = "";
+      feedback.className = "exp-check__feedback pr-check__feedback";
+      hintText.hidden = true;
+      solution.hidden = true;
+      hintStep = 0;
+      solutionRevealed = false;
+    }
   };
 
   seedInput.addEventListener("change", () => {
@@ -923,16 +1092,32 @@ function createTrainer(root) {
       localStorage.setItem("exponenciales:seed", String(seed));
     } catch {}
     contrastSubIndex = 0;
+    problemIndex = 0;
     newChallenge();
+  });
+
+  seedInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      seedInput.dispatchEvent(new Event("change"));
+    }
   });
 
   typeSelect.addEventListener("change", () => {
     contrastSubIndex = 0;
+    problemIndex = 0;
     newChallenge();
   });
 
   input.addEventListener("input", () => {
     preview.textContent = `Interpretado como: ${input.value.trim() || "—"}`;
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      revise.click();
+    }
   });
 
   mount(
@@ -942,6 +1127,7 @@ function createTrainer(root) {
       { class: "exp-trainer pr-trainer" },
       h("h3", null, "Entrenador infinito por semilla PRNG"),
       h("div", { class: "exp-widget__controls pr-widget__controls" }, seedLabel, typeLabel, randomizeBtn, copySeedBtn),
+      problemSelector,
       meta,
       adaptiveNote,
       prompt,
@@ -952,7 +1138,7 @@ function createTrainer(root) {
         input,
       ),
       preview,
-      h("div", { class: "exp-check__actions pr-check__actions" }, revise, hint, reveal, next),
+      h("div", { class: "exp-check__actions pr-check__actions" }, revise, hint, reveal, prevRetoBtn, next),
       feedback,
       hintText,
       solution,
@@ -1035,3 +1221,6 @@ export function initRetosModule(
   createTrainer(panels[0]);
   createTraps(panels[1]);
 }
+
+export const generateExpChallenge = makeChallenge;
+export const generateExpChallenges = makeChallenges;

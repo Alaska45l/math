@@ -79,12 +79,33 @@ export const CHALLENGE_TYPES = [
   },
 ];
 
-export function generateQuadChallenge(seed, forcedType = 'all') {
-  const rng = mulberry32(seed);
-  const typeObj =
-    forcedType === 'all'
-      ? randChoice(rng, CHALLENGE_TYPES)
-      : CHALLENGE_TYPES.find((t) => t.id === forcedType) || CHALLENGE_TYPES[0];
+function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
+  let rng;
+  let typeObj;
+
+  const isAll = !forcedType || forcedType === 'all' || forcedType === 'aleatorio';
+
+  if (isAll) {
+    if (problemIndex === 0) {
+      rng = mulberry32(seed >>> 0);
+      typeObj = randChoice(rng, CHALLENGE_TYPES);
+    } else {
+      const baseRng = mulberry32(seed >>> 0);
+      const baseIndex = Math.floor(baseRng() * CHALLENGE_TYPES.length);
+      const chosenIndex = (baseIndex + problemIndex) % CHALLENGE_TYPES.length;
+      typeObj = CHALLENGE_TYPES[chosenIndex];
+      const subSeed = (seed + problemIndex * 7919 + 1013) >>> 0;
+      rng = mulberry32(subSeed);
+    }
+  } else {
+    typeObj = CHALLENGE_TYPES.find((t) => t.id === forcedType) || CHALLENGE_TYPES[0];
+    if (problemIndex === 0) {
+      rng = mulberry32(seed >>> 0);
+    } else {
+      const subSeed = (seed + problemIndex * 7919 + 1013) >>> 0;
+      rng = mulberry32(subSeed);
+    }
+  }
   const type = typeObj.id;
 
   // 1. factor_trinomial
@@ -440,6 +461,20 @@ export function generateQuadChallenge(seed, forcedType = 'all') {
   };
 }
 
+export function generateQuadChallenge(seed, forcedType = 'all', problemIndex = 0) {
+  const ch = _generateQuadChallengeRaw(seed, forcedType, problemIndex);
+  return {
+    ...ch,
+    seed,
+    problemIndex,
+    totalProblems: 8,
+  };
+}
+
+export function generateQuadChallenges(seed, forcedType = 'all', count = 8) {
+  return Array.from({ length: count }, (_, i) => generateQuadChallenge(seed, forcedType, i));
+}
+
 export const TRAPS = [
   {
     id: 'trap-1-canonica-ordenada',
@@ -726,18 +761,22 @@ function validateRetoAnswer(challenge, rawInput) {
   return { ok: eq.equivalent && eq.sameForm };
 }
 
-export function mountQuadraticRetos(root, { vn } = {}) {
+export function mountQuadraticRetos(root, { seed, vn } = {}) {
   if (!root) return;
   clear(root);
+
+  const initialSeed = (typeof seed === 'number' && Number.isFinite(seed) ? seed : 202608) >>> 0;
 
   const state = {
     activeTab: 'prng',
     family: 'all',
-    seed: 202608,
+    seed: initialSeed,
+    problemIndex: 0,
     streak: 0,
     solvedCount: 0,
     hintIndex: 0,
     currentChallenge: null,
+    problemsState: {},
     activeTrapIndex: 0,
   };
 
@@ -785,34 +824,103 @@ export function mountQuadraticRetos(root, { vn } = {}) {
     familyChipsWrap.appendChild(btn);
   }
 
+  const problemSelectorRow = h('div', {
+    class: 'pr-chip-row quad-problem-selector',
+    role: 'tablist',
+    'aria-label': 'Batería de retos de la semilla',
+  });
+
   const seedBadge = h('span', { class: 'quad-seed-badge' });
   const streakBadge = h('span', { class: 'quad-streak-badge' });
+  const prevRetoBtn = h(
+    'button',
+    { type: 'button', class: 'pr-btn pr-btn-secondary quad-prev-reto-btn', title: 'Ir al reto anterior de esta semilla' },
+    [chalkIcon('compass', 15), ' Reto anterior']
+  );
+  const nextRetoBtn = h(
+    'button',
+    { type: 'button', class: 'pr-btn pr-btn-secondary quad-next-reto-btn', title: 'Ir al siguiente reto de esta semilla' },
+    [chalkIcon('compass', 15), ' Siguiente reto']
+  );
   const nextSeedBtn = h(
     'button',
     { type: 'button', class: 'pr-btn pr-btn-secondary' },
-    [chalkIcon('compass', 15), ' Nuevo desafío (Semilla +1)']
+    [chalkIcon('reset', 15), ' Nuevo desafío (Semilla +1)']
   );
 
   const metaBar = h('div', { class: 'quad-retos-meta' }, [
     seedBadge,
     streakBadge,
+    prevRetoBtn,
+    nextRetoBtn,
     nextSeedBtn,
   ]);
 
   const challengeCard = h('div', { class: 'quad-reto-card' });
-  prngPane.append(familyChipsWrap, metaBar, challengeCard);
+  prngPane.append(familyChipsWrap, problemSelectorRow, metaBar, challengeCard);
+
+  function renderProblemSelector() {
+    clear(problemSelectorRow);
+    for (let i = 0; i < 8; i++) {
+      const pKey = `${state.seed}-${state.family}-${i}`;
+      const isSolved = !!state.problemsState[pKey]?.solved;
+      const isActive = state.problemIndex === i;
+      const chip = h(
+        'button',
+        {
+          type: 'button',
+          class: ['pr-chip', 'quad-problem-chip', isActive ? 'is-active' : '', isSolved ? 'is-solved' : ''],
+          role: 'tab',
+          'aria-selected': String(isActive),
+          on: {
+            click: () => {
+              playClick();
+              state.problemIndex = i;
+              renderPrngChallenge();
+            },
+          },
+        },
+        [chalkIcon(isSolved ? 'check' : 'target', 13), ` Reto ${i + 1}/8`]
+      );
+      problemSelectorRow.appendChild(chip);
+    }
+  }
 
   function renderPrngChallenge() {
-    state.currentChallenge = generateQuadChallenge(state.seed, state.family);
-    state.hintIndex = 0;
-    let solutionRevealed = false;
+    state.currentChallenge = generateQuadChallenge(state.seed, state.family, state.problemIndex);
     const ch = state.currentChallenge;
+    const pKey = `${state.seed}-${state.family}-${state.problemIndex}`;
+    const pState = state.problemsState[pKey] || {
+      hintIndex: 0,
+      solutionRevealed: false,
+      solved: false,
+      isIndependent: false,
+      userAnswer: '',
+      hints: [],
+      feedbackClass: '',
+      feedbackText: '',
+      feedbackNodes: null,
+    };
 
-    seedBadge.textContent = `Semilla #${ch.seed} · Competencia: ${ch.competencyId}`;
-    streakBadge.textContent = `Racha actual: ${state.streak} · Resueltos: ${state.solvedCount}`;
+    state.hintIndex = pState.hintIndex || 0;
+    let solutionRevealed = !!pState.solutionRevealed;
+
+    const solvedInSeed = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+      (i) => state.problemsState[`${state.seed}-${state.family}-${i}`]?.solved
+    ).length;
+
+    seedBadge.textContent = `Semilla #${ch.seed} (Reto ${state.problemIndex + 1}/8) · Competencia: ${ch.competencyId}`;
+    streakBadge.textContent = `Racha actual: ${state.streak} · Semilla #${state.seed}: ${solvedInSeed}/8 resueltos (Total: ${state.solvedCount})`;
+
+    prevRetoBtn.disabled = state.problemIndex === 0;
+    if (prevRetoBtn.style) {
+      prevRetoBtn.style.opacity = state.problemIndex === 0 ? '0.5' : '1';
+    }
+
+    renderProblemSelector();
 
     clear(challengeCard);
-    const badgeEl = h('div', { class: 'quad-reto-badge' }, ch.badge);
+    const badgeEl = h('div', { class: 'quad-reto-badge' }, `${ch.badge} · Reto ${state.problemIndex + 1}/8`);
     const promptEl = h('p', { class: 'quad-reto-prompt' }, ch.prompt);
 
     const inputEl = h('input', {
@@ -820,18 +928,19 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       class: 'pr-check-input quad-reto-input',
       placeholder: ch.placeholder || 'Tu respuesta...',
       'aria-label': 'Respuesta del desafío cuadrático',
+      value: pState.userAnswer || '',
     });
 
     const verifyBtn = h(
       'button',
-      { type: 'button', class: 'pr-btn pr-check-submit' },
+      { type: 'button', class: 'pr-btn pr-check-submit quad-reto-verify-btn' },
       [chalkIcon('check', 15), ' Verificar respuesta']
     );
 
     const hintBtn = h(
       'button',
-      { type: 'button', class: 'pr-btn pr-btn-secondary' },
-      [chalkIcon('bulb', 15), ` Pedir pista (0/${ch.hints.length})`]
+      { type: 'button', class: 'pr-btn pr-btn-secondary quad-reto-hint-btn' },
+      [chalkIcon('bulb', 15), ` Pedir pista (${state.hintIndex}/${ch.hints.length})`]
     );
 
     const solutionBtn = h(
@@ -854,20 +963,64 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       'aria-live': 'polite',
     });
 
-    solutionBtn.addEventListener('click', () => {
-      playClick();
-      solutionRevealed = true;
+    if (pState.hints && pState.hints.length > 0) {
+      hintsBox.removeAttribute('hidden');
+      pState.hints.forEach((hText) => {
+        hintsBox.appendChild(h('div', { class: 'quad-hint-item' }, hText));
+      });
+      if (state.hintIndex >= ch.hints.length) {
+        hintBtn.textContent = 'Todas las pistas desplegadas';
+      }
+    }
+
+    if (pState.solved || solutionRevealed) {
       inputEl.disabled = true;
       verifyBtn.disabled = true;
+      hintBtn.disabled = true;
       solutionBtn.disabled = true;
-      state.streak = 0;
-      streakBadge.textContent = `Racha actual: 0 · Resueltos: ${state.solvedCount}`;
+    }
+
+    if (solutionRevealed) {
       feedbackBox.className = 'pr-check-feedback is-ok is-solution';
       feedbackBox.replaceChildren(
         chalkIcon('spark', 14),
         h('strong', {}, ' Solución explicada: '),
         h('span', {}, ch.explanation)
       );
+    } else if (pState.solved && pState.feedbackNodes) {
+      feedbackBox.className = pState.feedbackClass || 'pr-check-feedback is-ok';
+      feedbackBox.replaceChildren(...pState.feedbackNodes.map((n) => n.cloneNode(true)));
+    } else if (pState.feedbackText) {
+      feedbackBox.className = pState.feedbackClass;
+      feedbackBox.textContent = pState.feedbackText;
+    }
+
+    solutionBtn.addEventListener('click', () => {
+      playClick();
+      solutionRevealed = true;
+      inputEl.disabled = true;
+      verifyBtn.disabled = true;
+      hintBtn.disabled = true;
+      solutionBtn.disabled = true;
+      state.streak = 0;
+      const curSolved = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+        (i) => state.problemsState[`${state.seed}-${state.family}-${i}`]?.solved
+      ).length;
+      streakBadge.textContent = `Racha actual: 0 · Semilla #${state.seed}: ${curSolved}/8 resueltos (Total: ${state.solvedCount})`;
+      feedbackBox.className = 'pr-check-feedback is-ok is-solution';
+      feedbackBox.replaceChildren(
+        chalkIcon('spark', 14),
+        h('strong', {}, ' Solución explicada: '),
+        h('span', {}, ch.explanation)
+      );
+      state.problemsState[pKey] = {
+        hintIndex: state.hintIndex,
+        hints: state.problemsState[pKey]?.hints || [],
+        solutionRevealed: true,
+        solved: false,
+        userAnswer: inputEl.value,
+        feedbackClass: feedbackBox.className,
+      };
     });
 
     hintBtn.addEventListener('click', () => {
@@ -881,6 +1034,11 @@ export function mountQuadraticRetos(root, { vn } = {}) {
           state.hintIndex < ch.hints.length
             ? `Pedir pista (${state.hintIndex}/${ch.hints.length})`
             : 'Todas las pistas desplegadas';
+
+        if (!state.problemsState[pKey]) state.problemsState[pKey] = {};
+        state.problemsState[pKey].hintIndex = state.hintIndex;
+        if (!state.problemsState[pKey].hints) state.problemsState[pKey].hints = [];
+        state.problemsState[pKey].hints.push(ch.hints[state.hintIndex - 1]);
       }
     });
 
@@ -899,7 +1057,11 @@ export function mountQuadraticRetos(root, { vn } = {}) {
           state.streak += 1;
         }
         state.solvedCount += 1;
-        streakBadge.textContent = `Racha actual: ${state.streak} · Resueltos: ${state.solvedCount}`;
+        inputEl.disabled = true;
+        verifyBtn.disabled = true;
+        hintBtn.disabled = true;
+        solutionBtn.disabled = true;
+
         const masteryTag = isIndependent ? '[Logro Independiente]' : '[Logro Asistido]';
         feedbackBox.className = 'pr-check-feedback is-ok';
         feedbackBox.replaceChildren(
@@ -907,6 +1069,24 @@ export function mountQuadraticRetos(root, { vn } = {}) {
           h('strong', {}, ` ¡Correcto! ${masteryTag} `),
           h('span', {}, ch.explanation)
         );
+
+        state.problemsState[pKey] = {
+          hintIndex: state.hintIndex,
+          hints: state.problemsState[pKey]?.hints || [],
+          solutionRevealed: false,
+          solved: true,
+          isIndependent,
+          userAnswer: inputEl.value,
+          feedbackClass: feedbackBox.className,
+          feedbackNodes: Array.from(feedbackBox.childNodes).map((n) => n.cloneNode(true)),
+        };
+
+        const curSolved = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+          (i) => state.problemsState[`${state.seed}-${state.family}-${i}`]?.solved
+        ).length;
+        streakBadge.textContent = `Racha actual: ${state.streak} · Semilla #${state.seed}: ${curSolved}/8 resueltos (Total: ${state.solvedCount})`;
+        renderProblemSelector();
+
         if (isIndependent && STREAK_REACTIONS[state.streak]) {
           if (vn && typeof vn.react === 'function') {
             vn.react(STREAK_REACTIONS[state.streak].pose, STREAK_REACTIONS[state.streak].text);
@@ -919,17 +1099,38 @@ export function mountQuadraticRetos(root, { vn } = {}) {
 
       playError();
       state.streak = 0;
-      streakBadge.textContent = `Racha actual: 0 · Resueltos: ${state.solvedCount}`;
+      const curSolved = [0, 1, 2, 3, 4, 5, 6, 7].filter(
+        (i) => state.problemsState[`${state.seed}-${state.family}-${i}`]?.solved
+      ).length;
+      streakBadge.textContent = `Racha actual: 0 · Semilla #${state.seed}: ${curSolved}/8 resueltos (Total: ${state.solvedCount})`;
 
       if (res.syntaxError) {
         feedbackBox.className = 'pr-check-feedback is-warn';
         feedbackBox.textContent = `Revisá el formato: ${res.syntaxError}`;
+        state.problemsState[pKey] = {
+          hintIndex: state.hintIndex,
+          hints: state.problemsState[pKey]?.hints || [],
+          solutionRevealed: false,
+          solved: false,
+          userAnswer: inputEl.value,
+          feedbackClass: feedbackBox.className,
+          feedbackText: feedbackBox.textContent,
+        };
         return;
       }
 
       if (res.equivalentWrongForm) {
         feedbackBox.className = 'pr-check-feedback is-warn';
         feedbackBox.textContent = DIAGNOSE_REACTIONS.equivalent_form.text;
+        state.problemsState[pKey] = {
+          hintIndex: state.hintIndex,
+          hints: state.problemsState[pKey]?.hints || [],
+          solutionRevealed: false,
+          solved: false,
+          userAnswer: inputEl.value,
+          feedbackClass: feedbackBox.className,
+          feedbackText: feedbackBox.textContent,
+        };
         if (vn && typeof vn.react === 'function') {
           vn.react(DIAGNOSE_REACTIONS.equivalent_form.pose, DIAGNOSE_REACTIONS.equivalent_form.text);
         } else {
@@ -942,6 +1143,15 @@ export function mountQuadraticRetos(root, { vn } = {}) {
       if (diag) {
         feedbackBox.className = 'pr-check-feedback is-error';
         feedbackBox.textContent = diag.message;
+        state.problemsState[pKey] = {
+          hintIndex: state.hintIndex,
+          hints: state.problemsState[pKey]?.hints || [],
+          solutionRevealed: false,
+          solved: false,
+          userAnswer: inputEl.value,
+          feedbackClass: feedbackBox.className,
+          feedbackText: feedbackBox.textContent,
+        };
         if (vn && typeof vn.react === 'function') {
           vn.react(diag.pose, diag.message);
         } else {
@@ -951,6 +1161,15 @@ export function mountQuadraticRetos(root, { vn } = {}) {
         feedbackBox.className = 'pr-check-feedback is-error';
         feedbackBox.textContent =
           'El resultado todavía no coincide. Usá el botón «Pedir pista» para revisar el paso intermedio.';
+        state.problemsState[pKey] = {
+          hintIndex: state.hintIndex,
+          hints: state.problemsState[pKey]?.hints || [],
+          solutionRevealed: false,
+          solved: false,
+          userAnswer: inputEl.value,
+          feedbackClass: feedbackBox.className,
+          feedbackText: feedbackBox.textContent,
+        };
       }
     };
 
@@ -973,13 +1192,34 @@ export function mountQuadraticRetos(root, { vn } = {}) {
     for (const b of familyChipsWrap.querySelectorAll('button[data-family]')) {
       b.classList.toggle('is-active', b === btn);
     }
+    state.problemIndex = 0;
     state.seed += 1;
+    renderPrngChallenge();
+  });
+
+  prevRetoBtn.addEventListener('click', () => {
+    playClick();
+    if (state.problemIndex > 0) {
+      state.problemIndex -= 1;
+      renderPrngChallenge();
+    }
+  });
+
+  nextRetoBtn.addEventListener('click', () => {
+    playClick();
+    if (state.problemIndex < 7) {
+      state.problemIndex += 1;
+    } else {
+      state.problemIndex = 0;
+      state.seed += 1;
+    }
     renderPrngChallenge();
   });
 
   nextSeedBtn.addEventListener('click', () => {
     playClick();
     state.seed += 1;
+    state.problemIndex = 0;
     renderPrngChallenge();
   });
 
@@ -1109,4 +1349,5 @@ export function mountQuadraticRetos(root, { vn } = {}) {
 }
 
 export const makeChallenge = generateQuadChallenge;
+export const makeChallenges = generateQuadChallenges;
 export const initRetosModule = mountQuadraticRetos;

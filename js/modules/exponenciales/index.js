@@ -1060,6 +1060,9 @@ export {
   initRetosModule,
   CHALLENGE_TYPES,
   makeChallenge,
+  makeChallenges,
+  generateExpChallenge,
+  generateExpChallenges,
   TRAPS,
   mulberry32,
 } from "./retos.js";
