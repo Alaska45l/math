@@ -231,7 +231,6 @@ export function initAgrupacionEstrategia(host) {
             y,
             width: 584,
             height: 54,
-            rx: 7,
             fill: active ? 'rgba(246, 189, 96, 0.14)' : 'rgba(20, 30, 25, 0.65)',
             stroke: active ? 'var(--yellow)' : 'rgba(236, 242, 232, 0.16)',
             'stroke-width': active ? 2 : 1,
@@ -332,7 +331,6 @@ export function initAgrupacionEstrategia(host) {
             y,
             width: 588,
             height: 44,
-            rx: 6,
             fill: chk.matched
               ? 'rgba(129, 178, 154, 0.18)'
               : 'rgba(20, 30, 25, 0.55)',

@@ -583,7 +583,6 @@ export function initOptimizacionExtremos(host) {
           y: fY - 10,
           width: maxW + 10,
           height: 12,
-          rx: 3,
           fill: '#5a4a3a',
           stroke: 'var(--yellow)',
           'stroke-width': 1.5,

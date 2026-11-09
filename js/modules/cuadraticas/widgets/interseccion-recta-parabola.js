@@ -86,12 +86,12 @@ export function initInterseccionRectaParabola(host) {
   // Dos clipPath independientes para aislar estrictamente leftBox y rightBox
   board.defs.appendChild(
     s('clipPath', { id: 'inter-clip-left' }, [
-      s('rect', { x: 38, y: 38, width: 288, height: 268, rx: 6 }),
+      s('rect', { x: 38, y: 38, width: 288, height: 268 }),
     ])
   );
   board.defs.appendChild(
     s('clipPath', { id: 'inter-clip-right' }, [
-      s('rect', { x: 368, y: 38, width: 288, height: 268, rx: 6 }),
+      s('rect', { x: 368, y: 38, width: 288, height: 268 }),
     ])
   );
 

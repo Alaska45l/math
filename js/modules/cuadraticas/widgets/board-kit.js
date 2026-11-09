@@ -34,7 +34,6 @@ export function createQuadBoardSvg({
         y: plotBox.y,
         width: plotBox.w,
         height: plotBox.h,
-        rx: 6,
       }),
     ]),
   ]);
@@ -44,7 +43,6 @@ export function createQuadBoardSvg({
     y: plotBox.y,
     width: plotBox.w,
     height: plotBox.h,
-    rx: 6,
     fill: 'rgba(14, 22, 18, 0.55)',
     stroke: 'rgba(236, 242, 232, 0.18)',
     'stroke-width': 1,

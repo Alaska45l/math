@@ -209,7 +209,6 @@ export function initModeloAreaBinomios(host) {
           y,
           width: w,
           height: hRect,
-          rx: 5,
           fill,
           stroke,
           'stroke-width': 1.8,
@@ -355,7 +354,6 @@ export function initModeloAreaBinomios(host) {
           y: boxY,
           width: 220,
           height: totalH,
-          rx: 8,
           fill: 'rgba(20, 30, 25, 0.85)',
           stroke: 'rgba(236, 242, 232, 0.22)',
         }

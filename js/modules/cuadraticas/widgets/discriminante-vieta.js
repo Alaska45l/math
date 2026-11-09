@@ -264,7 +264,6 @@ export function initDiscriminanteVieta(host) {
         y: board.plotBox.y + 8,
         width: 315,
         height: 54,
-        rx: 6,
         fill: 'rgba(16, 24, 20, 0.88)',
         stroke: badgeColor,
         'stroke-width': 1.5,

@@ -4,7 +4,7 @@
  */
 
 import { h, clear, qsa, chalkIcon } from '../../core/dom.js';
-import { renderNav } from '../../core/nav.js';
+import { renderNav, initLessonDock } from '../../core/nav.js';
 import { initGlossary } from '../../core/glossary.js';
 import {
   annotatedQuadFormula,
@@ -765,6 +765,7 @@ export function initBlackboardController() {
 
   const page = document.querySelector('.seq-page');
   const sidebar = document.querySelector('.seq-sidebar');
+  const menuGlyph = String.fromCodePoint(0x2630);
   const sidebarToggle = h(
     'button',
     {
@@ -775,50 +776,37 @@ export function initBlackboardController() {
     },
     'Índice'
   );
-  const badge = h(
-    'span',
-    { class: 'seq-board-bar__badge' },
-    `Pizarrón 1 de ${LESSON_SECTIONS.length}`
-  );
-  const title = h(
-    'strong',
-    { class: 'seq-board-bar__title' },
-    LESSON_SECTIONS[0].title
-  );
+  const badge = h('span', {
+    class: 'seq-blackboard-toolbar__badge',
+    id: 'seq-board-badge',
+  });
+  const title = h('strong', { id: 'seq-board-title' });
   const toggle = h(
     'button',
-    { type: 'button', class: 'chip seq-board-bar__mode', 'data-board-mode': 'true' },
+    { type: 'button', class: 'chip', id: 'seq-mode-toggle' },
     'Pizarrón por lección (activo)'
   );
   const bar = h(
     'div',
-    { class: 'seq-board-bar', role: 'region', 'aria-label': 'Control de pizarrón' },
+    { class: 'seq-blackboard-toolbar', id: 'seq-board-toolbar' },
     sidebarToggle,
-    h('div', { class: 'seq-board-bar__meta' }, badge, title),
-    toggle
+    h('div', { class: 'seq-blackboard-toolbar__info' }, badge, title),
+    h('div', { class: 'seq-blackboard-toolbar__actions' }, toggle)
   );
   content.prepend(bar);
+  initLessonDock();
 
-  const sidebarClose = h(
-    'button',
-    {
-      type: 'button',
-      class: 'exp-sidebar-close pr-sidebar-close',
-      'data-sidebar-close': 'true',
-      'aria-label': 'Cerrar índice',
-    },
-    '×'
-  );
   if (sidebar) {
     sidebar.id = 'quad-sidebar-index';
-    sidebar.prepend(sidebarClose);
   }
 
   const sidebarKey = 'cuadraticas:sidebar:v1';
   const setSidebar = (collapsed, persist = true) => {
     page?.classList.toggle('is-sidebar-collapsed', collapsed);
     sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-    sidebarToggle.textContent = collapsed ? 'Índice' : 'Ocultar índice';
+    sidebarToggle.textContent = collapsed
+      ? `${menuGlyph} Índice`
+      : '◀ Ocultar índice';
     if (persist) {
       try {
         localStorage.setItem(sidebarKey, collapsed ? 'collapsed' : 'open');
@@ -843,7 +831,6 @@ export function initBlackboardController() {
   sidebarToggle.addEventListener('click', () =>
     setSidebar(!page?.classList.contains('is-sidebar-collapsed'))
   );
-  sidebarClose.addEventListener('click', () => setSidebar(true));
 
   let focused = true;
   let current = LESSON_SECTIONS[0].id;
