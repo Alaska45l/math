@@ -12,6 +12,8 @@ import {
   createCheckBlock,
   bindTutorButtons,
   mountProgress,
+  mountCompetencyDashboard,
+  getCompetencyReport,
   PROGRESS_KEY,
   getProgress,
   saveProgress,
@@ -113,6 +115,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec1-q1',
       competencyId: 'quadratics.area_model_and_notable_products',
+      prerequisiteIds: [],
+      family: 'modelo_area_binomios',
+      representation: 'manipulative',
+      difficulty: 1,
+      stage: 'exploration',
+      transferDistance: 'near',
+      diagnosticIds: ['distributed_square_over_sum'],
       kind: 'expression',
       requireForm: 'polynomial',
       prompt:
@@ -131,6 +140,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec1-q2',
       competencyId: 'quadratics.area_model_and_notable_products',
+      prerequisiteIds: [],
+      family: 'cuadrado_binomio',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['distributed_square_over_sum'],
       kind: 'expression',
       requireForm: 'polynomial',
       prompt:
@@ -154,6 +170,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec1-q3',
       competencyId: 'quadratics.area_model_and_notable_products',
+      prerequisiteIds: [],
+      family: 'falsa_cuadratica',
+      representation: 'verbal',
+      difficulty: 3,
+      stage: 'retrieval',
+      transferDistance: 'near',
+      diagnosticIds: ['distributed_square_over_sum'],
       kind: 'choice',
       prompt:
         'Analizá la expresión f(n) = 2(n − 1)² − 2n². Al abrir el paréntesis y simplificar, ¿es realmente una función cuadrática?',
@@ -187,6 +210,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec2-q1',
       competencyId: 'quadratics.sum_product_factoring',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'trinomio_suma_producto',
+      representation: 'symbolic',
+      difficulty: 1,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['confused_sum_product_signs_vieta'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -205,6 +235,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec2-q2',
       competencyId: 'quadratics.sum_product_factoring',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'trinomio_suma_producto',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['confused_sum_product_signs_vieta'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -223,6 +260,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec2-q3',
       competencyId: 'quadratics.sum_product_factoring',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'factor_comun_y_trinomio',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['forgot_leading_a_in_factored_form'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -244,6 +288,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec3-q1',
       competencyId: 'quadratics.grouping_and_factoring_strategy',
+      prerequisiteIds: ['quadratics.sum_product_factoring'],
+      family: 'diferencia_cuadrados',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['forgot_leading_a_in_factored_form'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -262,6 +313,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec3-q2',
       competencyId: 'quadratics.grouping_and_factoring_strategy',
+      prerequisiteIds: ['quadratics.sum_product_factoring'],
+      family: 'agrupacion_no_monico',
+      representation: 'symbolic',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['forgot_leading_a_in_factored_form'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -280,6 +338,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec3-q3',
       competencyId: 'quadratics.grouping_and_factoring_strategy',
+      prerequisiteIds: ['quadratics.sum_product_factoring'],
+      family: 'trinomio_cuadrado_perfecto',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['distributed_square_over_sum'],
       kind: 'expression',
       requireForm: 'factored',
       prompt:
@@ -301,6 +366,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec4-q1',
       competencyId: 'quadratics.canonical_form_and_vertex',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'vertice_forma_canonica',
+      representation: 'symbolic',
+      difficulty: 1,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign'],
       kind: 'pair',
       prompt:
         'Dada la función cuadrática en forma canónica f(x) = 3(x + 2)² + 1, indicá las coordenadas exactas de su vértice como par ordenado (xᵥ; yᵥ):',
@@ -318,6 +390,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec4-q2',
       competencyId: 'quadratics.canonical_form_and_vertex',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'ordenada_forma_canonica',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['confused_c_with_canonical_k'],
       kind: 'number',
       prompt:
         'Para la función f(x) = −5(x + 1)² − 6, calculá el valor numérico de su ordenada al origen f(0):',
@@ -342,6 +421,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec4-q3',
       competencyId: 'quadratics.canonical_form_and_vertex',
+      prerequisiteIds: ['quadratics.area_model_and_notable_products'],
+      family: 'despeje_raices_canonica',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['omitted_plus_minus_in_square_root'],
       kind: 'set',
       prompt:
         'Despejá directamente desde la forma canónica (x − 3)² − 4 = 0 y escribí el conjunto de sus raíces entre llaves:',
@@ -362,6 +448,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec5-q1',
       competencyId: 'quadratics.factored_form_and_symmetry',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.sum_product_factoring'],
+      family: 'producto_cero_incompleta',
+      representation: 'symbolic',
+      difficulty: 1,
+      stage: 'exploration',
+      transferDistance: 'near',
+      diagnosticIds: ['divided_by_x_lost_zero_root'],
       kind: 'set',
       prompt:
         'Resolvé la ecuación cuadrática incompleta x² − 4x = 0 extrayendo factor común (sin tachar la x) e indicá su conjunto solución entre llaves:',
@@ -379,6 +472,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec5-q2',
       competencyId: 'quadratics.factored_form_and_symmetry',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.sum_product_factoring'],
+      family: 'simetria_raices_vertice',
+      representation: 'graphical',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign'],
       kind: 'pair',
       prompt:
         'Dada la parábola en forma factorizada f(x) = −2(x + 1)(x − 3), usá la simetría entre sus raíces para hallar las coordenadas del vértice V(xᵥ; yᵥ):',
@@ -396,6 +496,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec5-q3',
       competencyId: 'quadratics.factored_form_and_symmetry',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.sum_product_factoring'],
+      family: 'reconstruccion_factorizada',
+      representation: 'symbolic',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['forgot_leading_a_in_factored_form'],
       kind: 'expression',
       requireForm: null,
       prompt:
@@ -417,6 +524,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec6-q1',
       competencyId: 'quadratics.completing_the_square',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.area_model_and_notable_products'],
+      family: 'completar_cuadrado_monico',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['unbalanced_completing_square'],
       kind: 'expression',
       requireForm: 'canonical',
       prompt:
@@ -442,6 +556,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec6-q2',
       competencyId: 'quadratics.completing_the_square',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.area_model_and_notable_products'],
+      family: 'completar_cuadrado_no_monico',
+      representation: 'symbolic',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['unbalanced_completing_square'],
       kind: 'expression',
       requireForm: 'canonical',
       prompt:
@@ -467,6 +588,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec6-q3',
       competencyId: 'quadratics.completing_the_square',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.area_model_and_notable_products'],
+      family: 'deduccion_vertice_formula',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'retrieval',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign'],
       kind: 'pair',
       prompt:
         'En f(x) = −1/2 x² + 2x − 9/2, usá la relación deducida xᵥ = −b/(2a) y evaluá yᵥ = f(xᵥ) para dar las coordenadas del vértice (xᵥ; yᵥ):',
@@ -494,6 +622,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec7-q1',
       competencyId: 'quadratics.discriminant_and_vieta',
+      prerequisiteIds: ['quadratics.completing_the_square', 'quadratics.factored_form_and_symmetry'],
+      family: 'calculo_discriminante',
+      representation: 'symbolic',
+      difficulty: 1,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['neg_b_or_square_sign_in_resolvente'],
       kind: 'number',
       prompt:
         'Calculá el valor exacto del discriminante Δ = b² − 4ac para la ecuación x² − 6x + 2 = 0:',
@@ -511,6 +646,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec7-q2',
       competencyId: 'quadratics.discriminant_and_vieta',
+      prerequisiteIds: ['quadratics.completing_the_square', 'quadratics.factored_form_and_symmetry'],
+      family: 'discriminante_parametro',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['neg_b_or_square_sign_in_resolvente'],
       kind: 'number',
       prompt:
         '¿Qué valor positivo debe tomar el parámetro k para que la ecuación x² − kx + 9 = 0 tenga una única raíz real doble (parábola tangente al eje X)?',
@@ -528,6 +670,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec7-q3',
       competencyId: 'quadratics.discriminant_and_vieta',
+      prerequisiteIds: ['quadratics.completing_the_square', 'quadratics.factored_form_and_symmetry'],
+      family: 'cardano_vieta_suma',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'retrieval',
+      transferDistance: 'near',
+      diagnosticIds: ['confused_sum_product_signs_vieta'],
       kind: 'number',
       prompt:
         'Sin calcular las raíces por separado, usá Cardano-Vieta para hallar cuánto vale la suma de las raíces x₁ + x₂ en la ecuación 2x² − 14x + 19 = 0:',
@@ -548,6 +697,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec8-q1',
       competencyId: 'quadratics.full_analysis_exactas',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.discriminant_and_vieta'],
+      family: 'imagen_parabola',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['used_yv_for_monotonicity_or_open_image'],
       kind: 'set',
       prompt:
         'Dada la función f(x) = 16 − (x − 4)², escribí su conjunto Imagen Im(f) en notación de intervalo:',
@@ -572,6 +728,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec8-q2',
       competencyId: 'quadratics.full_analysis_exactas',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.discriminant_and_vieta'],
+      family: 'intervalo_crecimiento',
+      representation: 'graphical',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['used_yv_for_monotonicity_or_open_image'],
       kind: 'set',
       prompt:
         'Para f(x) = −(x + 3)² + 1, cuyo vértice es V(−3; 1), indicá su intervalo de crecimiento I↑ mirando el eje correspondiente:',
@@ -596,6 +759,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec8-q3',
       competencyId: 'quadratics.full_analysis_exactas',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.discriminant_and_vieta'],
+      family: 'conjunto_negatividad',
+      representation: 'graphical',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['used_yv_for_monotonicity_or_open_image'],
       kind: 'set',
       prompt:
         'La parábola f(x) = −2(x − 1)² rebota en el eje X en su raíz doble x = 1 y abre hacia abajo. ¿Cuál es su conjunto de negatividad C⁻?',
@@ -623,6 +793,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec9-q1',
       competencyId: 'quadratics.parabola_line_tangency',
+      prerequisiteIds: ['quadratics.discriminant_and_vieta'],
+      family: 'tangencia_recta_parabola',
+      representation: 'verbal',
+      difficulty: 2,
+      stage: 'exploration',
+      transferDistance: 'near',
+      diagnosticIds: ['neg_b_or_square_sign_in_resolvente', 'confused_c_with_canonical_k'],
       kind: 'choice',
       prompt:
         'Queremos saber cuántos puntos de intersección tienen la parábola f(x) = x² − 2x + 3 y la recta g(x) = 2x − 1. ¿Qué ocurre al igualarlas?',
@@ -653,6 +830,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec9-q2',
       competencyId: 'quadratics.parabola_line_tangency',
+      prerequisiteIds: ['quadratics.discriminant_and_vieta'],
+      family: 'tangencia_parametro_k',
+      representation: 'symbolic',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['neg_b_or_square_sign_in_resolvente'],
       kind: 'set',
       prompt:
         'Hallá el conjunto de los dos valores del parámetro k para los cuales la recta y = kx − 1 resulta tangente a la parábola y = x² + 2x + 3:',
@@ -670,6 +854,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec9-q3',
       competencyId: 'quadratics.parabola_line_tangency',
+      prerequisiteIds: ['quadratics.discriminant_and_vieta'],
+      family: 'punto_contacto_tangente',
+      representation: 'symbolic',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign'],
       kind: 'pair',
       prompt:
         'La parábola y = x² − 4x + 5 y la recta horizontal y = 1 son tangentes. ¿Cuáles son las coordenadas (x; y) de su único punto de contacto?',
@@ -690,6 +881,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec10-q1',
       competencyId: 'quadratics.extremum_optimization',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.full_analysis_exactas'],
+      family: 'optimizacion_corte_xv',
+      representation: 'verbal',
+      difficulty: 2,
+      stage: 'guided_practice',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign'],
       kind: 'number',
       prompt:
         'En el problema del cuadrado inscrito dentro de un cuadrado de 16 cm de lado, el área interior en función del corte x es S(x) = 2x² − 32x + 256. ¿Para qué medida de corte x (en cm) se alcanza el área mínima?',
@@ -707,6 +905,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec10-q2',
       competencyId: 'quadratics.extremum_optimization',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.full_analysis_exactas'],
+      family: 'optimizacion_area_minima_yv',
+      representation: 'verbal',
+      difficulty: 2,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['used_yv_for_monotonicity_or_open_image'],
       kind: 'number',
       prompt:
         'Continuando con S(x) = 2x² − 32x + 256 para el cuadrado inscrito en el cuadrado de 16 cm de lado, ¿cuál es el valor de esa área mínima (en cm²)?',
@@ -724,6 +929,13 @@ export const CHECKS_DATA = {
     {
       id: 'sec10-q3',
       competencyId: 'quadratics.extremum_optimization',
+      prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.full_analysis_exactas'],
+      family: 'optimizacion_tiro_vertical',
+      representation: 'verbal',
+      difficulty: 3,
+      stage: 'transfer',
+      transferDistance: 'near',
+      diagnosticIds: ['inverted_vertex_h_sign', 'used_yv_for_monotonicity_or_open_image'],
       kind: 'number',
       prompt:
         'Se lanza una pelota verticalmente hacia arriba y su altura (en metros) a los t segundos está dada por h(t) = −5t² + 20t. ¿Cuál es la altura máxima (en metros) que alcanza la pelota?',
@@ -1072,7 +1284,24 @@ if (typeof document !== 'undefined') {
     mountQuadraticRetos(retosHost);
   }
 
-  // 5. Botones de impresión en #sec-repaso
+  // 5. Panel de Competencias y Atlas de Errores en #sec-repaso
+  const dashboardHost = document.getElementById('quad-competency-dashboard');
+  if (dashboardHost) {
+    mountCompetencyDashboard(dashboardHost, {
+      onSelectSection: (sectionId) => {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${sectionId}"]`);
+        if (link) link.click();
+        else location.hash = `#${sectionId}`;
+      },
+      onPracticeCompetency: (competencyId) => {
+        const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+        if (link) link.click();
+        else location.hash = '#sec-retos';
+      },
+    });
+  }
+
+  // 6. Botones de impresión en #sec-repaso
   qsa('[data-print-sheet]').forEach((btn) => {
     btn.addEventListener('click', () => {
       if (typeof window !== 'undefined' && typeof window.print === 'function') {
@@ -1109,4 +1338,6 @@ export {
   getProgress,
   saveProgress,
   markSectionCompleted,
+  mountCompetencyDashboard,
+  getCompetencyReport,
 };

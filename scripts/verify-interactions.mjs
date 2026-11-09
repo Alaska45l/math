@@ -837,7 +837,7 @@ const expResults = await client.eval(`(async () => {
   return {
     sections: sections.length,
     widgets: widgets.length,
-    checks: document.querySelectorAll('.exp-check__item').length,
+    checks: document.querySelectorAll('.seq-section:not(#sec-retos) .exp-check__item').length,
     tutorButtons: document.querySelectorAll('.vn-trigger[data-tutor]').length,
     glossaryTerms: document.querySelectorAll('span.gloss-term[data-gloss]').length,
     interactiveWidgetSvgs,

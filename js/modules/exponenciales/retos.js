@@ -23,6 +23,7 @@ import { playScript } from "../../core/vn.js";
 import { diagnoseExp } from "./logic.js";
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from "./vn-scripts.js";
 import { saveProgress, recordCompetencyAttempt, getCompetencyReport } from "./components.js";
+import { recordExpAttempt } from "./learning-adapter.js";
 import { parseIntervalExactas, equivalentExp } from "./expr.js";
 import { getCompetencyById } from "./competencies-map.js";
 
@@ -401,7 +402,18 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
   };
 
   const generator = cases[type] || cases.razon_tabla_vs_salto;
-  return generator();
+  const challenge = generator();
+  const compDef = getCompetencyById(challenge.competencyId);
+  return {
+    ...challenge,
+    family: challenge.family || challenge.type || type,
+    prerequisiteIds: challenge.prerequisiteIds || (compDef?.prerequisiteIds ? [...compDef.prerequisiteIds] : []),
+    representation: challenge.representation || 'symbolic',
+    difficulty: challenge.difficulty || 2,
+    stage: challenge.stage || 'transfer',
+    transferDistance: challenge.transferDistance || 'near',
+    diagnosticIds: challenge.diagnosticIds || (compDef?.diagnosticIds ? [...compDef.diagnosticIds] : []),
+  };
 }
 
 export function makeChallenges(seed, requestedType = null, count = 8) {
@@ -835,10 +847,23 @@ function createTrainer(root) {
         saveProgress("challenge:last", { seed, type: current.type, mode, solved: true });
 
         if (current.competencyId) {
+          recordExpAttempt({
+            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
+            competencyId: current.competencyId,
+            correct: true,
+            mode,
+            hintsUsed: hintStep,
+            solutionRevealed: false,
+            diagnosticId: null,
+            representation: current.representation || 'symbolic',
+            stage: current.stage || 'transfer',
+            transferDistance: current.transferDistance || 'near',
+          });
           recordCompetencyAttempt({
             competencyId: current.competencyId,
             correct: true,
             mode,
+            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
           });
         }
 
@@ -887,11 +912,24 @@ function createTrainer(root) {
         failStreak++;
         const wasAssisted = hintStep > 0 || solutionRevealed;
         if (current.competencyId) {
+          recordExpAttempt({
+            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
+            competencyId: current.competencyId,
+            correct: false,
+            mode: wasAssisted ? "assisted" : "independent",
+            hintsUsed: hintStep,
+            solutionRevealed: false,
+            diagnosticId: diagnosis?.id || null,
+            representation: current.representation || 'symbolic',
+            stage: current.stage || 'transfer',
+            transferDistance: current.transferDistance || 'near',
+          });
           recordCompetencyAttempt({
             competencyId: current.competencyId,
             correct: false,
             mode: wasAssisted ? "assisted" : "independent",
             diagnosticId: diagnosis?.id || null,
+            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
           });
         }
         feedbackEl.textContent =
@@ -951,6 +989,27 @@ function createTrainer(root) {
 
       statusEl.textContent = "Resuelto (Con apoyo)";
       statusEl.className = "exp-challenge-card__status is-solution";
+
+      if (current.competencyId) {
+        recordExpAttempt({
+          exerciseId: `exp-reto-${current.type}-${problemIndex}`,
+          competencyId: current.competencyId,
+          correct: true,
+          mode: 'assisted',
+          hintsUsed: hintStep,
+          solutionRevealed: true,
+          diagnosticId: null,
+          representation: current.representation || 'symbolic',
+          stage: current.stage || 'transfer',
+          transferDistance: current.transferDistance || 'near',
+        });
+        recordCompetencyAttempt({
+          competencyId: current.competencyId,
+          correct: true,
+          mode: 'assisted',
+          exerciseId: `exp-reto-${current.type}-${problemIndex}`,
+        });
+      }
 
       problemsState[pKey] = {
         solved: false,
@@ -1020,7 +1079,7 @@ function createTrainer(root) {
     const card = h(
       "li",
       {
-        class: `exp-challenge-card exp-check__item seq-check__card${pState?.solved ? " is-solved" : ""}`,
+        class: `exp-challenge-card exp-challenge__item seq-check__card${pState?.solved ? " is-solved" : ""}`,
         "data-problem-index": String(problemIndex),
       },
       headerEl,

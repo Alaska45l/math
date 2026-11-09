@@ -17,6 +17,12 @@ import {
   fmtNumClean,
 } from './logic.js';
 import { SCRIPTS, DIAGNOSE_REACTIONS, STREAK_REACTIONS } from './vn-scripts.js';
+import {
+  QUAD_COMPETENCIES,
+  QUAD_DIAGNOSTIC_TAXONOMY,
+} from './competencies-map.js';
+import { STATUS_BADGES } from '../../core/learning/progress-store.js';
+import { recordQuadAttempt, getQuadCompetencyReport } from './learning-adapter.js';
 
 function triggerVnReaction(vn, pose, text, tag = 'Modo Alaska') {
   if (vn && typeof vn.react === 'function') {
@@ -35,6 +41,15 @@ function triggerVnScript(vn, script, title = '') {
 }
 
 export const PROGRESS_KEY = 'cuadraticas:progreso:v1';
+
+const dashboardRenderers = new Set();
+export function notifyCompetencyDashboardUpdate() {
+  dashboardRenderers.forEach((fn) => {
+    try {
+      fn();
+    } catch {}
+  });
+}
 
 let globalStreak = 0;
 
@@ -63,6 +78,7 @@ export function saveProgress(itemId, status = 'independent') {
   } catch {
     // La sesión continúa aunque se exceda la cuota de almacenamiento
   }
+  notifyCompetencyDashboardUpdate();
   return state;
 }
 
@@ -397,6 +413,20 @@ export function buildSingleQuestionCard(item, idx, { vn, onItemSolved, sectionId
     if (!solved) {
       solved = true;
       saveProgress(item.id, status);
+      try {
+        recordQuadAttempt({
+          exerciseId: item.id,
+          competencyId: item.competencyId,
+          correct: true,
+          mode: status,
+          hintsUsed: hintCursor,
+          solutionRevealed: false,
+          diagnosticId: null,
+          representation: item.representation || 'symbolic',
+          stage: item.stage || 'guided_practice',
+          transferDistance: item.transferDistance || 'near',
+        });
+      } catch {}
       if (typeof onItemSolved === 'function') onItemSolved(item.id, status);
     }
     if (isIndependent && STREAK_REACTIONS[globalStreak]) {
@@ -426,6 +456,20 @@ export function buildSingleQuestionCard(item, idx, { vn, onItemSolved, sectionId
     if (!solved) {
       solved = true;
       saveProgress(item.id, 'assisted');
+      try {
+        recordQuadAttempt({
+          exerciseId: item.id,
+          competencyId: item.competencyId,
+          correct: true,
+          mode: 'assisted',
+          hintsUsed: hintCursor,
+          solutionRevealed: true,
+          diagnosticId: null,
+          representation: item.representation || 'symbolic',
+          stage: item.stage || 'guided_practice',
+          transferDistance: item.transferDistance || 'near',
+        });
+      } catch {}
       if (typeof onItemSolved === 'function') onItemSolved(item.id, 'assisted');
     }
   };
@@ -446,6 +490,21 @@ export function buildSingleQuestionCard(item, idx, { vn, onItemSolved, sectionId
           diagnosticMap: item.diagnosticMap,
         });
 
+    try {
+      recordQuadAttempt({
+        exerciseId: item.id,
+        competencyId: item.competencyId,
+        correct: false,
+        mode: (hintCursor === 0 && !solutionRevealed) ? 'independent' : 'assisted',
+        hintsUsed: hintCursor,
+        solutionRevealed: false,
+        diagnosticId: diagId || diag?.id || null,
+        representation: item.representation || 'symbolic',
+        stage: item.stage || 'guided_practice',
+        transferDistance: item.transferDistance || 'near',
+      });
+    } catch {}
+
     if (diag) {
       const msg = diag.message || diag.text;
       feedbackEl.className = 'pr-check-feedback is-error';
@@ -456,6 +515,7 @@ export function buildSingleQuestionCard(item, idx, { vn, onItemSolved, sectionId
       feedbackEl.textContent =
         'Todavía no coincide. Desplegá una pista progresiva para revisar el paso algebraico intermedio.';
     }
+    notifyCompetencyDashboardUpdate();
   };
 
   if (item.kind === 'choice' && Array.isArray(item.options)) {
@@ -729,4 +789,253 @@ export function mountProgress(progressEl, solvedSections = new Set(), totalSecti
   const count = solvedSections.size ?? 0;
   const pct = Math.round((count / totalSections) * 100);
   progressEl.textContent = `${count}/${totalSections} pizarrones (${pct}%)`;
+}
+
+/**
+ * Returns aggregated learning report for Cuadráticas.
+ * @returns {object}
+ */
+export function getCompetencyReport() {
+  const storeReport = getQuadCompetencyReport();
+  const rawComps = storeReport?.competencies || [];
+
+  const list = QUAD_COMPETENCIES.map((comp) => {
+    const found = rawComps.find((c) => c.id === comp.id) || {
+      id: comp.id,
+      competencyId: comp.id,
+      status: 'unseen',
+      attempts: 0,
+      independentCount: 0,
+      assistedCount: 0,
+      errorCount: 0,
+      diagnostics: [],
+      badge: STATUS_BADGES.unseen,
+    };
+
+    return {
+      id: comp.id,
+      competency: comp,
+      title: comp.title,
+      sectionId: comp.sectionId,
+      order: comp.order,
+      independentCount: found.independentCount || 0,
+      assistedCount: found.assistedCount || 0,
+      errorCount: found.errorCount || 0,
+      attempts: found.attempts || 0,
+      diagnostics: Array.isArray(found.diagnostics) ? [...found.diagnostics] : (Array.isArray(found.recentDiagnosticIds) ? [...found.recentDiagnosticIds] : []),
+      status: found.status || 'unseen',
+      badge: found.badge || STATUS_BADGES[found.status] || STATUS_BADGES.unseen,
+    };
+  });
+
+  return {
+    summary: {
+      total: QUAD_COMPETENCIES.length,
+      durable: storeReport?.summary?.durable || 0,
+      consolidating: storeReport?.summary?.consolidating || 0,
+      developing: storeReport?.summary?.developing || 0,
+      review_due: storeReport?.summary?.review_due || 0,
+      needs_repair: storeReport?.summary?.needs_repair || 0,
+      introduced: storeReport?.summary?.introduced || 0,
+      unseen: storeReport?.summary?.unseen ?? QUAD_COMPETENCIES.length,
+      get mastered() {
+        return this.consolidating + this.durable;
+      },
+      get assisted() {
+        return this.developing;
+      },
+      get pending() {
+        return this.unseen + this.introduced + this.needs_repair + this.review_due;
+      },
+    },
+    competencies: Object.fromEntries(list.map((item) => [item.id, item])),
+    list,
+  };
+}
+
+/**
+ * Mounts the competency dashboard matching Exponenciales' design:
+ * summary cards for 7 states, error atlas linked to Alaska poses, competency practice buttons.
+ *
+ * @param {HTMLElement} host
+ * @param {object} [callbacks={}]
+ * @returns {{ destroy: () => void, update: () => void }}
+ */
+export function mountCompetencyDashboard(host, { onSelectSection, onPracticeCompetency } = {}) {
+  if (!host) return null;
+
+  const render = () => {
+    const report = getCompetencyReport();
+    clear(host);
+
+    // 1. Resumen de dominio (KPIs)
+    const summaryCard = h(
+      'div',
+      { class: 'quad-dashboard-summary exp-dashboard-summary' },
+      h(
+        'div',
+        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--mastered exp-dashboard-kpi--mastered' },
+        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.consolidating + report.summary.durable)),
+        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'Consolidada / Durable'),
+      ),
+      h(
+        'div',
+        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--assisted exp-dashboard-kpi--assisted' },
+        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.developing)),
+        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'En desarrollo'),
+      ),
+      h(
+        'div',
+        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--pending exp-dashboard-kpi--pending' },
+        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.unseen + report.summary.introduced + report.summary.needs_repair + report.summary.review_due)),
+        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'Pendiente / Refuerzo'),
+      ),
+    );
+
+    // 2. Grilla de las 10 competencias
+    const cards = report.list.map((item) => {
+      const comp = item.competency;
+      const badgeInfo = STATUS_BADGES[item.status] || STATUS_BADGES.unseen;
+
+      const toneToClass = {
+        success: 'badge--success',
+        warning: 'badge--warning',
+        info: 'badge--info',
+        attention: 'badge--attention',
+        danger: 'badge--danger',
+        muted: 'badge--neutral',
+      };
+      const badgeToneClass = toneToClass[badgeInfo.tone] || 'badge--neutral';
+
+      const statusBadge = h(
+        'span',
+        {
+          class: `quad-dashboard-badge exp-dashboard-badge badge ${badgeToneClass} is-${badgeInfo.classModifier || item.status}`,
+          'data-status': item.status,
+        },
+        badgeInfo.label,
+      );
+
+      const header = h(
+        'header',
+        { class: 'quad-dashboard-card__header exp-dashboard-card__header' },
+        h('h4', { class: 'quad-dashboard-card__title exp-dashboard-card__title' }, `${comp.order}. ${comp.title}`),
+        statusBadge,
+      );
+
+      // Atlas de errores linked to Alaska poses
+      const diagnosticEls = [];
+      if (item.diagnostics && item.diagnostics.length > 0) {
+        item.diagnostics.forEach((diagId) => {
+          const tax = QUAD_DIAGNOSTIC_TAXONOMY[diagId];
+          const label = tax ? tax.shortLabel : diagId;
+          const pose = tax?.pose || 'pensativa';
+          diagnosticEls.push(
+            h(
+              'div',
+              {
+                class: 'quad-dashboard-error-alert exp-dashboard-error-alert',
+                title: `Error cognitivo recurrente (Pose: ${pose})`,
+              },
+              chalkIcon('hint', 14),
+              h('span', {}, ` Error detectado: ${label}`),
+            ),
+          );
+        });
+      }
+
+      const btnGo = h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn btn--subtle btn--sm quad-dashboard-btn-nav exp-dashboard-btn-nav pr-btn',
+          on: {
+            click: () => {
+              if (typeof onSelectSection === 'function') {
+                onSelectSection(comp.sectionId);
+              } else {
+                const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+                if (link) link.click();
+                else location.hash = `#${comp.sectionId}`;
+              }
+            },
+          },
+        },
+        `Ir al Pizarrón ${comp.order}`,
+      );
+      btnGo.addEventListener('click', () => {
+        if (typeof onSelectSection === 'function') {
+          onSelectSection(comp.sectionId);
+        } else {
+          const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+          if (link) link.click();
+          else location.hash = `#${comp.sectionId}`;
+        }
+      });
+
+      const btnPractice = h(
+        'button',
+        {
+          type: 'button',
+          class: 'btn btn--sm quad-dashboard-btn-practice exp-dashboard-btn-practice pr-btn',
+          on: {
+            click: () => {
+              if (typeof onPracticeCompetency === 'function') {
+                onPracticeCompetency(comp.id);
+              } else {
+                const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+                if (link) link.click();
+                else location.hash = '#sec-retos';
+              }
+            },
+          },
+        },
+        chalkIcon('target', 14),
+        ' Practicar en Entrenador',
+      );
+      btnPractice.addEventListener('click', () => {
+        if (typeof onPracticeCompetency === 'function') {
+          onPracticeCompetency(comp.id);
+        } else {
+          const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+          if (link) link.click();
+          else location.hash = '#sec-retos';
+        }
+      });
+
+      const actions = h(
+        'div',
+        { class: 'quad-dashboard-card__actions exp-dashboard-card__actions' },
+        btnGo,
+        btnPractice,
+      );
+
+      return h(
+        'article',
+        { class: `quad-dashboard-card exp-dashboard-card quad-dashboard-card--${badgeInfo.classModifier || item.status} exp-dashboard-card--${badgeInfo.classModifier || item.status}` },
+        header,
+        diagnosticEls.length > 0 ? h('div', { class: 'quad-dashboard-errors exp-dashboard-errors' }, ...diagnosticEls) : null,
+        actions,
+      );
+    });
+
+    const grid = h('div', { class: 'quad-dashboard-grid exp-dashboard-grid' }, ...cards);
+
+    const titleHeader = h(
+      'header',
+      { class: 'quad-dashboard-header exp-dashboard-header' },
+      h('h3', {}, 'Mapa de Competencias y Atlas de Errores'),
+      h('p', { class: 'muted small' }, 'Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad.'),
+    );
+
+    host.replaceChildren(titleHeader, summaryCard, grid);
+  };
+
+  dashboardRenderers.add(render);
+  render();
+
+  return {
+    update: render,
+    destroy: () => dashboardRenderers.delete(render),
+  };
 }

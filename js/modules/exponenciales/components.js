@@ -21,6 +21,9 @@ import {
   EXP_COMPETENCIES,
   EXP_DIAGNOSTIC_TAXONOMY,
 } from "./competencies-map.js";
+import { evaluateCompetencyMastery } from "../../core/learning/mastery.js";
+import { STATUS_BADGES } from "../../core/learning/progress-store.js";
+import { recordExpAttempt } from "./learning-adapter.js";
 
 export { STREAK_REACTIONS, DIAGNOSE_REACTIONS, VN_SCRIPTS };
 
@@ -65,23 +68,41 @@ export function saveProgress(key, value = "independent") {
   return state;
 }
 
-export function recordCompetencyAttempt({ competencyId, correct, mode = "independent", diagnosticId = null }) {
+export function recordCompetencyAttempt({ competencyId, correct, mode = "independent", diagnosticId = null, exerciseId = null }) {
   if (!competencyId) return null;
   const state = getProgress();
   if (!state.competencies || typeof state.competencies !== "object") {
     state.competencies = {};
   }
   const entry = state.competencies[competencyId] || {
+    competencyId,
     independentCount: 0,
     assistedCount: 0,
     errorCount: 0,
     diagnostics: [],
-    status: "pending",
+    status: "unseen",
+    attempts: 0,
   };
   if (!Array.isArray(entry.diagnostics)) {
     entry.diagnostics = [];
   }
 
+  // Record normalized attempt in core progress store
+  try {
+    recordExpAttempt({
+      exerciseId: exerciseId || 'exp-check',
+      competencyId,
+      correct,
+      mode,
+      hintsUsed: mode === 'assisted' ? 1 : 0,
+      solutionRevealed: false,
+      diagnosticId,
+    });
+  } catch {
+    // Non-blocking in case of isolated unit testing
+  }
+
+  // Update legacy counters for backwards compatibility
   if (correct) {
     if (mode === "independent") {
       entry.independentCount = (entry.independentCount || 0) + 1;
@@ -97,18 +118,22 @@ export function recordCompetencyAttempt({ competencyId, correct, mode = "indepen
 
   entry.attempts = (entry.independentCount || 0) + (entry.assistedCount || 0) + (entry.errorCount || 0);
 
-  // Actualizar status:
-  // "mastered": si independentCount >= 1 y el último intento fue independiente
-  // "assisted": si fue resuelto con pistas o tuvo errores recientes
-  // "pending": sin aciertos aún
-  const totalCorrect = (entry.independentCount || 0) + (entry.assistedCount || 0);
-  if (totalCorrect === 0) {
-    entry.status = "pending";
-  } else if (correct && mode === "independent") {
-    entry.status = "mastered";
-  } else {
-    entry.status = "assisted";
-  }
+  // Evaluate conservative 7-state machine: 1 independent success MUST transition to "developing", NEVER to "mastered"
+  const transition = evaluateCompetencyMastery(entry, {
+    type: 'answer_submitted',
+    moduleId: 'exponenciales',
+    exerciseId: exerciseId || 'exp-check',
+    competencyIds: [competencyId],
+    occurredAt: new Date().toISOString(),
+    correct: Boolean(correct),
+    hintsUsed: mode === 'assisted' ? 1 : 0,
+    solutionRevealed: false,
+    assistance: correct ? (mode === 'independent' ? 'none' : 'hints') : 'none',
+    diagnosticId: !correct ? diagnosticId : null,
+  });
+
+  entry.status = transition.newStatus;
+  entry.lastAttemptAt = new Date().toISOString();
 
   state.competencies[competencyId] = entry;
 
@@ -128,7 +153,26 @@ export function getCompetencyReport() {
   const rawComps = (state && typeof state.competencies === "object" && state.competencies) || {};
 
   const report = {
-    summary: { mastered: 0, assisted: 0, pending: 0, total: EXP_COMPETENCIES.length },
+    summary: {
+      total: EXP_COMPETENCIES.length,
+      durable: 0,
+      consolidating: 0,
+      developing: 0,
+      review_due: 0,
+      needs_repair: 0,
+      introduced: 0,
+      unseen: 0,
+      // Backwards-compatibility getters:
+      get mastered() {
+        return this.consolidating + this.durable;
+      },
+      get assisted() {
+        return this.developing;
+      },
+      get pending() {
+        return this.unseen + this.introduced + this.needs_repair + this.review_due;
+      },
+    },
     competencies: {},
     list: [],
   };
@@ -139,8 +183,13 @@ export function getCompetencyReport() {
       assistedCount: 0,
       errorCount: 0,
       diagnostics: [],
-      status: "pending",
+      status: "unseen",
     };
+
+    let status = raw.status || "unseen";
+    if (status === "mastered") status = "consolidating";
+    else if (status === "assisted") status = "developing";
+    else if (status === "pending") status = "unseen";
 
     const item = {
       id: comp.id,
@@ -153,16 +202,19 @@ export function getCompetencyReport() {
       errorCount: raw.errorCount || 0,
       attempts: (raw.independentCount || 0) + (raw.assistedCount || 0) + (raw.errorCount || 0),
       diagnostics: Array.isArray(raw.diagnostics) ? [...raw.diagnostics] : [],
-      status: ["mastered", "assisted", "pending"].includes(raw.status) ? raw.status : "pending",
+      status,
+      badge: STATUS_BADGES[status] || STATUS_BADGES.unseen,
     };
 
     report.competencies[comp.id] = item;
     report[comp.id] = item;
     report.list.push(item);
 
-    if (item.status === "mastered") report.summary.mastered++;
-    else if (item.status === "assisted") report.summary.assisted++;
-    else report.summary.pending++;
+    if (report.summary[status] !== undefined) {
+      report.summary[status]++;
+    } else {
+      report.summary.unseen++;
+    }
   });
 
   return report;
@@ -182,41 +234,45 @@ export function mountCompetencyDashboard(host, { onSelectSection, onPracticeComp
       h(
         "div",
         { class: "exp-dashboard-kpi exp-dashboard-kpi--mastered" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.mastered)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "Consolidada (Independiente)"),
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.consolidating + report.summary.durable)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "Consolidada / Durable"),
       ),
       h(
         "div",
         { class: "exp-dashboard-kpi exp-dashboard-kpi--assisted" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.assisted)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "Con apoyo (Asistida)"),
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.developing)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "En desarrollo"),
       ),
       h(
         "div",
         { class: "exp-dashboard-kpi exp-dashboard-kpi--pending" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.pending)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "Pendiente"),
+        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.unseen + report.summary.introduced + report.summary.needs_repair + report.summary.review_due)),
+        h("span", { class: "exp-dashboard-kpi__label" }, "Pendiente / Refuerzo"),
       ),
     );
 
     // 2. Grilla de las 10 competencias
     const cards = report.list.map((item) => {
       const comp = item.competency;
-      const statusLabels = {
-        mastered: "Consolidada (Independiente)",
-        assisted: "Con apoyo (Asistida)",
-        pending: "Pendiente",
+      const badgeInfo = STATUS_BADGES[item.status] || STATUS_BADGES.unseen;
+
+      const toneToClass = {
+        success: "badge--success",
+        warning: "badge--warning",
+        info: "badge--info",
+        attention: "badge--attention",
+        danger: "badge--danger",
+        muted: "badge--neutral",
       };
-      const statusClasses = {
-        mastered: "badge badge--success is-independent",
-        assisted: "badge badge--warning is-assisted",
-        pending: "badge badge--neutral is-pending",
-      };
+      const badgeToneClass = toneToClass[badgeInfo.tone] || "badge--neutral";
 
       const statusBadge = h(
         "span",
-        { class: `exp-dashboard-badge ${statusClasses[item.status]}` },
-        statusLabels[item.status],
+        {
+          class: `exp-dashboard-badge badge ${badgeToneClass} is-${badgeInfo.classModifier || item.status}`,
+          "data-status": item.status,
+        },
+        badgeInfo.label,
       );
 
       const header = h(
@@ -293,7 +349,7 @@ export function mountCompetencyDashboard(host, { onSelectSection, onPracticeComp
 
       return h(
         "article",
-        { class: `exp-dashboard-card exp-dashboard-card--${item.status}` },
+        { class: `exp-dashboard-card exp-dashboard-card--${badgeInfo.classModifier || item.status}` },
         header,
         diagnosticEls.length > 0 ? h("div", { class: "exp-dashboard-errors" }, ...diagnosticEls) : null,
         actions,
@@ -878,6 +934,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           correct: true,
           mode: isIndependent ? "independent" : "assisted",
           diagnosticId: null,
+          exerciseId: question.id,
         });
 
         card.classList.add("is-solved");
@@ -926,6 +983,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           correct: false,
           mode: (hintStep === 0 && !solutionRevealed) ? "independent" : "assisted",
           diagnosticId: diagnostic?.id || null,
+          exerciseId: question.id,
         });
         feedback.textContent =
           diagnostic?.message || "Todavía no: mirá las pistas y justificá un paso por vez.";

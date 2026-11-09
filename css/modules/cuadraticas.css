@@ -975,3 +975,192 @@
 .quad-page [data-widget] *::after {
   border-radius: 0 !important;
 }
+
+/* =============================================================================
+   PANEL DE COMPETENCIAS Y ATLAS DE ERRORES (P0.3)
+   ============================================================================= */
+#quad-competency-dashboard {
+  margin: 28px 0 36px;
+}
+
+.quad-dashboard-header {
+  margin-bottom: 20px;
+}
+
+.quad-dashboard-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--chalk-primary, #ffffff);
+}
+
+.quad-dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.quad-dashboard-kpi {
+  background: rgba(18, 28, 22, 0.75);
+  border: 1px solid var(--board-border, rgba(236, 242, 232, 0.15));
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quad-dashboard-kpi--mastered {
+  border-left: 3px solid var(--green, #2a9d8f);
+}
+
+.quad-dashboard-kpi--assisted {
+  border-left: 3px solid var(--yellow, #e9c46a);
+}
+
+.quad-dashboard-kpi--pending {
+  border-left: 3px solid rgba(236, 242, 232, 0.25);
+}
+
+.quad-dashboard-kpi__num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: var(--chalk-primary, #ffffff);
+}
+
+.quad-dashboard-kpi__label {
+  font-size: 0.85rem;
+  color: var(--text-muted, #a7b8ae);
+}
+
+.quad-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.quad-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: rgba(18, 28, 22, 0.65);
+  border: 1px solid var(--board-border, rgba(236, 242, 232, 0.2));
+  transition: border-color 0.2s ease;
+}
+
+.quad-dashboard-card--durable,
+.quad-dashboard-card--consolidating,
+.quad-dashboard-card--mastered {
+  border-left: 3px solid var(--green, #2a9d8f);
+}
+
+.quad-dashboard-card--developing,
+.quad-dashboard-card--assisted {
+  border-left: 3px solid var(--yellow, #e9c46a);
+}
+
+.quad-dashboard-card--needs-repair {
+  border-left: 3px solid #e76f51;
+}
+
+.quad-dashboard-card--review-due {
+  border-left: 3px solid #f4a261;
+}
+
+.quad-dashboard-card--unseen,
+.quad-dashboard-card--introduced,
+.quad-dashboard-card--pending {
+  border-left: 3px solid rgba(236, 242, 232, 0.25);
+}
+
+.quad-dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.quad-dashboard-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text, #ecf2e8);
+}
+
+.quad-dashboard-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.quad-dashboard-badge.badge--success {
+  background: rgba(42, 157, 143, 0.2);
+  color: var(--green, #2a9d8f);
+  border: 1px solid var(--green, #2a9d8f);
+}
+
+.quad-dashboard-badge.badge--warning {
+  background: rgba(233, 196, 106, 0.2);
+  color: var(--yellow, #e9c46a);
+  border: 1px solid var(--yellow, #e9c46a);
+}
+
+.quad-dashboard-badge.badge--info {
+  background: rgba(74, 144, 226, 0.2);
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+}
+
+.quad-dashboard-badge.badge--attention {
+  background: rgba(244, 162, 97, 0.2);
+  color: #f4a261;
+  border: 1px solid #f4a261;
+}
+
+.quad-dashboard-badge.badge--danger {
+  background: rgba(231, 111, 81, 0.2);
+  color: #e76f51;
+  border: 1px solid #e76f51;
+}
+
+.quad-dashboard-badge.badge--neutral {
+  background: rgba(236, 242, 232, 0.1);
+  color: var(--text-muted, #a7b8ae);
+  border: 1px solid rgba(236, 242, 232, 0.2);
+}
+
+.quad-dashboard-errors {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quad-dashboard-error-alert {
+  font-size: 0.8rem;
+  color: #f4a261;
+  background: rgba(244, 162, 97, 0.1);
+  border-left: 2px solid #f4a261;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quad-dashboard-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.quad-dashboard-card__actions .btn {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+}
+

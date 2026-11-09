@@ -20,6 +20,8 @@ import {
   fmtNumClean,
 } from './logic.js';
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from './vn-scripts.js';
+import { recordQuadAttempt } from './learning-adapter.js';
+import { getCompetencyById } from './competencies-map.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -463,11 +465,19 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
 
 export function generateQuadChallenge(seed, forcedType = 'all', problemIndex = 0) {
   const ch = _generateQuadChallengeRaw(seed, forcedType, problemIndex);
+  const compDef = getCompetencyById(ch.competencyId);
   return {
     ...ch,
     seed,
     problemIndex,
     totalProblems: 8,
+    family: ch.family || ch.type,
+    prerequisiteIds: ch.prerequisiteIds || (compDef?.prerequisiteIds ? [...compDef.prerequisiteIds] : []),
+    representation: ch.representation || 'symbolic',
+    difficulty: ch.difficulty || 2,
+    stage: ch.stage || 'transfer',
+    transferDistance: ch.transferDistance || 'near',
+    diagnosticIds: ch.diagnosticIds || (compDef?.diagnosticIds ? [...compDef.diagnosticIds] : []),
   };
 }
 
@@ -1082,6 +1092,23 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       statusEl.textContent = 'Resuelto (Con apoyo)';
       statusEl.className = 'exp-challenge-card__status is-solution';
 
+      if (ch.competencyId) {
+        try {
+          recordQuadAttempt({
+            exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+            competencyId: ch.competencyId,
+            correct: true,
+            mode: 'assisted',
+            hintsUsed: hintIndex,
+            solutionRevealed: true,
+            diagnosticId: null,
+            representation: ch.representation || 'symbolic',
+            stage: ch.stage || 'transfer',
+            transferDistance: ch.transferDistance || 'near',
+          });
+        } catch {}
+      }
+
       feedbackBox.className = 'exp-check__feedback pr-check-feedback is-ok is-solution';
       feedbackBox.replaceChildren(
         chalkIcon('spark', 14),
@@ -1144,6 +1171,23 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
         hintBtn.disabled = true;
         solutionBtn.disabled = true;
 
+        if (ch.competencyId) {
+          try {
+            recordQuadAttempt({
+              exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+              competencyId: ch.competencyId,
+              correct: true,
+              mode: isIndependent ? 'independent' : 'assisted',
+              hintsUsed: hintIndex,
+              solutionRevealed: false,
+              diagnosticId: null,
+              representation: ch.representation || 'symbolic',
+              stage: ch.stage || 'transfer',
+              transferDistance: ch.transferDistance || 'near',
+            });
+          } catch {}
+        }
+
         card.classList.add('is-solved');
         statusEl.textContent = isIndependent ? 'Resuelto (Independiente)' : 'Resuelto (Con apoyo)';
         statusEl.className = `exp-challenge-card__status ${isIndependent ? 'is-solved-indep' : 'is-solved-assisted'}`;
@@ -1199,6 +1243,22 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       }
 
       if (res.equivalentWrongForm) {
+        if (ch.competencyId) {
+          try {
+            recordQuadAttempt({
+              exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+              competencyId: ch.competencyId,
+              correct: false,
+              mode: hintIndex > 0 ? 'assisted' : 'independent',
+              hintsUsed: hintIndex,
+              solutionRevealed: false,
+              diagnosticId: 'forgot_leading_a_in_factored_form',
+              representation: ch.representation || 'symbolic',
+              stage: ch.stage || 'transfer',
+              transferDistance: ch.transferDistance || 'near',
+            });
+          } catch {}
+        }
         feedbackBox.className = 'exp-check__feedback pr-check-feedback is-warn';
         feedbackBox.textContent = DIAGNOSE_REACTIONS.equivalent_form.text;
         state.problemsState[pKey] = {
@@ -1220,6 +1280,22 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
 
       const diag = diagnoseQuad(inputEl.value, ch.diagContext);
       if (diag) {
+        if (ch.competencyId) {
+          try {
+            recordQuadAttempt({
+              exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+              competencyId: ch.competencyId,
+              correct: false,
+              mode: hintIndex > 0 ? 'assisted' : 'independent',
+              hintsUsed: hintIndex,
+              solutionRevealed: false,
+              diagnosticId: diag.id || null,
+              representation: ch.representation || 'symbolic',
+              stage: ch.stage || 'transfer',
+              transferDistance: ch.transferDistance || 'near',
+            });
+          } catch {}
+        }
         feedbackBox.className = 'exp-check__feedback pr-check-feedback is-error';
         feedbackBox.textContent = diag.message;
         state.problemsState[pKey] = {
@@ -1237,6 +1313,22 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
           vnReact({ pose: diag.pose, tag: diag.shortLabel || 'Diagnóstico', html: diag.message });
         }
       } else {
+        if (ch.competencyId) {
+          try {
+            recordQuadAttempt({
+              exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+              competencyId: ch.competencyId,
+              correct: false,
+              mode: hintIndex > 0 ? 'assisted' : 'independent',
+              hintsUsed: hintIndex,
+              solutionRevealed: false,
+              diagnosticId: null,
+              representation: ch.representation || 'symbolic',
+              stage: ch.stage || 'transfer',
+              transferDistance: ch.transferDistance || 'near',
+            });
+          } catch {}
+        }
         feedbackBox.className = 'exp-check__feedback pr-check-feedback is-error';
         feedbackBox.textContent =
           'El resultado todavía no coincide. Usá el botón «Pedir pista» para revisar el paso intermedio.';
@@ -1263,7 +1355,7 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
     const card = h(
       'li',
       {
-        class: `exp-challenge-card exp-check__item seq-check__card quad-reto-card${pState?.solved ? ' is-solved' : ''}`,
+        class: `exp-challenge-card exp-challenge__item seq-check__card quad-reto-card${pState?.solved ? ' is-solved' : ''}`,
         'data-problem-index': String(problemIndex),
       },
       headerEl,
