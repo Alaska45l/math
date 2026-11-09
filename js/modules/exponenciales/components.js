@@ -23,7 +23,7 @@ import {
 } from "./competencies-map.js";
 import { evaluateCompetencyMastery } from "../../core/learning/mastery.js";
 import { STATUS_BADGES } from "../../core/learning/progress-store.js";
-import { recordExpAttempt } from "./learning-adapter.js";
+import { recordExpAttempt, getExpCompetencyReport } from "./learning-adapter.js";
 
 export { STREAK_REACTIONS, DIAGNOSE_REACTIONS, VN_SCRIPTS };
 
@@ -68,74 +68,130 @@ export function saveProgress(key, value = "independent") {
   return state;
 }
 
-export function recordCompetencyAttempt({ competencyId, correct, mode = "independent", diagnosticId = null, exerciseId = null }) {
+export function recordCompetencyAttempt({
+  competencyId,
+  correct,
+  mode = "independent",
+  diagnosticId = null,
+  exerciseId = null,
+  hintsUsed = 0,
+  solutionRevealed = false,
+  stage = 'guided_practice',
+  representation = 'symbolic',
+  transferDistance = 'near',
+}) {
   if (!competencyId) return null;
   const state = getProgress();
   if (!state.competencies || typeof state.competencies !== "object") {
     state.competencies = {};
   }
-  const entry = state.competencies[competencyId] || {
-    competencyId,
-    independentCount: 0,
-    assistedCount: 0,
-    errorCount: 0,
-    diagnostics: [],
-    status: "unseen",
-    attempts: 0,
-  };
+  const rawEntry = state.competencies[competencyId];
+  const entry = rawEntry
+    ? { ...rawEntry }
+    : {
+        competencyId,
+        independentCount: 0,
+        assistedCount: 0,
+        errorCount: 0,
+        consecutiveErrors: 0,
+        diagnostics: [],
+        status: "unseen",
+        attempts: 0,
+        distinctExercises: [],
+        representationsCovered: [],
+        stagesCovered: [],
+      };
   if (!Array.isArray(entry.diagnostics)) {
     entry.diagnostics = [];
+  }
+  if (!Array.isArray(entry.distinctExercises)) {
+    entry.distinctExercises = [];
+  }
+
+  const isCorrect = Boolean(correct);
+  const solRevealed = Boolean(solutionRevealed);
+  const hintsCount =
+    typeof hintsUsed === "number" && Number.isInteger(hintsUsed) && hintsUsed >= 0
+      ? hintsUsed
+      : mode === "assisted" && !solRevealed
+        ? 1
+        : 0;
+
+  let assistance = "none";
+  if (solRevealed) {
+    assistance = "solution_revealed";
+  } else if (hintsCount > 0 || mode === "assisted") {
+    assistance = "hints";
   }
 
   // Record normalized attempt in core progress store
   try {
     recordExpAttempt({
-      exerciseId: exerciseId || 'exp-check',
+      exerciseId: exerciseId || "exp-check",
       competencyId,
-      correct,
+      correct: isCorrect,
       mode,
-      hintsUsed: mode === 'assisted' ? 1 : 0,
-      solutionRevealed: false,
-      diagnosticId,
+      hintsUsed: hintsCount,
+      solutionRevealed: solRevealed,
+      diagnosticId: !isCorrect ? diagnosticId : null,
+      representation,
+      stage,
+      transferDistance,
     });
   } catch {
     // Non-blocking in case of isolated unit testing
   }
 
-  // Update legacy counters for backwards compatibility
-  if (correct) {
-    if (mode === "independent") {
-      entry.independentCount = (entry.independentCount || 0) + 1;
-    } else {
-      entry.assistedCount = (entry.assistedCount || 0) + 1;
-    }
-  } else {
-    entry.errorCount = (entry.errorCount || 0) + 1;
-    if (diagnosticId && !entry.diagnostics.includes(diagnosticId)) {
-      entry.diagnostics.push(diagnosticId);
-    }
-  }
-
-  entry.attempts = (entry.independentCount || 0) + (entry.assistedCount || 0) + (entry.errorCount || 0);
-
   // Evaluate conservative 7-state machine: 1 independent success MUST transition to "developing", NEVER to "mastered"
+  // Do NOT pre-mutate entry counters or diagnostics before calling evaluateCompetencyMastery
   const transition = evaluateCompetencyMastery(entry, {
-    type: 'answer_submitted',
-    moduleId: 'exponenciales',
-    exerciseId: exerciseId || 'exp-check',
+    type: "answer_submitted",
+    moduleId: "exponenciales",
+    exerciseId: exerciseId || "exp-check",
     competencyIds: [competencyId],
     occurredAt: new Date().toISOString(),
-    correct: Boolean(correct),
-    hintsUsed: mode === 'assisted' ? 1 : 0,
-    solutionRevealed: false,
-    assistance: correct ? (mode === 'independent' ? 'none' : 'hints') : 'none',
-    diagnosticId: !correct ? diagnosticId : null,
+    correct: isCorrect,
+    hintsUsed: hintsCount,
+    solutionRevealed: solRevealed,
+    assistance,
+    diagnosticId: !isCorrect ? diagnosticId : null,
+    representation,
+    stage,
+    transferDistance,
   });
 
-  entry.status = transition.newStatus;
-  entry.lastAttemptAt = new Date().toISOString();
+  const updated = transition?.updatedEntry || {};
+  const updatedEntry = {
+    ...entry,
+    competencyId,
+    status: transition.newStatus || updated.status || entry.status,
+    attempts: updated.attempts ?? (entry.attempts || 0),
+    independentCount: updated.independentCount ?? (entry.independentCount || 0),
+    assistedCount: updated.assistedCount ?? (entry.assistedCount || 0),
+    errorCount: updated.errorCount ?? (entry.errorCount || 0),
+    consecutiveErrors: updated.consecutiveErrors ?? (entry.consecutiveErrors || 0),
+    diagnostics: Array.isArray(updated.diagnostics)
+      ? [...updated.diagnostics]
+      : [...entry.diagnostics],
+    recentDiagnosticIds: Array.isArray(updated.recentDiagnosticIds)
+      ? [...updated.recentDiagnosticIds]
+      : (Array.isArray(updated.diagnostics) ? [...updated.diagnostics] : []),
+    distinctExercises: Array.isArray(updated.distinctExercises)
+      ? [...updated.distinctExercises]
+      : [...entry.distinctExercises],
+    representationsCovered: Array.isArray(updated.representationsCovered)
+      ? [...updated.representationsCovered]
+      : [...(entry.representationsCovered || [])],
+    stagesCovered: Array.isArray(updated.stagesCovered)
+      ? [...updated.stagesCovered]
+      : [...(entry.stagesCovered || [])],
+    delayedRecallSuccessCount: updated.delayedRecallSuccessCount ?? (entry.delayedRecallSuccessCount || 0),
+    transferSuccessCount: updated.transferSuccessCount ?? (entry.transferSuccessCount || 0),
+    lastAttemptAt: updated.lastAttemptAt || new Date().toISOString(),
+    nextReviewAt: updated.nextReviewAt ?? entry.nextReviewAt ?? null,
+  };
 
-  state.competencies[competencyId] = entry;
+  state.competencies[competencyId] = updatedEntry;
 
   try {
     if (typeof localStorage !== "undefined" && localStorage.setItem) {
@@ -145,23 +201,29 @@ export function recordCompetencyAttempt({ competencyId, correct, mode = "indepen
 
   updateProgressUI();
   notifyCompetencyDashboardUpdate();
-  return entry;
+  return updatedEntry;
 }
 
 export function getCompetencyReport() {
+  let storeReport = null;
+  try {
+    storeReport = getExpCompetencyReport();
+  } catch {}
+  const storeComps = Array.isArray(storeReport?.competencies) ? storeReport.competencies : [];
+
   const state = getProgress();
   const rawComps = (state && typeof state.competencies === "object" && state.competencies) || {};
 
   const report = {
     summary: {
       total: EXP_COMPETENCIES.length,
-      durable: 0,
-      consolidating: 0,
-      developing: 0,
-      review_due: 0,
-      needs_repair: 0,
-      introduced: 0,
-      unseen: 0,
+      durable: storeReport?.summary?.durable || 0,
+      consolidating: storeReport?.summary?.consolidating || 0,
+      developing: storeReport?.summary?.developing || 0,
+      review_due: storeReport?.summary?.review_due || 0,
+      needs_repair: storeReport?.summary?.needs_repair || 0,
+      introduced: storeReport?.summary?.introduced || 0,
+      unseen: storeReport?.summary?.unseen ?? EXP_COMPETENCIES.length,
       // Backwards-compatibility getters:
       get mastered() {
         return this.consolidating + this.durable;
@@ -178,15 +240,14 @@ export function getCompetencyReport() {
   };
 
   EXP_COMPETENCIES.forEach((comp) => {
-    const raw = rawComps[comp.id] || {
-      independentCount: 0,
-      assistedCount: 0,
-      errorCount: 0,
-      diagnostics: [],
-      status: "unseen",
-    };
+    const storeEntry = storeComps.find((c) => c.id === comp.id);
+    const raw = rawComps[comp.id] || {};
 
-    let status = raw.status || "unseen";
+    const source = (storeEntry && storeEntry.attempts > 0)
+      ? storeEntry
+      : (raw.attempts > 0 ? raw : (storeEntry || raw));
+
+    let status = source.status || "unseen";
     if (status === "mastered") status = "consolidating";
     else if (status === "assisted") status = "developing";
     else if (status === "pending") status = "unseen";
@@ -197,25 +258,38 @@ export function getCompetencyReport() {
       title: comp.title,
       sectionId: comp.sectionId,
       order: comp.order,
-      independentCount: raw.independentCount || 0,
-      assistedCount: raw.assistedCount || 0,
-      errorCount: raw.errorCount || 0,
-      attempts: (raw.independentCount || 0) + (raw.assistedCount || 0) + (raw.errorCount || 0),
-      diagnostics: Array.isArray(raw.diagnostics) ? [...raw.diagnostics] : [],
+      independentCount: source.independentCount || 0,
+      assistedCount: source.assistedCount || 0,
+      errorCount: source.errorCount || 0,
+      attempts: source.attempts || ((source.independentCount || 0) + (source.assistedCount || 0) + (source.errorCount || 0)),
+      diagnostics: Array.isArray(source.diagnostics)
+        ? [...source.diagnostics]
+        : (Array.isArray(source.recentDiagnosticIds) ? [...source.recentDiagnosticIds] : []),
       status,
-      badge: STATUS_BADGES[status] || STATUS_BADGES.unseen,
+      badge: source.badge || STATUS_BADGES[status] || STATUS_BADGES.unseen,
     };
 
     report.competencies[comp.id] = item;
     report[comp.id] = item;
     report.list.push(item);
-
-    if (report.summary[status] !== undefined) {
-      report.summary[status]++;
-    } else {
-      report.summary.unseen++;
-    }
   });
+
+  if (!storeReport || !storeReport.summary) {
+    report.summary.durable = 0;
+    report.summary.consolidating = 0;
+    report.summary.developing = 0;
+    report.summary.review_due = 0;
+    report.summary.needs_repair = 0;
+    report.summary.introduced = 0;
+    report.summary.unseen = 0;
+    report.list.forEach((item) => {
+      if (report.summary[item.status] !== undefined) {
+        report.summary[item.status]++;
+      } else {
+        report.summary.unseen++;
+      }
+    });
+  }
 
   return report;
 }
@@ -873,6 +947,36 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
         h("ol", null, ...question.solution.map((step) => h("li", null, ...inlineMathNodes(step)))),
       );
       playScript([STREAK_REACTIONS.showSolution, STREAK_REACTIONS.solutionAfter]);
+
+      if (!solved) {
+        solved = true;
+        saveProgress(`${sectionId}:${index}`, "assisted");
+        card.classList.add("is-solved", "is-assisted");
+        card.classList.remove("is-independent");
+        feedback.textContent =
+          "Solución revelada. El razonamiento analítico quedó verificado.";
+        feedback.className = "exp-check__feedback seq-check__feedback is-correct is-assisted";
+        review.disabled = true;
+        answer.disable?.();
+        recordCompetencyAttempt({
+          competencyId: question.competencyId,
+          correct: true,
+          mode: "assisted",
+          hintsUsed: hintStep,
+          solutionRevealed: true,
+          diagnosticId: null,
+          exerciseId: question.id,
+          stage: question.stage || 'guided_practice',
+          representation: question.representation || 'symbolic',
+          transferDistance: question.transferDistance || 'near',
+        });
+
+        if (questions.every((_, position) => getProgress()[`${sectionId}:${position}`])) {
+          saveProgress(sectionId);
+          markSectionCompleted(sectionId);
+          onComplete?.(sectionId);
+        }
+      }
     });
 
     const card = h(
@@ -933,8 +1037,13 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           competencyId: question.competencyId,
           correct: true,
           mode: isIndependent ? "independent" : "assisted",
+          hintsUsed: hintStep,
+          solutionRevealed: solutionRevealed,
           diagnosticId: null,
           exerciseId: question.id,
+          stage: question.stage || 'guided_practice',
+          representation: question.representation || 'symbolic',
+          transferDistance: question.transferDistance || 'near',
         });
 
         card.classList.add("is-solved");
@@ -982,8 +1091,13 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           competencyId: question.competencyId,
           correct: false,
           mode: (hintStep === 0 && !solutionRevealed) ? "independent" : "assisted",
+          hintsUsed: hintStep,
+          solutionRevealed: solutionRevealed,
           diagnosticId: diagnostic?.id || null,
           exerciseId: question.id,
+          stage: question.stage || 'guided_practice',
+          representation: question.representation || 'symbolic',
+          transferDistance: question.transferDistance || 'near',
         });
         feedback.textContent =
           diagnostic?.message || "Todavía no: mirá las pistas y justificá un paso por vez.";

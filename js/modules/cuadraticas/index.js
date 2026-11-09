@@ -400,7 +400,7 @@ export const CHECKS_DATA = {
       kind: 'number',
       prompt:
         'Para la función f(x) = −5(x + 1)² − 6, calculá el valor numérico de su ordenada al origen f(0):',
-      expected: -11,
+      expected: '-11',
       placeholder: 'Ej: -11',
       diagContext: {
         target: 'y_intercept',

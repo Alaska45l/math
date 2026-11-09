@@ -963,15 +963,6 @@ export function mountCompetencyDashboard(host, { onSelectSection, onPracticeComp
         },
         `Ir al Pizarrón ${comp.order}`,
       );
-      btnGo.addEventListener('click', () => {
-        if (typeof onSelectSection === 'function') {
-          onSelectSection(comp.sectionId);
-        } else {
-          const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
-          if (link) link.click();
-          else location.hash = `#${comp.sectionId}`;
-        }
-      });
 
       const btnPractice = h(
         'button',
@@ -993,15 +984,6 @@ export function mountCompetencyDashboard(host, { onSelectSection, onPracticeComp
         chalkIcon('target', 14),
         ' Practicar en Entrenador',
       );
-      btnPractice.addEventListener('click', () => {
-        if (typeof onPracticeCompetency === 'function') {
-          onPracticeCompetency(comp.id);
-        } else {
-          const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
-          if (link) link.click();
-          else location.hash = '#sec-retos';
-        }
-      });
 
       const actions = h(
         'div',

@@ -22,7 +22,7 @@ import { fmt, frac } from "../../core/math-format.js";
 import { playScript } from "../../core/vn.js";
 import { diagnoseExp } from "./logic.js";
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from "./vn-scripts.js";
-import { saveProgress, recordCompetencyAttempt, getCompetencyReport } from "./components.js";
+import { saveProgress, getCompetencyReport } from "./components.js";
 import { recordExpAttempt } from "./learning-adapter.js";
 import { parseIntervalExactas, equivalentExp } from "./expr.js";
 import { getCompetencyById } from "./competencies-map.js";
@@ -859,12 +859,6 @@ function createTrainer(root) {
             stage: current.stage || 'transfer',
             transferDistance: current.transferDistance || 'near',
           });
-          recordCompetencyAttempt({
-            competencyId: current.competencyId,
-            correct: true,
-            mode,
-            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
-          });
         }
 
         inputEl.disabled = true;
@@ -923,13 +917,6 @@ function createTrainer(root) {
             representation: current.representation || 'symbolic',
             stage: current.stage || 'transfer',
             transferDistance: current.transferDistance || 'near',
-          });
-          recordCompetencyAttempt({
-            competencyId: current.competencyId,
-            correct: false,
-            mode: wasAssisted ? "assisted" : "independent",
-            diagnosticId: diagnosis?.id || null,
-            exerciseId: `exp-reto-${current.type}-${problemIndex}`,
           });
         }
         feedbackEl.textContent =
@@ -1002,12 +989,6 @@ function createTrainer(root) {
           representation: current.representation || 'symbolic',
           stage: current.stage || 'transfer',
           transferDistance: current.transferDistance || 'near',
-        });
-        recordCompetencyAttempt({
-          competencyId: current.competencyId,
-          correct: true,
-          mode: 'assisted',
-          exerciseId: `exp-reto-${current.type}-${problemIndex}`,
         });
       }
 
