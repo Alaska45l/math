@@ -138,6 +138,18 @@ const EQUATIONS = {
       ],
       solution: 'S = { 1 }',
     },
+    {
+      id: 'contrast_prod',
+      title: '2^(x+1) · 2ˣ = 32 (Contraste: Producto)',
+      steps: [
+        { lhs: '2^(x + 1) · 2ˣ', rhs: '32', rule: 'Ecuación original. Hay un PRODUCTO (·) de potencias de igual base 2.' },
+        { lhs: '2^(x + 1 + x)', rhs: '2⁵', rule: 'En un producto de igual base se SUMAN exponentes: (x+1) + x = 2x+1. 32 = 2⁵.' },
+        { lhs: '2^(2x + 1)', rhs: '2⁵', rule: 'Bases idénticas igualadas: 2^(2x+1) = 2⁵.' },
+        { lhs: '2x + 1', rhs: '5', rule: 'Por inyectividad de la base 2 en ℝ, igualamos exponentes: 2x + 1 = 5.' },
+        { lhs: 'x', rhs: '2', rule: '¡Solución única! S = { 2 }. (Contraste: en una suma 2^(x+1) + 2ˣ = 24 NO se suman exponentes, se saca factor común).' },
+      ],
+      solution: 'S = { 2 }',
+    },
   ],
   common_factor: [
     {
@@ -176,6 +188,18 @@ const EQUATIONS = {
         },
       ],
       solution: 'S = { 2 }',
+    },
+    {
+      id: 'contrast_sum',
+      title: '2^(x+1) + 2ˣ = 24 (Contraste: Suma)',
+      steps: [
+        { lhs: '2^(x + 1) + 2ˣ', rhs: '24', rule: 'Ecuación original. Hay una SUMA (+) entre potencias: NO se pueden sumar exponentes.' },
+        { lhs: '2ˣ · 2¹ + 2ˣ · 1', rhs: '24', rule: 'Descomponemos 2^(x+1) = 2ˣ · 2¹ y extraemos 2ˣ como factor común.' },
+        { lhs: '2ˣ · (2 + 1)', rhs: '24', rule: 'Sumamos los coeficientes: 2 + 1 = 3 ⟹ 2ˣ · 3 = 24.' },
+        { lhs: '2ˣ', rhs: '8 = 2³', rule: 'Dividimos ambos miembros por 3: 2ˣ = 8 = 2³.' },
+        { lhs: 'x', rhs: '3', rule: '¡Solución única! S = { 3 }. (Contraste: en un producto 2^(x+1) · 2ˣ = 32 se suman exponentes dando x = 2).' },
+      ],
+      solution: 'S = { 3 }',
     },
   ],
   quadratic_sub: [
@@ -243,6 +267,28 @@ const EQUATIONS = {
         },
       ],
       solution: 'S = { −1; 0 }',
+    },
+    {
+      id: 'case3_no_roots',
+      title: '2^(2x) + 3 · 2ˣ + 2 = 0 (Caso 3: Ninguna u > 0, S = ∅)',
+      steps: [
+        { lhs: '(2ˣ)² + 3 · (2ˣ) + 2', rhs: '0', rule: 'Estructura cuadrática con u = 2ˣ > 0 estricto en ℝ.' },
+        { lhs: 'u² + 3u + 2 = 0', rhs: 'con u = 2ˣ > 0', rule: 'Factorizamos: (u + 1)(u + 2) = 0 ⟹ u₁ = −1 y u₂ = −2.' },
+        { lhs: 'u₁ = −1 ≤ 0 | u₂ = −2 ≤ 0', rhs: '¡AMBAS DESCARTADAS!', rule: 'Como 2ˣ > 0 para todo x ∈ ℝ, ni 2ˣ = −1 ni 2ˣ = −2 tienen solución real.' },
+        { lhs: 'Solución en ℝ', rhs: 'S = ∅ (vacío)', rule: '¡Ninguna raíz auxiliar sobrevive! La ecuación carece de soluciones reales: S = ∅.' },
+      ],
+      solution: 'S = ∅',
+    },
+    {
+      id: 'case4_null_root',
+      title: '2^(2x) − 4 · 2ˣ = 0 (Caso 4: Raíz u = 0 descartada)',
+      steps: [
+        { lhs: '(2ˣ)² − 4 · (2ˣ)', rhs: '0', rule: 'Ecuación cuadrática sin término independiente: factorizamos u.' },
+        { lhs: 'u² − 4u = 0', rhs: 'con u = 2ˣ > 0', rule: 'u(u − 4) = 0 ⟹ u₁ = 4 y u₂ = 0.' },
+        { lhs: 'u₁ = 4 (válido) | u₂ = 0', rhs: '¡u₂ = 0 DESCARTADO!', rule: '¡Atención! 2ˣ jamás es igual a 0 en ℝ (la asíntota y = 0 no se toca): u = 0 se descarta.' },
+        { lhs: '2ˣ = 4 = 2²', rhs: 'x = 2', rule: 'Solo sobrevive u₁ = 4 ⟹ 2ˣ = 4 ⟹ x = 2.' },
+      ],
+      solution: 'S = { 2 }',
     },
   ],
 };
@@ -409,7 +455,7 @@ export function initWidget(container, options = {}) {
       cy: fulcrumY,
       r: 9,
       fill: 'var(--accent, var(--yellow))',
-      stroke: 'var(--bg, #26352d)',
+      stroke: 'var(--bg, #1c2024)',
       'stroke-width': 2.5,
     }),
   );

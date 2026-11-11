@@ -111,7 +111,7 @@ export function recordCompetencyAttempt({
   const isCorrect = Boolean(correct);
   const solRevealed = Boolean(solutionRevealed);
   const hintsCount =
-    typeof hintsUsed === "number" && Number.isInteger(hintsUsed) && hintsUsed >= 0
+    typeof hintsUsed === "number" && Number.isInteger(hintsUsed) && hintsUsed > 0
       ? hintsUsed
       : mode === "assisted" && !solRevealed
         ? 1

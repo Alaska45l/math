@@ -21,7 +21,7 @@ import { classifyTable } from '../logic.js';
 const PRESETS = {
   khan_linear: {
     label: '1. Lineal (Δx = 3)',
-    xs: [12, 15, 18, 21],
+    xs: [8, 10, 12, 21],
     ys: [-2, 5, 12, 19],
     model: 'Lineal: y = (7/3)x − 30',
     type: 'linear',
@@ -58,6 +58,24 @@ const PRESETS = {
     model: 'Lineal degenerada: y = 4',
     type: 'constant',
     note: 'Diferencia Δy = 0 fija. No es exponencial porque la base unitaria a = 1 está prohibida en ℝ.',
+  },
+  impostor_quad: {
+    label: '6. Impostora (1, 2, 4, 7)',
+    xs: [0, 1, 2, 3],
+    ys: [1, 2, 4, 7],
+    model: 'Cuadrática impostora: y = 0,5x² + 0,5x + 1',
+    type: 'quadratic',
+    fn: (x) => 0.5 * x * x + 0.5 * x + 1,
+    note: 'Los primeros 3 valores simulan duplicación (1, 2, 4), pero el 4° es 7 (Δy = 3, Δ²y = 1). ¡No es 2ˣ! Exige verificar la muestra completa.',
+  },
+  exp_step2: {
+    label: '7. Paso Δx = 2 (Base vs Razón)',
+    xs: [0, 2, 4, 6],
+    ys: [3, 12, 48, 192],
+    model: 'Exponencial: y = 3 · 2ˣ',
+    type: 'exponential',
+    fn: (x) => 3 * Math.pow(2, x),
+    note: 'El paso es Δx = 2 y el cociente entre filas consecutivas es 4 = a² ⟹ la base unitaria es a = √4 = 2. ¡No confundir factor de fila con base unitaria!',
   },
 };
 
@@ -498,7 +516,7 @@ export function initWidget(container, options = {}) {
         const k = preset.ys[0] / Math.pow(a, preset.xs[0]);
         cy = k * Math.pow(a, cx);
       } else if (preset.type === 'quadratic') {
-        cy = Math.pow(cx / 2 + 1, 2);
+        cy = typeof preset.fn === 'function' ? preset.fn(cx) : Math.pow(cx / 2 + 1, 2);
       } else {
         cy = preset.ys[0];
       }

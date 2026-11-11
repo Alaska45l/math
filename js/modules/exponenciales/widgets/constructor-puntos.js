@@ -49,6 +49,12 @@ const PRESETS = {
     p2: { x: 2, y: -0.75 },
     note: 'Ambos puntos en y < 0. Razón (−0,75)/(−3) = 1/4 con Δx = 2 ⟹ a = 1/2, k = −3. ¡Creciente!',
   },
+  parcial_neg: {
+    label: '(1; −1.5) y (3; −6)',
+    p1: { x: 1, y: -1.5 },
+    p2: { x: 3, y: -6 },
+    note: 'k < 0 con Δx = 2: razón (−6)/(−1,5) = 4 ⟹ a = √4 = 2 y k = −0,75. Comprobación: f(2) = −3.',
+  },
 };
 
 export function initWidget(container, options = {}) {
@@ -284,22 +290,32 @@ export function initWidget(container, options = {}) {
       setVisible(stepTextV, true);
 
       const exactFormula = fit.formula ? fit.formula.replace('f(x) = ', '') : `${fit.exactK || fmt(fit.k)} · ${fit.exactA || fmt(fit.a)}ˣ`;
+      const x3 = (p1.x + p2.x) / 2;
+      const y3 = fit.k * Math.pow(fit.a, x3);
 
       const rows = [
         [
-          '1. Cociente de Ordenadas',
-          `f(x₂) / f(x₁) = (${fmt(p2.y)}) / (${fmt(p1.y)}) = ${fmt(ratioY)}. Como k se cancela: a^(x₂ − x₁) = ${fmt(ratioY)}.`,
+          'Paso 1 · Plantear ambas ecuaciones',
+          `f(${fmt(p1.x)}) = k · a^(${fmt(p1.x)}) = ${fmt(p1.y)}   y   f(${fmt(p2.x)}) = k · a^(${fmt(p2.x)}) = ${fmt(p2.y)}`,
         ],
         [
-          '2. Despeje de la Base a',
-          `Paso horizontal Δx = x₂ − x₁ = ${fmt(deltaX)} ⟹ a = (${fmt(ratioY)})^(1/${fmt(deltaX)}) = ${fit.exactA || fmt(fit.a)}.`,
+          'Paso 2 · Dividir miembro a miembro para cancelar k',
+          `[k · a^(${fmt(p2.x)})] / [k · a^(${fmt(p1.x)})] = ${fmt(p2.y)} / ${fmt(p1.y)} ⟹ a^(${fmt(deltaX)}) = ${fmt(ratioY)}.`,
         ],
         [
-          '3. Coeficiente y Modelo Final',
-          `k = y₁ / a^(x₁) = ${fit.exactK || fmt(fit.k)} ⟹ f(x) = ${exactFormula}.`,
+          'Paso 3 · Despejar la base unitaria a en ℝ⁺',
+          `a = (${fmt(ratioY)})^(1/${fmt(deltaX)}) = ${fit.exactA || fmt(fit.a)} (se descartan soluciones no positivas).`,
+        ],
+        [
+          'Paso 4 · Sustituir para hallar k y modelo',
+          `k = ${fmt(p1.y)} / (${fit.exactA || fmt(fit.a)})^(${fmt(p1.x)}) = ${fit.exactK || fmt(fit.k)} ⟹ f(x) = ${exactFormula}.`,
+        ],
+        [
+          'Paso 5 · Comprobar en un 3.er punto',
+          `Para x₃ = ${fmt(x3)} (punto medio): f(${fmt(x3)}) = ${fit.exactK || fmt(fit.k)} · (${fit.exactA || fmt(fit.a)})^(${fmt(x3)}) = ${fmt(y3)}. ¡Pertenece a la curva!`,
         ],
       ];
-      renderReadout(board.readout, 'Reconstrucción Analítica Completa', rows);
+      renderReadout(board.readout, 'Reconstrucción Analítica en 5 Pasos', rows);
     } else {
       setVisible(curvePath, false);
       setVisible(stepLineH, false);

@@ -145,7 +145,11 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
             ? `Los factores que multiplicados dan ${model.c} y sumados dan ${model.b} son ${-r1} y ${-r2}, por lo que las raíces son x₁ = ${r1} y x₂ = ${r2}.`
             : `El producto maestro a·c vale ${prodAC} y la suma b vale ${model.b}. Los dos enteros que multiplicados dan ${prodAC} y sumados dan ${model.b} son m = ${m} y n = ${n}; descomponé el término central ${model.b}x en (${mStr}x ${nStr}x) y agrupá por parejas.`
         }`,
-        `Pista 3 (Remate): Armá el producto cambiando el signo de cada raíz dentro del paréntesis: ${model.forms.factored}.`,
+        `Pista 3 (Remate): ${
+          model.a === 1
+            ? `Escribí el producto de los dos binomios (x − x₁)·(x − x₂) invirtiendo el signo de cada raíz al ubicarla dentro de su paréntesis.`
+            : `Tras agrupar por parejas y extraer los factores comunes, asegurate de que el coeficiente principal a = ${model.a} quede multiplicando adelante de la forma factorizada.`
+        }`,
       ],
       explanation: `Las raíces de ${model.forms.polynomial} son x₁ = ${model.roots[0]} y x₂ = ${model.roots[1]}. Multiplicando por el coeficiente principal a = ${model.a}, la forma factorizada exacta es ${model.forms.factored}.`,
     };
@@ -181,7 +185,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       hints: [
         `Pista 1 (Orientación): En f(x) = ${model.forms.polynomial}, tenés a = ${model.a} y b = ${model.b}. La abscisa del vértice vive en xᵥ = −b / (2a).`,
         `Pista 2 (Paso intermedio): Al dividir b/a = ${fmtNumClean(model.b / model.a)} por 2 obtenés ${halfLinear}. Sumando y restando (${halfLinear})² = ${sqAdd} adentro del corchete formás el cuadrado (x ${xv > 0 ? '− ' + xv : '+ ' + Math.abs(xv)})².`,
-        `Pista 3 (Remate): El vértice está en V(${xv}; ${yv}). Con el coeficiente principal a = ${model.a}, la forma canónica queda ${model.forms.canonical}.`,
+        `Pista 3 (Remate): Con el vértice V(${xv}; ${yv}) y el coeficiente a = ${model.a}, armá el molde canónico a·(x − xᵥ)² + yᵥ invirtiendo el signo de xᵥ dentro del binomio al cuadrado y manteniendo el signo de yᵥ afuera.`,
       ],
       explanation: `Al completar el cuadrado en ${model.forms.polynomial}, el eje de simetría queda en xᵥ = ${xv} y la altura del vértice es f(${xv}) = ${yv}, resultando f(x) = ${model.forms.canonical}.`,
     };
@@ -220,7 +224,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         hints: [
           `Pista 1 (Orientación): Como te dan las coordenadas del vértice V(${xv}; ${yv}), arrancá planteando el molde canónico f(x) = a·(x ${xv > 0 ? '− ' + xv : '+ ' + Math.abs(xv)})² ${yv >= 0 ? '+ ' + yv : '− ' + Math.abs(yv)}.`,
           `Pista 2 (Paso intermedio): Reemplazá las coordenadas del punto P(${px}; ${py}) en x y en f(x): ${py} = a·(${px} − (${xv}))² + (${yv}), es decir, ${py} = a·${dx * dx} + (${yv}).`,
-          `Pista 3 (Remate): Despejando obtenés a = (${py} − (${yv})) / ${dx * dx} = ${a}. La ecuación queda ${model.forms.canonical}.`,
+          `Pista 3 (Remate): Despejá el coeficiente a resolviendo la cuenta (${py} ${yv >= 0 ? '− ' + yv : '+ ' + Math.abs(yv)}) / ${dx * dx} y colócalo adelante en el molde canónico con vértice V(${xv}; ${yv}) para escribir la función.`,
         ],
         explanation: `Usando el molde canónico con V(${xv}; ${yv}) y evaluando en P(${px}; ${py}) despejamos a = ${a}, obteniendo f(x) = ${model.forms.canonical} (o ${model.forms.polynomial}).`,
       };
@@ -244,7 +248,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       hints: [
         `Pista 1 (Orientación): Conociendo las dos raíces x₁ = ${r1} y x₂ = ${r2}, planteá el molde factorizado f(x) = a·(x + ${Math.abs(r1)})·(x − ${r2}). ¡No asumas que a vale 1!`,
         `Pista 2 (Paso intermedio): La ordenada al origen es el punto (0; ${model.c}). Reemplazá x = 0: ${model.c} = a·(0 + ${Math.abs(r1)})·(0 − ${r2}) = a·(${r1 * r2}).`,
-        `Pista 3 (Remate): Despejás a = ${model.c} / (${r1 * r2}) = ${a}. La función buscada es ${model.forms.factored}.`,
+        `Pista 3 (Remate): Despejá el coeficiente a dividiendo la ordenada al origen ${model.c} por el producto de raíces (${r1 * r2}) y colócalo multiplicando al frente del molde a·(x − x₁)·(x − x₂).`,
       ],
       explanation: `Planteando f(x) = a(x + ${Math.abs(r1)})(x − ${r2}) y evaluando en (0; ${model.c}) resulta a = ${a}, por lo que f(x) = ${model.forms.factored}.`,
     };
@@ -271,7 +275,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       hints: [
         `Pista 1 (Orientación): Una ecuación cuadrática tiene raíz real única (raíz doble) exactamente cuando su discriminante vale cero: Δ = b² − 4·a·c = 0.`,
         `Pista 2 (Paso intermedio): Acá tenés a = ${a}, b = ${b} y c = k. Armá la ecuación (${b})² − 4·(${a})·k = 0, que equivale a ${b * b} − ${4 * a}k = 0.`,
-        `Pista 3 (Remate): Despejando k de ${4 * a}k = ${b * b} obtenés k = ${b * b} / ${4 * a} = ${kVal}.`,
+        `Pista 3 (Remate): De la igualdad obtenida en el paso anterior, despejá el parámetro k dividiendo el término constante por el coeficiente que acompaña a k para hallar el valor numérico.`,
       ],
       explanation: `Imponiendo la condición de raíz doble Δ = (${b})² − 4·(${a})·k = ${b * b} − ${4 * a}k = 0, despejamos k = ${kVal} (con lo cual la raíz doble queda en x = ${r0}).`,
     };
@@ -294,7 +298,11 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         target: 'image',
         h1: `Pista 1 (Orientación): La Imagen se lee sobre el eje vertical Y a partir de la altura del vértice yᵥ = ${ana.vertex.yv}, mirando hacia dónde abren las ramas según el signo de a = ${ana.a}.`,
         h2: `Pista 2 (Paso intermedio): Como a = ${ana.a} ${ana.a > 0 ? '> 0, el vértice es un piso mínimo y las alturas van desde yᵥ hacia +∞' : '< 0, el vértice es un techo máximo y las alturas vienen desde −∞ hasta yᵥ'}.`,
-        h3: `Pista 3 (Remate): Recordá que la parábola sí toca su vértice, por lo que en ${ana.vertex.yv} lleva corchete cerrado: ${ana.image}.`,
+        h3: `Pista 3 (Remate): ${
+          ana.a > 0
+            ? `Armá el intervalo desde el piso mínimo ${ana.vertex.yv} (con corchete cerrado) hacia +inf (con paréntesis abierto), separando con punto y coma.`
+            : `Armá el intervalo desde -inf (con paréntesis abierto) hasta el techo máximo ${ana.vertex.yv} (con corchete cerrado), separando con punto y coma.`
+        }`,
       },
       CPlus: {
         q: `Hallá el conjunto de positividad C⁺ de f(x) = ${ana.forms.polynomial} (sabiendo que sus raíces son x₁ = ${r1} y x₂ = ${adjR2}):`,
@@ -302,7 +310,11 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         target: 'CPlus',
         h1: `Pista 1 (Orientación): El conjunto de positividad C⁺ son los tramos del eje X donde la parábola está estrictamente por encima del eje X (f(x) > 0).`,
         h2: `Pista 2 (Paso intermedio): Las raíces x₁ = ${r1} y x₂ = ${adjR2} parten al eje X en tres zonas. Como a = ${ana.a} ${ana.a > 0 ? '> 0 (ramas hacia arriba), la curva es positiva afuera de las raíces' : '< 0 (ramas hacia abajo), la curva es positiva entre las dos raíces'}.`,
-        h3: `Pista 3 (Remate): Con paréntesis abiertos porque en las raíces vale 0, resulta C⁺ = ${ana.CPlus}.`,
+        h3: `Pista 3 (Remate): ${
+          ana.a > 0
+            ? "Uní los dos intervalos exteriores con 'U': desde -inf hasta la raíz menor y desde la mayor hasta +inf, usando paréntesis abiertos en todos los extremos."
+            : `Escribí el intervalo abierto acotado entre ambas raíces (${r1} y ${adjR2}) separado por punto y coma, sin incluir los extremos.`
+        }`,
       },
       CMinus: {
         q: `Hallá el conjunto de negatividad C⁻ de f(x) = ${ana.forms.polynomial} (sabiendo que sus raíces son x₁ = ${r1} y x₂ = ${adjR2}):`,
@@ -310,7 +322,11 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         target: 'CMinus',
         h1: `Pista 1 (Orientación): El conjunto de negatividad C⁻ son los tramos del eje X donde el dibujo queda por debajo del eje X (f(x) < 0).`,
         h2: `Pista 2 (Paso intermedio): Mirá la concavidad: como a = ${ana.a} ${ana.a > 0 ? '> 0, la panza que se hunde bajo el eje X es el tramo central entre las dos raíces' : '< 0, las dos ramas que caen bajo el eje X están hacia los costados exteriores de las raíces'}.`,
-        h3: `Pista 3 (Remate): Expresado en notación de intervalos de Exactas con punto y coma, C⁻ = ${ana.CMinus}.`,
+        h3: `Pista 3 (Remate): ${
+          ana.a > 0
+            ? `Escribí el intervalo abierto acotado entre ambas raíces (${r1} y ${adjR2}) separado por punto y coma, ya que allí la curva se hunde bajo el eje X.`
+            : "Uní los dos tramos exteriores con 'U': desde -inf hasta la raíz menor y desde la mayor hasta +inf, con paréntesis abiertos."
+        }`,
       },
       increasing: {
         q: `Indicá el intervalo de crecimiento I↑ de la función f(x) = ${ana.forms.canonical}:`,
@@ -318,7 +334,11 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         target: 'increasing',
         h1: `Pista 1 (Orientación): Los intervalos de crecimiento y decrecimiento se leen SIEMPRE en el eje horizontal X quebrando en la abscisa del vértice xᵥ = ${ana.vertex.xv} (¡nunca uses la altura yᵥ = ${ana.vertex.yv}!).`,
         h2: `Pista 2 (Paso intermedio): Caminando de izquierda a derecha sobre la curva con a = ${ana.a}, ${ana.a > 0 ? `bajás hasta xᵥ = ${ana.vertex.xv} y subís a partir de xᵥ = ${ana.vertex.xv} hacia la derecha` : `subís desde −∞ hasta alcanzar la cumbre en xᵥ = ${ana.vertex.xv}`}.`,
-        h3: `Pista 3 (Remate): El intervalo de crecimiento es I↑ = ${ana.increasingInterval}.`,
+        h3: `Pista 3 (Remate): ${
+          ana.a > 0
+            ? `El crecimiento empieza en la abscisa del vértice xᵥ = ${ana.vertex.xv} y continúa hacia la derecha: armá el intervalo con corchete cerrado en ${ana.vertex.xv} y paréntesis abierto en +inf.`
+            : `La curva crece desde la izquierda hasta llegar a la cumbre en xᵥ = ${ana.vertex.xv}: armá el intervalo con paréntesis abierto en -inf y corchete cerrado en ${ana.vertex.xv}.`
+        }`,
       },
     };
 
@@ -367,7 +387,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         hints: [
           `Pista 1 (Orientación): ¡Prohibido pasar el término lineal al otro lado y dividir por x! Si tachás la x, perdés una solución. El camino limpio es extraer factor común x.`,
           `Pista 2 (Paso intermedio): Al sacar factor común te queda ${model.forms.factored} = 0. Por propiedad del producto cero, igualás cada factor a cero por separado.`,
-          `Pista 3 (Remate): Del primer factor sale x₁ = 0 y del paréntesis sale x₂ = ${rNonZero}. Escribí el conjunto entre llaves separado por punto y coma: ${ansSet}.`,
+          `Pista 3 (Remate): Igualá cada factor a cero: de la x extraída surge la primera raíz nula y del paréntesis despejás la segunda; luego agrupá ambas soluciones entre llaves { ... } separadas por punto y coma.`,
         ],
         explanation: `Extrayendo factor común en ${model.forms.polynomial} = 0 obtenemos ${model.forms.factored} = 0, cuyas dos raíces son x = 0 y x = ${rNonZero}: conjunto solución ${ansSet}.`,
       };
@@ -395,7 +415,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       hints: [
         `Pista 1 (Orientación): No hace falta expandir el cuadrado. Pasá el término constante ${yv} al otro miembro y dividí por a = ${a} para dejar solo al cuadrado: (x ${xv > 0 ? '− ' + xv : '+ ' + Math.abs(xv)})² = ${dist * dist}.`,
         `Pista 2 (Paso intermedio): Al aplicar raíz cuadrada en ambos lados, recordá que √(u²) = |u|: te queda x ${xv > 0 ? '− ' + xv : '+ ' + Math.abs(xv)} = ±${dist}.`,
-        `Pista 3 (Remate): Sumando ${xv} a ambos caminos (x = ${xv} − ${dist} y x = ${xv} + ${dist}) obtenés las dos raíces simétricas: ${ansSet}.`,
+        `Pista 3 (Remate): Resolvé los dos caminos del módulo x = ${xv} − ${dist} y x = ${xv} + ${dist}, y escribí ambas raíces dentro de llaves { ... } ordenadas y separadas por punto y coma.`,
       ],
       explanation: `Despejando (x − (${xv}))² = ${dist * dist} y aplicando módulo |x − (${xv})| = ${dist}, resultan x₁ = ${r1} y x₂ = ${r2}: conjunto solución ${ansSet}.`,
     };
@@ -434,7 +454,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
         }x + ${xTan * xTan} = 0, que es el trinomio cuadrado perfecto (x ${
           xTan > 0 ? '− ' + xTan : '+ ' + Math.abs(xTan)
         })² = 0, así que el contacto ocurre en x = ${xTan}.`,
-        `Pista 3 (Remate): Reemplazá x = ${xTan} en la ecuación de la recta g(${xTan}) = ${adjustedM}·(${xTan}) + (${dTan}) = ${yTan} y escribí el punto como (${xTan}; ${yTan}).`,
+        `Pista 3 (Remate): Calculá la coordenada y evaluando x = ${xTan} en la recta (${adjustedM}·(${xTan}) ${dTan >= 0 ? '+ ' + dTan : '− ' + Math.abs(dTan)}) y escribí el punto de tangencia como par ordenado (x; y).`,
       ],
       explanation: `Al igualar f(x) = g(x) obtenemos (x − (${xTan}))² = 0 (Δ_int = 0). Evaluando en x = ${xTan} obtenemos y = ${yTan}, por lo que el único punto de contacto es (${xTan}; ${yTan}).`,
     };
@@ -457,7 +477,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
     hints: [
       `Pista 1 (Orientación): La función de área A(x) = −x² + ${halfPerim}x es una parábola con a = −1 < 0 (abre hacia abajo), por lo que alcanza su área máxima en el vértice (xᵥ; yᵥ).`,
       `Pista 2 (Paso intermedio): Las raíces de A(x) = x·(${halfPerim} − x) son x₁ = 0 y x₂ = ${halfPerim}. Por simetría, la base óptima que maximiza el área está en el punto medio xᵥ = ${halfPerim} / 2 = ${xv} m.`,
-      `Pista 3 (Remate): ¡Ojo! La pregunta pide el área máxima yᵥ, no la base xᵥ. Evaluá A(${xv}) = ${xv}·(${halfPerim} − ${xv}) = ${maxArea} m².`,
+      `Pista 3 (Remate): ¡Atención! La pregunta pide el área máxima yᵥ, no la base xᵥ. Calculá el valor numérico del área evaluando A(${xv}) = ${xv}·(${halfPerim} − ${xv}).`,
     ],
     explanation: `El vértice de A(x) = −x² + ${halfPerim}x se alcanza cuando la base mide xᵥ = ${xv} m (un cuadrado perfecto de ${xv} × ${xv}), entregando un área máxima de yᵥ = ${maxArea} m².`,
   };

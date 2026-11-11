@@ -187,7 +187,7 @@ No reducir texto secundario hasta que parezca una nota legal. Limitar el ancho d
 
 ### 4.2. Color con significado estable
 
-Partir de los tokens de css/base.css, no de valores nuevos dispersos. La paleta documentada utiliza verde pizarrón, tinta cálida, tiza gastada y acentos semánticos.
+Partir de los tokens de css/base.css, no de valores nuevos dispersos. La paleta documentada utiliza pizarra oscura, tinta cálida, tiza gastada y acentos semánticos.
 
 Los valores CSS reales son la fuente de verdad. Si esta guía y la hoja de estilos difieren, inspeccionar la hoja actual, corregir la guía y no introducir un token duplicado.
 

@@ -168,7 +168,7 @@ export function chalkIcon(type, attrs = {}) {
     );
   } else if (type === 'dot-open') {
     icon.append(
-      s('circle', { cx: 8, cy: 8, r: 4.5, fill: 'var(--bg, #1b261e)', 'stroke-width': '2.2' })
+      s('circle', { cx: 8, cy: 8, r: 4.5, fill: 'var(--bg, #111417)', 'stroke-width': '2.2' })
     );
   } else if (type === 'dot-closed') {
     icon.append(

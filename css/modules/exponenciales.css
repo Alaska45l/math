@@ -6,7 +6,7 @@
 :root {
   --accent: var(--yellow);
   --border: var(--line, rgba(236, 242, 232, 0.28));
-  --panel: var(--surface, #24322b);
+  --panel: var(--surface, #1b1f23);
   --text: var(--ink, #ecf2e8);
   --text-muted: var(--muted, #a7b8ae);
   --orange: #f4a261;
@@ -1338,7 +1338,7 @@
 #exp-competency-dashboard {
   margin: 24px 0 36px;
   padding: 20px;
-  background: var(--panel, #24322b);
+  background: var(--panel, #1b1f23);
   border: 1px solid var(--border, rgba(236, 242, 232, 0.28));
 }
 

@@ -108,7 +108,7 @@ export function recordExpAttempt({
   const canonicalId = resolveCompetencyId(competencyId) || competencyId;
   const isCorrect = Boolean(correct);
   const solRevealed = Boolean(solutionRevealed);
-  const hintsCount = typeof hintsUsed === 'number' && Number.isInteger(hintsUsed) && hintsUsed >= 0
+  const hintsCount = typeof hintsUsed === 'number' && Number.isInteger(hintsUsed) && hintsUsed > 0
     ? hintsUsed
     : (mode === 'assisted' && !solRevealed ? 1 : 0);
 

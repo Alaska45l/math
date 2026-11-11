@@ -93,13 +93,13 @@
   color-scheme: dark;
 
   /* Superficie de pizarrón real */
-  --bg: #26352d;          /* pizarrón verde pizarra */
-  --card: #26352d;        /* igual que el pizarrón (usado en halos SVG) */
-  --surface: #26352d;     /* igual que el pizarrón */
+  --bg: #1c2024;          /* pizarra oscura */
+  --card: #1c2024;        /* igual que el pizarrón (usado en halos SVG) */
+  --surface: #1c2024;     /* igual que el pizarrón */
   --ink: #ece8dc;         /* blanco tiza: estructura y texto */
   --text: var(--ink);     /* alias de texto principal */
   --chalk: var(--ink);    /* alias de blanco tiza */
-  --muted: #a9b3a6;       /* tiza gastada */
+  --muted: #a8b0b8;       /* tiza gastada */
   --chalk-dim: var(--muted); /* alias de tiza gastada */
   --yellow: #e6d38a;     /* "mirá acá": respuesta, resultado, selección */
   --blue: #9bbfd9;       /* datos, entradas, lo que el usuario mueve */
@@ -108,7 +108,7 @@
   --green: #aed1a2;      /* correcto, neutro multiplicativo, cancelación */
 
   /* Roles semánticos de tiza en pizarrón (7 tokens puros):
-     --bg:     superficie de pizarra verde oscura
+     --bg:     superficie de pizarra oscura
      --ink:    blanco tiza: texto principal, fórmulas, ejes, curvas base, catetos Δx y Δy, C⁻ (trazos), I↓ (trazos)
      --muted:  tiza gastada: guías secundarias, cuadrículas, asíntotas mudas, etiquetas sutiles
      --yellow: "mirá acá": resultados, respuestas, secante/TCP, raíces C₀, lámpara encendida
@@ -172,7 +172,7 @@ body::before {
     url("grain-tile.webp"),
     url("chalkboard-eraser.webp"),
     url("chalkboard-ghosts.svg"),
-    radial-gradient(ellipse 120% 90% at 50% 25%, #2e3f36 0%, #26352d 65%, #1f2c25 100%);
+    radial-gradient(ellipse 120% 90% at 50% 25%, #262b30 0%, #1c2024 65%, #14171a 100%);
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
   background-size: 256px 256px, cover, cover, cover;
   background-position: 0 0, center center, center center, center center;

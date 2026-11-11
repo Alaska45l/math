@@ -7,7 +7,7 @@
 :root {
   --accent: var(--yellow);
   --border: var(--line, rgba(236, 242, 232, 0.28));
-  --panel: var(--surface, #24322b);
+  --panel: var(--surface, #1b1f23);
   --text: var(--ink, #ecf2e8);
   --text-muted: var(--muted, #a7b8ae);
   --orange: #f4a261;
@@ -284,7 +284,7 @@
   max-width: 100%;
   height: auto;
   border: 1px solid var(--line, var(--border));
-  background: color-mix(in srgb, var(--bg) 92%, #111915);
+  background: color-mix(in srgb, var(--bg) 92%, #0a0c0e);
   touch-action: none;
   user-select: none;
 }
@@ -1002,7 +1002,7 @@
 }
 
 .quad-dashboard-kpi {
-  background: rgba(18, 28, 22, 0.75);
+  background: rgba(11, 14, 16, 0.75);
   border: 1px solid var(--board-border, rgba(236, 242, 232, 0.15));
   padding: 14px 18px;
   display: flex;
@@ -1044,7 +1044,7 @@
   display: flex;
   flex-direction: column;
   padding: 14px;
-  background: rgba(18, 28, 22, 0.65);
+  background: rgba(11, 14, 16, 0.65);
   border: 1px solid var(--board-border, rgba(236, 242, 232, 0.2));
   transition: border-color 0.2s ease;
 }
