@@ -1536,7 +1536,7 @@ button.site-nav__sound-btn,
   font-family: inherit;
   font-size: 0.8125rem;
   line-height: 1;
-  color: var(--muted);
+  color: var(--bgcontrass);
   background: transparent;
   border: 4px solid transparent;
   border-image: var(--chalk-border-1);
