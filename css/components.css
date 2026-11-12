@@ -1008,7 +1008,7 @@ svg text[fill="var(--yellow)"] {
 .vn-hud {
   position: fixed;
   bottom: 1.5rem;
-  right: 2rem;
+  right: 0;
   z-index: 9999;
   max-width: 860px;
   width: calc(100vw - 4rem);
@@ -1077,7 +1077,8 @@ svg text[fill="var(--yellow)"] {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 2px solid var(--ink);
-  border-radius: 12px;
+  border-right: 0px;
+  border-radius: 12px 0 0 12px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 28px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: stretch;
@@ -1627,7 +1628,7 @@ button.site-nav__sound-btn:focus-visible,
 .scratchpad-container {
   position: fixed;
   bottom: 1.25rem;
-  left: 1.25rem;
+  left: 0rem;
   z-index: 9200;
   display: flex;
   align-items: flex-end;
@@ -1640,11 +1641,12 @@ button.site-nav__sound-btn:focus-visible,
   width: 44px;
   height: 44px;
   min-height: 44px;
-  border-radius: 50%;
+  border-radius: 0 12px 12px 0;
   background: rgba(11, 14, 16, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 2px solid var(--ink);
+  border-left: 0px;
   color: var(--yellow);
   display: inline-flex;
   align-items: center;
