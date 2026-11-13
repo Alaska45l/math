@@ -1609,6 +1609,27 @@ button.site-nav__sound-btn:focus-visible,
   cursor: none;
 }
 
+.scratchpad-btn[hidden] {
+  display: none;
+}
+
+/* Subrayados anclados al texto (CSS Custom Highlight API) */
+::highlight(sp-hl-white) {
+  background-color: rgba(236, 232, 220, 0.3);
+}
+
+::highlight(sp-hl-yellow) {
+  background-color: rgba(238, 212, 159, 0.42);
+}
+
+::highlight(sp-hl-teal) {
+  background-color: rgba(139, 213, 202, 0.38);
+}
+
+::highlight(sp-hl-pink) {
+  background-color: rgba(245, 189, 230, 0.4);
+}
+
 .scratchpad-eraser-cursor {
   position: fixed;
   top: 0;

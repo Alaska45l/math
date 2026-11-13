@@ -26,21 +26,29 @@ const STROKE_WIDTHS = [
 
 const ERASER_RADIUS = 20;
 
+// Subrayados anclados al texto (estilo lector electrónico)
+const MARKS_STORAGE_PREFIX = 'sp-marks:';
+const ANCHOR_CONTEXT = 32;
+const HIGHLIGHT_SUPPORTED =
+  typeof CSS !== 'undefined' && !!CSS.highlights && typeof Highlight !== 'undefined';
+
 export function initScratchpad(root = document.body) {
   if (instance) return instance;
   if (typeof window === 'undefined' || typeof document === 'undefined' || !root) return null;
 
   // Estado del lienzo
-  let activeTool = 'pencil'; // 'pencil' | 'eraser' | 'pointer'
+  let activeTool = 'pencil'; // 'pencil' | 'highlighter' | 'eraser'
   let currentColor = CHALK_COLORS[1].hex; // Amarillo por defecto
   let currentWidth = STROKE_WIDTHS[1].size; // Medio por defecto
   let isToolbarOpen = false;
   let isDrawing = false;
 
   // Vector de trazos anclados a coordenadas de documento (pageX, pageY)
-  // Cada trazo: { isEraser, color, width, points: [{x, y, v}] }
+  // Cada trazo: { isEraser, color, width, points: [{x, y}] }
   const strokes = [];
   const redoStack = [];
+  // Historial unificado (trazos de tiza y subrayados) para deshacer / rehacer
+  const history = [];
 
   // Elementos del DOM
   const canvas = h('canvas', {
@@ -68,10 +76,11 @@ export function initScratchpad(root = document.body) {
       s('path', { d: 'M9 13.5h5' })
     );
 
-  const iconPointer = () =>
+  const iconHighlighter = () =>
     s('svg', { viewBox: '0 0 16 16', width: '18', height: '18', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' },
-      s('path', { d: 'M3 3l4.5 10.5 2-4 4-2L3 3z' }),
-      s('path', { d: 'M9.5 9.5L13 13' })
+      s('path', { d: 'M9.5 2.5l4 4-5.5 5.5-4-4 5.5-5.5z' }),
+      s('path', { d: 'M4 8l4 4' }),
+      s('path', { d: 'M2.5 14h6' })
     );
 
   const iconUndo = () =>
@@ -118,6 +127,9 @@ export function initScratchpad(root = document.body) {
   root.appendChild(container);
 
   const ctx = canvas.getContext('2d');
+
+  // Trazo en curso (declarado antes de la primera llamada a redraw)
+  let activeStroke = null;
 
   // Ajuste de resolución Retina / HiDPI
   let dpr = window.devicePixelRatio || 1;
@@ -234,7 +246,6 @@ export function initScratchpad(root = document.body) {
   }
 
   // Variables de trazo en vivo con filtro de paso bajo
-  let activeStroke = null;
   let prevSmoothX = 0;
   let prevSmoothY = 0;
   let lastMidX = 0;
@@ -243,7 +254,9 @@ export function initScratchpad(root = document.body) {
   let liveStrokeWidth = currentWidth;
 
   function updateCanvasInteractivity() {
-    if (activeTool === 'pointer' || !isToolbarOpen) {
+    if (!isToolbarOpen || activeTool === 'highlighter') {
+      // Barra minimizada o remarcador: el lienzo no captura eventos y el texto
+      // de la página se puede seleccionar de forma nativa.
       canvas.classList.remove('is-active', 'is-eraser');
       eraserCursor.style.display = 'none';
     } else if (activeTool === 'eraser') {
@@ -257,9 +270,10 @@ export function initScratchpad(root = document.body) {
 
   // Manejadores de puntero para trazo libre inteligente
   canvas.addEventListener('pointerdown', (e) => {
-    if (activeTool === 'pointer') return;
+    if (!isToolbarOpen) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.preventDefault();
-    canvas.setPointerCapture?.(e.pointerId);
+    try { canvas.setPointerCapture?.(e.pointerId); } catch { /* puntero sintético o ya liberado */ }
 
     isDrawing = true;
     redoStack.length = 0; // Se descarta el rehacer al crear un nuevo trazo
@@ -314,7 +328,8 @@ export function initScratchpad(root = document.body) {
 
     if (!isDrawing || !activeStroke) return;
 
-    const events = typeof e.getCoalescedEvents === 'function' ? e.getCoalescedEvents() : [e];
+    const coalesced = typeof e.getCoalescedEvents === 'function' ? e.getCoalescedEvents() : [];
+    const events = coalesced.length > 0 ? coalesced : [e];
     const scrollX = window.scrollX || window.pageXOffset || 0;
     const scrollY = window.scrollY || window.pageYOffset || 0;
 
@@ -384,10 +399,16 @@ export function initScratchpad(root = document.body) {
     isDrawing = false;
     if (activeStroke && activeStroke.points.length > 0) {
       strokes.push(activeStroke);
-      if (strokes.length > 150) strokes.shift(); // Límite de seguridad
+      history.push({ kind: 'stroke', item: activeStroke });
+      if (strokes.length > 150) {
+        const dropped = strokes.shift(); // Límite de seguridad
+        const hi = history.findIndex((en) => en.item === dropped);
+        if (hi >= 0) history.splice(hi, 1);
+      }
     }
     activeStroke = null;
-    canvas.releasePointerCapture?.(e.pointerId);
+    updateToolbarUI(); // habilita Deshacer / Limpiar
+    try { canvas.releasePointerCapture?.(e.pointerId); } catch { /* sin captura activa */ }
   }
 
   canvas.addEventListener('pointerup', endDrawing);
@@ -406,28 +427,295 @@ export function initScratchpad(root = document.body) {
     }
   });
 
+  function applyEntry(entry, add) {
+    if (entry.kind === 'stroke') {
+      const idx = strokes.indexOf(entry.item);
+      if (add && idx < 0) strokes.push(entry.item);
+      if (!add && idx >= 0) strokes.splice(idx, 1);
+      redraw();
+    } else if (add) {
+      addMark(entry.item);
+    } else {
+      removeMark(entry.item);
+    }
+  }
+
   function undo() {
-    if (strokes.length === 0) return;
-    const removed = strokes.pop();
-    redoStack.push(removed);
-    redraw();
+    if (history.length === 0) return;
+    const entry = history.pop();
+    redoStack.push(entry);
+    applyEntry(entry, false);
+    updateToolbarUI();
     playClick();
   }
 
   function redo() {
     if (redoStack.length === 0) return;
-    const restored = redoStack.pop();
-    strokes.push(restored);
-    redraw();
+    const entry = redoStack.pop();
+    history.push(entry);
+    applyEntry(entry, true);
+    updateToolbarUI();
     playClick();
   }
 
   function clearAll() {
-    if (strokes.length === 0) return;
+    if (strokes.length === 0 && marks.length === 0) return;
     strokes.length = 0;
+    history.length = 0;
     redoStack.length = 0;
+    clearMarks();
     redraw();
+    updateToolbarUI();
     playClick();
+  }
+
+  // ==========================================================================
+  // SUBRAYADOS ANCLADOS AL TEXTO
+  // Se usa la CSS Custom Highlight API: no modifica el DOM (no rompe widgets) y
+  // los Range vivos siguen al texto ante scroll, resize o reflujo. Para
+  // persistir entre visitas, cada subrayado guarda una cita de texto con
+  // prefijo y sufijo, que se vuelve a ubicar al cargar la página.
+  // ==========================================================================
+  const marks = []; // { id, range, color, colorId, anchor }
+  const highlightsByColor = new Map();
+  let pendingAnchors = []; // anclas aún no resueltas (contenido dinámico)
+  const storageKey = MARKS_STORAGE_PREFIX + (location.pathname || '/');
+  let markSeq = 0;
+
+  function highlightFor(colorId) {
+    let hl = highlightsByColor.get(colorId);
+    if (!hl) {
+      hl = new Highlight();
+      highlightsByColor.set(colorId, hl);
+      CSS.highlights.set(`sp-hl-${colorId}`, hl);
+    }
+    return hl;
+  }
+
+  function isIgnoredNode(node) {
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    if (!el) return true;
+    if (el.closest('.scratchpad-container, .scratchpad-canvas, script, style, noscript, textarea')) return true;
+    return false;
+  }
+
+  // Índice lineal de todo el texto visible de la página
+  function buildTextIndex() {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (isIgnoredNode(n) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    const nodes = [];
+    let text = '';
+    let n;
+    while ((n = walker.nextNode())) {
+      nodes.push({ node: n, start: text.length });
+      text += n.nodeValue;
+    }
+    return { text, nodes };
+  }
+
+  function offsetOf(index, container, offset) {
+    // Convierte (nodo, offset) del DOM en un offset lineal del índice de texto
+    if (container.nodeType === 3) {
+      const entry = index.nodes.find((e) => e.node === container);
+      return entry ? entry.start + offset : -1;
+    }
+    const probe = document.createRange();
+    probe.setStart(container, offset);
+    probe.collapse(true);
+    for (const entry of index.nodes) {
+      const r = document.createRange();
+      r.selectNodeContents(entry.node);
+      if (r.compareBoundaryPoints(Range.START_TO_START, probe) >= 0) return entry.start;
+    }
+    return index.text.length;
+  }
+
+  function locate(index, pos) {
+    for (let i = index.nodes.length - 1; i >= 0; i--) {
+      const e = index.nodes[i];
+      if (pos >= e.start) return { node: e.node, offset: Math.min(pos - e.start, e.node.nodeValue.length) };
+    }
+    return null;
+  }
+
+  function makeAnchor(range) {
+    const index = buildTextIndex();
+    const start = offsetOf(index, range.startContainer, range.startOffset);
+    const end = offsetOf(index, range.endContainer, range.endOffset);
+    if (start < 0 || end <= start) return null;
+    return {
+      quote: index.text.slice(start, end),
+      prefix: index.text.slice(Math.max(0, start - ANCHOR_CONTEXT), start),
+      suffix: index.text.slice(end, end + ANCHOR_CONTEXT),
+      start,
+    };
+  }
+
+  function resolveAnchor(anchor, index) {
+    const { quote, prefix, suffix } = anchor;
+    if (!quote) return null;
+    let best = -1;
+    let bestScore = -1;
+    let from = 0;
+    for (;;) {
+      const at = index.text.indexOf(quote, from);
+      if (at < 0) break;
+      let score = 0;
+      const before = index.text.slice(Math.max(0, at - prefix.length), at);
+      const after = index.text.slice(at + quote.length, at + quote.length + suffix.length);
+      if (before === prefix) score += 2;
+      if (after === suffix) score += 2;
+      if (at === anchor.start) score += 1;
+      if (score > bestScore) { best = at; bestScore = score; }
+      from = at + 1;
+    }
+    // Sin contexto coincidente se acepta solo si la cita es única
+    if (best < 0 || (bestScore < 2 && index.text.indexOf(quote, best + 1) >= 0)) return null;
+    const a = locate(index, best);
+    const b = locate(index, best + quote.length);
+    if (!a || !b) return null;
+    const range = document.createRange();
+    range.setStart(a.node, a.offset);
+    range.setEnd(b.node, b.offset);
+    return range;
+  }
+
+  function saveMarks() {
+    try {
+      const data = [
+        ...marks.map((m) => ({ ...m.anchor, colorId: m.colorId })),
+        ...pendingAnchors,
+      ];
+      if (data.length === 0) localStorage.removeItem(storageKey);
+      else localStorage.setItem(storageKey, JSON.stringify(data));
+    } catch { /* almacenamiento no disponible */ }
+  }
+
+  function addMark(mark, persist = true) {
+    if (marks.includes(mark)) return;
+    marks.push(mark);
+    highlightFor(mark.colorId).add(mark.range);
+    if (persist) saveMarks();
+  }
+
+  function removeMark(mark) {
+    const idx = marks.indexOf(mark);
+    if (idx < 0) return;
+    marks.splice(idx, 1);
+    highlightsByColor.get(mark.colorId)?.delete(mark.range);
+    saveMarks();
+  }
+
+  function clearMarks() {
+    marks.length = 0;
+    pendingAnchors = [];
+    highlightsByColor.forEach((hl) => hl.clear());
+    saveMarks();
+  }
+
+  function restoreMarks() {
+    if (pendingAnchors.length === 0) return;
+    const index = buildTextIndex();
+    const still = [];
+    for (const anchor of pendingAnchors) {
+      const range = resolveAnchor(anchor, index);
+      const color = CHALK_COLORS.find((c) => c.id === anchor.colorId);
+      if (range && color) {
+        addMark({ id: ++markSeq, range, color: color.hex, colorId: color.id, anchor }, false);
+      } else {
+        still.push(anchor);
+      }
+    }
+    pendingAnchors = still;
+  }
+
+  function loadMarks() {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      const data = raw ? JSON.parse(raw) : [];
+      pendingAnchors = Array.isArray(data) ? data.filter((a) => a && typeof a.quote === 'string') : [];
+    } catch {
+      pendingAnchors = [];
+    }
+    restoreMarks();
+    // El contenido de los widgets puede renderizarse después: se reintenta
+    [400, 1500, 4000].forEach((ms) => setTimeout(restoreMarks, ms));
+    window.addEventListener('load', restoreMarks, { once: true });
+  }
+
+  let selectionTimer = null;
+  let pointerIsDown = false;
+
+  function commitSelectionAsMark() {
+    if (!isToolbarOpen || activeTool !== 'highlighter' || pointerIsDown) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+    const range = sel.getRangeAt(0).cloneRange();
+    if (isIgnoredNode(range.commonAncestorContainer)) return;
+    if (!document.body.contains(range.commonAncestorContainer)) return;
+    if (!range.toString().trim()) return;
+
+    const anchor = makeAnchor(range);
+    if (!anchor || !anchor.quote.trim()) return;
+    const color = CHALK_COLORS.find((c) => c.hex === currentColor) || CHALK_COLORS[1];
+    const mark = { id: ++markSeq, range, color: color.hex, colorId: color.id, anchor };
+
+    redoStack.length = 0;
+    addMark(mark);
+    history.push({ kind: 'mark', item: mark });
+    sel.removeAllRanges();
+    updateToolbarUI();
+    playClick();
+  }
+
+  function markAtPoint(x, y) {
+    for (let i = marks.length - 1; i >= 0; i--) {
+      const rects = marks[i].range.getClientRects();
+      for (const r of rects) {
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return marks[i];
+      }
+    }
+    return null;
+  }
+
+  if (HIGHLIGHT_SUPPORTED) {
+    loadMarks();
+
+    document.addEventListener('selectionchange', () => {
+      clearTimeout(selectionTimer);
+      if (!isToolbarOpen || activeTool !== 'highlighter') return;
+      selectionTimer = setTimeout(commitSelectionAsMark, 350);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (e.target instanceof Element && e.target.closest('.scratchpad-container')) return;
+      pointerIsDown = true;
+    }, true);
+    const onPointerRelease = () => {
+      if (!pointerIsDown) return;
+      pointerIsDown = false;
+      clearTimeout(selectionTimer);
+      selectionTimer = setTimeout(commitSelectionAsMark, 30);
+    };
+    document.addEventListener('pointerup', onPointerRelease, true);
+    document.addEventListener('pointercancel', onPointerRelease, true);
+
+    // Tocar un subrayado (sin seleccionar texto) lo quita
+    document.addEventListener('click', (e) => {
+      if (!isToolbarOpen || activeTool !== 'highlighter') return;
+      if (e.target instanceof Element && e.target.closest('.scratchpad-container')) return;
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      const hit = markAtPoint(e.clientX, e.clientY);
+      if (!hit) return;
+      removeMark(hit);
+      const hi = history.findIndex((en) => en.item === hit);
+      if (hi >= 0) history.splice(hi, 1);
+      updateToolbarUI();
+      playClick();
+    });
   }
 
   function setTool(tool) {
@@ -443,9 +731,6 @@ export function initScratchpad(root = document.body) {
     toggleBtn.setAttribute('aria-expanded', isToolbarOpen ? 'true' : 'false');
     toggleBtn.classList.toggle('is-open', isToolbarOpen);
 
-    if (isToolbarOpen && activeTool === 'pointer') {
-      activeTool = 'pencil';
-    }
     updateToolbarUI();
     updateCanvasInteractivity();
     playClick();
@@ -457,7 +742,7 @@ export function initScratchpad(root = document.body) {
   function updateToolbarUI() {
     toolbar.replaceChildren();
 
-    // 1. Selector de herramientas: Lápiz, Goma, Puntero (Interactuar)
+    // 1. Selector de herramientas: Lápiz, Remarcador, Goma
     const toolGroup = h('div', { class: 'scratchpad-group', role: 'group', 'aria-label': 'Herramientas' },
       h('button', {
         type: 'button',
@@ -468,18 +753,19 @@ export function initScratchpad(root = document.body) {
       }, iconPencil(), h('span', { class: 'scratchpad-btn__text' }, 'Lápiz')),
       h('button', {
         type: 'button',
+        hidden: !HIGHLIGHT_SUPPORTED,
+        class: ['scratchpad-btn', activeTool === 'highlighter' ? 'is-active' : ''],
+        title: 'Remarcador (seleccioná texto para subrayarlo; tocá un subrayado para quitarlo)',
+        'aria-label': 'Remarcador de texto',
+        on: { click: () => setTool('highlighter') },
+      }, iconHighlighter(), h('span', { class: 'scratchpad-btn__text' }, 'Remarcador')),
+      h('button', {
+        type: 'button',
         class: ['scratchpad-btn', activeTool === 'eraser' ? 'is-active' : ''],
         title: 'Goma de borrar (eliminar trazos de tiza)',
         'aria-label': 'Goma de borrar',
         on: { click: () => setTool('eraser') },
-      }, iconEraser(), h('span', { class: 'scratchpad-btn__text' }, 'Goma')),
-      h('button', {
-        type: 'button',
-        class: ['scratchpad-btn', activeTool === 'pointer' ? 'is-active' : ''],
-        title: 'Modo Puntero (interactuar con la página sin borrar los cálculos)',
-        'aria-label': 'Modo puntero para interactuar con la página',
-        on: { click: () => setTool('pointer') },
-      }, iconPointer(), h('span', { class: 'scratchpad-btn__text' }, 'Puntero'))
+      }, iconEraser(), h('span', { class: 'scratchpad-btn__text' }, 'Goma'))
     );
 
     // 2. Paleta de colores de tiza
@@ -494,7 +780,7 @@ export function initScratchpad(root = document.body) {
           on: {
             click: () => {
               currentColor = c.hex;
-              if (activeTool === 'eraser' || activeTool === 'pointer') {
+              if (activeTool === 'eraser') {
                 activeTool = 'pencil';
                 updateCanvasInteractivity();
               }
@@ -517,7 +803,7 @@ export function initScratchpad(root = document.body) {
           on: {
             click: () => {
               currentWidth = sItem.size;
-              if (activeTool === 'eraser' || activeTool === 'pointer') {
+              if (activeTool === 'eraser' || activeTool === 'highlighter') {
                 activeTool = 'pencil';
                 updateCanvasInteractivity();
               }
@@ -539,7 +825,7 @@ export function initScratchpad(root = document.body) {
         class: 'scratchpad-btn scratchpad-btn--icon',
         title: 'Deshacer último trazo (Ctrl+Z)',
         'aria-label': 'Deshacer',
-        disabled: strokes.length === 0,
+        disabled: strokes.length === 0 && marks.length === 0,
         on: { click: undo },
       }, iconUndo()),
       h('button', {
@@ -547,7 +833,7 @@ export function initScratchpad(root = document.body) {
         class: 'scratchpad-btn scratchpad-btn--icon',
         title: 'Limpiar toda la pizarra',
         'aria-label': 'Limpiar pizarra',
-        disabled: strokes.length === 0,
+        disabled: strokes.length === 0 && marks.length === 0,
         on: { click: clearAll },
       }, iconClear()),
       h('button', {
@@ -559,6 +845,7 @@ export function initScratchpad(root = document.body) {
       }, iconClose())
     );
 
+    sizeGroup.hidden = activeTool === 'highlighter';
     toolbar.append(toolGroup, colorGroup, sizeGroup, actionGroup);
   }
 
@@ -569,6 +856,7 @@ export function initScratchpad(root = document.body) {
     undo,
     redo,
     getStrokesCount: () => strokes.length,
+    getMarksCount: () => marks.length,
     getActiveTool: () => activeTool,
   };
 
