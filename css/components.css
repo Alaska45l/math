@@ -1024,10 +1024,10 @@ svg text[fill="var(--yellow)"] {
 .vn-fab {
   display: grid;
   position: fixed;
-  right: 2rem;
+  right: 0;
   bottom: 1.5rem;
   z-index: 10000;
-  width: 80px;
+  width: 100px;
   padding: 10px;
   overflow: hidden;
   place-items: center;
@@ -1035,7 +1035,8 @@ svg text[fill="var(--yellow)"] {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 2px solid var(--ink);
-  border-radius: 15%;
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   pointer-events: auto;
