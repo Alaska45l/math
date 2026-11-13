@@ -1020,43 +1020,112 @@ svg text[fill="var(--yellow)"] {
   pointer-events: none;
 }
 
-/* Acceso persistente al diálogo: un Chibi en lugar de un rótulo de texto. */
+/* Acceso persistente al diálogo: Alaska Chibi como mascota pixel-art de escritorio. */
 .vn-fab {
   display: grid;
   position: fixed;
-  right: 0;
-  bottom: 1.5rem;
+  right: 1rem;
+  bottom: 1rem;
   z-index: 10000;
-  width: 100px;
-  padding: 10px;
-  overflow: hidden;
+  padding: 0;
+  overflow: visible;
   place-items: center;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 2px solid var(--ink);
-  border-right: 0;
-  border-radius: 12px 0 0 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
   pointer-events: auto;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vn-fab__avatar {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 22%;
-  transform: scale(1.18);
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 0;
+  overflow: visible;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.48));
+  transition: filter 0.4s ease;
   pointer-events: none;
 }
 
-.vn-fab:hover {
-  transform: scale(1.08);
-  border-color: var(--ink);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+/* Cartel de tiza discreto bajo el sprite (aparece al hover/foco). */
+.vn-fab::after {
+  content: "Consultar a Alaska";
+  position: absolute;
+  right: 100%;
+  bottom: 12px;
+  margin-right: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  border: 1px dashed var(--ink);
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.vn-fab:hover::after,
+.vn-fab:focus-visible::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.vn-fab:hover,
+.vn-fab:focus-visible {
+  transform: translateY(-4px) scale(1.04);
+}
+
+.vn-fab:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Modo madrugada (00:00-05:59): resplandor de la pantalla de la laptop. */
+.vn-fab.is-late-night .vn-fab__avatar {
+  filter: brightness(0.84) contrast(1.1)
+    drop-shadow(0 -3px 10px rgba(120, 205, 255, 0.48))
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.62));
+}
+
+/* Sacudida breve al entrar en estado de estrés. */
+.vn-fab.vn-fab--shake {
+  animation: vn-fab-shake 0.45s steps(6, end) 1;
+}
+
+@keyframes vn-fab-shake {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -3px 0; }
+  40% { translate: 3px 0; }
+  60% { translate: -2px 0; }
+  80% { translate: 2px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vn-fab,
+  .vn-fab__avatar,
+  .vn-fab::after {
+    transition: none;
+  }
+
+  .vn-fab.vn-fab--shake {
+    animation: none;
+  }
+
+  .vn-fab:hover,
+  .vn-fab:focus-visible {
+    transform: none;
+  }
 }
 
 .vn-fab.is-hidden {
@@ -1467,8 +1536,11 @@ button.vn-ctrl-btn:hover,
   .vn-fab {
     right: 0.65rem;
     bottom: 0.65rem;
-    width: 58px;
-    height: 58px;
+  }
+
+  .vn-fab__avatar {
+    width: 76px;
+    height: 76px;
   }
 
   .vn-box {

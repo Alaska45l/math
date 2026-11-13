@@ -26,6 +26,28 @@ export const VN_POSES = {
   attack: "assets/vn/attack.webp",
 };
 
+/**
+ * Micro-loops pixel-art del Chibi que vive en el botón flotante `.vn-fab`.
+ * Generados por scripts/build-chibi-avatar.py.
+ */
+export const CHIBI_AVATAR_STATES = {
+  typing: "assets/vn/chibi/chibi-typing.webp",
+  thinking: "assets/vn/chibi/chibi-thinking.webp",
+  colapso: "assets/vn/chibi/chibi-colapso.webp",
+  sigh: "assets/vn/chibi/chibi-sigh.webp",
+};
+
+/** Fallback estático (prefers-reduced-motion). */
+export const CHIBI_AVATAR_STATIC = "assets/vn/chibi/alaskachibi.webp";
+
+const CHIBI_STRESS_POSES = new Set(["enojada", "colapso", "panico"]);
+const CHIBI_THINK_POSES = new Set(["pensativa", "sospecha", "evaluando"]);
+const CHIBI_STRESS_MS = 8000;
+const CHIBI_THINK_MS = 6000;
+const CHIBI_IDLE_ACTION_MS = 4500;
+const CHIBI_IDLE_MIN_MS = 18000;
+const CHIBI_IDLE_MAX_MS = 32000;
+
 export const POSE_ICONS = {
   pensativa: "spark",
   base: "glasses",
@@ -161,6 +183,13 @@ class VisualNovelController {
     this.isOpen = false;
     this.isMinimized = false;
 
+    this.chibiState = "typing";
+    this.chibiIdleTimer = null;
+    this.chibiRevertTimer = null;
+    this.chibiAvatarEl = null;
+    this.chibiReducedMotion = false;
+    this.chibiLifecycleReady = false;
+
     if (typeof document !== "undefined") {
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => this.initDOM());
@@ -187,11 +216,13 @@ class VisualNovelController {
       },
       h("img", {
         class: "vn-fab__avatar",
-        src: "assets/vn/chibi/alaskachibi.webp",
+        src: CHIBI_AVATAR_STATES.typing,
         alt: "",
         "aria-hidden": "true",
       }),
     );
+    this.chibiAvatarEl = this.fabEl.querySelector?.(".vn-fab__avatar") ?? null;
+    if (this.fabEl.dataset) this.fabEl.dataset.chibiState = "typing";
 
     // Sprite de personaje con Easter Egg de 5 clics
     this.spriteEl = h("img", {
@@ -315,6 +346,7 @@ class VisualNovelController {
     );
 
     document.body.append(this.hudEl, this.fabEl);
+    this.initChibiAvatar();
 
     // Atajos de teclado globales
     window.addEventListener("keydown", (e) => {
@@ -473,6 +505,143 @@ class VisualNovelController {
   }
 
   /**
+   * Inicializa el ciclo de vida autónomo del Chibi en `.vn-fab__avatar`:
+   * madrugada, precarga, idle loop, visibilidad y reduced-motion.
+   */
+  initChibiAvatar() {
+    if (!this.fabEl || !this.chibiAvatarEl) return;
+
+    const hour = new Date().getHours();
+    this.fabEl.classList?.toggle?.("is-late-night", hour >= 0 && hour < 6);
+
+    const preload = () => {
+      if (typeof Image !== "function") return;
+      [...Object.values(CHIBI_AVATAR_STATES), CHIBI_AVATAR_STATIC].forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
+    };
+    if (typeof requestIdleCallback === "function") {
+      requestIdleCallback(preload, { timeout: 1500 });
+    } else {
+      setTimeout(preload, 400);
+    }
+
+    // Entornos sin DOM completo (tests con mocks): sólo estado inicial, sin listeners.
+    if (typeof document.addEventListener !== "function" || typeof window === "undefined") return;
+
+    const mq =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)")
+        : null;
+    const applyMotionPref = () => {
+      this.chibiReducedMotion = Boolean(mq?.matches);
+      this.clearChibiTimers();
+      if (this.chibiReducedMotion) {
+        this.chibiAvatarEl.src = CHIBI_AVATAR_STATIC;
+        if (this.fabEl.dataset) this.fabEl.dataset.chibiState = "typing";
+        this.chibiState = "typing";
+      } else {
+        this.applyChibiState("typing", true);
+        if (!document.hidden) this.scheduleChibiIdle();
+      }
+    };
+    if (mq?.addEventListener) mq.addEventListener("change", applyMotionPref);
+
+    document.addEventListener("visibilitychange", () => {
+      if (this.chibiReducedMotion) return;
+      if (document.hidden) {
+        this.clearChibiTimers();
+        this.applyChibiState("typing");
+      } else {
+        this.scheduleChibiIdle();
+      }
+    });
+
+    // «¡Estoy atorado! Mostrame la solución» (botón compartido por varios módulos).
+    document.addEventListener(
+      "click",
+      (ev) => {
+        const btn = ev.target instanceof Element ? ev.target.closest("button") : null;
+        if (btn && /mostrame la soluci[oó]n/i.test(btn.textContent || "")) {
+          this.setChibiAvatarState("sigh", CHIBI_STRESS_MS);
+        }
+      },
+      true,
+    );
+
+    this.chibiLifecycleReady = true;
+    applyMotionPref();
+  }
+
+  clearChibiTimers() {
+    clearTimeout(this.chibiIdleTimer);
+    clearTimeout(this.chibiRevertTimer);
+    this.chibiIdleTimer = null;
+    this.chibiRevertTimer = null;
+  }
+
+  applyChibiState(state, force = false) {
+    if (!CHIBI_AVATAR_STATES[state] || !this.chibiAvatarEl) return;
+    if (!force && this.chibiState === state) return;
+    this.chibiState = state;
+    this.chibiAvatarEl.src = CHIBI_AVATAR_STATES[state];
+    if (this.chibiAvatarEl.dataset) this.chibiAvatarEl.dataset.chibiState = state;
+    if (this.fabEl?.dataset && this.fabEl.classList) {
+      this.fabEl.dataset.chibiState = state;
+      this.fabEl.classList.remove("vn-fab--shake");
+      if (state === "colapso") {
+        void this.fabEl.offsetWidth;
+        this.fabEl.classList.add("vn-fab--shake");
+      }
+    }
+  }
+
+  scheduleChibiIdle() {
+    clearTimeout(this.chibiIdleTimer);
+    if (!this.chibiLifecycleReady) return;
+    if (this.chibiReducedMotion || (typeof document !== "undefined" && document.hidden)) return;
+    const wait = CHIBI_IDLE_MIN_MS + Math.random() * (CHIBI_IDLE_MAX_MS - CHIBI_IDLE_MIN_MS);
+    this.chibiIdleTimer = setTimeout(() => {
+      // No interrumpir una alerta de error / reacción en curso.
+      if (this.chibiRevertTimer || this.chibiState === "colapso") {
+        this.scheduleChibiIdle();
+        return;
+      }
+      this.setChibiAvatarState(Math.random() < 0.65 ? "thinking" : "sigh", CHIBI_IDLE_ACTION_MS);
+    }, wait);
+    this.chibiIdleTimer?.unref?.();
+  }
+
+  /**
+   * API pública: cambia el estado del Chibi del FAB y vuelve a `typing`
+   * tras `durationMs` (0 = permanente hasta el próximo cambio).
+   */
+  setChibiAvatarState(state, durationMs = 0) {
+    if (!CHIBI_AVATAR_STATES[state]) return false;
+    if (!this.chibiAvatarEl) {
+      if (!this.hudEl) this.initDOM();
+      if (!this.chibiAvatarEl) return false;
+    }
+    if (this.chibiReducedMotion) return false;
+
+    this.clearChibiTimers();
+    this.applyChibiState(state);
+
+    if (durationMs > 0 && state !== "typing") {
+      this.chibiRevertTimer = setTimeout(() => {
+        this.chibiRevertTimer = null;
+        this.applyChibiState("typing");
+        this.scheduleChibiIdle();
+      }, durationMs);
+      this.chibiRevertTimer?.unref?.();
+    } else {
+      this.scheduleChibiIdle();
+    }
+    return true;
+  }
+
+  /**
    * Renderiza la pose, tag y texto de la línea actual
    */
   renderCurrentLine() {
@@ -499,6 +668,13 @@ class VisualNovelController {
 
     if (this.fabEl) {
       this.fabEl.title = "Consultar a Alaska";
+    }
+
+    // Sincronizar el Chibi del FAB con la emoción de la línea actual.
+    if (CHIBI_STRESS_POSES.has(pose)) {
+      this.setChibiAvatarState("colapso", CHIBI_STRESS_MS);
+    } else if (CHIBI_THINK_POSES.has(pose) || /pista/i.test(tag)) {
+      this.setChibiAvatarState("thinking", CHIBI_THINK_MS);
     }
 
     if (this.spriteWrapEl) {
@@ -657,6 +833,10 @@ export function playScript(lines, options) {
 
 export function react(options) {
   return vn.react(options);
+}
+
+export function setChibiAvatarState(state, durationMs) {
+  return vn.setChibiAvatarState(state, durationMs);
 }
 
 export default vn;
