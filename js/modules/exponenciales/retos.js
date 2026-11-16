@@ -26,6 +26,13 @@ import { saveProgress, getCompetencyReport } from "./components.js";
 import { recordExpAttempt } from "./learning-adapter.js";
 import { parseIntervalExactas, equivalentExp } from "./expr.js";
 import { getCompetencyById } from "./competencies-map.js";
+import { selectAdaptiveExercise } from "../../core/learning/exercise-selector.js";
+import {
+  generateTransferChallenge,
+  recordTransferAttempt,
+  normalizeTransferAnswer,
+  validateTransferAnswer,
+} from "../../core/learning/transfer.js";
 
 export const CHALLENGE_TYPES = [
   "razon_tabla_vs_salto",
@@ -95,38 +102,105 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
 
   const cases = {
     razon_tabla_vs_salto() {
+      const variant = int(rng, 1, 3);
       const k = int(rng, 2, 5);
       const a = int(rng, 2, 4);
-      const y0 = k;
-      const y1 = k * a;
-      const y2 = k * a * a;
-      const y3 = k * a * a * a;
-      const linearDiff = y1 - y0;
-      return {
-        ...common,
-        competencyId: "exponentials.tables_additive_vs_multiplicative",
-        prompt: `Dada la tabla exponencial (0, ${y0}), (1, ${y1}), (2, ${y2}), (3, ${y3}) con paso Δx = 1 regular, ¿cuál es la razón multiplicativa constante a = y_(i+1) / y_i entre términos consecutivos?`,
-        answer: a,
-        displayAnswer: fmt(a),
-        spec: {
-          problemType: "table",
-          type: "table",
-          expected: a,
-          ratio: a,
-          linearDiff,
-          context: "tabla razon",
-        },
-        hints: [
-          "Calculá el cociente entre dos renglones consecutivos: dividí el valor de y en x = 1 por el valor en x = 0.",
-          `Comprobá que esa división se mantenga constante calculando ${y2} / ${y1} y ${y1} / ${y0}. No restes los valores.`,
-          `Ese cociente constante y_(i+1) / y_i entre términos consecutivos es exactamente la base exponencial buscada.`,
-        ],
-        solution: [
-          "En una función exponencial con paso Δx = 1, la razón multiplicativa es a = y_(i+1) / y_i.",
-          `Dividimos los dos primeros valores: ${y1} / ${y0} = ${a}.`,
-          `Verificamos con los siguientes términos: ${y2} / ${y1} = ${a} y ${y3} / ${y2} = ${a}. La respuesta es ${a}.`,
-        ],
-      };
+
+      if (variant === 1) {
+        // Subvariante 1: Paso estándar Δx = 1
+        const y0 = k;
+        const y1 = k * a;
+        const y2 = k * a * a;
+        const y3 = k * a * a * a;
+        const linearDiff = y1 - y0;
+        return {
+          ...common,
+          competencyId: "exponentials.tables_additive_vs_multiplicative",
+          prompt: `Dada la tabla exponencial (0, ${y0}), (1, ${y1}), (2, ${y2}), (3, ${y3}) con paso Δx = 1 regular, ¿cuál es la razón multiplicativa constante a = y_(i+1) / y_i entre términos consecutivos?`,
+          answer: a,
+          displayAnswer: fmt(a),
+          spec: {
+            problemType: "table",
+            type: "table",
+            expected: a,
+            ratio: a,
+            linearDiff,
+            context: "tabla razon",
+          },
+          hints: [
+            "Calculá el cociente entre dos renglones consecutivos: dividí el valor de y en x = 1 por el valor en x = 0.",
+            `Comprobá que esa división se mantenga constante calculando ${y2} / ${y1} y ${y1} / ${y0}. No restes los valores.`,
+            "Ese cociente constante y_(i+1) / y_i entre términos consecutivos es exactamente la base exponencial buscada.",
+          ],
+          solution: [
+            "En una función exponencial con paso Δx = 1, la razón multiplicativa es a = y_(i+1) / y_i.",
+            `Dividimos los dos primeros valores: ${y1} / ${y0} = ${a}.`,
+            `Verificamos con los siguientes términos: ${y2} / ${y1} = ${a} y ${y3} / ${y2} = ${a}. La respuesta es ${a}.`,
+          ],
+        };
+      } else if (variant === 2) {
+        // Subvariante 2: Incrementos no uniformes en x (Δx = 2)
+        const y0 = k;
+        const y1 = k * a * a;
+        const y2 = k * a * a * a * a;
+        const y3 = k * a * a * a * a * a * a;
+        const rowRatio = a * a;
+        const linearDiff = y1 - y0;
+        return {
+          ...common,
+          competencyId: "exponentials.tables_additive_vs_multiplicative",
+          prompt: `En una tabla con paso constante Δx = 2: (0, ${y0}), (2, ${y1}), (4, ${y2}), (6, ${y3}), el factor entre renglones consecutivos es a^(Δx) = ${rowRatio}. ¿Cuál es la base unitaria a de la función f(x) = k · aˣ?`,
+          answer: a,
+          displayAnswer: fmt(a),
+          spec: {
+            problemType: "table",
+            type: "table",
+            expected: a,
+            ratio: a,
+            linearDiff,
+            deltaX: 2,
+            rowRatio,
+            context: "base unitaria paso 2",
+          },
+          hints: [
+            `Observá que x avanza de a 2 unidades (Δx = 2). Cada paso de renglón multiplica por a² = ${rowRatio}.`,
+            `Para hallar la base unitaria a correspondiente a un solo paso Δx = 1, calculá la raíz cuadrada: a = (${rowRatio})^(1/2).`,
+            "Calculá la raíz cuadrada del factor de renglón para obtener la razón multiplicativa por unidad.",
+          ],
+          solution: [
+            `Como Δx = 2, la razón entre renglones consecutivos responde a a^(Δx) = a² = ${y1} / ${y0} = ${rowRatio}.`,
+            `Despejamos la base unitaria extrayendo raíz cuadrada: a = √${rowRatio} = ${a}.`,
+            `La base unitaria es a = ${a}.`,
+          ],
+        };
+      } else {
+        // Subvariante 3: Reconstrucción inversa desde la fórmula
+        return {
+          ...common,
+          competencyId: "exponentials.tables_additive_vs_multiplicative",
+          prompt: `Dada la fórmula f(x) = ${k} · ${a}ˣ, si se construye una tabla con paso constante Δx = 1, ¿qué razón multiplicativa constante y_(i+1) / y_i debe observarse entre filas consecutivas?`,
+          answer: a,
+          displayAnswer: fmt(a),
+          spec: {
+            problemType: "table",
+            type: "table",
+            expected: a,
+            ratio: a,
+            linearDiff: k * (a - 1),
+            context: "reconstruccion inversa formula a tabla",
+          },
+          hints: [
+            "En f(x) = k · aˣ, el parámetro a representa la razón de multiplicación por cada incremento unitario Δx = 1.",
+            `Evaluá el cociente teórico f(x+1) / f(x) = (${k} · ${a}^(x+1)) / (${k} · ${a}ˣ).`,
+            "Simplificá el cociente cancelando el coeficiente inicial y restando los exponentes de la base unitaria.",
+          ],
+          solution: [
+            `Planteamos el cociente entre dos valores consecutivos: f(x+1) / f(x) = (${k} · ${a}^(x+1)) / (${k} · ${a}ˣ).`,
+            `Cancelamos k = ${k} y restamos exponentes: a^(x+1−x) = a¹ = ${a}.`,
+            `La razón multiplicativa en la tabla es exactamente la base a = ${a}.`,
+          ],
+        };
+      }
     },
 
     evaluacion_k_a_x() {
@@ -221,7 +295,11 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
       const y3 = k * a * a * a;
       return {
         ...common,
-        competencyId: "exponentials.analytical_reconstruction_two_points",
+        competencyId: "exponentials.four_quadrants_monotonicity",
+        competencyIds: [
+          "exponentials.four_quadrants_monotonicity",
+          "exponentials.analytical_reconstruction_two_points",
+        ],
         prompt: `Una función exponencial f(x) = k · aˣ pasa por los puntos P(1; ${y1}) y Q(2; ${y2}). Hallá el valor de f(3).`,
         answer: y3,
         displayAnswer: fmt(y3),
@@ -317,28 +395,30 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
     },
 
     formula_desde_dos_puntos() {
-      const k = int(rng, 2, 5);
+      const allowNeg = int(rng, 0, 2) === 0; // ~33% con k < 0
+      const kMag = int(rng, 2, 5);
+      const k = allowNeg ? -kMag : kMag;
       const a = int(rng, 2, 4);
-      const useOrigin = int(rng, 0, 1) === 0;
-      let pX, pY, qX, qY;
-      if (useOrigin) {
-        pX = 0;
-        pY = k;
-        qX = 1;
-        qY = k * a;
-      } else {
-        pX = 1;
-        pY = k * a;
-        qX = 2;
-        qY = k * a * a;
-      }
-      const ansStr = `${k} * ${a}^x`;
+
+      const deltaX = int(rng, 1, 2); // Δx = 1 o Δx = 2
+      const pX = int(rng, 0, 1);
+      const qX = pX + deltaX;
+
+      const pY = k * (a ** pX);
+      const qY = k * (a ** qX);
+
+      const ansStr = k < 0 ? `-${Math.abs(k)} * ${a}^x` : `${k} * ${a}^x`;
+      const ratioY = qY / pY; // Siempre positivo porque sgn(pY) == sgn(qY)
+      const diffExp = qX - pX;
+      const testX = qX + 1;
+      const testY = k * (a ** testX);
+
       return {
         ...common,
         competencyId: "exponentials.analytical_reconstruction_two_points",
-        prompt: `Hallá la fórmula f(x) = k · aˣ que pasa exactamente por los puntos P(${pX}; ${pY}) y Q(${qX}; ${qY}). Escribí la expresión algebraica (ej: 3 * 2^x).`,
+        prompt: `Reconstruí la fórmula f(x) = k · aˣ que pasa por P(${pX}; ${pY}) y Q(${qX}; ${qY}) siguiendo los 5 pasos analíticos (plantear, dividir miembro a miembro, despejar a, hallar k y comprobar en un 3.er punto). Escribí la expresión algebraica (ej: ${k < 0 ? "-2 * 3^x" : "3 * 2^x"}).`,
         answer: ansStr,
-        displayAnswer: `f(x) = ${k} · ${a}ˣ`,
+        displayAnswer: `f(x) = ${k < 0 ? `−${Math.abs(k)}` : k} · ${a}ˣ`,
         spec: {
           k,
           a,
@@ -348,14 +428,14 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
           context: "formula dos puntos",
         },
         hints: [
-          `Planteá el sistema evaluando en ambos puntos: f(${pX}) = k · a^${pX} = ${pY} y f(${qX}) = k · a^${qX} = ${qY}.`,
-          `Dividí miembro a miembro f(${qX})/f(${pX}) para cancelar k y despejar la base a: a^(${qX}−${pX}) = ${qY}/${pY}.`,
-          `Sustituí el valor de la base en cualquiera de los puntos para calcular la escala k, y armá la expresión canónica k * a^x.`,
+          `Paso 1: Planteá las dos ecuaciones: k · a^${pX} = ${pY} y k · a^${qX} = ${qY}.`,
+          `Pasos 2 y 3: Dividí miembro a miembro para cancelar k: a^(${qX}−${pX}) = ${qY} / ${pY} = ${ratioY} ⟹ a = (${ratioY})^(1/${diffExp}).`,
+          "Pasos 4 y 5: Reemplazá la base en cualquiera de los puntos conocidos para calcular k y escribí la expresión canónica k * a^x.",
         ],
         solution: [
-          `Planteamos el sistema con los puntos P(${pX}; ${pY}) y Q(${qX}; ${qY}): k · a^${pX} = ${pY} y k · a^${qX} = ${qY}.`,
-          `Dividiendo ambas ecuaciones miembro a miembro: a^(${qX} - ${pX}) = ${qY} / ${pY} = ${a} ⟹ a = ${a}.`,
-          `Reemplazando a = ${a} obtenemos k = ${k}. La fórmula buscada es f(x) = ${k} · ${a}ˣ (o ${k} * ${a}^x).`,
+          `Paso 1 y 2: Planteamos k · a^${pX} = ${pY} y k · a^${qX} = ${qY}. Dividiendo miembro a miembro: a^(${diffExp}) = ${qY}/${pY} = ${ratioY}.`,
+          `Paso 3 y 4: Despejamos la base positiva a = ${a}. Sustituyendo en P: k · ${a}^${pX} = ${pY} ⟹ k = ${k}. La fórmula es f(x) = ${ansStr}.`,
+          `Paso 5: Comprobamos en el 3.er punto x = ${testX}: f(${testX}) = ${k} · ${a}^${testX} = ${testY}. Coincide plenamente.`,
         ],
       };
     },
@@ -373,7 +453,11 @@ export function makeChallenge(seed, requestedType = null, problemIndex = 0) {
       const ansStr = k > 0 ? `(${c}; +inf)` : `(-inf; ${c})`;
       return {
         ...common,
-        competencyId: "exponentials.shifts_and_horizontal_asymptote",
+        competencyId: "exponentials.full_analytical_study",
+        competencyIds: [
+          "exponentials.full_analytical_study",
+          "exponentials.shifts_and_horizontal_asymptote",
+        ],
         prompt: `Para la función ${formulaStr}, determiná el conjunto imagen en notación de intervalo Exactas UNMDP (usá ';' para separar extremos e 'inf' o '+inf' para infinito, ej: (2; +inf)).`,
         answer: ansStr,
         displayAnswer: `Im(f) = ${ansStr}`,
@@ -587,8 +671,9 @@ function createTrainer(root) {
     { "aria-label": "Familia de reto" },
     [
       ["aleatorio", "Todas las familias (Aleatorio)"],
-      ["adaptativo", "Modo Adaptativo (Refuerzo de errores)"],
+      ["adaptativo", "Modo Inteligente (Recomendado por Alaska)"],
       ["contrastivo", "Modo Contrastivo (Pares conceptuales)"],
+      ["transferencia", "Transferencia Inter-Módulo (Lineal vs. Exponencial vs. Cuadrática)"],
       ...CHALLENGE_TYPES.map((type) => [type, type.replaceAll("_", " ")]),
     ].map(([value, label]) => h("option", { value }, label)),
   );
@@ -716,10 +801,11 @@ function createTrainer(root) {
 
     let cardAdaptiveNote = null;
     if (typeSelect.value === "adaptativo" && current._targetComp) {
+      const reasonText = current._selectionReason ? ` Alaska recomienda: ${current._selectionReason}` : "";
       cardAdaptiveNote = h(
         "div",
         { class: "exp-challenge__adaptive-note" },
-        `Motivo de selección: Reforzar «${current._targetComp.title}» (pendiente de resolución independiente / se detectó confusión previa).`,
+        `Motivo de selección: Reforzar «${current._targetComp.title}» (pendiente de resolución independiente / se detectó confusión previa).${reasonText}`,
       );
     }
 
@@ -800,6 +886,47 @@ function createTrainer(root) {
         feedbackEl.className = "exp-check__feedback pr-check__feedback is-warning";
         return;
       }
+
+      if (current.isTransfer) {
+        const ok = validateTransferAnswer(current, raw).ok;
+        if (ok) {
+          const wasAssisted = hintStep > 0 || solutionRevealed;
+          const mode = wasAssisted ? "assisted" : "independent";
+          feedbackEl.textContent = `¡Correcto! ${current.explanation}`;
+          feedbackEl.className = `exp-check__feedback pr-check__feedback is-correct is-${mode} check-feedback--${mode} state-solved`;
+          recordTransferAttempt({
+            moduleId: "exponenciales",
+            exerciseId: current.id,
+            competencyIds: current.competencyIds,
+            correct: true,
+            hintsUsed: hintStep,
+            solutionRevealed: false,
+            representation: current.representation || "symbolic",
+          });
+          inputEl.disabled = true;
+          reviseBtn.disabled = true;
+          revealBtn.disabled = true;
+          hintBtn.disabled = true;
+          statusEl.textContent = wasAssisted ? "Resuelto (Con apoyo)" : "Resuelto (Independiente)";
+          statusEl.className = `exp-challenge-card__status ${wasAssisted ? "is-solved-assisted" : "is-solved-indep"}`;
+          problemsState[pKey] = { solved: true, mode };
+          updateProgressPill();
+        } else {
+          feedbackEl.textContent = "El resultado todavía no coincide. Revisá la justificación o pedí una pista.";
+          feedbackEl.className = "exp-check__feedback pr-check__feedback is-error check-feedback--incorrect";
+          recordTransferAttempt({
+            moduleId: "exponenciales",
+            exerciseId: current.id,
+            competencyIds: current.competencyIds,
+            correct: false,
+            hintsUsed: hintStep,
+            solutionRevealed: false,
+            representation: current.representation || "symbolic",
+          });
+        }
+        return;
+      }
+
       const valNum = Number(raw.replace(",", "."));
       let isCorrect = typeof current.answer === "number" && Number.isFinite(valNum) && Math.abs(valNum - current.answer) < 1e-4;
 
@@ -977,6 +1104,22 @@ function createTrainer(root) {
       statusEl.textContent = "Resuelto (Con apoyo)";
       statusEl.className = "exp-challenge-card__status is-solution";
 
+      if (current.isTransfer) {
+        recordTransferAttempt({
+          moduleId: "exponenciales",
+          exerciseId: current.id,
+          competencyIds: current.competencyIds,
+          correct: true,
+          hintsUsed: hintStep,
+          solutionRevealed: true,
+          representation: current.representation || "symbolic",
+        });
+        clear(solutionEl);
+        solutionEl.appendChild(h("h4", null, "Solución explicada:"));
+        solutionEl.appendChild(h("p", null, current.explanation));
+        return;
+      }
+
       if (current.competencyId) {
         recordExpAttempt({
           exerciseId: `exp-reto-${current.type}-${problemIndex}`,
@@ -1085,42 +1228,49 @@ function createTrainer(root) {
     let challenges = [];
 
     if (requested === "adaptativo") {
-      const report = getCompetencyReport();
-      let candidates = report.list.filter(
-        (item) => (item.diagnostics && item.diagnostics.length > 0) || item.status === "pending"
-      );
-      if (candidates.length === 0) {
-        candidates = report.list.filter((item) => item.status === "assisted");
-      }
-      if (candidates.length === 0) {
-        candidates = report.list;
-      }
-      const compMap = {
-        "exponentials.tables_additive_vs_multiplicative": "razon_tabla_vs_salto",
-        "exponentials.neutral_and_order_of_operations": "evaluacion_k_a_x",
-        "exponentials.rational_density_and_base_restrictions": "densidad_potencia_racional",
-        "exponentials.base_reflection_and_asymptote": "espejo_base_inversa",
-        "exponentials.four_quadrants_monotonicity": "evaluacion_k_a_x",
-        "exponentials.analytical_reconstruction_two_points": "formula_desde_dos_puntos",
-        "exponentials.time_models_rates_and_euler_base": "modelo_tiempo_compuesto",
-        "exponentials.shifts_and_horizontal_asymptote": "imagen_intervalo_asintota",
-        "exponentials.full_analytical_study": "imagen_intervalo_asintota",
-        "exponentials.equations_three_methods_in_reals": "ecuacion_igualacion_factor_comun",
-      };
+      const candidateFamilies = [
+        { id: "razon_tabla_vs_salto", family: "razon_tabla_vs_salto", competencyId: "exponentials.tables_additive_vs_multiplicative" },
+        { id: "evaluacion_k_a_x", family: "evaluacion_k_a_x", competencyId: "exponentials.neutral_and_order_of_operations" },
+        { id: "densidad_potencia_racional", family: "densidad_potencia_racional", competencyId: "exponentials.rational_density_and_base_restrictions" },
+        { id: "espejo_base_inversa", family: "espejo_base_inversa", competencyId: "exponentials.base_reflection_and_asymptote" },
+        { id: "reconstruccion_dos_puntos", family: "reconstruccion_dos_puntos", competencyId: "exponentials.four_quadrants_monotonicity" },
+        { id: "formula_desde_dos_puntos", family: "formula_desde_dos_puntos", competencyId: "exponentials.analytical_reconstruction_two_points" },
+        { id: "modelo_tiempo_compuesto", family: "modelo_tiempo_compuesto", competencyId: "exponentials.time_models_rates_and_euler_base" },
+        { id: "asintota_imagen_desplazamiento", family: "asintota_imagen_desplazamiento", competencyId: "exponentials.shifts_and_horizontal_asymptote" },
+        { id: "imagen_intervalo_asintota", family: "imagen_intervalo_asintota", competencyId: "exponentials.full_analytical_study" },
+        { id: "ecuacion_igualacion_factor_comun", family: "ecuacion_igualacion_factor_comun", competencyId: "exponentials.equations_three_methods_in_reals" },
+      ];
 
-      challenges = Array.from({ length: 8 }, (_, i) => {
-        const candidateIndex = (Math.abs(seed) + i) % candidates.length;
-        const targetItem = candidates[candidateIndex];
-        const targetComp = targetItem?.competency;
-        const fam = (targetComp && compMap[targetComp.id]) || "razon_tabla_vs_salto";
-        const ch = makeChallenge(seed, fam, i);
-        ch._targetComp = targetComp;
-        return ch;
-      });
+      challenges = [];
+      let prevCompId = null;
+      for (let i = 0; i < 8; i++) {
+        const selection = selectAdaptiveExercise({
+          moduleId: "exponenciales",
+          availableExercises: candidateFamilies,
+          previousCompetencyId: prevCompId,
+        });
+        const chosenFam = selection.exercise?.family || "razon_tabla_vs_salto";
+        const ch = makeChallenge(seed, chosenFam, i);
+        ch._targetComp = getCompetencyById(selection.targetCompetencyId || selection.exercise?.competencyId);
+        ch._selectionReason = selection.selectionReason;
+        prevCompId = selection.targetCompetencyId || selection.exercise?.competencyId;
+        challenges.push(ch);
+      }
 
       adaptiveNote.hidden = false;
       const firstTitle = challenges[0]?._targetComp?.title || "Competencia clave";
-      adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}» (pendiente de resolución independiente / se detectó confusión previa).`;
+      const firstReason = challenges[0]?._selectionReason || "Refuerzo adaptativo según tu progreso.";
+      adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}» (pendiente de resolución independiente / se detectó confusión previa). Alaska recomienda: ${firstReason}`;
+    } else if (requested === "transferencia") {
+      challenges = Array.from({ length: 8 }, (_, i) => {
+        const ch = generateTransferChallenge(seed, "all", i);
+        ch.isTransfer = true;
+        ch.displayAnswer = ch.expected;
+        ch.answer = ch.expected;
+        return ch;
+      });
+      adaptiveNote.hidden = false;
+      adaptiveNote.textContent = "Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales y Cuadráticos.";
     } else if (requested === "contrastivo") {
       challenges = Array.from({ length: 8 }, (_, i) => {
         const pairIdx = Math.floor(i / 2) % contrastPairs.length;

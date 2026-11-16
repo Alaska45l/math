@@ -31,21 +31,29 @@ El repositorio combina capacidades implementadas con una arquitectura de aprendi
 
 | Área | Estado actual |
 |---|---|
-| Laboratorios interactivos y planos SVG | Implementado en los módulos publicados en el hub |
-| Evaluadores algebraicos mediante AST | Implementado en módulos que aceptan fórmulas |
-| Diagnósticos de errores conceptuales | Implementado para un catálogo concreto de errores por módulo |
+| Laboratorios interactivos y planos SVG | Implementado en los módulos publicados (10 widgets interactivos POE en Exponenciales y Cuadráticas) |
+| Evaluadores algebraicos mediante AST | Implementado en módulos que aceptan fórmulas (`expr.js`, `logic.js`) |
+| Diagnósticos de errores conceptuales | Implementado con catálogo de 10 diagnósticos cognitivos por módulo y poses de Alaska |
 | Tutora Visual Novel, guiones, poses y audio procedural | Implementado |
 | Glosario contextual y pizarra de trabajo | Implementado en los módulos que los integran |
-| Progreso local por sección | Implementado en determinados módulos |
-| Motor central de competencias y dominio | Planificado |
-| Repetición espaciada adaptativa | Planificado |
-| Selección global de práctica intercalada | Planificado |
+| Progreso local por sección y competencia | Implementado con almacén centralizado (`alaska:learning:v1`) y migración no destructiva |
+| Motor central de competencias y dominio | Implementado (`js/core/learning/mastery.js` máquina conservadora de 7 estados) |
+| Repetición espaciada adaptativa | Implementado (`js/core/learning/scheduler.js` ventanas deterministas `review_due`) |
+| Selección global de práctica intercalada | Implementado (`js/core/learning/exercise-selector.js` Modo Inteligente en Retos) |
+| Motor de transferencia inter-módulo | Implementado (`js/core/learning/transfer.js` discriminación Lineal vs. Exponencial vs. Cuadrática) |
 | Calibración metacognitiva de confianza | Planificado |
-| Atlas longitudinal de errores | Planificado |
+| Atlas longitudinal de errores | Implementado en dashboards de Exponenciales y Cuadráticas (`mountCompetencyDashboard`) |
 | Campamento persistente y autónomo | Exploración futura |
 | Jefes como evaluaciones integradoras | Dirección de diseño; motor unificado pendiente |
 
 El estado detallado de implementación y las dependencias entre tareas se mantienen en [ROADMAP.md](ROADMAP.md). La arquitectura pedagógica objetivo, sus fundamentos y las referencias científicas están en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
+
+### Cobertura Pedagógica Comparativa (Módulos Homogeneizados)
+
+| Módulo | Secciones | Widgets POE | Chequeos Guiados | Pistas Artesanales | Familias PRNG | Trampas de Examen | Competencias Mapeadas | Diagnósticos Cognitivos | Estado de Verificación |
+|---|---|---|---|---|---|---|---|---|---|
+| **Funciones Exponenciales** (`exponenciales.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (134 tests, 9/9 auditoría) |
+| **Función Cuadrática** (`cuadraticas.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (88 tests, 100% auditoría) |
 
 ## Qué ofrece actualmente
 
@@ -108,20 +116,28 @@ El proyecto utiliza HTML, CSS y módulos JavaScript nativos, sin dependencias de
 
 La lógica matemática se separa de la representación y de los eventos DOM. En los módulos que lo necesitan, las expresiones se analizan como AST y los validadores trabajan sobre estructuras matemáticas en vez de comparar cadenas.
 
-### Núcleo compartido
+### Núcleo compartido (`js/core/`)
 
-| Archivo | Responsabilidad |
+| Archivo / Directorio | Responsabilidad |
 |---|---|
-| js/core/dom.js | Helpers DOM/SVG, montaje, delegación de eventos y store reactivo. |
-| js/core/plot.js | Conversión de coordenadas, planos SVG y arrastre persistente. |
-| js/core/math-format.js | Formato matemático y convenciones numéricas es-AR. |
-| js/core/vn.js | HUD Visual Novel, diálogo, poses y reacciones de Alaska. |
-| js/core/sound.js | Síntesis procedural de sonidos y preferencias de audio. |
-| js/core/nav.js | Navegación global, menú curricular y controles compartidos. |
-| js/core/glossary.js | Glosario contextual y consulta de términos. |
-| js/core/scratchpad.js | Pizarra de trabajo auxiliar. |
+| `js/core/dom.js` | Helpers DOM/SVG, montaje, delegación de eventos y store reactivo. |
+| `js/core/plot.js` | Conversión de coordenadas, planos SVG y arrastre persistente. |
+| `js/core/math-format.js` | Formato matemático (`fmt()` con coma decimal es-AR, signo menos Unicode `−`, fracciones). |
+| `js/core/vn.js` | HUD Visual Novel, diálogo, poses y reacciones de Alaska. |
+| `js/core/sound.js` | Síntesis procedural de sonidos (Web Audio API) y preferencias de audio. |
+| `js/core/nav.js` | Navegación global, mega-menú curricular y controles compartidos. |
+| `js/core/glossary.js` | Glosario contextual y consulta de términos. |
+| `js/core/scratchpad.js` | Pizarra de trabajo auxiliar. |
+| `js/core/learning/events.js` | Contrato, fábrica y validación de eventos inmutables `LearningEvent`. |
+| `js/core/learning/competencies.js` | Registro unificado de competencias y validador topológico acíclico de DAG. |
+| `js/core/learning/progress-store.js` | Persistencia local (`alaska:learning:v1`), log acotado (200 eventos) y reportes KPI. |
+| `js/core/learning/mastery.js` | Máquina de estados conservadora de 7 estados (elimina consolidación por único acierto). |
+| `js/core/learning/scheduler.js` | Planificador determinista de ventanas de repaso espaciado (`review_due`). |
+| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalado según urgencia pedagógica (`needs_repair` $\to$ `review_due` $\to$ `developing`). |
+| `js/core/learning/transfer.js` | Motor de discriminación inter-módulo (Lineal vs. Exponencial vs. Cuadrática) en tablas, geometría y álgebra. |
+| `js/core/learning/migrations.js` | Utilidades de migración no destructiva con preservación de claves locales previas. |
 
-### Módulos matemáticos
+### Módulos matemáticos (`js/modules/`)
 
 - **js/modules/circuitos/**: lógica y renderizado de desigualdades compuestas.
 - **js/modules/dimensional/**: cálculo y representación de análisis dimensional.
@@ -129,8 +145,8 @@ La lógica matemática se separa de la representación y de los eventos DOM. En 
 - **js/modules/potencias-raices/**: lógica, parser, componentes, retos y widgets.
 - **js/modules/sucesiones/**: lógica, parser, diagnóstico, retos, guiones y widgets.
 - **js/modules/valor-absoluto/**: lógica, parser, diagnóstico, retos, guiones y widgets.
-- **js/modules/exponenciales/**: lecciones, componentes, parser, retos y widgets.
-- **js/modules/cuadraticas/**: parser AST, diagnóstico conceptual, mapa de competencias, lecciones, retos, guiones y widgets.
+- **js/modules/exponenciales/**: 10 widgets interactivos, 30 chequeos guiados con 8-tupla, 90 pistas artesanales, 10 familias PRNG, 5 trampas de examen, mapa de competencias, adaptador de aprendizaje y dashboard Error Atlas.
+- **js/modules/cuadraticas/**: 10 widgets interactivos, parser AST, 30 chequeos guiados con 8-tupla, 90 pistas artesanales, 10 familias PRNG, 5 trampas de examen, mapa de competencias, adaptador de aprendizaje y dashboard Error Atlas.
 
 No todos los módulos comparten aún el mismo modelo de lección, persistencia o chequeo. La futura arquitectura adaptativa deberá integrarse progresivamente, sin forzar una migración masiva ni duplicar motores existentes.
 

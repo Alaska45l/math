@@ -819,7 +819,7 @@ export function diagnoseExp(userInput, context = {}) {
     }
   }
   // Deteccion heuristica para 3 * 2^x -> 6^x o 4 * 2^x -> 8^x
-  if (/\b(?:6\^x|8\^x)\b/i.test(norm) && (kVal === 3 || kVal === 4 || /3\s*\*\s*2|4\s*\*\s*2/.test(ctx.expression || ''))) {
+  if (/\b(?:6\^x|8\^x)\b/i.test(norm) && (kVal === 3 || kVal === 4 || ctx.problemType === 'formula' || /3\s*\*\s*2|4\s*\*\s*2/.test(ctx.expression || ''))) {
     return buildResult('multiplied_k_and_base');
   }
   const isK3A2Context =

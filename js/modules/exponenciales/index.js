@@ -1295,10 +1295,10 @@ if (typeof document !== "undefined") {
             "exponentials.neutral_and_order_of_operations": "evaluacion_k_a_x",
             "exponentials.rational_density_and_base_restrictions": "densidad_potencia_racional",
             "exponentials.base_reflection_and_asymptote": "espejo_base_inversa",
-            "exponentials.four_quadrants_monotonicity": "evaluacion_k_a_x",
+            "exponentials.four_quadrants_monotonicity": "reconstruccion_dos_puntos",
             "exponentials.analytical_reconstruction_two_points": "formula_desde_dos_puntos",
             "exponentials.time_models_rates_and_euler_base": "modelo_tiempo_compuesto",
-            "exponentials.shifts_and_horizontal_asymptote": "imagen_intervalo_asintota",
+            "exponentials.shifts_and_horizontal_asymptote": "asintota_imagen_desplazamiento",
             "exponentials.full_analytical_study": "imagen_intervalo_asintota",
             "exponentials.equations_three_methods_in_reals": "ecuacion_igualacion_factor_comun",
           };

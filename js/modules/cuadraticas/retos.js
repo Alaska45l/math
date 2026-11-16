@@ -1,6 +1,6 @@
 /**
  * Alaska Math Lab · Función Cuadrática, Factorización y Parábolas
- * Entrenador Contrastivo Infinito (PRNG Mulberry32 · 8 Familias) + 5 Trampas Clásicas de Examen
+ * Entrenador Contrastivo Infinito (PRNG Mulberry32 · 10 Familias) + 5 Trampas Clásicas de Examen
  */
 
 import { h, clear, num, chalkIcon } from '../../core/dom.js';
@@ -22,6 +22,13 @@ import {
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from './vn-scripts.js';
 import { recordQuadAttempt } from './learning-adapter.js';
 import { getCompetencyById } from './competencies-map.js';
+import { selectAdaptiveExercise } from '../../core/learning/exercise-selector.js';
+import {
+  generateTransferChallenge,
+  recordTransferAttempt,
+  normalizeTransferAnswer,
+  validateTransferAnswer,
+} from '../../core/learning/transfer.js';
 
 export function mulberry32(seed) {
   let a = seed >>> 0;
@@ -78,6 +85,16 @@ export const CHALLENGE_TYPES = [
     id: 'optimization_context',
     label: 'Optimización de extremos en contexto',
     competencyId: 'quadratics.extremum_optimization',
+  },
+  {
+    id: 'area_model_and_notable_products',
+    label: 'Modelo de área y productos notables',
+    competencyId: 'quadratics.area_model_and_notable_products',
+  },
+  {
+    id: 'grouping_and_factoring_strategy',
+    label: 'Estrategia de factorización y agrupación',
+    competencyId: 'quadratics.grouping_and_factoring_strategy',
   },
 ];
 
@@ -256,6 +273,89 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
 
   // 4. discriminant_parameter_k
   if (type === 'discriminant_parameter_k') {
+    const subMode = randChoice(rng, [
+      'double_root_k',
+      'no_real_roots_interval',
+      'vieta_reconstruct_monic',
+      'vieta_missing_param',
+    ]);
+
+    if (subMode === 'no_real_roots_interval') {
+      const halfB = randChoice(rng, [2, 3, 4, 5]);
+      const b = -2 * halfB;
+      const kBound = halfB * halfB;
+      const ansIv = `(${kBound}; +inf)`;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 4 · Discriminante y Cardano-Viète',
+        prompt: `¿Para qué valores del parámetro real k la ecuación x² − ${Math.abs(b)}x + k = 0 carece de raíces reales (cumple Δ < 0)? Escribí el conjunto en notación de intervalo Exactas:`,
+        inputKind: 'set',
+        expected: ansIv,
+        placeholder: `Ej: (${kBound}; +inf)`,
+        diagContext: { target: 'discriminant', a: 1, b, c: kBound },
+        hints: [
+          'Pista 1 (Orientación): Una cuadrática no corta al eje X ni posee raíces reales cuando su discriminante es estrictamente negativo: Δ = b² − 4·a·c < 0.',
+          `Pista 2 (Paso intermedio): Con a = 1, b = ${b} y c = k, planteá (${b})² − 4·1·k < 0, es decir, ${b * b} − 4k < 0.`,
+          'Pista 3 (Remate): Despejá k pasando 4k al otro miembro, dividí por 4 y expresá la semirrecta de valores estrictamente mayores como intervalo abierto hacia el infinito positivo.',
+        ],
+        explanation: `Planteando Δ = ${b * b} − 4k < 0 despejamos 4k > ${b * b} ⟹ k > ${kBound}, que en notación de intervalo es ${ansIv}.`,
+      };
+    }
+
+    if (subMode === 'vieta_reconstruct_monic') {
+      const r1 = randChoice(rng, [1, 2, 3, 4]);
+      const r2 = randChoice(rng, [2, 3, 5, 6]);
+      const sumS = r1 + r2;
+      const prodP = r1 * r2;
+      const poly = fromPolynomial({ a: 1, b: -sumS, c: prodP }).forms.polynomial;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 4 · Discriminante y Cardano-Viète',
+        prompt: `Sabiendo que la suma de las raíces de una cuadrática mónica es S = x₁ + x₂ = ${sumS} y su producto es P = x₁ · x₂ = ${prodP}, reconstruí su fórmula polinómica f(x) = x² + bx + c usando Cardano-Viète (sin aplicar Bhaskara):`,
+        inputKind: 'expression',
+        requireForm: 'polynomial',
+        expected: poly,
+        placeholder: 'Ej: x^2 - 5x + 6',
+        diagContext: { target: 'vieta_reconstruct', a: 1, b: -sumS, c: prodP },
+        hints: [
+          'Pista 1 (Orientación): Por las relaciones de Cardano-Viète en una cuadrática mónica (a = 1), se cumple b = −(x₁ + x₂) = −S y c = x₁ · x₂ = P.',
+          `Pista 2 (Paso intermedio): Como la suma vale S = ${sumS}, el coeficiente lineal lleva signo opuesto (b = −${sumS}), mientras que el término independiente coincide con el producto P.`,
+          'Pista 3 (Remate): Ensamblá el trinomio mónico comenzando con el término cuadrático, restando la suma multiplicada por la variable y sumando el producto constante.',
+        ],
+        explanation: `Por Cardano-Viète, toda cuadrática mónica verifica x² − S·x + P, resultando directamente f(x) = ${poly}.`,
+      };
+    }
+
+    if (subMode === 'vieta_missing_param') {
+      const a = randChoice(rng, [1, 2, 3]);
+      const r1 = randChoice(rng, [1, 2, 3]);
+      const r2 = randChoice(rng, [3, 4, 5]);
+      const sumRoots = r1 + r2;
+      const b = -a * sumRoots;
+      const cVal = a * r1 * r2;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 4 · Discriminante y Cardano-Viète',
+        prompt: `En la ecuación ${a === 1 ? '' : a}x² − ${Math.abs(b)}x + c = 0, una de sus raíces es x₁ = ${r1}. Usando las relaciones de Cardano-Viète (suma x₁ + x₂ = −b/a = ${sumRoots} y producto x₁ · x₂ = c/a), hallá el valor exacto del parámetro c:`,
+        inputKind: 'number',
+        expected: cVal,
+        placeholder: 'Ej: 8',
+        diagContext: { target: 'vieta_parameter', a, b, c: cVal },
+        hints: [
+          `Pista 1 (Orientación): Como la suma de raíces es x₁ + x₂ = ${sumRoots} y conocés x₁ = ${r1}, despejá primero la segunda raíz x₂ = ${sumRoots} − ${r1} = ${r2}.`,
+          `Pista 2 (Paso intermedio): Aplicá ahora la relación del producto de Cardano-Viète: x₁ · x₂ = c / a ⟹ ${r1} · ${r2} = c / ${a}.`,
+          `Pista 3 (Remate): Multiplicá el producto de ambas raíces por el coeficiente principal a = ${a} para despejar el término independiente buscado.`,
+        ],
+        explanation: `De x₁ + x₂ = ${sumRoots} con x₁ = ${r1} obtenemos x₂ = ${r2}. Luego, por Cardano-Viète, c = a · x₁ · x₂ = ${a} · ${r1} · ${r2} = ${cVal}.`,
+      };
+    }
+
     const a = randChoice(rng, [1, 2, 3]);
     const r0 = randChoice(rng, [-4, -3, -2, 2, 3, 4]);
     const b = -2 * a * r0;
@@ -266,7 +366,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       seed,
       type,
       competencyId: typeObj.competencyId,
-      badge: 'Familia 4 · Discriminante y Parámetros',
+      badge: 'Familia 4 · Discriminante y Cardano-Viète',
       prompt: `¿Qué valor debe tomar el parámetro real k para que la ecuación ${a === 1 ? '' : a}x² ${bSign} + k = 0 tenga una única raíz real doble?`,
       inputKind: 'number',
       expected: kVal,
@@ -289,7 +389,50 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
     // Asegurar xv entero parando r1 y r2 con igual paridad
     const adjR2 = (r1 + r2) % 2 !== 0 ? r2 + 1 : r2;
     const ana = analyzeQuadratic(fromFactored({ a, x1: r1, x2: adjR2 }));
-    const subTarget = randChoice(rng, ['image', 'CPlus', 'CMinus', 'increasing']);
+    const subTarget = randChoice(rng, [
+      'image',
+      'CPlus',
+      'CMinus',
+      'increasing',
+      'decreasing',
+      'CZero',
+      'invertibility',
+      'inverse_reconstruction',
+    ]);
+
+    if (subTarget === 'inverse_reconstruction') {
+      const aCanon = randChoice(rng, [1, 2, -1, -2]);
+      const xv = randChoice(rng, [-3, -2, 1, 2, 4]);
+      const yv = randChoice(rng, [-5, -3, 2, 4, 6]);
+      const model = fromCanonical({ a: aCanon, xv, yv });
+      const imStr = aCanon > 0 ? `[${yv}; +∞)` : `(−∞; ${yv}]`;
+      const incStr = aCanon > 0 ? `[${xv}; +∞)` : `(−∞; ${xv}]`;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 5 · Radiografía Completa',
+        prompt: `Reconstruí en forma canónica la función cuadrática con |a| = ${Math.abs(aCanon)} sabiendo que su conjunto imagen es Im(f) = ${imStr} y su intervalo de crecimiento es I↑ = ${incStr}:`,
+        inputKind: 'expression',
+        requireForm: 'canonical',
+        expected: model.forms.canonical,
+        placeholder: 'Ej: 2(x - 1)^2 - 3',
+        diagContext: {
+          target: 'canonical',
+          a: aCanon,
+          b: model.b,
+          c: model.c,
+          xv,
+          yv,
+        },
+        hints: [
+          `Pista 1 (Orientación): Del borde finito del intervalo de crecimiento I↑ = ${incStr} leés la abscisa del vértice xᵥ = ${xv}, y del borde cerrado de la imagen Im(f) = ${imStr} leés la ordenada yᵥ = ${yv}.`,
+          `Pista 2 (Paso intermedio): Mirá hacia dónde abre la imagen: como Im(f) = ${imStr}, el vértice es un ${aCanon > 0 ? 'mínimo y las ramas abren hacia arriba (a > 0)' : 'máximo y las ramas abren hacia abajo (a < 0)'}, por lo que a = ${aCanon}.`,
+          'Pista 3 (Remate): Ensamblá la estructura canónica colocando el coeficiente principal con su signo delante del binomio al cuadrado desplazado en la abscisa del vértice y sumando la ordenada del vértice.',
+        ],
+        explanation: `De I↑ = ${incStr} e Im(f) = ${imStr} deducimos V(${xv}; ${yv}) y concavidad con a = ${aCanon}, obteniendo f(x) = ${model.forms.canonical}.`,
+      };
+    }
 
     const labels = {
       image: {
@@ -340,6 +483,34 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
             : `La curva crece desde la izquierda hasta llegar a la cumbre en xᵥ = ${ana.vertex.xv}: armá el intervalo con paréntesis abierto en -inf y corchete cerrado en ${ana.vertex.xv}.`
         }`,
       },
+      decreasing: {
+        q: `Indicá el intervalo de decrecimiento I↓ sobre el eje X de la función f(x) = ${ana.forms.canonical}:`,
+        ans: ana.decreasingInterval,
+        target: 'decreasing',
+        h1: `Pista 1 (Orientación): La monotonía se lee siempre sobre el eje horizontal X quebrando en la abscisa del vértice xᵥ = ${ana.vertex.xv} (no uses la ordenada yᵥ = ${ana.vertex.yv}).`,
+        h2: `Pista 2 (Paso intermedio): Como a = ${ana.a}, al avanzar de izquierda a derecha la curva desciende ${ana.a > 0 ? `desde −∞ hasta el piso en xᵥ = ${ana.vertex.xv}` : `a partir de la cumbre en xᵥ = ${ana.vertex.xv} hacia +∞`}.`,
+        h3: `Pista 3 (Remate): ${
+          ana.a > 0
+            ? `Expresá la semirrecta izquierda que termina en la abscisa del vértice xᵥ = ${ana.vertex.xv} usando punto y coma como separador.`
+            : `Expresá la semirrecta derecha que comienza en la abscisa del vértice xᵥ = ${ana.vertex.xv} hacia +inf usando punto y coma.`
+        }`,
+      },
+      CZero: {
+        q: `Dada la función cuadrática en forma factorizada f(x) = ${ana.forms.factored}, determiná su conjunto de ceros C₀ entre llaves:`,
+        ans: `{${r1}; ${adjR2}}`,
+        target: 'roots',
+        h1: 'Pista 1 (Orientación): En la forma factorizada a·(x − x₁)·(x − x₂), las raíces son los valores que anulan cada factor por la propiedad del producto nulo.',
+        h2: `Pista 2 (Paso intermedio): Igualá cada paréntesis a cero por separado para despejar las dos abscisas donde la parábola corta al eje X.`,
+        h3: 'Pista 3 (Remate): Escribí ambas raíces ordenadas de menor a mayor dentro de llaves { ... } y separadas por punto y coma.',
+      },
+      invertibility: {
+        q: `Para que f(x) = ${ana.forms.canonical} sea inyectiva y admita función inversa, se restringe su dominio a la rama monótona derecha a partir del vértice. Escribí dicho intervalo maximal [xᵥ; +∞):`,
+        ans: `[${ana.vertex.xv}; +inf)`,
+        target: 'invertibility',
+        h1: `Pista 1 (Orientación): Una parábola completa en ℝ no es inyectiva por su simetría respecto de la recta vertical x = xᵥ = ${ana.vertex.xv}.`,
+        h2: `Pista 2 (Paso intermedio): Al cortar el dominio en la abscisa del vértice xᵥ = ${ana.vertex.xv} (y no en yᵥ = ${ana.vertex.yv}), cada rama por separado pasa la prueba de la recta horizontal.`,
+        h3: `Pista 3 (Remate): Armá el intervalo semiabierto hacia +inf que se inicia con corchete cerrado en la abscisa del eje de simetría.`,
+      },
     };
 
     const chosen = labels[subTarget];
@@ -351,7 +522,7 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
       prompt: chosen.q,
       inputKind: 'set',
       expected: chosen.ans,
-      placeholder: 'Ej: [-4; +inf) o (-inf; -1) U (3; +inf)',
+      placeholder: 'Ej: [-4; +inf) o {-2; 4}',
       diagContext: {
         target: chosen.target,
         a: ana.a,
@@ -423,13 +594,60 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
 
   // 7. parabola_line_intersection
   if (type === 'parabola_line_intersection') {
+    const interMode = randChoice(rng, ['tangency_point', 'secant_k_interval', 'exterior_d_interval']);
+
+    if (interMode === 'secant_k_interval') {
+      const xv = randChoice(rng, [1, 2, 3]);
+      const yv = randChoice(rng, [2, 3, 4, 5]);
+      const model = fromCanonical({ a: 1, xv, yv });
+      const ansIv = `(${yv}; +inf)`;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 7 · Sistemas Parábola-Recta',
+        prompt: `Dada la parábola f(x) = ${model.forms.polynomial} y la recta horizontal y = k, ¿para qué valores del parámetro k la recta es secante a la parábola (la corta en dos puntos distintos, Δ_int > 0)? Escribí el intervalo para k:`,
+        inputKind: 'set',
+        expected: ansIv,
+        placeholder: `Ej: (${yv}; +inf)`,
+        diagContext: { target: 'roots', a: 1, b: model.b, c: model.c },
+        hints: [
+          `Pista 1 (Orientación): Igualá la parábola con la recta y pasá k restando: ${model.forms.polynomial} − k = 0.`,
+          `Pista 2 (Paso intermedio): Planteá la condición de recta secante exigiendo discriminante positivo: Δ_int = (${model.b})² − 4·1·(${model.c} − k) = 4k − ${4 * yv} > 0.`,
+          'Pista 3 (Remate): Despejá k de la inecuación lineal y expresá los valores que superan estrictamente la ordenada del vértice como intervalo abierto hacia +inf.',
+        ],
+        explanation: `Exigiendo Δ_int = 4(k − ${yv}) > 0 obtenemos k > ${yv}, es decir, k ∈ ${ansIv} (superando la altura mínima del vértice yᵥ = ${yv}).`,
+      };
+    }
+
+    if (interMode === 'exterior_d_interval') {
+      const m = randChoice(rng, [2, 4, -2]);
+      const c = randChoice(rng, [3, 5, 7]);
+      const polyStr = fromPolynomial({ a: 1, b: m, c }).forms.polynomial;
+      const ansIv = `(-inf; ${c})`;
+      return {
+        seed,
+        type,
+        competencyId: typeObj.competencyId,
+        badge: 'Familia 7 · Sistemas Parábola-Recta',
+        prompt: `¿Para qué valores de la ordenada al origen d la recta g(x) = ${m}x + d resulta exterior a la parábola f(x) = ${polyStr} (sin puntos de intersección, Δ_int < 0)? Escribí el intervalo para d:`,
+        inputKind: 'set',
+        expected: ansIv,
+        placeholder: `Ej: (-inf; ${c})`,
+        diagContext: { target: 'roots', a: 1, b: 0, c },
+        hints: [
+          `Pista 1 (Orientación): Armá la ecuación diferencia f(x) − g(x) = 0 restando ambas expresiones: los términos lineales ${m}x se cancelan y queda x² + (${c} − d) = 0.`,
+          `Pista 2 (Paso intermedio): El discriminante de la ecuación diferencia es Δ_int = 0² − 4·1·(${c} − d) = 4(d − ${c}). Para que sea exterior debe ser Δ_int < 0.`,
+          'Pista 3 (Remate): Resolvé la desigualdad 4(d − c) < 0 y escribí la semirrecta de valores estrictamente menores como intervalo abierto desde -inf.',
+        ],
+        explanation: `Al plantear Δ_int = 4(d − ${c}) < 0 resulta d < ${c}, que se expresa en notación Exactas como ${ansIv}.`,
+      };
+    }
+
     const xTan = randChoice(rng, [-3, -2, -1, 1, 2, 3]);
     const b = randChoice(rng, [-2, 0, 2, 4]);
-    const m = randChoice(rng, [-2, 1, 2, 4]);
-    // Para que sea tangente en xTan con a = 1: (b - m) / (-2) = xTan => b - m = -2*xTan
     const adjustedM = b + 2 * xTan;
     const c = randChoice(rng, [1, 2, 3, 5]);
-    // c - d = xTan^2 => d = c - xTan^2
     const dTan = c - xTan * xTan;
     const yTan = adjustedM * xTan + dTan;
     const polyStr = fromPolynomial({ a: 1, b, c }).forms.polynomial;
@@ -461,25 +679,264 @@ function _generateQuadChallengeRaw(seed, forcedType = 'all', problemIndex = 0) {
   }
 
   // 8. optimization_context
-  const halfPerim = randChoice(rng, [12, 16, 20, 24, 30]);
-  const xv = halfPerim / 2;
-  const maxArea = xv * xv;
+  if (type === 'optimization_context') {
+    const optCase = randChoice(rng, ['interior', 'exterior', 'closed_candidates', 'wall_fence']);
+
+    if (optCase === 'exterior') {
+      const pv = randChoice(rng, [2, 3, 4]);
+      const pMin = pv + randChoice(rng, [2, 3]);
+      const pMax = pMin + randChoice(rng, [3, 4]);
+      const a = 2;
+      const b = -2 * a * pv;
+      const c = 50;
+      const yv = a * pv * pv + b * pv + c;
+      return {
+        seed,
+        type: 'optimization_context',
+        competencyId: 'quadratics.extremum_optimization',
+        badge: 'Familia 8 · Optimización en Contexto',
+        prompt: `El consumo de combustible de un generador según su potencia p está modelado por C(p) = 2p² − ${Math.abs(b)}p + ${c} (con vértice matemático en pᵥ = ${pv}). Por especificación técnica, solo puede operar en el intervalo restringido p ∈ [${pMin}; ${pMax}] (el vértice queda afuera). ¿Para qué valor de potencia p se obtiene el consumo mínimo dentro del rango permitido?`,
+        inputKind: 'number',
+        expected: pMin,
+        placeholder: 'Ej: 5',
+        diagContext: { target: 'xv', a, b, c, xv: pv, yv },
+        hints: [
+          `Pista 1 (Orientación): ¡Cuidado con usar el vértice ciegamente! El vértice vive en pᵥ = ${pv}, pero ese valor no pertenece al dominio operativo permitido.`,
+          `Pista 2 (Paso intermedio): Como a = 2 > 0, para todo p ≥ ${pv} la curva es estrictamente creciente; en consecuencia, a mayor potencia dentro del intervalo admisible, mayor es el consumo.`,
+          'Pista 3 (Remate): Elegí el extremo inferior del intervalo admisible donde comienza el tramo monótono creciente para señalar la potencia de menor consumo.',
+        ],
+        explanation: `Como pᵥ = ${pv} ∉ [${pMin}; ${pMax}] y en ese tramo la función es estrictamente creciente, el mínimo se alcanza en el borde izquierdo permitido p = ${pMin}.`,
+      };
+    }
+
+    if (optCase === 'closed_candidates') {
+      const xv = randChoice(rng, [3, 4, 5]);
+      const b = 2 * xv;
+      const yv = xv * xv;
+      const xLeft = 1;
+      const xRight = 2 * xv + 1; // Más alejado del eje de simetría que xLeft
+      const fLeft = -xLeft * xLeft + b * xLeft;
+      const fRight = -xRight * xRight + b * xRight; // Será negativo, el mínimo absoluto
+      return {
+        seed,
+        type: 'optimization_context',
+        competencyId: 'quadratics.extremum_optimization',
+        badge: 'Familia 8 · Optimización en Contexto',
+        prompt: `Se analiza la función cuadrática f(x) = −x² + ${b}x en el intervalo cerrado [${xLeft}; ${xRight}]. Su vértice está en xᵥ = ${xv} con f(${xv}) = ${yv}. Evaluando los candidatos de borde f(${xLeft}) y f(${xRight}), ¿cuál es el valor numérico del mínimo absoluto de f(x) en dicho intervalo?`,
+        inputKind: 'number',
+        expected: fRight,
+        placeholder: 'Ej: -5',
+        diagContext: { target: 'yv', a: -1, b, c: 0, xv, yv },
+        hints: [
+          `Pista 1 (Orientación): En un intervalo cerrado [${xLeft}; ${xRight}], los extremos absolutos se disputan entre el vértice interior xᵥ = ${xv} (que aquí es el máximo) y los bordes del intervalo.`,
+          `Pista 2 (Paso intermedio): Evaluá la función en ambos bordes: en x = ${xLeft} vale f(${xLeft}) = ${fLeft}, y en x = ${xRight} debés calcular −(${xRight})² + ${b}·(${xRight}).`,
+          `Pista 3 (Remate): Como x = ${xRight} está más lejos del eje de simetría xᵥ = ${xv} que x = ${xLeft}, efectuá la resta −${xRight * xRight} + ${b * xRight} para determinar la altura mínima alcanzada.`,
+        ],
+        explanation: `Comparando los tres candidatos en [${xLeft}; ${xRight}]: f(${xv}) = ${yv} (máximo), f(${xLeft}) = ${fLeft} y f(${xRight}) = ${fRight}. El mínimo absoluto es ${fRight}.`,
+      };
+    }
+
+    if (optCase === 'wall_fence') {
+      const wireLen = randChoice(rng, [24, 32, 40, 48, 60]);
+      const xv = wireLen / 4;
+      const maxArea = xv * (wireLen - 2 * xv);
+      return {
+        seed,
+        type: 'optimization_context',
+        competencyId: 'quadratics.extremum_optimization',
+        badge: 'Familia 8 · Optimización en Contexto',
+        prompt: `Un cerco rectangular aprovecha una pared existente y se completan los otros tres lados con ${wireLen} metros de alambre. El área en función del ancho x es A(x) = x·(${wireLen} − 2x) = −2x² + ${wireLen}x para x ∈ (0; ${wireLen / 2}). ¿Cuál es el área máxima encerrada (en m²)?`,
+        inputKind: 'number',
+        expected: maxArea,
+        placeholder: 'Ej: 200',
+        diagContext: { target: 'yv', a: -2, b: wireLen, c: 0, xv, yv: maxArea },
+        hints: [
+          `Pista 1 (Orientación): En la función A(x) = −2x² + ${wireLen}x tenés a = −2 < 0 (abre hacia abajo), lo que garantiza un máximo absoluto en la cumbre del vértice.`,
+          `Pista 2 (Paso intermedio): La abscisa del vértice es xᵥ = −b / (2a) = −${wireLen} / (2·(−2)) = ${xv} metros, que pertenece al dominio físico admisible (0; ${wireLen / 2}).`,
+          `Pista 3 (Remate): Evaluá la función de área multiplicando el ancho óptimo ${xv} por el largo correspondiente (${wireLen} − 2·${xv}) para obtener el área máxima.`,
+        ],
+        explanation: `El ancho óptimo es xᵥ = ${xv} m ∈ (0; ${wireLen / 2}), entregando un área máxima de A(${xv}) = ${xv} · (${wireLen - 2 * xv}) = ${maxArea} m².`,
+      };
+    }
+
+    // Default: interior 4-sided fence
+    const halfPerim = randChoice(rng, [12, 16, 20, 24, 30]);
+    const xv = halfPerim / 2;
+    const maxArea = xv * xv;
+    return {
+      seed,
+      type: 'optimization_context',
+      competencyId: 'quadratics.extremum_optimization',
+      badge: 'Familia 8 · Optimización en Contexto',
+      prompt: `Se dispone de ${halfPerim * 2} metros de alambre para cercar los cuatro lados de una huerta rectangular de base x. El área en función de la base es A(x) = x·(${halfPerim} − x) = −x² + ${halfPerim}x. ¿Cuál es el área máxima (en m²) que puede encerrarse?`,
+      inputKind: 'number',
+      expected: maxArea,
+      placeholder: 'Ej: 64',
+      diagContext: { target: 'yv', a: -1, b: halfPerim, c: 0, xv, yv: maxArea },
+      hints: [
+        `Pista 1 (Orientación): La función de área A(x) = −x² + ${halfPerim}x es una parábola con a = −1 < 0 (abre hacia abajo), por lo que alcanza su área máxima en el vértice (xᵥ; yᵥ).`,
+        `Pista 2 (Paso intermedio): Las raíces de A(x) = x·(${halfPerim} − x) son x₁ = 0 y x₂ = ${halfPerim}. Por simetría, la base óptima que maximiza el área está en el punto medio xᵥ = ${halfPerim} / 2 = ${xv} m.`,
+        `Pista 3 (Remate): ¡Atención! La pregunta pide el área máxima yᵥ, no la base xᵥ. Calculá el valor numérico del área evaluando A(${xv}) = ${xv}·(${halfPerim} − ${xv}).`,
+      ],
+      explanation: `El vértice de A(x) = −x² + ${halfPerim}x se alcanza cuando la base mide xᵥ = ${xv} m (un cuadrado perfecto de ${xv} × ${xv}), entregando un área máxima de yᵥ = ${maxArea} m².`,
+    };
+  }
+
+  // 9. area_model_and_notable_products
+  if (type === 'area_model_and_notable_products') {
+    const subKind = randChoice(rng, [
+      'rectangle',
+      'square_sum',
+      'square_diff',
+      'diff_of_squares',
+      'false_quadratic_cancellation',
+    ]);
+    let prompt, expected, diagContext, h1, h2, h3, expl;
+    let reqForm = 'polynomial';
+
+    if (subKind === 'false_quadratic_cancellation') {
+      const p = randChoice(rng, [1, 2, 3, 4]);
+      const q = randChoice(rng, [2, 3, 5]);
+      const bSum = p + q;
+      const prod = p * q;
+      const linExpr = `${bSum}x + ${prod}`;
+      reqForm = null;
+
+      prompt = `Desarrollá el producto y reducí los términos semejantes en la expresión aparente f(x) = (x + ${p})·(x + ${q}) − x² (detectando la cancelación del grado 2):`;
+      expected = linExpr;
+      diagContext = { target: 'expand_binomial', a: 0, b: bSum, c: prod };
+      h1 = `Pista 1 (Orientación): Desarrollá primero el producto de binomios (x + ${p})·(x + ${q}) sumando las cuatro áreas del rectángulo: x² + ${p}x + ${q}x + ${prod}.`;
+      h2 = `Pista 2 (Paso intermedio): Al restar el término −x² del final de la expresión, observá que x² − x² = 0 (el coeficiente cuadrático se anula: a = 0).`;
+      h3 = `Pista 3 (Remate): Asociá únicamente los términos lineales sobrevivientes y sumales la esquina constante para escribir la función lineal reducida.`;
+      expl = `Al expandir (x + ${p})(x + ${q}) − x² = x² + ${bSum}x + ${prod} − x², el término de grado 2 se cancela (a = 0) y queda la expresión lineal ${linExpr}.`;
+    } else if (subKind === 'rectangle') {
+      const a = randChoice(rng, [-5, -4, -3, -2, 1, 2, 3, 4]);
+      let b = randChoice(rng, [-4, -3, 2, 3, 5]);
+      if (b === a || b === -a) b += 1;
+      const bSum = a + b;
+      const prod = a * b;
+      const poly = fromPolynomial({ a: 1, b: bSum, c: prod }).forms.polynomial;
+      const aSign = a >= 0 ? `+ ${a}` : `− ${Math.abs(a)}`;
+      const bSign = b >= 0 ? `+ ${b}` : `− ${Math.abs(b)}`;
+
+      prompt = `Desarrollá mediante el modelo de área el producto de binomios (x ${aSign})·(x ${bSign}) y escribilo en forma polinómica:`;
+      expected = poly;
+      diagContext = { target: 'expand_binomial', a: 1, b: bSum, c: prod };
+      h1 = `Pista 1 (Orientación): Partí el rectángulo en cuatro parcelas de área: x·x = x², (${a})·x, (${b})·x y el cruce constante (${a})·(${b}).`;
+      h2 = `Pista 2 (Paso intermedio): Sumá las cuatro áreas elementales y asociá los dos términos lineales en x: (${a} + ${b})x.`;
+      h3 = `Pista 3 (Remate): Reducí los términos lineales semejantes para presentar el trinomio mónico ordenado en potencias decrecientes de x.`;
+      expl = `Multiplicando las cuatro regiones del modelo de área: x² + (${a})x + (${b})x + (${a})·(${b}) = ${poly}.`;
+    } else if (subKind === 'diff_of_squares') {
+      const k = randChoice(rng, [2, 3, 4, 5, 6]);
+      const k2 = k * k;
+      const poly = `x^2 - ${k2}`;
+
+      prompt = `Desarrollá el producto notable suma por diferencia (x − ${k})·(x + ${k}) y escribilo en forma polinómica reducida:`;
+      expected = poly;
+      diagContext = { target: 'expand_binomial', a: 1, b: 0, c: -k2 };
+      h1 = `Pista 1 (Orientación): Aplicá la propiedad distributiva o la identidad notable de la diferencia de cuadrados (u − v)(u + v) = u² − v².`;
+      h2 = `Pista 2 (Paso intermedio): Observá que los términos cruzados +${k}x y −${k}x son opuestos aditivos y se cancelan mutuamente a cero.`;
+      h3 = `Pista 3 (Remate): Escribí el binomio resultante restando directamente el cuadrado del número al cuadrado de x.`;
+      expl = `Por diferencia de cuadrados: (x − ${k})(x + ${k}) = x² − (${k})² = ${poly}.`;
+    } else {
+      const sign = subKind === 'square_sum' ? 1 : -1;
+      const k = randChoice(rng, [1, 2, 3, 4, 5]);
+      const bCoeff = sign * 2 * k;
+      const k2 = k * k;
+      const poly = fromPolynomial({ a: 1, b: bCoeff, c: k2 }).forms.polynomial;
+      const signStr = sign > 0 ? `+ ${k}` : `− ${k}`;
+
+      prompt = `Desarrollá el cuadrado del binomio (x ${signStr})² mediante el modelo de área y escribilo como trinomio cuadrado perfecto:`;
+      expected = poly;
+      diagContext = { target: 'expand_binomial', a: 1, b: bCoeff, c: k2 };
+      h1 = `Pista 1 (Orientación): ¡Cuidado con el error clásico! El cuadrado NO se distribuye sobre la suma: (x ${signStr})² ≠ x² ${sign > 0 ? '+' : '−'} ${k2}.`;
+      h2 = `Pista 2 (Paso intermedio): El modelo de área de un cuadrado de lado (x ${signStr}) contiene: x², dos rectángulos idénticos de lado ${k}·x, y la esquina ${k}².`;
+      h3 = `Pista 3 (Remate): Ensamblá el trinomio cuadrado perfecto sumando el término cuadrático, el doble producto central y el término independiente.`;
+      expl = `Desarrollando el cuadrado de un binomio: (x ${signStr})² = x² ${sign > 0 ? '+' : '−'} 2·(${k})·x + (${k})² = ${poly}.`;
+    }
+
+    return {
+      seed,
+      type,
+      competencyId: typeObj.competencyId,
+      badge: 'Familia 9 · Modelo de Área y Productos Notables',
+      prompt,
+      inputKind: 'expression',
+      requireForm: reqForm,
+      expected,
+      placeholder: 'Ej: x^2 + 2x - 15',
+      diagContext,
+      hints: [h1, h2, h3],
+      explanation: expl,
+    };
+  }
+
+  // 10. grouping_and_factoring_strategy
+  const subKind = randChoice(rng, ['grouping_non_monic', 'common_factor_diff_squares', 'common_factor_linear']);
+  let prompt, expected, diagContext, h1, h2, h3, expl;
+
+  if (subKind === 'grouping_non_monic') {
+    const a = randChoice(rng, [2, 3]);
+    const r1 = randChoice(rng, [1, 2, 3]);
+    const r2 = randChoice(rng, [-3, -2, -1, 1, 2]);
+    const bCoeff = a * r2 + r1;
+    const cCoeff = r1 * r2;
+    const poly = fromPolynomial({ a, b: bCoeff, c: cCoeff }).forms.polynomial;
+    const model = fromPolynomial({ a, b: bCoeff, c: cCoeff });
+    const fact = model.forms.factored;
+    const prodAC = a * cCoeff;
+
+    prompt = `Factorizá por agrupación descomponiendo el término central el trinomio con a ≠ 1: f(x) = ${poly}:`;
+    expected = fact;
+    diagContext = { target: 'factor', a, b: bCoeff, c: cCoeff };
+    h1 = `Pista 1 (Orientación): Multiplicá a·c = ${a}·(${cCoeff}) = ${prodAC}. Buscá dos enteros m y n que multiplicados den ${prodAC} y sumados den b = ${bCoeff}.`;
+    h2 = `Pista 2 (Paso intermedio): Los dos enteros son ${a * r2} y ${r1}. Descomponé el término central ${bCoeff}x en esos dos sumandos y agrupá por parejas.`;
+    h3 = `Pista 3 (Remate): Extraé el factor común de cada pareja para que emerja el binomio compartido y completá la factorización en producto de dos factores.`;
+    expl = `Descomponiendo ${bCoeff}x y agrupando por parejas: ${poly} = ${fact}.`;
+  } else if (subKind === 'common_factor_diff_squares') {
+    const a = randChoice(rng, [2, 3, 5]);
+    const k = randChoice(rng, [2, 3, 4]);
+    const k2 = k * k;
+    const cCoeff = -a * k2;
+    const poly = `${a}x^2 - ${Math.abs(cCoeff)}`;
+    const fact = `${a}(x - ${k})(x + ${k})`;
+
+    prompt = `Aplicá la estrategia de dos pasos (extraer factor común a = ${a} y luego diferencia de cuadrados) para factorizar f(x) = ${poly}:`;
+    expected = fact;
+    diagContext = { target: 'factor', a, b: 0, c: cCoeff };
+    h1 = `Pista 1 (Orientación): Mirá ambos términos: ambos son divisibles por a = ${a}. Extraé primero el factor común numérico fuera del paréntesis.`;
+    h2 = `Pista 2 (Paso intermedio): Al extraer ${a} queda ${a}·(x² − ${k2}). El paréntesis interior es una diferencia de cuadrados u² − v².`;
+    h3 = `Pista 3 (Remate): Factorizá el binomio interior como suma por diferencia sin omitir el coeficiente principal que extrajiste al inicio.`;
+    expl = `Extrayendo factor común ${a} y aplicando diferencia de cuadrados: ${poly} = ${a}(x² − ${k2}) = ${fact}.`;
+  } else {
+    const a = randChoice(rng, [2, 3, 4]);
+    const k = randChoice(rng, [2, 3, 5]);
+    const bCoeff = a * k;
+    const poly = `${a}x^2 + ${bCoeff}x`;
+    const fact = `${a}x(x + ${k})`;
+
+    prompt = `Identificá la estrategia adecuada y factorizá por extracción de factor común monomio la cuadrática incompleta f(x) = ${poly}:`;
+    expected = fact;
+    diagContext = { target: 'factor', a, b: bCoeff, c: 0 };
+    h1 = `Pista 1 (Orientación): Como el término independiente es nulo (c = 0), ambos sumandos comparten la variable x y el divisor numérico ${a}.`;
+    h2 = `Pista 2 (Paso intermedio): Extraé el monomio común ${a}x fuera de un paréntesis para que multiplique a los términos restantes divididos.`;
+    h3 = `Pista 3 (Remate): Dividí cada término del polinomio original por el monomio común extraído para armar el producto factorizado final.`;
+    expl = `Extrayendo factor común monomio ${a}x: ${poly} = ${fact}.`;
+  }
+
   return {
     seed,
-    type: 'optimization_context',
-    competencyId: 'quadratics.extremum_optimization',
-    badge: 'Familia 8 · Optimización en Contexto',
-    prompt: `Se dispone de ${halfPerim * 2} metros de alambre para cercar los cuatro lados de una huerta rectangular de base x. El área en función de la base es A(x) = x·(${halfPerim} − x) = −x² + ${halfPerim}x. ¿Cuál es el área máxima (en m²) que puede encerrarse?`,
-    inputKind: 'number',
-    expected: maxArea,
-    placeholder: 'Ej: 64',
-    diagContext: { target: 'yv', a: -1, b: halfPerim, c: 0, xv, yv: maxArea },
-    hints: [
-      `Pista 1 (Orientación): La función de área A(x) = −x² + ${halfPerim}x es una parábola con a = −1 < 0 (abre hacia abajo), por lo que alcanza su área máxima en el vértice (xᵥ; yᵥ).`,
-      `Pista 2 (Paso intermedio): Las raíces de A(x) = x·(${halfPerim} − x) son x₁ = 0 y x₂ = ${halfPerim}. Por simetría, la base óptima que maximiza el área está en el punto medio xᵥ = ${halfPerim} / 2 = ${xv} m.`,
-      `Pista 3 (Remate): ¡Atención! La pregunta pide el área máxima yᵥ, no la base xᵥ. Calculá el valor numérico del área evaluando A(${xv}) = ${xv}·(${halfPerim} − ${xv}).`,
-    ],
-    explanation: `El vértice de A(x) = −x² + ${halfPerim}x se alcanza cuando la base mide xᵥ = ${xv} m (un cuadrado perfecto de ${xv} × ${xv}), entregando un área máxima de yᵥ = ${maxArea} m².`,
+    type: 'grouping_and_factoring_strategy',
+    competencyId: typeObj.competencyId,
+    badge: 'Familia 10 · Estrategia de Factorización y Agrupación',
+    prompt,
+    inputKind: 'expression',
+    requireForm: 'factored',
+    expected,
+    placeholder: 'Ej: 2(x - 3)(x + 3) o (2x + 1)(x + 3)',
+    diagContext,
+    hints: [h1, h2, h3],
+    explanation: expl,
   };
 }
 
@@ -748,6 +1205,10 @@ function validateRetoAnswer(challenge, rawInput) {
     return { ok: false, empty: true };
   }
 
+  if (challenge.isTransfer) {
+    return validateTransferAnswer(challenge, trimmed);
+  }
+
   if (challenge.inputKind === 'number') {
     try {
       const val = parseNumberOrFraction(trimmed);
@@ -816,7 +1277,7 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       type: 'button',
       class: 'pr-chip is-active',
     },
-    [chalkIcon('spark', 15), ' Pestaña 1 · Entrenador Infinito (8 Familias PRNG)']
+    [chalkIcon('spark', 15), ' Pestaña 1 · Entrenador Infinito (10 Familias PRNG)']
   );
 
   const tabBtnTraps = h(
@@ -852,6 +1313,8 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
     { 'aria-label': 'Familia de reto', class: 'quad-family-select' },
     [
       h('option', { value: 'all' }, 'Todas las familias (Aleatorio)'),
+      h('option', { value: 'adaptativo' }, 'Modo Inteligente (Recomendado por Alaska)'),
+      h('option', { value: 'transferencia' }, 'Transferencia Inter-Módulo (Lineal vs. Exponencial vs. Cuadrática)'),
       ...CHALLENGE_TYPES.map((fam) => h('option', { value: fam.id }, fam.label)),
     ]
   );
@@ -944,7 +1407,9 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
     class: 'exp-challenges-cascade seq-check quad-challenges-cascade',
   });
 
-  prngPane.append(toolbar, cascadeList);
+  const adaptiveNote = h('div', { class: 'exp-challenge__adaptive-note quad-challenge__adaptive-note', hidden: '' });
+
+  prngPane.append(toolbar, adaptiveNote, cascadeList);
 
   function updateProgressPill() {
     const solvedInSeed = [0, 1, 2, 3, 4, 5, 6, 7].filter(
@@ -991,6 +1456,15 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       familyEl,
       statusEl
     );
+
+    let cardAdaptiveNote = null;
+    if (ch._selectionReason) {
+      cardAdaptiveNote = h(
+        'div',
+        { class: 'exp-challenge__adaptive-note quad-challenge__adaptive-note' },
+        `Recomendación de Alaska: ${ch._selectionReason}`
+      );
+    }
 
     const promptEl = h('p', { class: 'exp-challenge__prompt pr-challenge__prompt quad-reto-prompt' }, ch.prompt);
 
@@ -1112,7 +1586,17 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       statusEl.textContent = 'Resuelto (Con apoyo)';
       statusEl.className = 'exp-challenge-card__status is-solution';
 
-      if (ch.competencyId) {
+      if (ch.isTransfer) {
+        recordTransferAttempt({
+          moduleId: 'cuadraticas',
+          exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+          competencyIds: ch.competencyIds,
+          correct: true,
+          hintsUsed: hintIndex,
+          solutionRevealed: true,
+          representation: ch.representation || 'symbolic',
+        });
+      } else if (ch.competencyId) {
         try {
           recordQuadAttempt({
             exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
@@ -1191,7 +1675,17 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
         hintBtn.disabled = true;
         solutionBtn.disabled = true;
 
-        if (ch.competencyId) {
+        if (ch.isTransfer) {
+          recordTransferAttempt({
+            moduleId: 'cuadraticas',
+            exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+            competencyIds: ch.competencyIds,
+            correct: true,
+            hintsUsed: hintIndex,
+            solutionRevealed: false,
+            representation: ch.representation || 'symbolic',
+          });
+        } else if (ch.competencyId) {
           try {
             recordQuadAttempt({
               exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
@@ -1333,7 +1827,17 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
           vnReact({ pose: diag.pose, tag: diag.shortLabel || 'Diagnóstico', html: diag.message });
         }
       } else {
-        if (ch.competencyId) {
+        if (ch.isTransfer) {
+          recordTransferAttempt({
+            moduleId: 'cuadraticas',
+            exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
+            competencyIds: ch.competencyIds,
+            correct: false,
+            hintsUsed: hintIndex,
+            solutionRevealed: false,
+            representation: ch.representation || 'symbolic',
+          });
+        } else if (ch.competencyId) {
           try {
             recordQuadAttempt({
               exerciseId: `quad-reto-${ch.type}-${problemIndex}`,
@@ -1379,6 +1883,7 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
         'data-problem-index': String(problemIndex),
       },
       headerEl,
+      cardAdaptiveNote,
       promptEl,
       inputRow,
       actionsEl,
@@ -1392,7 +1897,50 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
 
   function renderPrngCascade() {
     clear(cascadeList);
-    const challenges = generateQuadChallenges(state.seed, state.family, 8);
+    adaptiveNote.setAttribute('hidden', '');
+    adaptiveNote.textContent = '';
+
+    let challenges = [];
+    if (state.family === 'adaptativo') {
+      const candidateFamilies = CHALLENGE_TYPES.map((f) => ({
+        id: f.id,
+        family: f.id,
+        competencyId: f.competencyId,
+        label: f.label,
+      }));
+
+      challenges = [];
+      let prevCompId = null;
+      for (let i = 0; i < 8; i++) {
+        const selection = selectAdaptiveExercise({
+          moduleId: 'cuadraticas',
+          availableExercises: candidateFamilies,
+          previousCompetencyId: prevCompId,
+        });
+        const chosenFam = selection.exercise?.family || CHALLENGE_TYPES[0].id;
+        const ch = generateQuadChallenge(state.seed, chosenFam, i);
+        ch._targetComp = getCompetencyById(selection.targetCompetencyId || selection.exercise?.competencyId);
+        ch._selectionReason = selection.selectionReason;
+        prevCompId = selection.targetCompetencyId || selection.exercise?.competencyId;
+        challenges.push(ch);
+      }
+
+      adaptiveNote.removeAttribute('hidden');
+      const firstTitle = challenges[0]?._targetComp?.title || 'Competencia clave';
+      const firstReason = challenges[0]?._selectionReason || 'Refuerzo adaptativo según tu progreso.';
+      adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}». Alaska recomienda: ${firstReason}`;
+    } else if (state.family === 'transferencia') {
+      challenges = Array.from({ length: 8 }, (_, i) => {
+        const ch = generateTransferChallenge(state.seed, 'all', i);
+        ch.isTransfer = true;
+        return ch;
+      });
+      adaptiveNote.removeAttribute('hidden');
+      adaptiveNote.textContent = 'Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales y Cuadráticos.';
+    } else {
+      challenges = generateQuadChallenges(state.seed, state.family, 8);
+    }
+
     challenges.forEach((ch, idx) => {
       const card = createQuadChallengeCard(ch, idx);
       cascadeList.appendChild(card);

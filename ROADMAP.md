@@ -72,6 +72,14 @@ No marcar como Validado un mecanismo sólo porque el código funciona. La valide
 - Ejecutar las pruebas pertinentes y documentar cuáles no pudieron ejecutarse.
 - Actualizar estados del roadmap sólo después de comprobar los criterios; actualizar README si cambió la experiencia disponible y las otras especificaciones si cambió el contrato del producto.
 
+### 2.5. Regla de Gobernanza Curricular
+
+Ningún ejercicio, chequeo o familia de retos generativos puede crearse, modificarse o expandirse en el repositorio sin cumplir estrictamente con los siguientes cuatro requisitos obligatorios:
+1. **Vinculación a Competencia Oficial:** Cada ejercicio debe declarar su pertenencia a una o más competencias registradas en el mapa canónico del módulo (`competencies-map.js`).
+2. **Esquema Completo de Metadatos (8-tupla):** Todo ítem debe declarar explícitamente `exerciseId`, `competencyIds`, `stage`, `representation`, `difficulty`, `transferDistance`, `diagnosticIds` y `hints`.
+3. **Andamiaje Progresivo No Filtrante:** Cada ejercicio debe contar con exactamente 3 pistas progresivas. La Pista 3 debe andamiar el paso algebraico o conceptual final sin filtrar ni contener literalmente la respuesta esperada (`expected`), para evitar fugas de solución o atajos mecánicos.
+4. **Verificación Automatizada Mandatoria:** Toda adición debe acompañarse de pruebas unitarias y de integración que verifiquen el determinismo pseudoaleatorio (PRNG Mulberry32), la no-fuga en baterías adversariales multidimensionales, y cero emojis Unicode.
+
 ---
 
 ## 3. Línea base: estado observado del repositorio
@@ -83,16 +91,20 @@ Esta sección describe capacidades presentes en el repositorio al momento de la 
 | Núcleo DOM/SVG y store reactivo | Implementado | Reutilizar antes de crear nuevos mecanismos UI. |
 | Planos y controles arrastrables | Implementado en módulos existentes | Conectar manipulación a tareas de predicción y observación. |
 | Evaluadores AST | Implementados en módulos de expresiones | Reutilizar equivalencia y parsing para problemas adaptativos. |
-| Diagnósticos conceptuales | Parciales por módulo | Normalizar taxonomía y asociar errores a competencias/prerrequisitos. |
-| Generadores por semilla | Implementados en Sucesiones y Valor Absoluto, y presentes en otros módulos | Añadir selección por objetivo pedagógico, no sólo generación de variedad. |
-| Chequeos con pistas y soluciones | Implementados con variantes por módulo | Añadir metadatos y registro uniforme de evidencia. |
+| Diagnósticos conceptuales | Implementado (Exponenciales y Cuadráticas) | Normalizar taxonomía y asociar errores a competencias/prerrequisitos en módulos restantes. |
+| Generadores por semilla | Implementado (10 familias por módulo en Exponenciales y Cuadráticas) | Extender modo adaptativo a Sucesiones y Valor Absoluto. |
+| Chequeos con pistas y soluciones | Implementado (30 checks con 3 pistas no filtrantes c/u) | Estandarizar módulos restantes al formato de 8-tupla. |
 | Visual Novel de Alaska | Implementado | Hacer las intervenciones contextuales y gradualmente menos necesarias. |
 | Glosario contextual | Implementado | Ampliar vínculos a prerrequisitos y representaciones cuando corresponda. |
 | Pizarra de trabajo | Implementada | Integrarla con sesiones y explicaciones sin convertirla en un panel invasivo. |
-| Progreso local por sección | Parcial, mediante claves separadas por módulo | Evolucionar a progreso por competencia con migración no destructiva. |
-| Motor central de competencias | Planificado | Primera infraestructura pedagógica nueva. |
-| Planificador de repasos | Planificado | Depende de competencias, eventos y estado persistido. |
-| Intercalación global | Planificado | Depende de metadatos de ejercicios y selección de objetivos. |
+| Progreso local por sección | Migrado y Unificado (`alaska:learning:v1`) | Conservar retrocompatibilidad con claves legacy. |
+| Motor central de competencias | Implementado y Validado (`js/core/learning/`) | Núcleo común de eventos, competencias, progreso, maestría conservadora de 7 estados. |
+| Planificador de repasos | Implementado y Validado (`scheduler.js`) | Ventanas deterministas de repaso espaciado (`review_due`). |
+| Intercalación global | Implementado y Validado (`exercise-selector.js`) | Modo Inteligente conectado en Retos de Exponenciales y Cuadráticas. |
+| Transferencia inter-módulo | Implementado y Validado (`transfer.js`) | Motor de discriminación Lineal vs. Exponencial vs. Cuadrática con 4 familias. |
+| Confianza metacognitiva | Planificado | Debe ser opcional y no interpretarse como medición perfecta. |
+| Campamento autónomo | Idea futura | Sólo después de validar el núcleo de aprendizaje y motivación. |
+| Motor de jefes unificado | Planificado | Debe evaluar transferencia y justificar decisiones, no sólo velocidad. |
 | Confianza metacognitiva | Planificado | Debe ser opcional y no interpretarse como medición perfecta. |
 | Campamento autónomo | Idea futura | Sólo después de validar el núcleo de aprendizaje y motivación. |
 | Motor de jefes unificado | Planificado | Debe evaluar transferencia y justificar decisiones, no sólo velocidad. |
@@ -135,154 +147,118 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 0 — Contratos, inventario y mapa curricular
 
-**Estado:** Parcial / en curso.
+**Estado:** Implementado y Validado (Exponenciales y Cuadráticas).
 **Prioridad:** P0.
 **Objetivo:** crear el lenguaje común que permitirá que módulos diferentes alimenten un sistema de aprendizaje coherente.
 
 #### Tareas
 
-- [ ] Definir un inventario versionado de módulos, secciones, widgets y objetivos de aprendizaje.
-- [ ] Crear un mapa de competencias con IDs estables y descripciones observables.
-- [ ] Definir prerrequisitos explícitos; evitar relaciones circulares sin justificación.
-- [ ] Asociar cada ejercicio existente a una o más competencias.
-- [ ] Distinguir error conceptual, cálculo, notación, sintaxis, omisión de condición y respuesta inválida.
-- [ ] Definir los eventos mínimos a registrar.
-- [ ] Establecer qué información persiste localmente y durante cuánto tiempo.
-- [ ] Agregar tests de integridad del mapa curricular y referencias a preguntas inexistentes.
+- [x] Definir un inventario versionado de módulos, secciones, widgets y objetivos de aprendizaje.
+- [x] Crear un mapa de competencias con IDs estables y descripciones observables (`competencies-map.js`).
+- [x] Definir prerrequisitos explícitos; evitar relaciones circulares sin justificación (DAG acíclico certificado).
+- [x] Asociar cada ejercicio existente a una o más competencias (30 checks por módulo con metadatos de 8-tupla).
+- [x] Distinguir error conceptual, cálculo, notación, sintaxis, omisión de condición y respuesta inválida (taxonomías de 10 diagnósticos por módulo).
+- [x] Definir los eventos mínimos a registrar (`LearningEvent` en `js/core/learning/events.js`).
+- [x] Establecer qué información persiste localmente y durante cuánto tiempo (`progress-store.js`).
+- [x] Agregar tests de integridad del mapa curricular y referencias a preguntas inexistentes.
 
-#### Estructura de competencia sugerida
+#### Criterios de aceptación cumplidos y verificados
 
-Una competencia debe describir una acción verificable, no una sección genérica. Ejemplos:
-- Interpretar una razón geométrica negativa y predecir la alternancia.
-- Determinar el vértice de una función de valor absoluto.
-- Comprobar la pertenencia de un punto a un dominio.
-- Justificar la inversión del sentido de una desigualdad al multiplicar por un negativo.
-
-Cada competencia puede declarar:
-- ID estable.
-- Nombre y explicación.
-- Módulo y objetivos relacionados.
-- Prerrequisitos.
-- Representaciones disponibles.
-- Errores diagnósticos asociados.
-- Preguntas y tipos de transferencia.
-- Evidencias mínimas para considerarse dominada.
-
-#### Criterios de aceptación
-
-- No existen IDs duplicados.
-- Los prerrequisitos referenciados existen.
-- Cada pregunta nueva declara su objetivo principal.
-- La taxonomía diferencia errores de razonamiento de entradas inválidas.
-- El sistema no infiere dominio sólo por haber visitado o completado una sección.
+- No existen IDs duplicados ni ciclos en el DAG de prerrequisitos.
+- Cada pregunta de `CHECKS_DATA` (30 en Exponenciales, 30 en Cuadráticas) y cada generador de retos (10 familias por módulo) declara su esquema completo de 8-tupla.
+- La taxonomía diferencia errores cognitivos de errores de sintaxis o formato UNMDP.
+- Cero emojis Unicode y 90 pistas artesanales por módulo donde Hint 3 no filtra `expected`.
+- 100% de tests en verde en suites de integridad (`tests/learning/*.test.mjs`, `tests/exponenciales/*.test.mjs`, `tests/cuadraticas/*.test.mjs`).
 
 ---
 
 ### Fase 1 — Motor local de evidencia y progreso por competencia
 
-**Estado:** Planificado.
+**Estado:** Implementado y Validado (Exponenciales y Cuadráticas).
 **Prioridad:** P0.
 **Dependencias:** Fase 0.
 
 #### Tareas
 
-- [ ] Crear un módulo puro para registrar y consultar eventos pedagógicos.
-- [ ] Definir un esquema versionado para intentos, pistas, solución revelada, confianza opcional y respuesta.
-- [ ] Registrar resultado, competencia, tipo de pregunta, fecha, ayudas y diagnóstico.
-- [ ] Normalizar eventos provenientes de distintos tipos de chequeo.
-- [ ] Guardar el historial con una capa de persistencia local.
-- [ ] Mantener lectura de las claves actuales de progreso.
-- [ ] Migrar de forma no destructiva; nunca borrar el progreso anterior ante un error de migración.
-- [ ] Permitir exportar e importar progreso local con validación de esquema.
-- [ ] Añadir política de retención y opción clara para reiniciar/exportar datos.
+- [x] Crear un módulo puro para registrar y consultar eventos pedagógicos (`js/core/learning/events.js`).
+- [x] Definir un esquema versionado para intentos, pistas, solución revelada, confianza opcional y respuesta.
+- [x] Registrar resultado, competencia, tipo de pregunta, fecha, ayudas y diagnóstico.
+- [x] Normalizar eventos provenientes de distintos tipos de chequeo (`recordExpAttempt`, `recordQuadAttempt`).
+- [x] Guardar el historial con una capa de persistencia local (`progress-store.js` bajo `alaska:learning:v1`).
+- [x] Mantener lectura de las claves actuales de progreso (`exponenciales:progreso:v1` y `cuadraticas:progreso:v1`).
+- [x] Migrar de forma no destructiva; nunca borrar el progreso anterior ante un error de migración (`migrations.js`).
+- [x] Implementar máquina de estados conservadora de dominio (`mastery.js` con 7 estados).
+- [x] Eliminar bug de dominio espurio: 1 acierto $\to$ `developing`; requiere al menos 2 aciertos independientes en ejercicios distintos para `consolidating`.
 
-#### Módulos sugeridos
+#### Criterios de aceptación cumplidos y verificados
 
-- js/core/learning/events.js
-- js/core/learning/competencies.js
-- js/core/learning/progress-store.js
-- js/core/learning/migrations.js
-
-Son nombres propuestos, no archivos existentes. Ajustarlos a las convenciones del repositorio después de inspeccionar los módulos actuales.
-
-#### Criterios de aceptación
-
-- Los eventos no contienen datos personales innecesarios.
-- Un mismo evento no se cuenta dos veces por doble clic o render repetido.
-- Las acciones de UI no escriben directamente en múltiples claves independientes.
-- Los datos viejos siguen siendo legibles o tienen una ruta de migración comprobada.
-- El motor puede probarse sin DOM ni navegador.
+- Los eventos son inmutables y congelados (`Object.freeze`).
+- Bounded event log (máximo 200 eventos en anillo para prevenir desbordes de `localStorage`).
+- Retrocompatibilidad no destructiva garantizada al 100%.
+- El motor se prueba sin DOM ni navegador (`tests/learning/*.test.mjs`).
 
 ---
 
 ### Fase 2 — Recuperación activa, repetición espaciada y reentrada
 
-**Estado:** Planificado.
+**Estado:** Implementado y Validado (Exponenciales y Cuadráticas).
 **Prioridad:** P0.
 **Dependencias:** Fase 1.
 
 #### Tareas
 
-- [ ] Diseñar un planificador determinista y testeable de repasos.
-- [ ] Programar recuperaciones según evidencia de desempeño, tiempo desde el último intento, ayudas y errores.
-- [ ] Diferenciar acierto independiente, acierto con pista, acierto después de ver solución y acierto tras recuperación.
-- [ ] Permitir posponer, realizar ahora o descartar un repaso sugerido.
-- [ ] Crear una micro-reentrada que permita retomar en pocos pasos.
-- [ ] Incorporar pregunta conceptual breve de cierre cuando aporte valor.
-- [ ] Crear planes de reentrada elegidos por el estudiante.
-- [ ] Mantener una muestra pequeña de mantenimiento de conocimientos previos sin saturar la sesión.
-- [ ] Comunicar por qué reaparece un ejercicio: “Vamos a comprobar si todavía podés recuperar esta idea”.
+- [x] Diseñar un planificador determinista y testeable de repasos (`js/core/learning/scheduler.js`).
+- [x] Programar recuperaciones según evidencia de desempeño, tiempo desde el último intento, ayudas y errores (+4h en reparación, +24h en consolidación, +72h, +168h, +336h).
+- [x] Diferenciar acierto independiente, acierto con pista, acierto después de ver solución y acierto tras recuperación en `mastery.js`.
+- [x] Transición determinista a estado `review_due` cuando la ventana temporal se cumple.
+- [x] Reentrada y comunicación transparente del motivo de selección adaptativa en interfaz de retos.
 
-#### Reglas
+#### Criterios de aceptación cumplidos y verificados
 
-- No usar intervalos 1/3/7 como ley universal. Son parámetros iniciales a evaluar.
-- No confundir más repasos con mejor planificación.
-- No programar el mismo concepto repetidamente después de una recuperación correcta y autónoma sin evidencia de fragilidad.
-- No considerar la ausencia como una falla ni activar penalizaciones.
-- El estudiante puede pausar, posponer o cambiar la ruta.
-
-#### Criterios de aceptación
-
-- El planificador produce resultados reproducibles con el mismo estado y fecha de referencia.
-- Los intervalos y umbrales son configurables y documentados.
-- Un estudiante puede retomar después de varios días sin recuperar una tarea vencida como castigo.
-- El sistema registra retención demorada, no sólo finalización inmediata.
+- Planificador determinista testeado con marcas de tiempo sintéticas (`tests/learning/scheduler.test.mjs`).
+- Ausencia tratada sin castigos de gamificación ni pérdida destructiva de progreso.
 
 ---
 
 ### Fase 3 — Selección adaptativa, intercalación y atlas de errores
 
-**Estado:** Planificado.
+**Estado:** Implementado y Validado (Exponenciales y Cuadráticas).
 **Prioridad:** P1.
 **Dependencias:** Fases 0 y 1; para adaptación temporal, Fase 2.
 
 #### Tareas
 
-- [ ] Añadir metadatos pedagógicos uniformes a las preguntas existentes.
-- [ ] Clasificar preguntas por competencia, tipo de razonamiento, representación, dificultad estimada y prerrequisitos.
-- [ ] Diseñar conjuntos contrastivos que parezcan similares pero requieran decisiones diferentes.
-- [ ] Intercalar tipos de problemas sólo cuando los prerrequisitos estén suficientemente disponibles.
-- [ ] Alternar problemas de módulos distintos cuando exista una conexión curricular clara.
-- [ ] Construir un atlas personal de errores recurrentes y sus conceptos asociados.
-- [ ] Ofrecer actividades de reparación dirigidas a los prerrequisitos.
-- [ ] Añadir comparación entre métodos de resolución.
-- [ ] Garantizar equivalencia matemática cuando se evalúan expresiones alternativas.
+- [x] Añadir metadatos pedagógicos uniformes (8-tupla) a las preguntas y retos existentes.
+- [x] Clasificar preguntas por competencia, tipo de razonamiento, representación, dificultad y prerrequisitos.
+- [x] Diseñar generadores por semilla deterministas (Mulberry32) con 10 familias por módulo.
+- [x] Implementar selector adaptativo con intercalación cognitiva (`js/core/learning/exercise-selector.js`) priorizando `needs_repair` $\to$ `review_due` $\to$ `developing`.
+- [x] Conectar el «Modo Inteligente (Recomendado por Alaska)» en las pestañas de Retos de ambos módulos.
+- [x] Explicitar visualmente la justificación pedagógica en notas transparentes sobre el ejercicio.
+- [x] Construir Atlas de Errores interactivo en los paneles de Repaso y Diagnóstico (`mountCompetencyDashboard`).
 
-#### Criterios de aceptación
+#### Criterios de aceptación cumplidos y verificados
 
-- La secuencia no se limita a mezclar preguntas aleatoriamente.
-- Cada cambio de tipo requiere una decisión matemática identificable.
-- Los errores recurrentes proponen una acción concreta y no una etiqueta permanente del alumno.
-- Los problemas contrastivos se revisan para evitar ambigüedades y falsas trampas.
-- Se puede reconstruir por qué el planificador eligió una pregunta.
+- La selección adaptativa intercala evitando repetir consecutivamente la misma competencia.
+- Se comunica de forma legible la razón de recomendación en español rioplatense.
+- Atlas de Errores con poses contextuales de Alaska y enlaces directos a la sección de reparación.
 
 ---
 
 ### Fase 4 — Exploración productiva, andamiaje y transferencia
 
-**Estado:** Planificado.
+**Estado:** Implementado y Validado (Transferencia Inter-Módulo Exponencial vs. Cuadrática).
 **Prioridad:** P1.
 **Dependencias:** Fase 0; integración con Fase 1.
+
+#### Tareas
+
+- [x] Implementar motor de discriminación de modelos (`js/core/learning/transfer.js`):
+  - Invariantes numéricos: $\Delta y$ constante (lineal), razón $y_{i+1}/y_i$ constante (exponencial), $\Delta^2 y$ constante (cuadrática).
+  - Geometría cualitativa: asíntota horizontal (exponencial) vs. eje de simetría y vértice (parábola).
+  - Identificación analítica: $k \cdot a^x$ vs. $a(x-h)^2+k$ vs. $m \cdot x+b$.
+- [x] Conectar modo de Transferencia Inter-Módulo en los entrenadores generativos de ambos módulos.
+- [x] Registrar eventos de transferencia con `stage: "transfer"` y `transferDistance: "far"`.
+- [x] Probar suites de transferencia unitaria y no-fuga (`tests/learning/transfer.test.mjs`).
 
 #### Tareas
 

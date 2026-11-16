@@ -915,7 +915,7 @@ export const CHECKS_DATA = {
       hints: [
         '¡Cuidado con usar el vértice ciegamente! El vértice vive en pᵥ = 3, pero ese valor no es físicamente admisible porque está fuera de [5; 8].',
         'Como a = 2 > 0, para todo p ≥ 3 la curva es estrictamente creciente; en consecuencia, a mayor potencia dentro de [5; 8], mayor es el consumo.',
-        'Elegí el borde del intervalo admisible [5; 8] donde comienza el tramo monótono creciente para señalar la potencia de menor consumo.',
+        'Elegí el extremo inferior del intervalo admisible donde comienza el tramo monótono creciente para señalar la potencia de menor consumo.',
       ],
       solution:
         'Como pᵥ = 3 ∉ [5; 8] y en ese intervalo la función es estrictamente creciente, el mínimo se ubica en el borde izquierdo: p = 5 (con consumo C(5) = 40).',
@@ -1291,6 +1291,12 @@ if (typeof document !== 'undefined') {
         const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
         if (link) link.click();
         else location.hash = '#sec-retos';
+        const familySelect = document.querySelector('.quad-family-select');
+        if (familySelect) {
+          const matchedType = CHALLENGE_TYPES.find((t) => t.competencyId === competencyId);
+          familySelect.value = matchedType ? matchedType.id : 'adaptativo';
+          familySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       },
     });
   }

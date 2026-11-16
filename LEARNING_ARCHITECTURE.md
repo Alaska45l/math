@@ -596,28 +596,64 @@ La selección deberá equilibrar cuatro fuentes:
 
 Como punto de partida, se puede usar una política transparente por prioridad, no porcentajes supuestamente óptimos. Después, ajustar con pruebas de aprendizaje. Evitar que los conceptos ya dominados desaparezcan para siempre: una pequeña muestra de mantenimiento debe seguir apareciendo.
 
-### 6.8. Integración con módulos existentes
+### 6.8. Integración con módulos existentes y estado de implementación
 
-| Ubicación actual | Integración propuesta |
-|---|---|
-| `js/modules/sucesiones/components.js` | Adjuntar eventos de respuesta, pistas, solución y diagnóstico a competencias. |
-| `js/modules/sucesiones/retos.js` | Añadir etiquetas `competencyIds`, familias y representación a cada tipo generado. |
-| `js/modules/valor-absoluto/components.js` | Registrar respuestas numéricas, simbólicas y cambios de gráficos como evidencia distinta. |
-| `js/modules/valor-absoluto/retos.js` | Etiquetar las ocho familias de problemas y las trampas conceptuales. |
-| `js/modules/*/logic.js` | Mantener diagnóstico matemático puro; devolver IDs que el mapa pedagógico interpreta. |
-| `js/core/vn.js` | Recibir eventos de aprendizaje resumidos y disparar reacciones contextuales. No incorporar el planificador dentro de la VN. |
-| `js/core/glossary.js` | Vincular definiciones con las competencias y prerrequisitos relacionados. |
-| `js/core/nav.js` / `js/hub.js` | Mostrar Continuar, Repasar y Explorar en la entrada al laboratorio. |
-| `localStorage` existente | Migrar sin borrar `sucesiones:progreso:v1` ni `valor_absoluto:progreso:v1`. |
+La infraestructura pedagógica común reside en `js/core/learning/` y se comunica con los módulos mediante adaptadores livianos:
 
-### 6.9. Compatibilidad y migración
+| Módulo / Archivo | Responsabilidad e Integración | Estado |
+|---|---|---|
+| `js/core/learning/events.js` | Contrato, fábrica y validación inmutable de `LearningEvent` (7 tipos, 5 representaciones, 5 etapas). | Implementado y Validado |
+| `js/core/learning/competencies.js` | Registro global de competencias, consulta unificada y validación de DAG estrictamente acíclico. | Implementado y Validado |
+| `js/core/learning/progress-store.js` | Persistencia unificada local-first (`alaska:learning:v1`), log acotado (máx 200 eventos) y reportes KPI. | Implementado y Validado |
+| `js/core/learning/mastery.js` | Máquina de estados conservadora de dominio (7 estados: `unseen`, `introduced`, `developing`, `needs_repair`, `consolidating`, `review_due`, `durable`). Regla anti-grinding: 1 acierto $\to$ `developing`; se requieren al menos 2 aciertos independientes en ejercicios distintos para `consolidating`. | Implementado y Validado |
+| `js/core/learning/scheduler.js` | Planificador determinista de ventanas de repaso (+4h en reparación, +24h tras consolidar, +72h, +168h, +336h). | Implementado y Validado |
+| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalado según urgencia pedagógica (`needs_repair` $\to$ `review_due` $\to$ `developing` $\to$ `consolidating` $\to$ `durable`) con desempate determinista y justificaciones en español rioplatense. | Implementado y Validado |
+| `js/core/learning/transfer.js` | Motor de discriminación inter-módulo (Lineal vs. Exponencial vs. Cuadrática) por invariantes ($\Delta y$, $y_{i+1}/y_i$, $\Delta^2 y$), geometría (asíntota vs. vértice/simetría) y álgebra. Registra eventos con `stage: "transfer"` y `transferDistance: "far"`. | Implementado y Validado |
+| `js/core/learning/migrations.js` | Migraciones no destructivas y retrocompatibles desde `exponenciales:progreso:v1` y `cuadraticas:progreso:v1` con corrección retroactiva de estados. | Implementado y Validado |
+| `js/modules/exponenciales/learning-adapter.js` | Adaptador pedagógico de Exponenciales: emite eventos normalizados y conecta `recordExpAttempt` con el almacén central. | Implementado y Validado |
+| `js/modules/exponenciales/competencies-map.js` | Mapa de 10 competencias y 10 diagnósticos cognitivos de Exponenciales en grafo DAG acíclico. | Implementado y Validado |
+| `js/modules/cuadraticas/learning-adapter.js` | Adaptador pedagógico de Cuadráticas: emite eventos normalizados y conecta `recordQuadAttempt` con el almacén central. | Implementado y Validado |
+| `js/modules/cuadraticas/competencies-map.js` | Mapa de 10 competencias y 10 diagnósticos cognitivos de Cuadráticas en grafo DAG acíclico. | Implementado y Validado |
 
-- Introducir una clave nueva, por ejemplo `alaska:learning:v1`.
-- Leer las claves actuales de progreso sin modificarlas durante la primera versión.
-- Si una sección figura como completada, usarlo como contexto histórico, no inferir dominio de todas sus competencias.
-- Añadir `schemaVersion` y funciones de migración explícitas.
-- Soportar `localStorage` no disponible, bloqueado o lleno con degradación segura.
-- No sincronizar datos con un servidor hasta que exista un motivo real y consentimiento explícito.
+### 6.9. Matriz de Cobertura Pedagógica Integral (Exponenciales y Cuadráticas)
+
+Cada competencia del currículo posee una correspondencia 1 a 1 entre sección instruccional, widget manipulable POE, familia generativa de retos PRNG, taxonomía diagnóstica y criterios de dominio:
+
+#### Módulo de Exponenciales (`exponenciales.html`)
+| Competencia | Sección & Widget | Familia Retos PRNG | Diagnósticos Clave | Evidencia de Dominio |
+|---|---|---|---|---|
+| `exponentials.tables_additive_vs_multiplicative` | Sec 1 · Detective de Tablas | `razon_tabla_vs_salto` | `additive_vs_multiplicative_confusion`, `impostor_quadratic_table` | 2 aciertos independientes en tablas con $\Delta x = 1$ y $\Delta x \ge 2$. |
+| `exponentials.neutral_and_order_of_operations` | Sec 2 · Jerarquía y Neutro | `evaluacion_k_a_x` | `multiplied_k_and_base`, `order_of_operations_pe` | Distinguir $k \cdot a^x$ de $(k \cdot a)^x$ y evaluar $a^0 = 1$. |
+| `exponentials.rational_density_and_base_restrictions` | Sec 3 · Densidad Racional | `densidad_potencia_racional` | `negative_base_fallacy`, `degenerate_base_one_or_zero` | Justificar base $a > 0, a \ne 1$ y raíces pares de negativos. |
+| `exponentials.base_reflection_and_asymptote` | Sec 4 · Espejo Base Inversa | `espejo_base_inversa` | `inverted_base_decay_confusion` | Reconocer simetría $a^x$ vs $(1/a)^x = a^{-x}$ y asíntota $y = 0$. |
+| `exponentials.four_quadrants_monotonicity` | Sec 5 · Monotonía en 4 Cuadrantes | `analisis_monotonia_cuadrantes` | `confused_k_sign_with_growth` | Clasificar crecimiento según signos de $k$ y rango de $a$. |
+| `exponentials.analytical_reconstruction_two_points` | Sec 6 · Constructor 2 Puntos | `formula_desde_dos_puntos` | `swapped_points_in_ratio`, `unfused_system_solution` | Secuencia de 5 pasos para despejar $a$ y $k$ con $k \gtrless 0$. |
+| `exponentials.time_models_rates_and_euler_base` | Sec 7 · Modelos Temporales | `modelo_tiempo_compuesto` | `period_vs_rate_mismatch`, `percentage_asymmetry_decay` | Modelado de vida media, tasas compuestas y base $e$. |
+| `exponentials.shifts_and_horizontal_asymptote` | Sec 8 · Desplazamientos | `imagen_intervalo_asintota` | `asymptote_touching_image_error` | Desplazamiento $k \cdot a^{x-h} + c$, asíntota $y = c$ e imagen abierta. |
+| `exponentials.full_analytical_study` | Sec 9 · Radiografía Exactas | `estudio_completo_exactas` | `used_asymptote_for_roots` | Raíces $C_0$, conjuntos $C^+, C^-$ e imagen en notación UNMDP. |
+| `exponentials.equations_three_methods_in_reals` | Sec 10 · Balanza de Ecuaciones | `ecuacion_igualacion_factor_comun` | `rejected_valid_or_accepted_spurious_root` | Igualación de bases, factor común y sustitución cuadrática ($u \le 0$). |
+
+#### Módulo de Función Cuadrática (`cuadraticas.html`)
+| Competencia | Sección & Widget | Familia Retos PRNG | Diagnósticos Clave | Evidencia de Dominio |
+|---|---|---|---|---|
+| `quadratics.area_model_and_products` | Sec 1 · Modelo de Áreas | `area_model_and_notable_products` | `distributed_square_over_sum` | Expansión geométrica de $(x+p)(x+q)$, cuadrados y diferencia de cuadrados. |
+| `quadratics.sum_product_factoring` | Sec 2 · Laboratorio de Raíces | `factor_trinomial` | `sign_error_in_factors`, `forgot_leading_a_in_factored_form` | Factorización de $x^2 + bx + c$ mediante $m \cdot n = c, m + n = b$. |
+| `quadratics.vertex_and_axis` | Sec 3 · Espejo de Simetría | `vertex_from_standard` | `inverted_vertex_h_sign`, `confused_h_with_c` | Cálculo exacto de $x_v = -b/(2a)$, eje $x = x_v$ y $y_v = f(x_v)$. |
+| `quadratics.three_forms_conversion` | Sec 4 · Traductor de Formas | `vertex_to_standard` | `swapped_canonical_parameters` | Conversión analítica canónica $\leftrightarrow$ polinómica $\leftrightarrow$ factorizada. |
+| `quadratics.complete_the_square` | Sec 5 · Completar Cuadrados | `complete_square_lead1` / `complete_square_lead_a` | `forgot_a_multiplier_in_square_completion` | Procedimiento de peaje algebraico con corchetes para $a \ne 1$. |
+| `quadratics.roots_and_discriminant` | Sec 6 · Explorador de Discriminante | `intercepts_and_sign` | `discriminant_sign_root_count_confusion` | Clasificación de regímenes $\Delta > 0, \Delta = 0, \Delta < 0$ y radicales exactos. |
+| `quadratics.line_parabola_intersection` | Sec 7 · Intersección Recta-Parábola | `linear_quadratic_system` | `ignored_tangency_multiplicity` | Resolución de sistemas $2 \times 2$, secantes, tangentes y exteriores. |
+| `quadratics.modeling_and_optimization` | Sec 8 · Optimización de Extremos | `optimization_context` | `used_yv_for_optimal_input_xv` | Maximización en dominios restringidos $[x_{\min}; x_{\max}]$. |
+| `quadratics.factoring_strategy` | Sec 9 · Taller de Factorización | `grouping_and_factoring_strategy` | `incomplete_factoring` | Estrategias combinadas: factor común, agrupación y raíces racionales. |
+| `quadratics.full_analysis_exactas` | Sec 10 · Radiografía Completa | `full_analysis_exactas` | `used_yv_for_monotonicity_or_open_image` | Dominio $\mathbb{R}$, monotonía con $x_v$, imagen cerrada con $y_v$, $C^+, C^-, C_0$. |
+
+### 6.10. Compatibilidad y migración
+
+- Persistencia centralizada bajo la clave unificada `alaska:learning:v1`.
+- Preservación íntegra sin mutación ni borrado de claves anteriores: `exponenciales:progreso:v1` y `cuadraticas:progreso:v1`.
+- Migración no destructiva con reparación retroactiva: los estados previos marcados incorrectamente como dominados tras un único acierto se migran a `developing`, exigiendo evidencia durable conforme a la regla conservadora.
+- Soporte total ante ausencia o bloqueo de `localStorage` con fallback seguro en memoria (`MemoryStorage`).
+- Cero dependencias externas en runtime, cero `eval()`, cero recolección remota de datos.
 
 ---
 
