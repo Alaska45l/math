@@ -25,27 +25,39 @@ import {
   resolveCompetencyId,
 } from '../../core/learning/competencies.js';
 import {
-  getProgressStore,
+  getProgressStore as getCoreProgressStore,
   recordLearningEvent,
   getModuleReport,
   STATUS_BADGES,
+  STORAGE_KEY,
+  resetStore,
 } from '../../core/learning/progress-store.js';
 import {
   QUAD_COMPETENCIES,
   QUAD_DIAGNOSTIC_TAXONOMY,
+  QUAD_COMPETENCY_ALIASES,
 } from './competencies-map.js';
 import { mountCompetencyDashboard as mountQuadDashboardUI } from './components.js';
 
 export const MODULE_ID = MODULE_IDS.CUADRATICAS;
 
-export const QUAD_COMPETENCY_ALIASES = Object.freeze({
-  // Aliases between progress-store fallback IDs and competencies-map canonical IDs
-  'quadratics.parabola_geometry_and_parameters': 'quadratics.canonical_form_and_vertex',
-  'quadratics.vertex_symmetry_canonical': 'quadratics.canonical_form_and_vertex',
-  'quadratics.roots_and_factored_form': 'quadratics.factored_form_and_symmetry',
-  'quadratics.full_analytical_study': 'quadratics.full_analysis_exactas',
-  'quadratics.line_parabola_intersection': 'quadratics.parabola_line_tangency',
-});
+export { QUAD_COMPETENCY_ALIASES };
+
+export function getProgressStore() {
+  if (typeof localStorage !== 'undefined' && localStorage !== null) {
+    try {
+      const store = getCoreProgressStore();
+      if (localStorage.getItem(STORAGE_KEY) === null && store._state?.events?.length > 0) {
+        resetStore();
+      }
+    } catch {}
+  }
+  return getCoreProgressStore();
+}
+
+export function getModuleState() {
+  return getQuadCompetencyReport();
+}
 
 /**
  * Registers the Cuadráticas module competencies and diagnostics in the registry.

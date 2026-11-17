@@ -25,6 +25,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Desarrolla productos de dos binomios mediante partición geométrica en cuatro regiones, identifica cuadrado de un binomio, diferencia de cuadrados y detecta falsas cuadráticas por cancelación del término de grado 2.',
     prerequisiteIds: [],
     diagnosticIds: ['distributed_square_over_sum'],
+    exerciseFamilies: ['area_model_and_notable_products'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.sum_product_factoring',
@@ -36,6 +38,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Reconstruye el producto (x + m)(x + n) a partir de x² + bx + c determinando pares enteros m, n tales que m + n = b y m · n = c guiándose por la regla de signos.',
     prerequisiteIds: ['quadratics.area_model_and_notable_products'],
     diagnosticIds: ['confused_sum_product_signs_vieta'],
+    exerciseFamilies: ['factor_trinomial'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.grouping_and_factoring_strategy',
@@ -47,6 +51,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Aplica el árbol de decisión completo (factor común, diferencia de cuadrados, trinomio cuadrado perfecto, suma-producto y descomposición de bx en mx + nx con m · n = a · c).',
     prerequisiteIds: ['quadratics.sum_product_factoring'],
     diagnosticIds: ['forgot_leading_a_in_factored_form'],
+    exerciseFamilies: ['grouping_and_factoring_strategy'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.canonical_form_and_vertex',
@@ -62,6 +68,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'confused_c_with_canonical_k',
       'omitted_plus_minus_in_square_root',
     ],
+    exerciseFamilies: ['vertex_from_standard'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.factored_form_and_symmetry',
@@ -73,6 +81,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Halla ceros por propiedad del producto cero sin cancelar variables, ubica el eje de simetría en el promedio xᵥ = (x₁ + x₂)/2 y reconstruye el coeficiente principal a con un punto de paso.',
     prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.sum_product_factoring'],
     diagnosticIds: ['divided_by_x_lost_zero_root', 'forgot_leading_a_in_factored_form'],
+    exerciseFamilies: ['roots_and_factored_form'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.completing_the_square',
@@ -84,6 +94,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Transforma cualquier cuadrática de forma polinómica a canónica sumando y restando (b/(2a))² y distribuyendo el coeficiente principal a sin alterar la igualdad.',
     prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.area_model_and_notable_products'],
     diagnosticIds: ['unbalanced_completing_square', 'inverted_vertex_h_sign'],
+    exerciseFamilies: ['complete_the_square'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.discriminant_and_vieta',
@@ -95,6 +107,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Descompone la resolvente como xᵥ ± √Δ/(2a), clasifica las raíces según el signo de Δ y utiliza las relaciones x₁ + x₂ = −b/a y x₁ · x₂ = c/a con parámetros.',
     prerequisiteIds: ['quadratics.completing_the_square', 'quadratics.factored_form_and_symmetry'],
     diagnosticIds: ['neg_b_or_square_sign_in_resolvente', 'confused_sum_product_signs_vieta'],
+    exerciseFamilies: ['discriminant_and_vieta'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.full_analysis_exactas',
@@ -106,6 +120,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Distingue coordenadas del eje X (dominio, intervalos de crecimiento/decrecimiento, positividad y negatividad) de alturas del eje Y (imagen con corchete cerrado en yᵥ) y restringe ramas para biyectividad.',
     prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.discriminant_and_vieta'],
     diagnosticIds: ['used_yv_for_monotonicity_or_open_image'],
+    exerciseFamilies: ['full_analysis_exactas'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.parabola_line_tangency',
@@ -117,6 +133,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Plantea la ecuación diferencia ax² + (b − m)x + (c − d) = 0, clasifica la recta en secante, tangente o exterior y despeja parámetros de tangencia.',
     prerequisiteIds: ['quadratics.discriminant_and_vieta'],
     diagnosticIds: ['neg_b_or_square_sign_in_resolvente'],
+    exerciseFamilies: ['line_parabola_intersection'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'quadratics.extremum_optimization',
@@ -128,6 +146,8 @@ export const QUAD_COMPETENCIES = Object.freeze([
       'Modela áreas, costos o trayectorias mediante funciones cuadráticas, determina el dominio físico de validez y calcula extremos absolutos en el vértice y en los bordes del intervalo.',
     prerequisiteIds: ['quadratics.canonical_form_and_vertex', 'quadratics.full_analysis_exactas'],
     diagnosticIds: ['inverted_vertex_h_sign', 'used_yv_for_monotonicity_or_open_image'],
+    exerciseFamilies: ['optimization_context'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
 ]);
 
@@ -204,8 +224,18 @@ export const QUAD_DIAGNOSTIC_TAXONOMY = Object.freeze({
   },
 });
 
+export const QUAD_COMPETENCY_ALIASES = Object.freeze({
+  'quadratics.parabola_geometry_and_parameters': 'quadratics.canonical_form_and_vertex',
+  'quadratics.vertex_symmetry_canonical': 'quadratics.canonical_form_and_vertex',
+  'quadratics.roots_and_factored_form': 'quadratics.factored_form_and_symmetry',
+  'quadratics.full_analytical_study': 'quadratics.full_analysis_exactas',
+  'quadratics.line_parabola_intersection': 'quadratics.parabola_line_tangency',
+});
+
 export function getCompetencyById(id) {
-  return QUAD_COMPETENCIES.find((c) => c.id === id) || null;
+  if (!id) return null;
+  const canonicalId = QUAD_COMPETENCY_ALIASES[id] || id;
+  return QUAD_COMPETENCIES.find((c) => c.id === canonicalId) || null;
 }
 
 export function getCompetenciesForSection(sectionId) {

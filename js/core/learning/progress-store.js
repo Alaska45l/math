@@ -10,7 +10,7 @@
 
 import { evaluateCompetencyMastery } from './mastery.js';
 import { isReviewDue } from './scheduler.js';
-import { getCompetenciesByModule } from './competencies.js';
+import { getCompetenciesByModule, resolveCompetencyId } from './competencies.js';
 
 export const STORAGE_KEY = 'alaska:learning:v1';
 export const MAX_EVENT_LOG_SIZE = 200;
@@ -120,32 +120,82 @@ export const STATUS_BADGES = Object.freeze({
  * Canonical module competency ID mappings used as fallback when
  * competencies.js is not yet initialized or dynamically querying.
  */
-const MODULE_COMPETENCY_IDS = {
-  exponenciales: [
-    'exponentials.tables_additive_vs_multiplicative',
-    'exponentials.base_and_initial_value_roles',
-    'exponentials.continuous_extension_and_restrictions',
-    'exponentials.asymptote_and_horizontal_reflection',
-    'exponentials.quadrant_monotonicity',
-    'exponentials.analytical_reconstruction_two_points',
-    'exponentials.half_life_and_compound_periods',
-    'exponentials.asymptote_shifts_and_image',
-    'exponentials.full_analytical_study',
-    'exponentials.equations_bases_factoring_substitution',
+export const MODULE_COMPETENCY_IDS = Object.freeze({
+  'potencias-raices': [
+    'powers.additive_vs_multiplicative_worlds',
+    'powers.negative_exponents_and_reciprocals',
+    'powers.quotient_and_product_laws',
+    'powers.rational_exponents_and_nth_roots',
+    'powers.geometric_squares_and_cubes',
+    'powers.prime_factor_tree_extraction',
+    'powers.radical_simplification_and_rationalization',
+    'powers.binomial_power_non_distributivity',
+    'powers.real_domain_restrictions_and_abs_root',
+    'powers.precedence_and_paradox_auditing',
+  ],
+  'valor-absoluto': [
+    'abs.distance_1d_and_equations',
+    'abs.cartesian_mirror_parent',
+    'abs.translations_vertex_hk',
+    'abs.vertical_scale_and_reflection',
+    'abs.canonical_form_synthesis',
+    'abs.piecewise_decomposition',
+    'abs.full_analytical_study_and_inequalities',
+    'abs.piecewise_domain_customs',
+    'abs.boundary_continuity_and_uniqueness',
+    'abs.step_floor_and_ceiling',
+  ],
+  sucesiones: [
+    'sequences.pattern_recognition_and_classification',
+    'sequences.discrete_domain_and_notation',
+    'sequences.recursive_formulas',
+    'sequences.arithmetic_explicit_and_membership',
+    'sequences.geometric_explicit_and_models',
+    'sequences.asymptotic_behavior_intuition',
   ],
   cuadraticas: [
     'quadratics.area_model_and_notable_products',
+    'quadratics.sum_product_factoring',
     'quadratics.grouping_and_factoring_strategy',
-    'quadratics.parabola_geometry_and_parameters',
-    'quadratics.vertex_symmetry_canonical',
-    'quadratics.roots_and_factored_form',
+    'quadratics.canonical_form_and_vertex',
+    'quadratics.factored_form_and_symmetry',
     'quadratics.completing_the_square',
     'quadratics.discriminant_and_vieta',
-    'quadratics.full_analytical_study',
-    'quadratics.line_parabola_intersection',
+    'quadratics.full_analysis_exactas',
+    'quadratics.parabola_line_tangency',
     'quadratics.extremum_optimization',
   ],
-};
+  exponenciales: [
+    'exponentials.tables_additive_vs_multiplicative',
+    'exponentials.neutral_and_order_of_operations',
+    'exponentials.rational_density_and_base_restrictions',
+    'exponentials.base_reflection_and_asymptote',
+    'exponentials.four_quadrants_monotonicity',
+    'exponentials.analytical_reconstruction_two_points',
+    'exponentials.time_models_rates_and_euler_base',
+    'exponentials.shifts_and_horizontal_asymptote',
+    'exponentials.full_analytical_study',
+    'exponentials.equations_three_methods_in_reals',
+  ],
+});
+
+const MODULE_COMPETENCY_PREFIXES = Object.freeze({
+  exponenciales: ['exponentials.'],
+  cuadraticas: ['quadratics.'],
+  'potencias-raices': ['powers.'],
+  'valor-absoluto': ['abs.'],
+  sucesiones: ['sequences.'],
+  desigualdades: ['inequalities.'],
+  unidades: ['units.'],
+  funciones: ['functions.'],
+  lineal: ['linear.'],
+  sistemas: ['systems.'],
+  polinomios: ['polynomials.'],
+  'racionales-irracionales': ['rational.', 'irrational.'],
+  logaritmicas: ['logarithms.'],
+  'razones-trigonometricas': ['trig_ratios.'],
+  'funciones-trigonometricas': ['trig_functions.'],
+});
 
 /**
  * Core Learning Progress Store Class
@@ -160,6 +210,7 @@ export class ProgressStore {
     this._storage = options.storage || resolveStorageEngine();
     this._masteryEvaluator = options.masteryEvaluator || evaluateCompetencyMastery;
     this._subscribers = new Set();
+    this._hasPersisted = false;
     this._state = this._loadState();
   }
 
@@ -171,6 +222,7 @@ export class ProgressStore {
     try {
       const raw = this._storage.getItem(STORAGE_KEY);
       if (!raw) return createDefaultStoreState();
+      this._hasPersisted = true;
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         if (!parsed.competencies || typeof parsed.competencies !== 'object') {
@@ -202,6 +254,7 @@ export class ProgressStore {
     }
     try {
       this._storage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+      this._hasPersisted = true;
     } catch {
       // If active storage fails (e.g. QuotaExceededError), switch to memory storage
       if (!(this._storage instanceof MemoryStorage)) {
@@ -273,7 +326,8 @@ export class ProgressStore {
     let primaryTransition = null;
     let primaryUpdatedEntry = null;
 
-    for (const compId of compIds) {
+    for (const rawCompId of compIds) {
+      const compId = resolveCompetencyId(rawCompId) || rawCompId;
       const currentEntry = this._state.competencies[compId]
         ? { ...this._state.competencies[compId] }
         : createDefaultCompetencyEntry(compId);
@@ -330,9 +384,10 @@ export class ProgressStore {
    */
   getCompetencyState(competencyId) {
     if (!competencyId) return createDefaultCompetencyEntry('');
-    const entry = this._state.competencies[competencyId];
+    const canonicalId = resolveCompetencyId(competencyId) || competencyId;
+    const entry = this._state.competencies[canonicalId] || this._state.competencies[competencyId];
     if (!entry) {
-      return createDefaultCompetencyEntry(competencyId);
+      return createDefaultCompetencyEntry(canonicalId);
     }
     return {
       ...entry,
@@ -355,7 +410,7 @@ export class ProgressStore {
    */
   getAllCompetencies() {
     const result = {};
-    for (const [id, entry] of Object.entries(this._state.competencies)) {
+    for (const [id] of Object.entries(this._state.competencies)) {
       result[id] = this.getCompetencyState(id);
     }
     return result;
@@ -393,8 +448,10 @@ export class ProgressStore {
     }
 
     // Also include any stored competencies matching module prefix if not in canonical list
-    const prefix = moduleId === 'exponenciales' ? 'exponentials.' : moduleId === 'cuadraticas' ? 'quadratics.' : `${moduleId}.`;
-    const storedKeys = Object.keys(this._state.competencies).filter((k) => k.startsWith(prefix));
+    const prefixes = MODULE_COMPETENCY_PREFIXES[moduleId] || [`${moduleId}.`];
+    const storedKeys = Object.keys(this._state.competencies)
+      .filter((k) => prefixes.some((p) => k.startsWith(p)))
+      .map((k) => resolveCompetencyId(k) || k);
     const allModuleIds = Array.from(new Set([...knownIds, ...storedKeys]));
 
     const summary = {
@@ -505,9 +562,20 @@ let _storeInstance = null;
  * @returns {ProgressStore}
  */
 export function getProgressStore(options) {
-  if (!_storeInstance || options) {
-    if (!_storeInstance) {
-      _storeInstance = new ProgressStore(options);
+  if (!_storeInstance) {
+    _storeInstance = new ProgressStore(options);
+    return _storeInstance;
+  }
+  if (!options && typeof localStorage !== 'undefined' && localStorage !== null) {
+    try {
+      if (
+        _storeInstance._storage !== localStorage ||
+        (_storeInstance._hasPersisted && localStorage.getItem(STORAGE_KEY) === null)
+      ) {
+        _storeInstance = new ProgressStore();
+      }
+    } catch {
+      // Ignore storage access errors
     }
   }
   return _storeInstance;

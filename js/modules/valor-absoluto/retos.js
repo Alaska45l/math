@@ -7,6 +7,14 @@
 
 import { h, s, mount, chalkIcon } from '../../core/dom.js';
 import { fmt } from '../../core/math-format.js';
+import {
+  REPRESENTATION_TYPES,
+  LEARNING_STAGES,
+  TRANSFER_DISTANCES,
+} from '../../core/learning/events.js';
+import { selectAdaptiveExercise } from '../../core/learning/exercise-selector.js';
+import { ABS_COMPETENCIES } from './competencies-map.js';
+import { getProgressStore } from './learning-adapter.js';
 import { createAbsBoard, createCheckBlock } from './components.js';
 import {
   approxEq,
@@ -17,6 +25,89 @@ import {
 } from './logic.js';
 import { react } from '../../core/vn.js';
 import { playSuccess, playError } from '../../core/sound.js';
+
+export const CHALLENGE_FAMILY_META = Object.freeze([
+  {
+    typeIndex: 0,
+    exerciseFamily: 'hallar_vertice',
+    competencyId: 'abs.translations_vertex_hk',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.GUIDED_PRACTICE,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'canonical_vertex_extraction',
+    diagnosticIds: ['inverted_h_sign', 'swapped_h_k'],
+  },
+  {
+    typeIndex: 1,
+    exerciseFamily: 'ecuacion_desde_grafica',
+    competencyId: 'abs.canonical_form_synthesis',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.RETRIEVAL,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'canonical_formula_from_vertex_and_point',
+    diagnosticIds: ['inverted_h_sign', 'wrong_reflection_sign', 'inverted_slope_fraction'],
+  },
+  {
+    typeIndex: 2,
+    exerciseFamily: 'graficar_interactivo',
+    competencyId: 'abs.canonical_form_synthesis',
+    representation: REPRESENTATION_TYPES.GRAPHICAL,
+    stage: LEARNING_STAGES.RETRIEVAL,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'interactive_vertex_and_slope_drag',
+    diagnosticIds: ['inverted_h_sign', 'wrong_reflection_sign'],
+  },
+  {
+    typeIndex: 3,
+    exerciseFamily: 'desarmar_en_partes',
+    competencyId: 'abs.piecewise_decomposition',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.GUIDED_PRACTICE,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'piecewise_branch_linear_coefficients',
+    diagnosticIds: ['inverted_h_sign'],
+  },
+  {
+    typeIndex: 4,
+    exerciseFamily: 'rango_y_positividad',
+    competencyId: 'abs.full_analytical_study_and_inequalities',
+    representation: REPRESENTATION_TYPES.GRAPHICAL,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'range_interval_from_vertex_and_sign',
+    diagnosticIds: ['wrong_reflection_sign', 'confused_x_and_y_in_intervals'],
+  },
+  {
+    typeIndex: 5,
+    exerciseFamily: 'evaluar_por_partes',
+    competencyId: 'abs.piecewise_domain_customs',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.GUIDED_PRACTICE,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'piecewise_boundary_evaluation',
+    diagnosticIds: [],
+  },
+  {
+    typeIndex: 6,
+    exerciseFamily: 'dominio_rango_partes',
+    competencyId: 'abs.boundary_continuity_and_uniqueness',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'step_function_discrete_range',
+    diagnosticIds: [],
+  },
+  {
+    typeIndex: 7,
+    exerciseFamily: 'resolver_modulo',
+    competencyId: 'abs.distance_1d_and_equations',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.RETRIEVAL,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'absolute_value_equation_larger_root',
+    diagnosticIds: ['inverted_h_sign'],
+  },
+]);
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -45,6 +136,17 @@ export function generateAbsProblem(seed, typeFilter = -1) {
   const randInt = (min, max) => Math.floor(rand() * (max - min + 1)) + min;
 
   const type = typeFilter >= 0 && typeFilter <= 7 ? typeFilter : Math.floor(rand() * 8);
+  const meta = CHALLENGE_FAMILY_META[type];
+  const withMeta = (problem) => ({
+    ...problem,
+    competencyId: meta.competencyId,
+    exerciseFamily: meta.exerciseFamily,
+    representation: meta.representation,
+    stage: meta.stage,
+    transferDistance: meta.transferDistance,
+    expectedEvidence: meta.expectedEvidence,
+    diagnosticIds: meta.diagnosticIds,
+  });
 
   switch (type) {
     case 0: {
@@ -53,7 +155,7 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const hVal = choice([-5, -4, -3, -2, 1, 2, 3, 4, 5]);
       const kVal = choice([-5, -3, -2, 2, 3, 4, 6]);
       const exprStr = formatCanonicalAbs(a, hVal, kVal);
-      return {
+      return withMeta({
         id: `seed-vert-${seed}`,
         type: 'vertex',
         prompt: `Dada la función <strong>f(x) = ${exprStr}</strong>, hallá las coordenadas exactas de su vértice <strong>(h; k)</strong>:`,
@@ -61,11 +163,12 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         secondLabel: 'k (coordenada Y)',
         expected: { a, h: hVal, k: kVal },
         hints: [
-          `Preguntate qué valor de x hace que el interior de las barras valga CERO: x − (${fmt(hVal)}) = 0.`,
-          `Cuando x = ${fmt(hVal)}, el término con barras vale 0 y queda f(${fmt(hVal)}) = ${fmt(kVal)}.`,
+          'Identificá la expresión lineal que quedó encerrada adentro de las barras de valor absoluto.',
+          `Igualá ese interior a cero para despejar la coordenada horizontal h.`,
+          `Una vez anulado el término con barras, leé el desplazamiento vertical k que quedó afuera.`,
         ],
         solution: `El interior de las barras se anula en <strong>h = ${fmt(hVal)}</strong> y el desplazamiento vertical es <strong>k = ${fmt(kVal)}</strong>. Vértice: <strong>(${fmt(hVal)}; ${fmt(kVal)})</strong>.`,
-      };
+      });
     }
 
     case 1: {
@@ -75,17 +178,18 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const kVal = choice([-3, -2, 1, 2, 3]);
       const exprStr = formatCanonicalAbs(a, hVal, kVal);
       const pRightY = kVal + a;
-      return {
+      return withMeta({
         id: `seed-eq-${seed}`,
         type: 'expr',
         prompt: `Una función de valor absoluto tiene su vértice en <strong>V(${fmt(hVal)}; ${fmt(kVal)})</strong> y pasa por el punto <strong>(${fmt(hVal + 1)}; ${fmt(pRightY)})</strong>. Escribí su fórmula <strong>f(x) = a|x − h| + k</strong>:`,
         expected: { a, h: hVal, k: kVal, expr: exprStr },
         hints: [
-          `Como el vértice está en (${fmt(hVal)}; ${fmt(kVal)}), la estructura es a|x ${hVal > 0 ? `− ${fmt(hVal)}` : `+ ${fmt(Math.abs(hVal))}`}| ${kVal >= 0 ? `+ ${fmt(kVal)}` : `− ${fmt(Math.abs(kVal))}`}.`,
-          `Al avanzar 1 unidad a la derecha desde x = ${fmt(hVal)} hasta x = ${fmt(hVal + 1)}, la altura pasa de ${fmt(kVal)} a ${fmt(pRightY)}, por lo que a = ${fmt(a)}.`,
+          `Usando el vértice (${fmt(hVal)}; ${fmt(kVal)}), recordá que adentro de las barras va |x − h| y afuera + k.`,
+          'Calculá la pendiente de la rama derecha a = Δy / Δx entre el vértice y el punto de paso.',
+          'Verificá si el punto de paso queda por encima o por debajo del vértice para confirmar el signo de a.',
         ],
         solution: `Con vértice (${fmt(hVal)}; ${fmt(kVal)}) y pendiente derecha a = ${fmt(pRightY)} − (${fmt(kVal)}) = ${fmt(a)}, la ecuación es <strong>${exprStr}</strong>.`,
-      };
+      });
     }
 
     case 2: {
@@ -94,7 +198,7 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const hVal = choice([-3, -2, 1, 2, 3]);
       const kVal = choice([-3, -2, 2, 3]);
       const exprStr = formatCanonicalAbs(a, hVal, kVal);
-      return {
+      return withMeta({
         id: `seed-graph-${seed}`,
         type: 'graph-target',
         prompt: `Arrastrá el <strong>Vértice (h; k)</strong> y el <strong>nodo de pendiente</strong> en el plano cartesiano hasta graficar <strong>f(x) = ${exprStr}</strong>:`,
@@ -104,11 +208,12 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         draggableSlope: true,
         snapStep: 1,
         hints: [
-          `Paso 1: Llevá el vértice amarillo a (${fmt(hVal)}; ${fmt(kVal)}).`,
-          `Paso 2: En x = ${fmt(hVal + 1)}, colocá el nodo azul a la altura y = ${fmt(kVal + a)}.`,
+          'Igualá el interior de las barras a cero para determinar h y leé el término independiente para k.',
+          'Arrastrá primero el nodo amarillo del vértice hacia las coordenadas (h; k).',
+          `Desde ese vértice, desplazate 1 unidad a la derecha y variá y según el coeficiente a = ${fmt(a)} para ubicar el nodo azul.`,
         ],
         solution: `El vértice va en <strong>(${fmt(hVal)}; ${fmt(kVal)})</strong> y el nodo de pendiente derecha en <strong>(${fmt(hVal + 1)}; ${fmt(kVal + a)})</strong>.`,
-      };
+      });
     }
 
     case 3: {
@@ -120,7 +225,7 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const askLeft = rand() > 0.5;
       const branch = askLeft ? pw.leftBranch : pw.rightBranch;
       const exprStr = formatCanonicalAbs(a, hVal, kVal);
-      return {
+      return withMeta({
         id: `seed-pw-${seed}`,
         type: 'pair',
         prompt: `Al desarmar <strong>f(x) = ${exprStr}</strong> como función por partes, la rama ${askLeft ? `izquierda (<strong>${branch.condition}</strong>)` : `derecha (<strong>${branch.condition}</strong>)`} es una recta <code>m·x + b</code>. ¿Cuánto valen su pendiente <strong>m</strong> y su ordenada <strong>b</strong>?`,
@@ -129,12 +234,13 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         expected: { first: branch.m, second: branch.b },
         hints: [
           askLeft
-            ? `Para x < ${fmt(hVal)}, lo de adentro es negativo y las barras anteponen un signo menos: −(${fmt(a)})(x − (${fmt(hVal)})) + (${fmt(kVal)}).`
-            : `Para x ≥ ${fmt(hVal)}, las barras se abren directamente: ${fmt(a)}(x − (${fmt(hVal)})) + (${fmt(kVal)}).`,
-          `Aplicá propiedad distributiva para llevarlo a la forma m·x + b.`,
+            ? `Para ${branch.condition}, lo de adentro de las barras es negativo: reemplazá |u| por −(u).`
+            : `Para ${branch.condition}, lo de adentro de las barras no es negativo: reemplazá |u| por +(u).`,
+          'Aplicá propiedad distributiva con el coeficiente a sin olvidar el desplazamiento k exterior.',
+          'Agrupá el término con x para leer la pendiente m y los números sueltos para leer la ordenada b.',
         ],
         solution: `Desarrollando la rama (${branch.condition}): ${branch.rawText} = <strong>${branch.simplifiedText}</strong>. Por lo tanto, <strong>m = ${fmt(branch.m)}</strong> y <strong>b = ${fmt(branch.b)}</strong>.`,
-      };
+      });
     }
 
     case 4: {
@@ -160,7 +266,7 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       rawItems.forEach((it, idx) => {
         if (it.diag) optionDiagnostics[idx] = it.diag;
       });
-      return {
+      return withMeta({
         id: `seed-rng-${seed}`,
         type: 'choice',
         prompt: `¿Cuál es el <strong>Conjunto Imagen (Rango)</strong> de la función <strong>f(x) = ${exprStr}</strong>?`,
@@ -169,10 +275,12 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         optionDiagnostics,
         explanation: `¡Exacto! Como a = ${fmt(a)} ${a > 0 ? '> 0 (abre hacia arriba)' : '< 0 (abre hacia abajo)'} y el vértice tiene altura k = ${fmt(kVal)}, la imagen es ${info.range.text}.`,
         hints: [
-          `Miramos la coordenada Y del vértice (k = ${fmt(kVal)}) y el signo de a = ${fmt(a)}.`,
+          'Recordá que el Conjunto Imagen se proyecta sobre el eje vertical Y usando la altura k del vértice (no h).',
+          `Observá el signo de a = ${fmt(a)}: determina si k es un mínimo (abre arriba) o un máximo (abre abajo).`,
+          `Como el vértice pertenece al gráfico, el extremo k = ${fmt(kVal)} se escribe con corchete cerrado.`,
         ],
         solution: `El conjunto imagen es <strong>${info.range.text}</strong>.`,
-      };
+      });
     }
 
     case 5: {
@@ -182,17 +290,18 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const m2 = -1, b2 = 5;
       const leftClosed = rand() > 0.5;
       const expectedY = leftClosed ? (m1 * c + b1) : (m2 * c + b2);
-      return {
+      return withMeta({
         id: `seed-evalpw-${seed}`,
         type: 'number',
         prompt: `Dada la función por partes: <br><code>f(x) = { 2x + 1 si x ${leftClosed ? '≤' : '<'} ${c}  ;  −x + 5 si x ${leftClosed ? '>' : '≥'} ${c} }</code><br>¿Cuánto vale exactamente <strong>f(${c})</strong> en la frontera?`,
         expected: expectedY,
         hints: [
-          `Fijate cuál de los dos renglones incluye el signo igual (${leftClosed ? '≤ en el primero' : '≥ en el segundo'}) para x = ${c}.`,
-          `Reemplazá x = ${c} únicamente en ese renglón.`,
+          `Observá que x = ${c} es el punto frontera entre ambas condiciones.`,
+          'Compará las desigualdades para detectar cuál contiene el signo igual (≤ o ≥).',
+          'Sustituí ese valor únicamente en la fórmula lineal del tramo habilitado.',
         ],
         solution: `En x = ${c} gobierna el ${leftClosed ? 'primer' : 'segundo'} tramo porque tiene la desigualdad inclusiva. Evaluando: <strong>f(${c}) = ${fmt(expectedY)}</strong>.`,
-      };
+      });
     }
 
     case 6: {
@@ -210,7 +319,7 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         const j = Math.floor(rand() * (i + 1));
         [rawItems[i], rawItems[j]] = [rawItems[j], rawItems[i]];
       }
-      return {
+      return withMeta({
         id: `seed-step-${seed}`,
         type: 'choice',
         prompt: `Una función escalonada de paso vale <strong>${y1}</strong> para <code>0 ≤ x &lt; 2</code>, vale <strong>${y2}</strong> para <code>2 ≤ x &lt; 4</code> y vale <strong>${y3}</strong> para <code>4 ≤ x ≤ 6</code>. ¿Cuál es su <strong>Rango (Imagen)</strong>?`,
@@ -218,10 +327,12 @@ export function generateAbsProblem(seed, typeFilter = -1) {
         expected: rawItems.findIndex((it) => it.correct),
         explanation: `¡Impecable! Como la función solo toma esos tres valores constantes aislados, su imagen es el conjunto discreto {${y1}; ${y2}; ${y3}}.`,
         hints: [
-          'Proyectá los tres escalones horizontales contra el eje Y: ¿cubren todos los decimales intermedios o solo tres puntos?',
+          'Distinguí primero el dominio en X ([0; 6]) de las alturas reales en Y que alcanza la función.',
+          'Proyectá los tres escalones horizontales contra el eje Y: preguntate si cubre decimales intermedios.',
+          'Cuando una función constante por tramos solo toma valores aislados, su imagen se escribe entre llaves { ... }.',
         ],
         solution: `El rango es el conjunto discreto entre llaves <strong>{${y1}; ${y2}; ${y3}}</strong> (mientras que [0; 6] es su dominio).`,
-      };
+      });
     }
 
     default: {
@@ -232,17 +343,18 @@ export function generateAbsProblem(seed, typeFilter = -1) {
       const c = kVal + dist;
       const sol = solveAbsComparison(1, hVal, kVal, '=', c);
       const exprStr = formatCanonicalAbs(1, hVal, kVal);
-      return {
+      return withMeta({
         id: `seed-mod-${seed}`,
         type: 'number',
         prompt: `Resolvé la ecuación con valor absoluto <strong>${exprStr} = ${fmt(c)}</strong> e ingresá la <strong>mayor</strong> de sus dos soluciones reales:`,
         expected: Math.max(...sol.solutions),
         hints: [
-          `Restá ${fmt(kVal)} a ambos lados: |x ${hVal > 0 ? `− ${fmt(hVal)}` : `+ ${fmt(Math.abs(hVal))}`}| = ${fmt(dist)}.`,
-          `Los dos números a distancia ${fmt(dist)} de ${fmt(hVal)} son ${fmt(hVal - dist)} y ${fmt(hVal + dist)}.`,
+          'Primero aislá el término con barras de valor absoluto pasando el corrimiento k al otro miembro.',
+          'Una vez que quede |x − h| = d, planteá las dos ramas opuestas: x − h = d y x − h = −d.',
+          'Calculá ambas raíces y entregá únicamente la de mayor valor numérico.',
         ],
         solution: `${sol.steps.join(' ')} La solución mayor es <strong>x = ${fmt(Math.max(...sol.solutions))}</strong>.`,
-      };
+      });
     }
   }
 }
@@ -253,6 +365,13 @@ export function generateAbsProblem(seed, typeFilter = -1) {
 export const TRAMPAS_EXAMEN = [
   {
     id: 'trampa-abs-1',
+    competencyId: 'abs.translations_vertex_hk',
+    exerciseFamily: 'hallar_vertice',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'avoid_h_sign_trap',
+    diagnosticIds: ['inverted_h_sign', 'swapped_h_k'],
     title: 'Trampa 1 · El espejismo del signo de h',
     desc: 'En un parcial piden marcar el vértice de <code>f(x) = |x + 3| − 2</code>. Un alumno recuerda «adentro es X y afuera es Y» y marca el vértice en <strong>(3; −2)</strong>.',
     question: '¿Por qué (3; −2) es falso y cuál es el razonamiento geométrico correcto?',
@@ -265,12 +384,21 @@ export const TRAMPAS_EXAMEN = [
     optionDiagnostics: { 0: 'inverted_h_sign', 2: 'swapped_h_k' },
     explanation: '¡Exacto! En x = 3 tendrías |3 + 3| − 2 = 4 (no estás en el pico). El pico ocurre en distancia cero: x + 3 = 0 ⟹ x = −3, donde f(−3) = |0| − 2 = −2.',
     hints: [
-      'Evaluá f(3) y f(−3) para ver en cuál de los dos las barras valen 0.',
+      'Evaluá f(3) y f(−3) para comprobar en cuál de los dos puntos el interior de las barras se hace cero.',
+      'Recordá que el vértice es el punto donde el término |x + 3| alcanza su valor mínimo (cero).',
+      'Igualá x + 3 = 0 para hallar el verdadero signo de la coordenada horizontal h.',
     ],
     solution: 'El vértice ocurre cuando el interior de las barras se anula: <code>x + 3 = 0 ⟺ x = −3</code>. En ese punto, <code>f(−3) = |0| − 2 = −2</code>. Vértice real: <strong>(−3; −2)</strong>.',
   },
   {
     id: 'trampa-abs-2',
+    competencyId: 'abs.piecewise_decomposition',
+    exerciseFamily: 'desarmar_en_partes',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'negation_of_negative_variable',
+    diagnosticIds: [],
     title: 'Trampa 2 · La paradoja de «−x es negativo»',
     desc: 'Al ver la definición por partes <code>|x| = −x si x &lt; 0</code>, un estudiante protesta: <em>«¡Esa fórmula está mal escrita! El valor absoluto es una distancia y nunca puede dar un resultado negativo como −x»</em>.',
     question: '¿Dónde está el error conceptual del estudiante?',
@@ -282,12 +410,21 @@ export const TRAMPAS_EXAMEN = [
     expected: 2,
     explanation: '¡Brillante! Cuando x = −4, la letra x guarda un número negativo adentro. Ponerle un menos adelante (−x) invierte su signo: −(−4) = +4 > 0.',
     hints: [
-      'Reemplazá x = −4 en la expresión −x con paréntesis.',
+      'Elegí un ejemplo concreto de la condición x < 0, por ejemplo x = −4.',
+      'Reemplazá ese número dentro de la expresión −x usando paréntesis: −(−4).',
+      'Recordá que el signo «−» delante de una letra significa «el opuesto de», no «número negativo».',
     ],
     solution: 'Si <code>x = −4 &lt; 0</code>, entonces <code>−x = −(−4) = +4 &gt; 0</code>. El signo menos delante de <code>x</code> es el operador opuesto que neutraliza el signo negativo de <code>x</code>.',
   },
   {
     id: 'trampa-abs-3',
+    competencyId: 'abs.boundary_continuity_and_uniqueness',
+    exerciseFamily: 'dominio_rango_partes',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'boundary_double_closed_violation',
+    diagnosticIds: ['both_endpoints_closed_violation'],
     title: 'Trampa 3 · Doble punto cerrado en la frontera',
     desc: 'En una hoja aparece escrito: <code>g(x) = { 2x + 1 si x ≤ 2  ;  x − 1 si x ≥ 2 }</code>.',
     question: '¿Por qué esta expresión escrita así ni siquiera define una función en x = 2?',
@@ -299,12 +436,21 @@ export const TRAMPAS_EXAMEN = [
     expected: 0,
     explanation: '¡Impecable! En x = 2 el primer renglón da 2(2)+1 = 5 (<span class="va-dot va-dot--closed" title="Punto cerrado"></span>) y el segundo da 2−1 = 1 (<span class="va-dot va-dot--closed" title="Punto cerrado"></span>). Una misma entrada x = 2 tendría dos salidas distintas, violando la definición de función.',
     hints: [
-      'Evaluá el primer renglón en x = 2 y el segundo renglón en x = 2.',
+      'Fijate qué desigualdades aparecen en la frontera x = 2 en ambos renglones.',
+      'Evaluá el primer renglón en x = 2 y también el segundo renglón en x = 2.',
+      'Comprobá si x = 2 recibe una única imagen o dos valores diferentes.',
     ],
     solution: 'Para que sea función, en <code>x = 2</code> solo uno de los dos tramos puede incluir la igualdad (por ejemplo, <code>x &lt; 2</code> con círculo abierto <span class="va-dot va-dot--open" title="Círculo abierto"></span> arriba y <code>x ≥ 2</code> con punto cerrado <span class="va-dot va-dot--closed" title="Punto cerrado"></span> abajo).',
   },
   {
     id: 'trampa-abs-4',
+    competencyId: 'abs.step_floor_and_ceiling',
+    exerciseFamily: 'dominio_rango_partes',
+    representation: REPRESENTATION_TYPES.GRAPHICAL,
+    stage: LEARNING_STAGES.INTERLEAVING,
+    transferDistance: TRANSFER_DISTANCES.NEAR,
+    expectedEvidence: 'step_function_range_vs_interval',
+    diagnosticIds: [],
     title: 'Trampa 4 · El rango de una función de paso',
     desc: 'Una función escalonada tiene tres escalones horizontales a las alturas <strong>y = 1</strong>, <strong>y = 3</strong> e <strong>y = 5</strong> sobre el dominio <code>[0; 6]</code>.',
     question: '¿Cuál es el conjunto Imagen (Rango) correcto?',
@@ -316,12 +462,21 @@ export const TRAMPAS_EXAMEN = [
     expected: 1,
     explanation: '¡Exacto! El intervalo [1; 5] incluiría infinitos valores como 2 o 4,3 que la función jamás alcanza. La imagen son exclusivamente los tres números {1; 3; 5}.',
     hints: [
-      '¿Existe algún x para el cual la función valga 2 o 3,5?',
+      'Distinguí el dominio horizontal [0; 6] de las alturas que efectivamente toma la función.',
+      'Preguntate si existe algún x para el cual la función devuelva y = 2 o y = 3,5.',
+      'Un conjunto finito de alturas aisladas se escribe entre llaves y no como intervalo.',
     ],
     solution: 'En toda función de paso, al proyectar los escalones horizontales contra el eje Y se obtienen puntos aislados: <strong>Imagen = {1; 3; 5}</strong>.',
   },
   {
     id: 'trampa-abs-5',
+    competencyId: 'abs.distance_1d_and_equations',
+    exerciseFamily: 'resolver_modulo',
+    representation: REPRESENTATION_TYPES.SYMBOLIC,
+    stage: LEARNING_STAGES.TRANSFER,
+    transferDistance: TRANSFER_DISTANCES.FAR,
+    expectedEvidence: 'sqrt_square_abs_identity',
+    diagnosticIds: ['missing_abs_bars'],
     title: 'Trampa 5 · Cancelar √(x²) = x en el parcial de Exactas',
     desc: 'Para resolver la ecuación cuadrática <code>(x − 3)² = 4</code>, un alumno aplica raíz cuadrada en ambos miembros, tacha la raíz con el cuadrado escribiendo <code>x − 3 = 2</code> y entrega como única respuesta <code>x = 5</code>.',
     question: '¿Qué error cometió al simplificar y qué solución perdió en el camino?',
@@ -333,7 +488,9 @@ export const TRAMPAS_EXAMEN = [
     expected: 2,
     explanation: '¡Nivel universitario desbloqueado! Como √(u²) = |u|, queda |x − 3| = 2, es decir, los puntos a distancia 2 del 3: x = 5 y x = 1. En efecto, (1 − 3)² = (−2)² = 4.',
     hints: [
-      'Probá reemplazar x = 1 en (x − 3)² = 4 y fijate cuánto da (−2)².',
+      'Recordá que al elevar un número negativo al cuadrado se obtiene el mismo resultado que con su opuesto positivo.',
+      'Probá reemplazar x = 1 en (x − 3)² = 4 para ver si verifica la igualdad.',
+      'Usá la identidad exacta √(u²) = |u| antes de quitar la raíz cuadrada.',
     ],
     solution: 'La propiedad real es <code>√((x − 3)²) = |x − 3| = 2</code>, que entrega las dos soluciones simétricas: <strong>x₁ = 5</strong> y <strong>x₂ = 1</strong>.',
   },
@@ -677,6 +834,7 @@ export function initRetosAbsModule(container) {
     if (activeTab === 'seed') {
       const typeOptions = [
         { id: -1, label: 'Todos los 8 tipos combinados' },
+        { id: -2, label: 'Adaptativo (recomendado por competencias)' },
         { id: 0, label: '1. Hallar el vértice (h; k)' },
         { id: 1, label: '2. Ecuación desde datos de la gráfica' },
         { id: 2, label: '3. Graficar arrastrando nodos en el plano' },
@@ -686,6 +844,29 @@ export function initRetosAbsModule(container) {
         { id: 6, label: '7. Rango discreto de función escalonada' },
         { id: 7, label: '8. Resolver ecuación con módulo a|x − h| + k = c' },
       ];
+
+      let effectiveTypeFilter = typeFilter;
+      let adaptiveBanner = null;
+      if (typeFilter === -2) {
+        const selection = selectAdaptiveExercise({
+          moduleId: 'valor-absoluto',
+          availableExercises: CHALLENGE_FAMILY_META,
+          store: getProgressStore(),
+        });
+        if (selection?.exercise && typeof selection.exercise.typeIndex === 'number') {
+          effectiveTypeFilter = selection.exercise.typeIndex;
+          const comp = ABS_COMPETENCIES.find((c) => c.id === selection.targetCompetencyId);
+          adaptiveBanner = h('div', { class: 'notice small', style: 'margin-bottom: 10px;' },
+            chalkIcon('sparkles'),
+            h('span', null,
+              comp ? h('strong', null, `${comp.title}: `) : null,
+              selection.selectionReason
+            )
+          );
+        } else {
+          effectiveTypeFilter = -1;
+        }
+      }
 
       const seedControls = h('div', { class: 'seq-controls' },
         h('label', { class: 'field__label' },
@@ -731,17 +912,24 @@ export function initRetosAbsModule(container) {
       );
 
       const generatedQuestions = [
-        generateAbsProblem(currentSeed, typeFilter),
-        generateAbsProblem(currentSeed + 19, typeFilter),
-        generateAbsProblem(currentSeed + 83, typeFilter),
+        generateAbsProblem(currentSeed, effectiveTypeFilter),
+        generateAbsProblem(currentSeed + 19, effectiveTypeFilter),
+        generateAbsProblem(currentSeed + 83, effectiveTypeFilter),
       ];
 
       const checkSlot = h('div', null);
-      createCheckBlock(checkSlot, generatedQuestions, `abs-seed-${currentSeed}`);
-      contentArea = h('div', null, seedControls, checkSlot);
+      createCheckBlock(checkSlot, generatedQuestions, `abs-seed-${currentSeed}`, null, { persistSection: false });
+      contentArea = h('div', null, seedControls, adaptiveBanner, checkSlot);
     } else if (activeTab === 'trampas') {
       const questions = TRAMPAS_EXAMEN.map((t) => ({
         id: t.id,
+        competencyId: t.competencyId,
+        exerciseFamily: t.exerciseFamily,
+        representation: t.representation,
+        stage: t.stage,
+        transferDistance: t.transferDistance,
+        expectedEvidence: t.expectedEvidence,
+        diagnosticIds: t.diagnosticIds,
         type: 'choice',
         prompt: `<strong>${t.title}</strong><br>${t.desc}<br><p><strong>${t.question}</strong></p>`,
         options: t.options,
@@ -753,7 +941,7 @@ export function initRetosAbsModule(container) {
       }));
 
       const checkSlot = h('div', null);
-      createCheckBlock(checkSlot, questions, 'abs-trampas-clasicas');
+      createCheckBlock(checkSlot, questions, 'abs-trampas-clasicas', null, { persistSection: false });
       contentArea = h('div', null, checkSlot);
     } else {
       const bossSlot = h('div', null);

@@ -3,7 +3,9 @@ import { fmt, frac } from "../../core/math-format.js";
 import { playScript } from "../../core/vn.js";
 import { diagnosePowRad, toDisplay } from "./expr.js";
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from "./vn-scripts.js";
-import { getProgress, saveProgress } from "./components.js";
+import { POW_COMPETENCIES, getCompetencyById } from "./competencies-map.js";
+import { recordPowAttempt, getProgressStore } from "./learning-adapter.js";
+import { selectAdaptiveExercise } from "../../core/learning/exercise-selector.js";
 
 export const CHALLENGE_TYPES = [
   "dos_mundos_mitad",
@@ -15,6 +17,73 @@ export const CHALLENGE_TYPES = [
   "choque_mundos_binomio",
   "auditoria_reales_exactas",
 ];
+
+export const CHALLENGE_FAMILY_META = Object.freeze({
+  dos_mundos_mitad: {
+    competencyId: "powers.rational_exponents_and_nth_roots",
+    representation: "symbolic",
+    difficulty: 1,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["additive_instead_of_multiplicative"],
+  },
+  exponente_negativo_neutro: {
+    competencyId: "powers.negative_exponents_and_reciprocals",
+    representation: "symbolic",
+    difficulty: 1,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["zero_exponent_is_zero", "negative_exponent_is_negative_number"],
+  },
+  cociente_potencias_neutro: {
+    competencyId: "powers.quotient_and_product_laws",
+    representation: "symbolic",
+    difficulty: 2,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["canceled_to_zero_or_counted_ones", "multiplied_bases_in_same_base_prod"],
+  },
+  arbol_raiz_orden_n: {
+    competencyId: "powers.prime_factor_tree_extraction",
+    representation: "symbolic",
+    difficulty: 2,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["unsimplified_radical"],
+  },
+  simplificar_radical_vars: {
+    competencyId: "powers.radical_simplification_and_rationalization",
+    representation: "symbolic",
+    difficulty: 3,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["unsimplified_radical"],
+  },
+  producto_radicales: {
+    competencyId: "powers.radical_simplification_and_rationalization",
+    representation: "symbolic",
+    difficulty: 2,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["unsimplified_radical"],
+  },
+  choque_mundos_binomio: {
+    competencyId: "powers.binomial_power_non_distributivity",
+    representation: "symbolic",
+    difficulty: 2,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["distributed_power_over_sum"],
+  },
+  auditoria_reales_exactas: {
+    competencyId: "powers.real_domain_restrictions_and_abs_root",
+    representation: "symbolic",
+    difficulty: 2,
+    stage: "retrieval",
+    transferDistance: "near",
+    diagnosticIds: ["forgot_abs_in_even_root", "illegal_real_root_distribution"],
+  },
+});
 
 export function mulberry32(seed) {
   let state = seed >>> 0;
@@ -247,10 +316,26 @@ export function makeChallenge(seed, requestedType = null) {
   };
   const build = cases[type];
   if (!build) throw new RangeError(`Tipo de reto desconocido: ${type}`);
-  return build();
+  const meta = CHALLENGE_FAMILY_META[type] || {};
+  const comp = getCompetencyById(meta.competencyId);
+  const built = build();
+  return {
+    id: `pr-reto-${type}-${seed}`,
+    family: type,
+    exerciseFamily: type,
+    competencyId: meta.competencyId || "powers.additive_vs_multiplicative_worlds",
+    prerequisiteIds: comp ? [...comp.prerequisiteIds] : [],
+    representation: meta.representation || "symbolic",
+    difficulty: meta.difficulty || 2,
+    stage: meta.stage || "retrieval",
+    transferDistance: meta.transferDistance || "near",
+    expectedEvidence: meta.expectedEvidence || type,
+    diagnosticIds: meta.diagnosticIds ? [...meta.diagnosticIds] : [],
+    ...built,
+  };
 }
 
-const TRAPS = [
+export const TRAPS = [
   {
     title: "Trampa 1 · Los factores “se cancelan”",
     wrong:
@@ -290,11 +375,30 @@ const TRAPS = [
   },
 ];
 
+function pickAdaptiveFamily() {
+  try {
+    const candidates = CHALLENGE_TYPES.map((type) => ({
+      id: type,
+      family: type,
+      competencyId: CHALLENGE_FAMILY_META[type]?.competencyId,
+    }));
+    const selection = selectAdaptiveExercise({
+      moduleId: "potencias-raices",
+      availableExercises: candidates,
+      store: getProgressStore(),
+    });
+    return selection?.exercise?.id || null;
+  } catch {
+    return null;
+  }
+}
+
 function createTrainer(root) {
   let seed = Number(localStorage.getItem("potencias_raices:seed") || 202611);
   let current = makeChallenge(seed);
   let failStreak = 0;
   let hintStep = 0;
+  let solutionRevealed = false;
   const seedInput = h("input", {
     type: "number",
     min: "0",
@@ -307,6 +411,7 @@ function createTrainer(root) {
     { "aria-label": "Tipo de desafío" },
     [
       ["aleatorio", "Aleatorio"],
+      ["adaptativo", "Inteligente (Según tu evidencia)"],
       ...CHALLENGE_TYPES.map((type) => [type, type.replaceAll("_", " ")]),
     ].map(([value, label]) => h("option", { value }, label)),
   );
@@ -348,31 +453,73 @@ function createTrainer(root) {
       class: "btn",
       on: {
         click: () => {
-          const diagnosis = diagnosePowRad(input.value, {
+          const val = String(input.value ?? "").trim();
+          if (!val) {
+            feedback.textContent = "Ingresá una respuesta antes de revisar.";
+            feedback.className = "pr-check__feedback is-error";
+            return;
+          }
+          const diagnosis = diagnosePowRad(val, {
             value: current.answer,
             context: current.prompt,
             expression: current.expression,
             vars: current.vars,
           });
+          const isAssisted = solutionRevealed || hintStep > 0;
+          const mode = isAssisted ? "assisted" : "independent";
+
           if (diagnosis.correct) {
-            feedback.textContent = `Correcto: ${current.displayAnswer}. El razonamiento quedó registrado.`;
+            feedback.textContent = isAssisted
+              ? `Correcto (logro asistido): ${current.displayAnswer}.`
+              : `Correcto (logro independiente): ${current.displayAnswer}. El razonamiento quedó registrado.`;
             feedback.className = "pr-check__feedback is-correct";
-            saveProgress("challenge:last", { seed, type: current.type });
-            playScript([
-              failStreak >= 3
-                ? STREAK_REACTIONS.flawlessRun
-                : failStreak
-                  ? STREAK_REACTIONS.recovered
-                  : STREAK_REACTIONS.firstTry,
-            ]);
+            try {
+              localStorage.setItem("potencias_raices:challenge:last:v1", JSON.stringify({ seed, type: current.type }));
+            } catch {}
+            try {
+              recordPowAttempt({
+                exerciseId: current.id,
+                competencyId: current.competencyId,
+                correct: true,
+                mode,
+                hintsUsed: hintStep,
+                solutionRevealed,
+                representation: current.representation,
+                stage: current.stage,
+                transferDistance: current.transferDistance,
+              });
+            } catch {}
+            if (!isAssisted) {
+              playScript([
+                failStreak >= 3
+                  ? STREAK_REACTIONS.flawlessRun
+                  : failStreak
+                    ? STREAK_REACTIONS.recovered
+                    : STREAK_REACTIONS.firstTry,
+              ]);
+            }
             failStreak = 0;
           } else {
             failStreak++;
+            const id = diagnosis.diagnostics[0]?.id || null;
+            try {
+              recordPowAttempt({
+                exerciseId: current.id,
+                competencyId: current.competencyId,
+                correct: false,
+                mode,
+                hintsUsed: hintStep,
+                solutionRevealed,
+                diagnosticId: id,
+                representation: current.representation,
+                stage: current.stage,
+                transferDistance: current.transferDistance,
+              });
+            } catch {}
             feedback.textContent =
               diagnosis.diagnostics[0]?.message ||
               "Todavía no coincide. Leé una pista y revisá las operaciones por separado.";
             feedback.className = "pr-check__feedback is-error";
-            const id = diagnosis.diagnostics[0]?.id;
             if (failStreak >= 2) playScript([STREAK_REACTIONS.repeatedError]);
             else if (DIAGNOSE_REACTIONS[id])
               playScript([DIAGNOSE_REACTIONS[id]]);
@@ -413,6 +560,8 @@ function createTrainer(root) {
       class: "btn btn--ghost",
       on: {
         click: () => {
+          const firstReveal = !solutionRevealed;
+          solutionRevealed = true;
           solution.hidden = false;
           mount(
             solution,
@@ -425,6 +574,21 @@ function createTrainer(root) {
               ),
             ),
           );
+          if (firstReveal) {
+            try {
+              recordPowAttempt({
+                exerciseId: current.id,
+                competencyId: current.competencyId,
+                correct: false,
+                mode: "assisted",
+                hintsUsed: hintStep,
+                solutionRevealed: true,
+                representation: current.representation,
+                stage: current.stage,
+                transferDistance: current.transferDistance,
+              });
+            } catch {}
+          }
           playScript([
             STREAK_REACTIONS.showSolution,
             STREAK_REACTIONS.solutionAfter,
@@ -453,7 +617,11 @@ function createTrainer(root) {
   );
   const newChallenge = () => {
     const requested =
-      typeSelect.value === "aleatorio" ? null : typeSelect.value;
+      typeSelect.value === "aleatorio"
+        ? null
+        : typeSelect.value === "adaptativo"
+          ? pickAdaptiveFamily()
+          : typeSelect.value;
     current = makeChallenge(seed, requested);
     mount(prompt, ...inlineMathNodes(current.prompt));
     meta.textContent = `Tipo: ${current.type.replaceAll("_", " ")} · Semilla ${fmt(seed)}`;
@@ -463,6 +631,7 @@ function createTrainer(root) {
     hintText.hidden = true;
     solution.hidden = true;
     hintStep = 0;
+    solutionRevealed = false;
   };
   seedInput.addEventListener("change", () => {
     seed = Number(seedInput.value) >>> 0;

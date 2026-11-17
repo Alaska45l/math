@@ -1941,4 +1941,222 @@ button.site-nav__sound-btn:focus-visible,
   }
 }
 
+/* ---------- Panel Compartido de Competencias (.learning-dashboard-*) ---------- */
+.learning-dashboard-host,
+#pr-competency-dashboard,
+#abs-competency-dashboard,
+#seq-competency-dashboard {
+  margin: 24px 0 36px;
+  padding: 20px;
+  background: var(--panel, #1b1f23);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.28));
+}
 
+.learning-dashboard-header {
+  margin-bottom: 20px;
+}
+
+.learning-dashboard-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  color: var(--yellow, #e9c46a);
+}
+
+.learning-dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.learning-dashboard-kpi {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.15));
+  border-left: 4px solid var(--muted, #888);
+}
+
+.learning-dashboard-kpi--mastered {
+  border-left-color: var(--green, #2a9d8f);
+}
+
+.learning-dashboard-kpi--assisted {
+  border-left-color: var(--yellow, #e9c46a);
+}
+
+.learning-dashboard-kpi--pending {
+  border-left-color: var(--pink, #e76f51);
+}
+
+.learning-dashboard-kpi__num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: var(--font-mono, monospace);
+  color: var(--text, #ecf2e8);
+}
+
+.learning-dashboard-kpi__label {
+  font-size: 0.82rem;
+  color: var(--text-muted, #a7b8ae);
+  margin-top: 4px;
+}
+
+.learning-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.learning-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border, rgba(236, 242, 232, 0.2));
+  transition: border-color 0.2s ease;
+}
+
+.learning-dashboard-card--durable {
+  border-left: 3px solid var(--green, #2a9d8f);
+}
+
+.learning-dashboard-card--consolidating {
+  border-left: 3px solid var(--yellow, #e9c46a);
+}
+
+.learning-dashboard-card--developing {
+  border-left: 3px solid var(--blue, #8aadf4);
+}
+
+.learning-dashboard-card--review-due {
+  border-left: 3px solid var(--orange, #f4a261);
+}
+
+.learning-dashboard-card--needs-repair {
+  border-left: 3px solid var(--pink, #e76f51);
+}
+
+.learning-dashboard-card--introduced,
+.learning-dashboard-card--unseen {
+  border-left: 3px solid rgba(236, 242, 232, 0.2);
+}
+
+.learning-dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.learning-dashboard-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text, #ecf2e8);
+}
+
+.learning-dashboard-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.learning-dashboard-badge.badge--success {
+  background: rgba(42, 157, 143, 0.2);
+  color: var(--green, #2a9d8f);
+  border: 1px solid var(--green, #2a9d8f);
+}
+
+.learning-dashboard-badge.badge--warning {
+  background: rgba(233, 196, 106, 0.2);
+  color: var(--yellow, #e9c46a);
+  border: 1px solid var(--yellow, #e9c46a);
+}
+
+.learning-dashboard-badge.badge--info {
+  background: rgba(138, 173, 244, 0.2);
+  color: var(--blue, #8aadf4);
+  border: 1px solid var(--blue, #8aadf4);
+}
+
+.learning-dashboard-badge.badge--attention {
+  background: rgba(244, 162, 97, 0.2);
+  color: var(--orange, #f4a261);
+  border: 1px solid var(--orange, #f4a261);
+}
+
+.learning-dashboard-badge.badge--danger {
+  background: rgba(231, 111, 81, 0.2);
+  color: var(--pink, #e76f51);
+  border: 1px solid var(--pink, #e76f51);
+}
+
+.learning-dashboard-badge.badge--neutral {
+  background: rgba(236, 242, 232, 0.1);
+  color: var(--text-muted, #a7b8ae);
+  border: 1px solid rgba(236, 242, 232, 0.2);
+}
+
+.learning-dashboard-errors {
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.learning-dashboard-error-alert {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--orange, #f4a261);
+  background: rgba(244, 162, 97, 0.1);
+  padding: 4px 8px;
+  border-left: 2px solid var(--orange, #f4a261);
+}
+
+.learning-dashboard-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.learning-dashboard-card__actions .btn {
+  flex: 1;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 6px 8px;
+}
+
+/* ---------- Bloque Compartido Predict-Observe-Explain (.learning-predict-box) ---------- */
+.learning-predict-box {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px dashed rgba(236, 242, 232, 0.28);
+  background: rgba(14, 22, 18, 0.35);
+}
+
+.learning-predict-prompt {
+  margin: 0 0 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.learning-predict-feedback {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+/* Foco accesible en manejadores SVG arrastrables */
+svg [role="slider"]:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 4px;
+}

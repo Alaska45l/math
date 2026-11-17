@@ -25,6 +25,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Identifica si un fenómeno con pasos uniformes en x avanza sumando una diferencia constante (lineal) o multiplicando por una razón constante a (exponencial), usando 3 o más filas para descartar parábolas impostoras.',
     prerequisiteIds: [],
     diagnosticIds: ['linear_difference_instead_of_ratio'],
+    exerciseFamilies: ['razon_tabla_vs_salto'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.neutral_and_order_of_operations',
@@ -36,6 +38,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Reconoce al coeficiente k como población en el instante inicial x = 0 y respeta la precedencia estricta de la potenciación sobre la multiplicación exterior, evitando crear falsas bases compuestas.',
     prerequisiteIds: ['exponentials.tables_additive_vs_multiplicative'],
     diagnosticIds: ['multiplied_k_and_base', 'confused_fencepost_x_minus_1'],
+    exerciseFamilies: ['orden_k_a_x'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.rational_density_and_base_restrictions',
@@ -47,6 +51,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Comprende por qué la extensión del dominio a los números racionales exige una base estrictamente positiva para evitar discontinuidades complejas y por qué se descartan las bases 0 y 1.',
     prerequisiteIds: ['exponentials.neutral_and_order_of_operations'],
     diagnosticIds: ['invalid_base_restriction'],
+    exerciseFamilies: ['restricciones_base'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.base_reflection_and_asymptote',
@@ -58,6 +64,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Interpreta el decaimiento radiactivo como reflexión especular respecto al eje Y mediante exponentes negativos y reconoce la recta y = 0 como frontera asintótica abierta inalcanzable.',
     prerequisiteIds: ['exponentials.rational_density_and_base_restrictions'],
     diagnosticIds: ['closed_bracket_on_asymptote'],
+    exerciseFamilies: ['simetria_inversa'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.four_quadrants_monotonicity',
@@ -69,6 +77,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Determina el crecimiento o decrecimiento estricto y el signo de las imágenes analizando conjuntamente si a > 1 o 0 < a < 1 y si k > 0 o k < 0, demostrando que g(x) = −3 · (1/2)ˣ es creciente.',
     prerequisiteIds: ['exponentials.base_reflection_and_asymptote'],
     diagnosticIds: ['ignored_negative_k_monotonicity'],
+    exerciseFamilies: ['monotonia_cuadrantes'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.analytical_reconstruction_two_points',
@@ -80,6 +90,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Plantea el sistema de dos puntos, divide miembro a miembro para cancelar k y despejar la base exacta mediante raíces racionales conservando fracciones exactas sin truncar.',
     prerequisiteIds: ['exponentials.four_quadrants_monotonicity'],
     diagnosticIds: [],
+    exerciseFamilies: ['formula_desde_dos_puntos'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'analytical_evaluator'],
   },
   {
     id: 'exponentials.time_models_rates_and_euler_base',
@@ -91,6 +103,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Formula modelos de crecimiento porcentual, semidesintegración con exponente compuesto t/T y decaimiento continuo con la constante e, respetando la coherencia de unidades temporales.',
     prerequisiteIds: ['exponentials.analytical_reconstruction_two_points'],
     diagnosticIds: ['raw_percentage_as_base', 'inverted_period_exponent'],
+    exerciseFamilies: ['modelos_temporales'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.shifts_and_horizontal_asymptote',
@@ -102,6 +116,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Analiza la traslación rígida f(x) = k · a^(x−h) + c, ubica el anclaje P(h; k + c), traslada la asíntota a y = c y establece la imagen abierta (c; +∞) o (−∞; c) con paréntesis redondo estricto.',
     prerequisiteIds: ['exponentials.base_reflection_and_asymptote'],
     diagnosticIds: ['closed_bracket_on_asymptote'],
+    exerciseFamilies: ['desplazamientos_asintota'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
   {
     id: 'exponentials.full_analytical_study',
@@ -113,6 +129,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'Realiza el informe exhaustivo de una función trasladada f(x) = c − (1/a)ˣ deduciendo ceros mediante igualación de bases e intervalos de signos coherentes con el crecimiento analítico.',
     prerequisiteIds: ['exponentials.shifts_and_horizontal_asymptote'],
     diagnosticIds: ['closed_bracket_on_asymptote'],
+    exerciseFamilies: ['estudio_completo_exactas'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'analytical_evaluator'],
   },
   {
     id: 'exponentials.equations_three_methods_in_reals',
@@ -127,6 +145,8 @@ export const EXP_COMPETENCIES = Object.freeze([
       'subtracted_exponents_without_parens',
       'accepted_non_positive_u_in_substitution',
     ],
+    exerciseFamilies: ['ecuaciones_exponenciales'],
+    evidenceMechanisms: ['check_verification', 'retos_generator', 'diagnostic_detector'],
   },
 ]);
 
@@ -203,7 +223,16 @@ export const EXP_DIAGNOSTIC_TAXONOMY = Object.freeze({
   },
 });
 
-const COMPETENCY_ALIASES = Object.freeze({
+export const EXP_COMPETENCY_ALIASES = Object.freeze({
+  // Fallback IDs from legacy progress-store / migrations
+  'exponentials.base_and_initial_value_roles': 'exponentials.neutral_and_order_of_operations',
+  'exponentials.continuous_extension_and_restrictions': 'exponentials.rational_density_and_base_restrictions',
+  'exponentials.asymptote_and_horizontal_reflection': 'exponentials.base_reflection_and_asymptote',
+  'exponentials.quadrant_monotonicity': 'exponentials.four_quadrants_monotonicity',
+  'exponentials.half_life_and_compound_periods': 'exponentials.time_models_rates_and_euler_base',
+  'exponentials.asymptote_shifts_and_image': 'exponentials.shifts_and_horizontal_asymptote',
+  'exponentials.equations_bases_factoring_substitution': 'exponentials.equations_three_methods_in_reals',
+  // Legacy aliases
   'exponentials.table_discrimination_additive_vs_multiplicative': 'exponentials.tables_additive_vs_multiplicative',
   'exponentials.neutral_exponent_zero_and_hierarchy_k_a_x': 'exponentials.neutral_and_order_of_operations',
   'exponentials.continuous_bridge_rational_density_and_base_restrictions': 'exponentials.rational_density_and_base_restrictions',
@@ -218,7 +247,7 @@ const COMPETENCY_ALIASES = Object.freeze({
 
 export function getCompetencyById(id) {
   if (!id) return null;
-  const canonicalId = COMPETENCY_ALIASES[id] || id;
+  const canonicalId = EXP_COMPETENCY_ALIASES[id] || id;
   return EXP_COMPETENCIES.find((c) => c.id === canonicalId) || null;
 }
 

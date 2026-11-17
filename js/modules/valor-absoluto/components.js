@@ -11,6 +11,7 @@ import { fmt, frac, MINUS } from '../../core/math-format.js';
 import { createPlane, bindSvgDrag, snapTo } from '../../core/plot.js';
 import { react, playScript } from '../../core/vn.js';
 import { playSuccess, playError, playSliderTick } from '../../core/sound.js';
+import { mountCompetencyDashboard as mountCoreCompetencyDashboard } from '../../core/learning/dashboard.js';
 import { tryParseExpr, toDisplay, equivalentFx } from './expr.js';
 import {
   approxEq,
@@ -20,8 +21,15 @@ import {
   formatCanonicalAbs,
 } from './logic.js';
 import { DIAGNOSE_REACTIONS, getSec7Q2Script } from './vn-scripts.js';
+import {
+  ABS_COMPETENCIES,
+  ABS_DIAGNOSTIC_TAXONOMY,
+  getCompetenciesForSection,
+} from './competencies-map.js';
+import { recordAbsAttempt, getAbsCompetencyReport } from './learning-adapter.js';
 
-const PROGRESS_KEY = 'valor_absoluto:progreso:v1';
+export const PROGRESS_KEY = 'valor_absoluto:progreso:v1';
+const ALLOWED_SECTION_REGEX = /^sec-(?:[1-9]|10)$/;
 
 export function getProgress() {
   try {
@@ -33,11 +41,45 @@ export function getProgress() {
 }
 
 export function saveSectionProgress(sectionId) {
+  if (!ALLOWED_SECTION_REGEX.test(String(sectionId || ''))) return;
   try {
     const current = getProgress();
     current[sectionId] = true;
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(current));
   } catch (_) {}
+}
+
+export function saveItemProgress(itemKey, mode = 'independent') {
+  if (!itemKey || typeof itemKey !== 'string') return;
+  const sectionPrefix = itemKey.split(':')[0];
+  if (!ALLOWED_SECTION_REGEX.test(sectionPrefix)) return;
+  try {
+    const current = getProgress();
+    const prev = current[itemKey];
+    current[itemKey] = prev === 'assisted' || mode === 'assisted' ? 'assisted' : 'independent';
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(current));
+  } catch (_) {}
+}
+
+export function recordCompetencyAttempt(params = {}) {
+  return recordAbsAttempt(params);
+}
+
+export function getCompetencyReport() {
+  return getAbsCompetencyReport();
+}
+
+export function mountCompetencyDashboard(container, options = {}) {
+  return mountCoreCompetencyDashboard({
+    container,
+    moduleId: 'valor-absoluto',
+    competencies: ABS_COMPETENCIES,
+    diagnosticTaxonomy: ABS_DIAGNOSTIC_TAXONOMY,
+    getReport: getCompetencyReport,
+    classPrefix: 'learning-dashboard',
+    subtitle: 'Progreso en las 10 competencias de Valor Absoluto y Funciones por Partes.',
+    ...options,
+  });
 }
 
 /**
@@ -890,7 +932,13 @@ function resolveExpectedChoiceIndex(q) {
  * - 'match': emparejamiento
  * - 'graph-target': lienzo cartesiano interactivo donde el usuario arrastra (h; k) y pendiente 'a'
  */
-export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null) {
+export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null, options = {}) {
+  const opts = typeof onComplete === 'object' && onComplete !== null && typeof options !== 'object'
+    ? onComplete
+    : (options || {});
+  const onCompleteCb = typeof onComplete === 'function' ? onComplete : null;
+  const persistSection = opts.persistSection !== false && ALLOWED_SECTION_REGEX.test(String(sectionId || ''));
+
   let lastCorrectSlot = -1;
   const state = {
     answers: questions.map((q) => {
@@ -918,7 +966,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         ok: false,
         feedback: null,
         hintIndex: 0,
+        hintsUsed: 0,
         showSolution: false,
+        solutionRevealed: false,
+        modeLockedAssisted: false,
         failCount: 0,
         optionOrder,
       };
@@ -927,6 +978,38 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
   };
 
   const container = h('div', { class: 'seq-check-block abs-check-block', dataset: { section: sectionId } });
+
+  function resolveQuestionCompetencyId(q) {
+    if (q?.competencyId) return q.competencyId;
+    const bySec = getCompetenciesForSection(sectionId);
+    return bySec?.[0]?.id || 'abs.distance_1d_and_equations';
+  }
+
+  function emitAttempt(q, qState, idx, { isCorrect, diagnosticId = null }) {
+    const isAssisted = Boolean(
+      qState.modeLockedAssisted ||
+      qState.solutionRevealed ||
+      qState.showSolution ||
+      (qState.hintsUsed || 0) > 0 ||
+      (qState.hintIndex || 0) > 0
+    );
+    const mode = isAssisted ? 'assisted' : 'independent';
+    if (persistSection) {
+      saveItemProgress(`${sectionId}:${idx}`, mode);
+    }
+    recordAbsAttempt({
+      exerciseId: q.id || `${sectionId || 'abs'}-q${idx + 1}`,
+      competencyId: resolveQuestionCompetencyId(q),
+      correct: Boolean(isCorrect),
+      mode,
+      hintsUsed: qState.hintsUsed || qState.hintIndex || 0,
+      solutionRevealed: Boolean(qState.solutionRevealed),
+      diagnosticId: diagnosticId || null,
+      representation: q.representation,
+      stage: q.stage,
+      transferDistance: q.transferDistance,
+    });
+  }
 
   function triggerVnReaction(q, qState, isOk, diagId = null) {
     if (isOk) {
@@ -1008,15 +1091,15 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
       });
     } else if (qState.failCount === 2) {
       react({
-        pose: 'sospecha',
-        tag: 'Mmm... sospechoso',
-        html: '¡No me tires coordenadas o fórmulas al azar para ver si embocás! N-no es que me preocupe tu nota, ¿eh?, pero sospecho que estás adivinando. ¡Tocá el botón de <strong>Pista</strong> y pensalo geométricamente!',
+        pose: 'evaluando',
+        tag: 'Revisemos la estrategia',
+        html: 'Probemos paso a paso sin apurarse: identificá primero dónde cambia de signo lo de adentro de las barras o usá una <strong>Pista</strong> para destrabar el análisis geométrico.',
       });
     } else {
       react({
-        pose: 'colapso',
-        tag: '¡Colapso mental!',
-        html: '¡Me vas a hacer dar un colapso nervioso! Evaluá un punto concreto en tu expresión (como el vértice <span class="eq">x = h</span>) y compará la altura que te da con la del gráfico.',
+        pose: 'empatia',
+        tag: 'Paso a paso desde el vértice',
+        html: 'Tomemos aire y hagamos una prueba concreta: evaluá un punto clave como el vértice <span class="eq">x = h</span> y compará su altura con la del gráfico o la fórmula.',
       });
     }
   }
@@ -1038,8 +1121,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           }, 450);
         }
       }
-      saveSectionProgress(sectionId);
-      onComplete?.(sectionId);
+      if (persistSection) {
+        saveSectionProgress(sectionId);
+      }
+      onCompleteCb?.(sectionId);
     }
   }
 
@@ -1093,6 +1178,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               ? { ok: true, message: q.explanation || '¡Excelente! Respuesta correcta.' }
               : { ok: false, message: `Obtuviste ${fmt(val)}, pero no coincide con el valor buscado.` };
             triggerVnReaction(q, qState, isMatch);
+            emitAttempt(q, qState, idx, { isCorrect: isMatch });
           }
           checkCompletion();
           render();
@@ -1163,6 +1249,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               message: warnDiag ? warnDiag.message : (q.explanation || '¡Perfecto! La expresión algebraica es correcta.'),
             };
             triggerVnReaction(q, qState, true, warnDiag?.id || null);
+            emitAttempt(q, qState, idx, { isCorrect: true, diagnosticId: warnDiag?.id || null });
           } else {
             qState.ok = false;
             qState.feedback = {
@@ -1170,6 +1257,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               message: errDiag?.message || 'La expresión ingresada no genera la gráfica o los valores pedidos.',
             };
             triggerVnReaction(q, qState, false, errDiag?.id || null);
+            emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: errDiag?.id || null });
           }
 
           checkCompletion();
@@ -1256,6 +1344,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             }
 
             triggerVnReaction(q, qState, qState.ok, diagId);
+            emitAttempt(q, qState, idx, { isCorrect: qState.ok, diagnosticId: qState.ok ? null : diagId });
           }
           checkCompletion();
           render();
@@ -1306,6 +1395,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
                 ? { ok: true, message: q.explanation || '¡Correcto! Opción acertada.' }
                 : { ok: false, message: q.optionFeedback?.[origIdx] || 'Opción incorrecta. Analizá la definición y volvé a probar.' };
               triggerVnReaction(q, qState, isMatch, diagId);
+              emitAttempt(q, qState, idx, { isCorrect: isMatch, diagnosticId: isMatch ? null : diagId });
               checkCompletion();
               render();
             });
@@ -1369,6 +1459,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           }
 
           triggerVnReaction(q, qState, isOk, diagId);
+          emitAttempt(q, qState, idx, { isCorrect: isOk, diagnosticId: isOk ? null : diagId });
           checkCompletion();
           render();
         });
@@ -1432,6 +1523,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
             ? { ok: true, message: q.explanation || '¡Todos los emparejamientos son correctos!' }
             : { ok: false, message: 'Alguno de los emparejamientos no coincide. Revisá cada fila.' };
           triggerVnReaction(q, qState, allMatch);
+          emitAttempt(q, qState, idx, { isCorrect: allMatch });
           checkCompletion();
           render();
         });
@@ -1469,6 +1561,11 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           if (qState.hintIndex < q.hints.length) {
             const hintText = q.hints[qState.hintIndex];
             qState.hintIndex++;
+            qState.hintsUsed = Math.max(qState.hintsUsed || 0, qState.hintIndex);
+            qState.modeLockedAssisted = true;
+            if (persistSection) {
+              saveItemProgress(`${sectionId}:${idx}`, 'assisted');
+            }
             render();
             react({
               pose: 'evaluando',
@@ -1487,13 +1584,19 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         }, qState.showSolution ? 'Ocultar solución' : '¡Estoy atorado! Mostrame la solución');
 
         btnSol.addEventListener('click', () => {
-          qState.showSolution = !qState.showSolution;
+          const opening = !qState.showSolution;
+          qState.showSolution = opening;
+          if (opening) {
+            qState.solutionRevealed = true;
+            qState.modeLockedAssisted = true;
+            emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: null });
+          }
           render();
           if (qState.showSolution) {
             react({
-              pose: 'colapso',
-              tag: 'Suspiro...',
-              html: 'Suspiro... bueno, no sufras de más. Mirá el desglose paso a paso para entender de dónde sale:',
+              pose: 'empatia',
+              tag: 'Desglose paso a paso',
+              html: 'Revisemos el razonamiento juntos paso a paso para entender de dónde sale:',
             });
           }
         });

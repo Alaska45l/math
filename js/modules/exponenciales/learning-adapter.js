@@ -25,40 +25,39 @@ import {
   resolveCompetencyId,
 } from '../../core/learning/competencies.js';
 import {
-  getProgressStore,
+  getProgressStore as getCoreProgressStore,
   recordLearningEvent,
   getModuleReport,
   STATUS_BADGES,
+  STORAGE_KEY,
+  resetStore,
 } from '../../core/learning/progress-store.js';
 import {
   EXP_COMPETENCIES,
   EXP_DIAGNOSTIC_TAXONOMY,
+  EXP_COMPETENCY_ALIASES,
 } from './competencies-map.js';
 import { mountCompetencyDashboard as mountExpDashboardUI } from './components.js';
 
 export const MODULE_ID = MODULE_IDS.EXPONENCIALES;
 
-export const COMPETENCY_ALIASES = Object.freeze({
-  // Fallback IDs from progress-store.js fallback map
-  'exponentials.base_and_initial_value_roles': 'exponentials.neutral_and_order_of_operations',
-  'exponentials.continuous_extension_and_restrictions': 'exponentials.rational_density_and_base_restrictions',
-  'exponentials.asymptote_and_horizontal_reflection': 'exponentials.base_reflection_and_asymptote',
-  'exponentials.quadrant_monotonicity': 'exponentials.four_quadrants_monotonicity',
-  'exponentials.half_life_and_compound_periods': 'exponentials.time_models_rates_and_euler_base',
-  'exponentials.asymptote_shifts_and_image': 'exponentials.shifts_and_horizontal_asymptote',
-  'exponentials.equations_bases_factoring_substitution': 'exponentials.equations_three_methods_in_reals',
-  // Legacy aliases
-  'exponentials.table_discrimination_additive_vs_multiplicative': 'exponentials.tables_additive_vs_multiplicative',
-  'exponentials.neutral_exponent_zero_and_hierarchy_k_a_x': 'exponentials.neutral_and_order_of_operations',
-  'exponentials.continuous_bridge_rational_density_and_base_restrictions': 'exponentials.rational_density_and_base_restrictions',
-  'exponentials.base_reflection_symmetry_and_decay': 'exponentials.base_reflection_and_asymptote',
-  'exponentials.four_quadrants_k_a_and_monotonicity': 'exponentials.four_quadrants_monotonicity',
-  'exponentials.two_point_reconstruction': 'exponentials.analytical_reconstruction_two_points',
-  'exponentials.time_models_percentages_and_base_e': 'exponentials.time_models_rates_and_euler_base',
-  'exponentials.shifts_and_open_asymptote': 'exponentials.shifts_and_horizontal_asymptote',
-  'exponentials.full_function_analysis': 'exponentials.full_analytical_study',
-  'exponentials.exponential_equations_three_methods': 'exponentials.equations_three_methods_in_reals',
-});
+export const COMPETENCY_ALIASES = EXP_COMPETENCY_ALIASES;
+
+export function getProgressStore() {
+  if (typeof localStorage !== 'undefined' && localStorage !== null) {
+    try {
+      const store = getCoreProgressStore();
+      if (localStorage.getItem(STORAGE_KEY) === null && store._state?.events?.length > 0) {
+        resetStore();
+      }
+    } catch {}
+  }
+  return getCoreProgressStore();
+}
+
+export function getModuleState() {
+  return getExpCompetencyReport();
+}
 
 /**
  * Initializes and registers the Exponenciales module within competencies registry.

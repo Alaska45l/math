@@ -1,6 +1,7 @@
 import { h, mount, qsa } from "../../core/dom.js";
 import { renderNav, initLessonDock } from "../../core/nav.js";
 import { initGlossary } from "../../core/glossary.js";
+import { isMigrationNeeded, migrateLegacyProgress } from "../../core/learning/migrations.js";
 import { initRetosModule } from "./retos.js";
 import {
   bindTutorButtons,
@@ -8,7 +9,19 @@ import {
   mountProgress,
   annotatedPowFormula,
   worldsComparisonCard,
+  mountCompetencyDashboard,
+  getCompetencyReport,
+  PROGRESS_KEY,
+  getProgress,
+  saveProgress,
 } from "./components.js";
+import {
+  POW_COMPETENCIES,
+  POW_DIAGNOSTIC_TAXONOMY,
+  getCompetencyById,
+  getCompetenciesForSection,
+} from "./competencies-map.js";
+import { initPowLearning } from "./learning-adapter.js";
 import { initDosMundosWidget } from "./widgets/dos-mundos.js";
 import { initCintaNegativaWidget } from "./widgets/cinta-negativa.js";
 import { initNeutroCancelacionWidget } from "./widgets/neutro-cancelacion.js";
@@ -20,7 +33,7 @@ import { initChoqueMundosWidget } from "./widgets/choque-mundos.js";
 import { initEspejoDominioRealWidget } from "./widgets/espejo-dominio-real.js";
 import { initInspectorParadojasWidget } from "./widgets/inspector-paradojas.js";
 
-export const CHECKS_DATA = {
+const RAW_CHECKS_DATA = {
   "sec-1": [
     {
       type: "number",
@@ -568,6 +581,94 @@ export const CHECKS_DATA = {
   ],
 };
 
+const CHECKS_SECTION_META = {
+  "sec-1": {
+    competencyId: "powers.additive_vs_multiplicative_worlds",
+    family: "dos_mundos_mitad",
+    representation: "symbolic",
+    diagnosticIds: ["additive_instead_of_multiplicative", "multiplied_bases_in_same_base_prod"],
+  },
+  "sec-2": {
+    competencyId: "powers.negative_exponents_and_reciprocals",
+    family: "exponente_negativo_neutro",
+    representation: "symbolic",
+    diagnosticIds: ["negative_exponent_is_negative_number", "zero_exponent_is_zero"],
+  },
+  "sec-3": {
+    competencyId: "powers.quotient_and_product_laws",
+    family: "cociente_potencias_neutro",
+    representation: "symbolic",
+    diagnosticIds: ["canceled_to_zero_or_counted_ones", "multiplied_bases_in_same_base_prod"],
+  },
+  "sec-4": {
+    competencyId: "powers.rational_exponents_and_nth_roots",
+    family: "dos_mundos_mitad",
+    representation: "symbolic",
+    diagnosticIds: ["additive_instead_of_multiplicative"],
+  },
+  "sec-5": {
+    competencyId: "powers.geometric_squares_and_cubes",
+    family: "dos_mundos_mitad",
+    representation: "verbal",
+    diagnosticIds: ["additive_instead_of_multiplicative"],
+  },
+  "sec-6": {
+    competencyId: "powers.prime_factor_tree_extraction",
+    family: "arbol_raiz_orden_n",
+    representation: "symbolic",
+    diagnosticIds: ["unsimplified_radical"],
+  },
+  "sec-7": {
+    competencyId: "powers.radical_simplification_and_rationalization",
+    family: "simplificar_radical_vars",
+    representation: "symbolic",
+    diagnosticIds: ["unsimplified_radical"],
+  },
+  "sec-8": {
+    competencyId: "powers.binomial_power_non_distributivity",
+    family: "choque_mundos_binomio",
+    representation: "symbolic",
+    diagnosticIds: ["distributed_power_over_sum"],
+  },
+  "sec-9": {
+    competencyId: "powers.real_domain_restrictions_and_abs_root",
+    family: "auditoria_reales_exactas",
+    representation: "symbolic",
+    diagnosticIds: ["forgot_abs_in_even_root", "illegal_real_root_distribution"],
+  },
+  "sec-10": {
+    competencyId: "powers.precedence_and_paradox_auditing",
+    family: "auditoria_reales_exactas",
+    representation: "symbolic",
+    diagnosticIds: ["neg_base_precedence"],
+  },
+};
+
+export const CHECKS_DATA = Object.fromEntries(
+  Object.entries(RAW_CHECKS_DATA).map(([sectionId, questions]) => {
+    const secNum = sectionId.replace("sec-", "");
+    const meta = CHECKS_SECTION_META[sectionId];
+    const comp = getCompetencyById(meta.competencyId);
+    return [
+      sectionId,
+      questions.map((q, idx) => ({
+        id: `sec${secNum}-q${idx + 1}`,
+        competencyId: meta.competencyId,
+        prerequisiteIds: comp ? [...comp.prerequisiteIds] : [],
+        family: meta.family,
+        exerciseFamily: q.exerciseFamily || meta.family,
+        representation: q.representation || meta.representation,
+        difficulty: q.difficulty || (idx === 0 ? 1 : idx === 1 ? 2 : 3),
+        stage: q.stage || (idx === 2 ? "retrieval" : "guided_practice"),
+        transferDistance: q.transferDistance || "near",
+        expectedEvidence: q.expectedEvidence || `${meta.family}_sec${secNum}_q${idx + 1}`,
+        diagnosticIds: q.diagnosis ? [q.diagnosis] : [...meta.diagnosticIds],
+        ...q,
+      })),
+    ];
+  }),
+);
+
 export const LESSON_SECTIONS = [
   {
     id: "sec-1",
@@ -844,23 +945,75 @@ export function initBlackboardController() {
   requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
 }
 
-renderNav();
-for (const [name, initialize] of WIDGETS) {
-  document
-    .querySelectorAll(`[data-widget="${name}"]`)
-    .forEach((host) => initialize(host));
+export function initPotenciasRaicesPage() {
+  if (typeof document === "undefined") return;
+  initPowLearning();
+  renderNav();
+  for (const [name, initialize] of WIDGETS) {
+    document
+      .querySelectorAll(`[data-widget="${name}"]`)
+      .forEach((host) => initialize(host));
+  }
+  for (const [sectionId, questions] of Object.entries(CHECKS_DATA)) {
+    const host = document.querySelector(`[data-check="${sectionId}"]`);
+    if (host) mountCheckBlock(host, questions, sectionId, mountProgress);
+  }
+  qsa(".pr-annotated-host").forEach((host) =>
+    annotatedPowFormula(host, { sectionId: host.closest("section")?.id }),
+  );
+  const worldHost = document.querySelector("[data-worlds-comparison]");
+  if (worldHost) worldsComparisonCard(worldHost);
+  bindTutorButtons();
+  mountProgress();
+  initRetosModule();
+
+  try {
+    if (typeof localStorage !== "undefined" && isMigrationNeeded(localStorage)) {
+      migrateLegacyProgress(localStorage);
+    }
+  } catch {
+    // Migration failure must never block module rendering
+  }
+
+  const dashboardHost = document.querySelector("#pr-competency-dashboard");
+  if (dashboardHost) {
+    mountCompetencyDashboard(dashboardHost, {
+      onSelectSection: (sectionId) => {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${sectionId}"]`);
+        if (link) link.click();
+        else document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      },
+      onPracticeCompetency: (competencyId) => {
+        const retosLink = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+        if (retosLink) retosLink.click();
+        else document.getElementById("sec-retos")?.scrollIntoView({ behavior: "smooth" });
+        const comp = getCompetencyById(competencyId);
+        const fam = comp?.exerciseFamilies?.[0];
+        const trainerSelect = document.querySelector('#pr-challenges select[aria-label="Tipo de desafío"]');
+        if (trainerSelect && fam) {
+          trainerSelect.value = fam;
+          trainerSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      },
+    });
+  }
+
+  initGlossary();
+  initBlackboardController();
 }
-for (const [sectionId, questions] of Object.entries(CHECKS_DATA)) {
-  const host = document.querySelector(`[data-check="${sectionId}"]`);
-  if (host) mountCheckBlock(host, questions, sectionId, mountProgress);
+
+if (typeof document !== "undefined") {
+  initPotenciasRaicesPage();
 }
-qsa(".pr-annotated-host").forEach((host) =>
-  annotatedPowFormula(host, { sectionId: host.closest("section")?.id }),
-);
-const worldHost = document.querySelector("[data-worlds-comparison]");
-if (worldHost) worldsComparisonCard(worldHost);
-bindTutorButtons();
-mountProgress();
-initRetosModule();
-initGlossary();
-initBlackboardController();
+
+export {
+  POW_COMPETENCIES,
+  POW_DIAGNOSTIC_TAXONOMY,
+  getCompetencyById,
+  getCompetenciesForSection,
+  getCompetencyReport,
+  mountCompetencyDashboard,
+  PROGRESS_KEY,
+  getProgress,
+  saveProgress,
+};

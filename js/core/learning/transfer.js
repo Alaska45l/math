@@ -596,7 +596,7 @@ export function generateTransferChallenge(seed, family = 'all', problemIndex = 0
           inputKind: 'expression',
           competencyIds: [
             'exponentials.tables_additive_vs_multiplicative',
-            'quadratics.three_forms_conversion',
+            'quadratics.canonical_form_and_vertex',
           ],
           prompt: `Identificá el invariante de la tabla ${tableStr} (lineal, exponencial o cuadrática) y escribí la expresión algebraica exacta de f(x) que ajusta los datos:`,
           expected: formula,

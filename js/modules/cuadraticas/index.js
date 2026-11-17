@@ -6,6 +6,7 @@
 import { h, clear, qsa, chalkIcon } from '../../core/dom.js';
 import { renderNav, initLessonDock } from '../../core/nav.js';
 import { initGlossary } from '../../core/glossary.js';
+import { isMigrationNeeded, migrateLegacyProgress } from '../../core/learning/migrations.js';
 import {
   annotatedQuadFormula,
   threeFormsRosettaStrip,
@@ -1276,6 +1277,14 @@ if (typeof document !== 'undefined') {
   const retosHost = document.getElementById('quad-challenges');
   if (retosHost) {
     mountQuadraticRetos(retosHost);
+  }
+
+  try {
+    if (typeof localStorage !== 'undefined' && isMigrationNeeded(localStorage)) {
+      migrateLegacyProgress(localStorage);
+    }
+  } catch {
+    // Migration failure must never block module rendering
   }
 
   // 5. Panel de Competencias y Atlas de Errores en #sec-repaso

@@ -7,6 +7,7 @@
 import { h, mount, qsa } from "../../core/dom.js";
 import { renderNav, initLessonDock } from "../../core/nav.js";
 import { initGlossary } from "../../core/glossary.js";
+import { isMigrationNeeded, migrateLegacyProgress } from "../../core/learning/migrations.js";
 import {
   bindTutorButtons,
   mountCheckBlock,
@@ -1270,6 +1271,14 @@ if (typeof document !== "undefined") {
     .catch((err) => {
       console.warn("[retos] initialization failed:", err);
     });
+
+  try {
+    if (typeof localStorage !== "undefined" && isMigrationNeeded(localStorage)) {
+      migrateLegacyProgress(localStorage);
+    }
+  } catch {
+    // Migration failure must never block module rendering
+  }
 
   // Montaje del panel vivo de competencias en sec-repaso
   const dashboardHost = document.querySelector("#exp-competency-dashboard");

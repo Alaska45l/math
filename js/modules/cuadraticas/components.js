@@ -22,6 +22,7 @@ import {
   QUAD_DIAGNOSTIC_TAXONOMY,
 } from './competencies-map.js';
 import { STATUS_BADGES } from '../../core/learning/progress-store.js';
+import { mountCompetencyDashboard as mountCoreCompetencyDashboard } from '../../core/learning/dashboard.js';
 import { recordQuadAttempt, getQuadCompetencyReport } from './learning-adapter.js';
 
 function triggerVnReaction(vn, pose, text, tag = 'Modo Alaska') {
@@ -864,160 +865,46 @@ export function getCompetencyReport() {
 export function mountCompetencyDashboard(host, { onSelectSection, onPracticeCompetency } = {}) {
   if (!host) return null;
 
-  const render = () => {
-    const report = getCompetencyReport();
-    clear(host);
-
-    // 1. Resumen de dominio (KPIs)
-    const summaryCard = h(
-      'div',
-      { class: 'quad-dashboard-summary exp-dashboard-summary' },
-      h(
-        'div',
-        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--mastered exp-dashboard-kpi--mastered' },
-        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.consolidating + report.summary.durable)),
-        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'Consolidada / Durable'),
-      ),
-      h(
-        'div',
-        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--assisted exp-dashboard-kpi--assisted' },
-        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.developing)),
-        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'En desarrollo'),
-      ),
-      h(
-        'div',
-        { class: 'quad-dashboard-kpi exp-dashboard-kpi quad-dashboard-kpi--pending exp-dashboard-kpi--pending' },
-        h('span', { class: 'quad-dashboard-kpi__num exp-dashboard-kpi__num' }, fmtNumClean(report.summary.unseen + report.summary.introduced + report.summary.needs_repair + report.summary.review_due)),
-        h('span', { class: 'quad-dashboard-kpi__label exp-dashboard-kpi__label' }, 'Pendiente / Refuerzo'),
-      ),
-    );
-
-    // 2. Grilla de las 10 competencias
-    const cards = report.list.map((item) => {
-      const comp = item.competency;
-      const badgeInfo = STATUS_BADGES[item.status] || STATUS_BADGES.unseen;
-
-      const toneToClass = {
-        success: 'badge--success',
-        warning: 'badge--warning',
-        info: 'badge--info',
-        attention: 'badge--attention',
-        danger: 'badge--danger',
-        muted: 'badge--neutral',
-      };
-      const badgeToneClass = toneToClass[badgeInfo.tone] || 'badge--neutral';
-
-      const statusBadge = h(
-        'span',
-        {
-          class: `quad-dashboard-badge exp-dashboard-badge badge ${badgeToneClass} is-${badgeInfo.classModifier || item.status}`,
-          'data-status': item.status,
-        },
-        badgeInfo.label,
-      );
-
-      const header = h(
-        'header',
-        { class: 'quad-dashboard-card__header exp-dashboard-card__header' },
-        h('h4', { class: 'quad-dashboard-card__title exp-dashboard-card__title' }, `${comp.order}. ${comp.title}`),
-        statusBadge,
-      );
-
-      // Atlas de errores linked to Alaska poses
-      const diagnosticEls = [];
-      if (item.diagnostics && item.diagnostics.length > 0) {
-        item.diagnostics.forEach((diagId) => {
-          const tax = QUAD_DIAGNOSTIC_TAXONOMY[diagId];
-          const label = tax ? tax.shortLabel : diagId;
-          const pose = tax?.pose || 'pensativa';
-          diagnosticEls.push(
-            h(
-              'div',
-              {
-                class: 'quad-dashboard-error-alert exp-dashboard-error-alert',
-                title: `Error cognitivo recurrente (Pose: ${pose})`,
-              },
-              chalkIcon('hint', 14),
-              h('span', {}, ` Error detectado: ${label}`),
-            ),
-          );
-        });
+  const instance = mountCoreCompetencyDashboard({
+    container: host,
+    moduleId: 'cuadraticas',
+    competencies: QUAD_COMPETENCIES,
+    diagnosticTaxonomy: QUAD_DIAGNOSTIC_TAXONOMY,
+    getReport: getCompetencyReport,
+    classPrefix: 'quad-dashboard',
+    extraClassPrefixes: ['exp-dashboard'],
+    subtitle:
+      'Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad.',
+    sectionLabelFn: (comp) => `Ir al Pizarrón ${comp.order}`,
+    formatNumber: (n) => fmtNumClean(n),
+    onNavigateSection: (comp) => {
+      if (typeof onSelectSection === 'function') {
+        onSelectSection(comp.sectionId);
+      } else if (typeof document !== 'undefined') {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+        if (link) link.click();
+        else if (typeof location !== 'undefined') location.hash = `#${comp.sectionId}`;
       }
+    },
+    onPracticeFamily: (comp) => {
+      if (typeof onPracticeCompetency === 'function') {
+        onPracticeCompetency(comp.id);
+      } else if (typeof document !== 'undefined') {
+        const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+        if (link) link.click();
+        else if (typeof location !== 'undefined') location.hash = '#sec-retos';
+      }
+    },
+  });
 
-      const btnGo = h(
-        'button',
-        {
-          type: 'button',
-          class: 'btn btn--subtle btn--sm quad-dashboard-btn-nav exp-dashboard-btn-nav pr-btn',
-          on: {
-            click: () => {
-              if (typeof onSelectSection === 'function') {
-                onSelectSection(comp.sectionId);
-              } else {
-                const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
-                if (link) link.click();
-                else location.hash = `#${comp.sectionId}`;
-              }
-            },
-          },
-        },
-        `Ir al Pizarrón ${comp.order}`,
-      );
-
-      const btnPractice = h(
-        'button',
-        {
-          type: 'button',
-          class: 'btn btn--sm quad-dashboard-btn-practice exp-dashboard-btn-practice pr-btn',
-          on: {
-            click: () => {
-              if (typeof onPracticeCompetency === 'function') {
-                onPracticeCompetency(comp.id);
-              } else {
-                const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
-                if (link) link.click();
-                else location.hash = '#sec-retos';
-              }
-            },
-          },
-        },
-        chalkIcon('target', 14),
-        ' Practicar en Entrenador',
-      );
-
-      const actions = h(
-        'div',
-        { class: 'quad-dashboard-card__actions exp-dashboard-card__actions' },
-        btnGo,
-        btnPractice,
-      );
-
-      return h(
-        'article',
-        { class: `quad-dashboard-card exp-dashboard-card quad-dashboard-card--${badgeInfo.classModifier || item.status} exp-dashboard-card--${badgeInfo.classModifier || item.status}` },
-        header,
-        diagnosticEls.length > 0 ? h('div', { class: 'quad-dashboard-errors exp-dashboard-errors' }, ...diagnosticEls) : null,
-        actions,
-      );
-    });
-
-    const grid = h('div', { class: 'quad-dashboard-grid exp-dashboard-grid' }, ...cards);
-
-    const titleHeader = h(
-      'header',
-      { class: 'quad-dashboard-header exp-dashboard-header' },
-      h('h3', {}, 'Mapa de Competencias y Atlas de Errores'),
-      h('p', { class: 'muted small' }, 'Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad.'),
-    );
-
-    host.replaceChildren(titleHeader, summaryCard, grid);
-  };
-
+  const render = () => instance?.update();
   dashboardRenderers.add(render);
-  render();
 
   return {
     update: render,
-    destroy: () => dashboardRenderers.delete(render),
+    destroy: () => {
+      dashboardRenderers.delete(render);
+      instance?.destroy();
+    },
   };
 }

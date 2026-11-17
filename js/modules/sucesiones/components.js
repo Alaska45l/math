@@ -9,10 +9,18 @@ import { h, s, mount, on, chalkIcon } from '../../core/dom.js';
 import { fmt, fractionHtml, MINUS } from '../../core/math-format.js';
 import { react } from '../../core/vn.js';
 import { playSuccess, playError } from '../../core/sound.js';
+import { mountCompetencyDashboard as mountCoreCompetencyDashboard } from '../../core/learning/dashboard.js';
 import { parse, equivalent, toDisplay, isStandardForm } from './expr.js';
 import { diagnose, approxEq } from './logic.js';
+import {
+  SEQ_COMPETENCIES,
+  SEQ_DIAGNOSTIC_TAXONOMY,
+  getCompetenciesForSection,
+} from './competencies-map.js';
+import { recordSeqAttempt, getSeqCompetencyReport } from './learning-adapter.js';
 
-const PROGRESS_KEY = 'sucesiones:progreso:v1';
+export const PROGRESS_KEY = 'sucesiones:progreso:v1';
+const ALLOWED_SECTION_REGEX = /^sec-(?:[1-9]|1[01]|5[ab])$/;
 
 export function getProgress() {
   try {
@@ -24,11 +32,45 @@ export function getProgress() {
 }
 
 export function saveSectionProgress(sectionId) {
+  if (!ALLOWED_SECTION_REGEX.test(String(sectionId || ''))) return;
   try {
     const current = getProgress();
     current[sectionId] = true;
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(current));
   } catch (_) {}
+}
+
+export function saveItemProgress(itemKey, mode = 'independent') {
+  if (!itemKey || typeof itemKey !== 'string') return;
+  const sectionPrefix = itemKey.split(':')[0];
+  if (!ALLOWED_SECTION_REGEX.test(sectionPrefix)) return;
+  try {
+    const current = getProgress();
+    const prev = current[itemKey];
+    current[itemKey] = prev === 'assisted' || mode === 'assisted' ? 'assisted' : 'independent';
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(current));
+  } catch (_) {}
+}
+
+export function recordCompetencyAttempt(params = {}) {
+  return recordSeqAttempt(params);
+}
+
+export function getCompetencyReport() {
+  return getSeqCompetencyReport();
+}
+
+export function mountCompetencyDashboard(container, options = {}) {
+  return mountCoreCompetencyDashboard({
+    container,
+    moduleId: 'sucesiones',
+    competencies: SEQ_COMPETENCIES,
+    diagnosticTaxonomy: SEQ_DIAGNOSTIC_TAXONOMY,
+    getReport: getCompetencyReport,
+    classPrefix: 'learning-dashboard',
+    subtitle: 'Progreso en las 6 competencias de Sucesiones Numéricas.',
+    ...options,
+  });
 }
 
 /**
@@ -381,7 +423,13 @@ function resolveExpectedChoiceIndex(q) {
  * - 'choice': selección múltiple con opciones
  * - 'match': emparejamiento
  */
-export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null) {
+export function createCheckBlock(root, questions = [], sectionId = '', onComplete = null, options = {}) {
+  const opts = typeof onComplete === 'object' && onComplete !== null && typeof options !== 'object'
+    ? onComplete
+    : (options || {});
+  const onCompleteCb = typeof onComplete === 'function' ? onComplete : null;
+  const persistSection = opts.persistSection !== false && ALLOWED_SECTION_REGEX.test(String(sectionId || ''));
+
   let lastCorrectSlot = -1;
   const state = {
     answers: questions.map((q) => {
@@ -407,7 +455,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         ok: false,
         feedback: null,
         hintIndex: 0,
+        hintsUsed: 0,
         showSolution: false,
+        solutionRevealed: false,
+        modeLockedAssisted: false,
         failCount: 0,
         optionOrder,
       };
@@ -415,6 +466,38 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
   };
 
   const container = h('div', { class: 'seq-check-block', dataset: { section: sectionId } });
+
+  function resolveQuestionCompetencyId(q) {
+    if (q?.competencyId) return q.competencyId;
+    const bySec = getCompetenciesForSection(sectionId);
+    return bySec?.[0]?.id || 'sequences.pattern_recognition_and_classification';
+  }
+
+  function emitAttempt(q, qState, idx, { isCorrect, diagnosticId = null }) {
+    const isAssisted = Boolean(
+      qState.modeLockedAssisted ||
+      qState.solutionRevealed ||
+      qState.showSolution ||
+      (qState.hintsUsed || 0) > 0 ||
+      (qState.hintIndex || 0) > 0
+    );
+    const mode = isAssisted ? 'assisted' : 'independent';
+    if (persistSection) {
+      saveItemProgress(`${sectionId}:${idx}`, mode);
+    }
+    recordSeqAttempt({
+      exerciseId: q.id || `${sectionId || 'seq'}-q${idx + 1}`,
+      competencyId: resolveQuestionCompetencyId(q),
+      correct: Boolean(isCorrect),
+      mode,
+      hintsUsed: qState.hintsUsed || qState.hintIndex || 0,
+      solutionRevealed: Boolean(qState.solutionRevealed),
+      diagnosticId: diagnosticId || null,
+      representation: q.representation,
+      stage: q.stage,
+      transferDistance: q.transferDistance,
+    });
+  }
 
   function triggerVnReaction(q, qState, isOk, diagId = null) {
     if (isOk) {
@@ -499,15 +582,15 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         }
       } else if (qState.failCount === 2) {
         react({
-          pose: 'enojada',
-          tag: '¡Frená la mano!',
-          html: '¿¡Me estás tirando números al azar para ver si embocás!? ¡No estamos en tu casa como para andar tirando cualquier fruta! N-no es que me preocupe si aprobás o no, ¿eh?, pero me da una bronca bárbara verte adivinar. ¡Mirá la cinta de saltos o tocá el botón de Pista antes de seguir disparando a ciegas!',
+          pose: 'evaluando',
+          tag: 'Revisemos el patrón',
+          html: 'Pensemos juntos sin apuro: verificá si entre términos consecutivos se suma o se multiplica, o usá una <strong>Pista</strong> para destrabar el paso siguiente.',
         });
       } else {
         react({
-          pose: 'enojada',
-          tag: '¡Colapso nervioso!',
-          html: '¡Me vas a hacer dar un colapso nervioso! Evaluá con <span class="eq">n = 1</span> en lo que escribiste y fijate que ni siquiera te da el primer término de la lista.',
+          pose: 'empatia',
+          tag: 'Comprobemos en n = 1',
+          html: 'Hagamos una prueba concreta: evaluá tu expresión con <span class="eq">n = 1</span> y <span class="eq">n = 2</span> para comparar contra los primeros postes de la cinta.',
         });
       }
     }
@@ -520,8 +603,10 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         state.allCompletedReported = true;
         setTimeout(() => playSuccess('section'), 320);
       }
-      saveSectionProgress(sectionId);
-      onComplete?.(sectionId);
+      if (persistSection) {
+        saveSectionProgress(sectionId);
+      }
+      onCompleteCb?.(sectionId);
     }
   }
 
@@ -578,6 +663,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               ? { ok: true, message: '¡Excelente! Respuesta correcta.' }
               : { ok: false, message: `Revisá el cálculo: obtuviste ${fmt(val)}, pero no coincide.` };
             triggerVnReaction(q, qState, isMatch);
+            emitAttempt(q, qState, idx, { isCorrect: isMatch });
           }
           checkCompletion();
           render();
@@ -645,7 +731,9 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
                 ok: false,
                 message: diags[0]?.message || 'La fórmula es matemáticamente equivalente, pero debés escribirla en la forma estándar con (n − 1).',
               };
-              triggerVnReaction(q, qState, false, diags[0]?.id || 'not_standard');
+              const diagId = diags[0]?.id || null;
+              triggerVnReaction(q, qState, false, diagId || 'not_standard');
+              emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: diagId });
             } else {
               qState.ok = true;
               qState.feedback = {
@@ -654,7 +742,9 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               };
               const diags = !isStd ? diagnose(ast, expected) : [];
               const isEquivWarn = (!isStd) || diags.some((d) => d.id === 'not_standard_but_equivalent');
-              triggerVnReaction(q, qState, true, isEquivWarn ? 'not_standard_but_equivalent' : null);
+              const diagId = isEquivWarn ? 'not_standard_but_equivalent' : null;
+              triggerVnReaction(q, qState, true, diagId);
+              emitAttempt(q, qState, idx, { isCorrect: true, diagnosticId: diagId });
             }
           } else {
             qState.ok = false;
@@ -663,7 +753,9 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               ok: false,
               message: diags[0]?.message || 'La fórmula no coincide con los términos de la sucesión pedida.',
             };
-            triggerVnReaction(q, qState, false, diags[0]?.id || null);
+            const diagId = diags[0]?.id || null;
+            triggerVnReaction(q, qState, false, diagId);
+            emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: diagId });
           }
 
           checkCompletion();
@@ -734,6 +826,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
 
             const diagPair = (!matchK && matchStep) ? 'wrong_k' : (matchK && !matchStep) ? 'wrong_step' : null;
             triggerVnReaction(q, qState, qState.ok, diagPair);
+            emitAttempt(q, qState, idx, { isCorrect: qState.ok });
           }
           checkCompletion();
           render();
@@ -778,7 +871,9 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               qState.feedback = isMatch
                 ? { ok: true, message: q.explanation || '¡Correcto! Opción acertada.' }
                 : { ok: false, message: 'Opción incorrecta. Leé la pregunta con atención y volvé a probar.' };
-              triggerVnReaction(q, qState, isMatch);
+              const diagId = (!isMatch && q.optionDiagnostics?.[origIdx]) || null;
+              triggerVnReaction(q, qState, isMatch, diagId);
+              emitAttempt(q, qState, idx, { isCorrect: isMatch, diagnosticId: isMatch ? null : diagId });
               checkCompletion();
               render();
             });
@@ -832,6 +927,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
               ? { ok: true, message: '¡Impecable! Todas las relaciones son correctas.' }
               : { ok: false, message: 'Hay emparejamientos incorrectos. Revisá el tipo de operación y signo en cada caso.' };
             triggerVnReaction(q, qState, allMatched);
+            emitAttempt(q, qState, idx, { isCorrect: allMatched });
           }
           checkCompletion();
           render();
@@ -865,6 +961,11 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           if (qState.hintIndex < q.hints.length) {
             const hintText = q.hints[qState.hintIndex];
             qState.hintIndex++;
+            qState.hintsUsed = Math.max(qState.hintsUsed || 0, qState.hintIndex);
+            qState.modeLockedAssisted = true;
+            if (persistSection) {
+              saveItemProgress(`${sectionId}:${idx}`, 'assisted');
+            }
             render();
             react({
               pose: 'base',
@@ -883,13 +984,19 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
         }, qState.showSolution ? 'Ocultar solución' : '¡Estoy atorado! Mostrame la solución');
 
         btnSol.addEventListener('click', () => {
-          qState.showSolution = !qState.showSolution;
+          const opening = !qState.showSolution;
+          qState.showSolution = opening;
+          if (opening) {
+            qState.solutionRevealed = true;
+            qState.modeLockedAssisted = true;
+            emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: null });
+          }
           render();
           if (qState.showSolution) {
             react({
-              pose: 'colapso',
-              tag: 'Suspiro...',
-              html: 'Suspiro... está bien, no sufras más. Guardá la goma de borrar y mirá cómo se desarma paso por paso:',
+              pose: 'empatia',
+              tag: 'Desglose paso a paso',
+              html: 'Revisemos juntos cómo se desarma paso por paso para entender el mecanismo:',
             });
           }
         });

@@ -17,11 +17,23 @@ export const EVENT_TYPES = Object.freeze({
 });
 
 export const MODULE_IDS = Object.freeze({
-  EXPONENCIALES: 'exponenciales',
-  CUADRATICAS: 'cuadraticas',
-  SUCESIONES: 'sucesiones',
-  VALOR_ABSOLUTO: 'valor-absoluto',
   POTENCIAS_RAICES: 'potencias-raices',
+  DESIGUALDADES: 'desigualdades',
+  UNIDADES: 'unidades',
+  FUNCIONES: 'funciones',
+  VALOR_ABSOLUTO: 'valor-absoluto',
+  SUCESIONES: 'sucesiones',
+  LINEAL: 'lineal',
+  SISTEMAS: 'sistemas',
+  CUADRATICAS: 'cuadraticas',
+  POLINOMIOS: 'polinomios',
+  RACIONALES_IRRACIONALES: 'racionales-irracionales',
+  EXPONENCIALES: 'exponenciales',
+  LOGARITMICAS: 'logaritmicas',
+  RAZONES_TRIGONOMETRICAS: 'razones-trigonometricas',
+  FUNCIONES_TRIGONOMETRICAS: 'funciones-trigonometricas',
+  JEFE_INTEGRADOR_1: 'jefe-integrador-1',
+  SIMULACRO_GLOBAL: 'simulacro-global',
 });
 
 export const ASSISTANCE_LEVELS = Object.freeze({

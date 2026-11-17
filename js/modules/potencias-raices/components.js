@@ -8,29 +8,158 @@ import {
   DIAGNOSE_REACTIONS,
   STREAK_REACTIONS,
 } from "./vn-scripts.js";
+import {
+  POW_COMPETENCIES,
+  POW_DIAGNOSTIC_TAXONOMY,
+  getCompetenciesForSection,
+} from "./competencies-map.js";
+import { STATUS_BADGES } from "../../core/learning/progress-store.js";
+import { mountCompetencyDashboard as mountCoreCompetencyDashboard } from "../../core/learning/dashboard.js";
+import { recordPowAttempt, getPowCompetencyReport } from "./learning-adapter.js";
 
 export const PROGRESS_KEY = "potencias_raices:progreso:v1";
 
+const dashboardRenderers = new Set();
+function notifyCompetencyDashboardUpdate() {
+  dashboardRenderers.forEach((fn) => {
+    try {
+      fn();
+    } catch {}
+  });
+}
+
 export function getProgress() {
   try {
+    if (typeof localStorage === "undefined" || !localStorage.getItem) return {};
     return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
   } catch {
     return {};
   }
 }
 
-export function saveProgress(key, value = true) {
+export function saveProgress(key, value = "independent") {
+  if (!/^sec-(?:[1-9]|10)(?::\d+)?$/.test(String(key || ""))) {
+    return getProgress();
+  }
   const state = getProgress();
   state[key] = value;
   try {
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    if (typeof localStorage !== "undefined" && localStorage.setItem) {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
+    }
   } catch {
     // The current session still works when storage is unavailable.
   }
   updateProgressUI();
+  notifyCompetencyDashboardUpdate();
+  return state;
+}
+
+export function recordCompetencyAttempt(params = {}) {
+  const res = recordPowAttempt(params);
+  updateProgressUI();
+  notifyCompetencyDashboardUpdate();
+  return res;
+}
+
+export function getCompetencyReport() {
+  const storeReport = getPowCompetencyReport();
+  const storeComps = Array.isArray(storeReport?.competencies) ? storeReport.competencies : [];
+
+  const list = POW_COMPETENCIES.map((comp) => {
+    const found = storeComps.find((c) => c.id === comp.id) || {};
+    const status = found.status || "unseen";
+    return {
+      id: comp.id,
+      competency: comp,
+      title: comp.title,
+      sectionId: comp.sectionId,
+      order: comp.order,
+      independentCount: found.independentCount || 0,
+      assistedCount: found.assistedCount || 0,
+      errorCount: found.errorCount || 0,
+      attempts: found.attempts || 0,
+      diagnostics: Array.isArray(found.diagnostics)
+        ? [...found.diagnostics]
+        : Array.isArray(found.recentDiagnosticIds)
+          ? [...found.recentDiagnosticIds]
+          : [],
+      status,
+      badge: found.badge || STATUS_BADGES[status] || STATUS_BADGES.unseen,
+    };
+  });
+
+  return {
+    summary: {
+      total: POW_COMPETENCIES.length,
+      durable: storeReport?.summary?.durable || 0,
+      consolidating: storeReport?.summary?.consolidating || 0,
+      developing: storeReport?.summary?.developing || 0,
+      review_due: storeReport?.summary?.review_due || 0,
+      needs_repair: storeReport?.summary?.needs_repair || 0,
+      introduced: storeReport?.summary?.introduced || 0,
+      unseen: storeReport?.summary?.unseen ?? POW_COMPETENCIES.length,
+      get mastered() {
+        return this.consolidating + this.durable;
+      },
+      get assisted() {
+        return this.developing;
+      },
+      get pending() {
+        return this.unseen + this.introduced + this.needs_repair + this.review_due;
+      },
+    },
+    competencies: Object.fromEntries(list.map((item) => [item.id, item])),
+    list,
+  };
+}
+
+export function mountCompetencyDashboard(host, { onSelectSection, onPracticeCompetency } = {}) {
+  if (!host) return null;
+
+  const instance = mountCoreCompetencyDashboard({
+    container: host,
+    moduleId: "potencias-raices",
+    competencies: POW_COMPETENCIES,
+    diagnosticTaxonomy: POW_DIAGNOSTIC_TAXONOMY,
+    getReport: getCompetencyReport,
+    classPrefix: "learning-dashboard",
+    subtitle:
+      "Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad.",
+    onNavigateSection: (comp) => {
+      if (typeof onSelectSection === "function") {
+        onSelectSection(comp.sectionId);
+      } else if (typeof document !== "undefined") {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+        if (link) link.click();
+        else if (typeof location !== "undefined") location.hash = `#${comp.sectionId}`;
+      }
+    },
+    onPracticeFamily: (comp) => {
+      if (typeof onPracticeCompetency === "function") {
+        onPracticeCompetency(comp.id);
+      } else if (typeof document !== "undefined") {
+        const link = document.querySelector('.seq-sidebar__link[data-sec="sec-retos"]');
+        if (link) link.click();
+        else if (typeof location !== "undefined") location.hash = "#sec-retos";
+      }
+    },
+  });
+
+  const render = () => instance?.update();
+  dashboardRenderers.add(render);
+
+  return {
+    update: render,
+    destroy: () => {
+      dashboardRenderers.delete(render);
+      instance?.destroy();
+    },
+  };
 }
 
 function updateProgressUI() {
+  if (typeof document === "undefined" || typeof document.getElementById !== "function") return;
   const state = getProgress();
   const complete = Object.keys(state).filter(
     (key) => /^sec-\d+$/.test(key) && state[key],
@@ -460,9 +589,16 @@ function assess(question, value) {
 
 /** Hand-authored prompts, progressive clues and worked solutions are rendered without defaults. */
 export function createCheckBlock(host, questions, sectionId, onComplete) {
+  const sectionCompetency = getCompetenciesForSection(sectionId)[0]?.id || "powers.additive_vs_multiplicative_worlds";
+
   const cards = questions.map((question, index) => {
+    const storageKey = `${sectionId}:${index}`;
+    const compId = question.competencyId || sectionCompetency;
+    const exerciseId = question.id || storageKey;
     let failStreak = 0;
     let hintStep = 0;
+    let solutionRevealed = false;
+    let recordedCorrect = false;
     const answer = buildAnswerControl(question, index);
     const preview = h(
       "p",
@@ -536,6 +672,8 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
     });
 
     show.addEventListener("click", () => {
+      const firstReveal = !solutionRevealed;
+      solutionRevealed = true;
       solutionBox.hidden = false;
       mount(
         solutionBox,
@@ -548,6 +686,22 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           ),
         ),
       );
+      saveProgress(storageKey, "assisted");
+      if (firstReveal) {
+        try {
+          recordCompetencyAttempt({
+            exerciseId,
+            competencyId: compId,
+            correct: false,
+            mode: "assisted",
+            hintsUsed: hintStep,
+            solutionRevealed: true,
+            representation: question.representation || "symbolic",
+            stage: question.stage || "guided_practice",
+            transferDistance: question.transferDistance || "near",
+          });
+        } catch {}
+      }
       playScript([
         STREAK_REACTIONS.showSolution,
         STREAK_REACTIONS.solutionAfter,
@@ -555,31 +709,84 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
     });
 
     review.addEventListener("click", () => {
-      const result = assess(question, answer.value());
+      const val = answer.value();
+      const isEmpty = Array.isArray(val)
+        ? val.every((v) => String(v ?? "").trim() === "")
+        : String(val ?? "").trim() === "";
+      if (isEmpty) {
+        feedback.textContent = "Ingresá una respuesta antes de revisar.";
+        feedback.className = "pr-check__feedback seq-check__feedback is-error";
+        return;
+      }
+
+      const result = assess(question, val);
+      const isAssisted = solutionRevealed || hintStep > 0;
+      const mode = isAssisted ? "assisted" : "independent";
+
       if (result.correct) {
-        saveProgress(`${sectionId}:${index}`);
+        const existingSaved = getProgress()[storageKey];
+        const finalStatus =
+          existingSaved === "assisted" || isAssisted ? "assisted" : "independent";
+        saveProgress(storageKey, finalStatus);
+
+        if (!recordedCorrect) {
+          recordedCorrect = true;
+          try {
+            recordCompetencyAttempt({
+              exerciseId,
+              competencyId: compId,
+              correct: true,
+              mode: finalStatus,
+              hintsUsed: hintStep,
+              solutionRevealed,
+              representation: question.representation || "symbolic",
+              stage: question.stage || "guided_practice",
+              transferDistance: question.transferDistance || "near",
+            });
+          } catch {}
+        }
+
         feedback.textContent =
-          "Correcto: la explicación coincide con el resultado y quedó guardada.";
+          finalStatus === "independent"
+            ? "Correcto (logro independiente): la explicación coincide con el resultado y quedó guardada."
+            : "Correcto (logro asistido): la explicación coincide con el resultado.";
         feedback.className =
           "pr-check__feedback seq-check__feedback is-correct";
-        const reaction =
-          failStreak >= 3
-            ? STREAK_REACTIONS.flawlessRun
-            : failStreak
-              ? STREAK_REACTIONS.recovered
-              : STREAK_REACTIONS.firstTry;
-        playScript([reaction]);
+        if (finalStatus === "independent") {
+          const reaction =
+            failStreak >= 3
+              ? STREAK_REACTIONS.flawlessRun
+              : failStreak
+                ? STREAK_REACTIONS.recovered
+                : STREAK_REACTIONS.firstTry;
+          playScript([reaction]);
+        }
         if (
           questions.every(
             (_, position) => getProgress()[`${sectionId}:${position}`],
           )
         ) {
-          saveProgress(sectionId);
+          saveProgress(sectionId, true);
           onComplete?.(sectionId);
         }
       } else {
         failStreak += 1;
         const diagnostic = result.diagnostics?.[0];
+        try {
+          recordCompetencyAttempt({
+            exerciseId,
+            competencyId: compId,
+            correct: false,
+            mode,
+            hintsUsed: hintStep,
+            solutionRevealed,
+            diagnosticId: diagnostic?.id || null,
+            representation: question.representation || "symbolic",
+            stage: question.stage || "guided_practice",
+            transferDistance: question.transferDistance || "near",
+          });
+        } catch {}
+
         feedback.textContent =
           diagnostic?.message ||
           "Todavía no: mirá las pistas y justificá un paso por vez.";
@@ -601,6 +808,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
       {
         class: "pr-check__item seq-check__card",
         "data-question-type": question.type,
+        "data-question-id": exerciseId,
       },
       mountQuestionPrompt(question),
       h("div", { class: "pr-check__answer" }, answer.node),

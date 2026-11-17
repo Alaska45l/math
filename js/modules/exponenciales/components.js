@@ -21,8 +21,8 @@ import {
   EXP_COMPETENCIES,
   EXP_DIAGNOSTIC_TAXONOMY,
 } from "./competencies-map.js";
-import { evaluateCompetencyMastery } from "../../core/learning/mastery.js";
 import { STATUS_BADGES } from "../../core/learning/progress-store.js";
+import { mountCompetencyDashboard as mountCoreCompetencyDashboard } from "../../core/learning/dashboard.js";
 import { recordExpAttempt, getExpCompetencyReport } from "./learning-adapter.js";
 
 export { STREAK_REACTIONS, DIAGNOSE_REACTIONS, VN_SCRIPTS };
@@ -76,37 +76,11 @@ export function recordCompetencyAttempt({
   exerciseId = null,
   hintsUsed = 0,
   solutionRevealed = false,
-  stage = 'guided_practice',
-  representation = 'symbolic',
-  transferDistance = 'near',
+  stage = "guided_practice",
+  representation = "symbolic",
+  transferDistance = "near",
 }) {
   if (!competencyId) return null;
-  const state = getProgress();
-  if (!state.competencies || typeof state.competencies !== "object") {
-    state.competencies = {};
-  }
-  const rawEntry = state.competencies[competencyId];
-  const entry = rawEntry
-    ? { ...rawEntry }
-    : {
-        competencyId,
-        independentCount: 0,
-        assistedCount: 0,
-        errorCount: 0,
-        consecutiveErrors: 0,
-        diagnostics: [],
-        status: "unseen",
-        attempts: 0,
-        distinctExercises: [],
-        representationsCovered: [],
-        stagesCovered: [],
-      };
-  if (!Array.isArray(entry.diagnostics)) {
-    entry.diagnostics = [];
-  }
-  if (!Array.isArray(entry.distinctExercises)) {
-    entry.distinctExercises = [];
-  }
 
   const isCorrect = Boolean(correct);
   const solRevealed = Boolean(solutionRevealed);
@@ -117,16 +91,9 @@ export function recordCompetencyAttempt({
         ? 1
         : 0;
 
-  let assistance = "none";
-  if (solRevealed) {
-    assistance = "solution_revealed";
-  } else if (hintsCount > 0 || mode === "assisted") {
-    assistance = "hints";
-  }
-
-  // Record normalized attempt in core progress store
+  let result = null;
   try {
-    recordExpAttempt({
+    result = recordExpAttempt({
       exerciseId: exerciseId || "exp-check",
       competencyId,
       correct: isCorrect,
@@ -139,65 +106,20 @@ export function recordCompetencyAttempt({
       transferDistance,
     });
   } catch {
-    // Non-blocking in case of isolated unit testing
+    // Non-blocking in isolated unit testing
   }
 
-  // Evaluate conservative 7-state machine: 1 independent success MUST transition to "developing", NEVER to "mastered"
-  // Do NOT pre-mutate entry counters or diagnostics before calling evaluateCompetencyMastery
-  const transition = evaluateCompetencyMastery(entry, {
-    type: "answer_submitted",
-    moduleId: "exponenciales",
-    exerciseId: exerciseId || "exp-check",
-    competencyIds: [competencyId],
-    occurredAt: new Date().toISOString(),
-    correct: isCorrect,
-    hintsUsed: hintsCount,
-    solutionRevealed: solRevealed,
-    assistance,
-    diagnosticId: !isCorrect ? diagnosticId : null,
-    representation,
-    stage,
-    transferDistance,
-  });
-
-  const updated = transition?.updatedEntry || {};
-  const updatedEntry = {
-    ...entry,
-    competencyId,
-    status: transition.newStatus || updated.status || entry.status,
-    attempts: updated.attempts ?? (entry.attempts || 0),
-    independentCount: updated.independentCount ?? (entry.independentCount || 0),
-    assistedCount: updated.assistedCount ?? (entry.assistedCount || 0),
-    errorCount: updated.errorCount ?? (entry.errorCount || 0),
-    consecutiveErrors: updated.consecutiveErrors ?? (entry.consecutiveErrors || 0),
-    diagnostics: Array.isArray(updated.diagnostics)
-      ? [...updated.diagnostics]
-      : [...entry.diagnostics],
-    recentDiagnosticIds: Array.isArray(updated.recentDiagnosticIds)
-      ? [...updated.recentDiagnosticIds]
-      : (Array.isArray(updated.diagnostics) ? [...updated.diagnostics] : []),
-    distinctExercises: Array.isArray(updated.distinctExercises)
-      ? [...updated.distinctExercises]
-      : [...entry.distinctExercises],
-    representationsCovered: Array.isArray(updated.representationsCovered)
-      ? [...updated.representationsCovered]
-      : [...(entry.representationsCovered || [])],
-    stagesCovered: Array.isArray(updated.stagesCovered)
-      ? [...updated.stagesCovered]
-      : [...(entry.stagesCovered || [])],
-    delayedRecallSuccessCount: updated.delayedRecallSuccessCount ?? (entry.delayedRecallSuccessCount || 0),
-    transferSuccessCount: updated.transferSuccessCount ?? (entry.transferSuccessCount || 0),
-    lastAttemptAt: updated.lastAttemptAt || new Date().toISOString(),
-    nextReviewAt: updated.nextReviewAt ?? entry.nextReviewAt ?? null,
-  };
-
-  state.competencies[competencyId] = updatedEntry;
-
-  try {
-    if (typeof localStorage !== "undefined" && localStorage.setItem) {
+  const updatedEntry = result?.updatedEntry || null;
+  if (updatedEntry && typeof localStorage !== "undefined" && localStorage.setItem) {
+    try {
+      const state = getProgress();
+      if (!state.competencies || typeof state.competencies !== "object") {
+        state.competencies = {};
+      }
+      state.competencies[competencyId] = updatedEntry;
       localStorage.setItem(PROGRESS_KEY, JSON.stringify(state));
-    }
-  } catch {}
+    } catch {}
+  }
 
   updateProgressUI();
   notifyCompetencyDashboardUpdate();
@@ -205,14 +127,8 @@ export function recordCompetencyAttempt({
 }
 
 export function getCompetencyReport() {
-  let storeReport = null;
-  try {
-    storeReport = getExpCompetencyReport();
-  } catch {}
+  const storeReport = getExpCompetencyReport();
   const storeComps = Array.isArray(storeReport?.competencies) ? storeReport.competencies : [];
-
-  const state = getProgress();
-  const rawComps = (state && typeof state.competencies === "object" && state.competencies) || {};
 
   const report = {
     summary: {
@@ -240,17 +156,8 @@ export function getCompetencyReport() {
   };
 
   EXP_COMPETENCIES.forEach((comp) => {
-    const storeEntry = storeComps.find((c) => c.id === comp.id);
-    const raw = rawComps[comp.id] || {};
-
-    const source = (storeEntry && storeEntry.attempts > 0)
-      ? storeEntry
-      : (raw.attempts > 0 ? raw : (storeEntry || raw));
-
-    let status = source.status || "unseen";
-    if (status === "mastered") status = "consolidating";
-    else if (status === "assisted") status = "developing";
-    else if (status === "pending") status = "unseen";
+    const storeEntry = storeComps.find((c) => c.id === comp.id) || {};
+    const status = storeEntry.status || "unseen";
 
     const item = {
       id: comp.id,
@@ -258,15 +165,21 @@ export function getCompetencyReport() {
       title: comp.title,
       sectionId: comp.sectionId,
       order: comp.order,
-      independentCount: source.independentCount || 0,
-      assistedCount: source.assistedCount || 0,
-      errorCount: source.errorCount || 0,
-      attempts: source.attempts || ((source.independentCount || 0) + (source.assistedCount || 0) + (source.errorCount || 0)),
-      diagnostics: Array.isArray(source.diagnostics)
-        ? [...source.diagnostics]
-        : (Array.isArray(source.recentDiagnosticIds) ? [...source.recentDiagnosticIds] : []),
+      independentCount: storeEntry.independentCount || 0,
+      assistedCount: storeEntry.assistedCount || 0,
+      errorCount: storeEntry.errorCount || 0,
+      attempts:
+        storeEntry.attempts ||
+        (storeEntry.independentCount || 0) +
+          (storeEntry.assistedCount || 0) +
+          (storeEntry.errorCount || 0),
+      diagnostics: Array.isArray(storeEntry.diagnostics)
+        ? [...storeEntry.diagnostics]
+        : Array.isArray(storeEntry.recentDiagnosticIds)
+          ? [...storeEntry.recentDiagnosticIds]
+          : [],
       status,
-      badge: source.badge || STATUS_BADGES[status] || STATUS_BADGES.unseen,
+      badge: storeEntry.badge || STATUS_BADGES[status] || STATUS_BADGES.unseen,
     };
 
     report.competencies[comp.id] = item;
@@ -274,180 +187,48 @@ export function getCompetencyReport() {
     report.list.push(item);
   });
 
-  if (!storeReport || !storeReport.summary) {
-    report.summary.durable = 0;
-    report.summary.consolidating = 0;
-    report.summary.developing = 0;
-    report.summary.review_due = 0;
-    report.summary.needs_repair = 0;
-    report.summary.introduced = 0;
-    report.summary.unseen = 0;
-    report.list.forEach((item) => {
-      if (report.summary[item.status] !== undefined) {
-        report.summary[item.status]++;
-      } else {
-        report.summary.unseen++;
-      }
-    });
-  }
-
   return report;
 }
 
 export function mountCompetencyDashboard(host, { onSelectSection, onPracticeCompetency } = {}) {
   if (!host) return null;
 
-  const render = () => {
-    const report = getCompetencyReport();
-    host.innerHTML = "";
-
-    // 1. Resumen de dominio (KPIs)
-    const summaryCard = h(
-      "div",
-      { class: "exp-dashboard-summary" },
-      h(
-        "div",
-        { class: "exp-dashboard-kpi exp-dashboard-kpi--mastered" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.consolidating + report.summary.durable)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "Consolidada / Durable"),
-      ),
-      h(
-        "div",
-        { class: "exp-dashboard-kpi exp-dashboard-kpi--assisted" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.developing)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "En desarrollo"),
-      ),
-      h(
-        "div",
-        { class: "exp-dashboard-kpi exp-dashboard-kpi--pending" },
-        h("span", { class: "exp-dashboard-kpi__num" }, fmt(report.summary.unseen + report.summary.introduced + report.summary.needs_repair + report.summary.review_due)),
-        h("span", { class: "exp-dashboard-kpi__label" }, "Pendiente / Refuerzo"),
-      ),
-    );
-
-    // 2. Grilla de las 10 competencias
-    const cards = report.list.map((item) => {
-      const comp = item.competency;
-      const badgeInfo = STATUS_BADGES[item.status] || STATUS_BADGES.unseen;
-
-      const toneToClass = {
-        success: "badge--success",
-        warning: "badge--warning",
-        info: "badge--info",
-        attention: "badge--attention",
-        danger: "badge--danger",
-        muted: "badge--neutral",
-      };
-      const badgeToneClass = toneToClass[badgeInfo.tone] || "badge--neutral";
-
-      const statusBadge = h(
-        "span",
-        {
-          class: `exp-dashboard-badge badge ${badgeToneClass} is-${badgeInfo.classModifier || item.status}`,
-          "data-status": item.status,
-        },
-        badgeInfo.label,
-      );
-
-      const header = h(
-        "header",
-        { class: "exp-dashboard-card__header" },
-        h("h4", { class: "exp-dashboard-card__title" }, `${comp.order}. ${comp.title}`),
-        statusBadge,
-      );
-
-      // Si registró algún error diagnóstico recurrente
-      const diagnosticEls = [];
-      if (item.diagnostics && item.diagnostics.length > 0) {
-        item.diagnostics.forEach((diagId) => {
-          const tax = EXP_DIAGNOSTIC_TAXONOMY[diagId];
-          const label = tax ? tax.shortLabel : diagId;
-          diagnosticEls.push(
-            h(
-              "div",
-              { class: "exp-dashboard-error-alert" },
-              chalkIcon("hint"),
-              h("span", null, ` Error detectado: ${label}`),
-            ),
-          );
-        });
+  const instance = mountCoreCompetencyDashboard({
+    container: host,
+    moduleId: "exponenciales",
+    competencies: EXP_COMPETENCIES,
+    diagnosticTaxonomy: EXP_DIAGNOSTIC_TAXONOMY,
+    getReport: getCompetencyReport,
+    classPrefix: "exp-dashboard",
+    subtitle:
+      "Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad.",
+    onNavigateSection: (comp) => {
+      if (typeof onSelectSection === "function") {
+        onSelectSection(comp.sectionId);
+      } else if (typeof document !== "undefined") {
+        const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
+        if (link) link.click();
+        else if (typeof location !== "undefined") location.hash = `#${comp.sectionId}`;
       }
+    },
+    onPracticeFamily: (comp) => {
+      if (typeof onPracticeCompetency === "function") {
+        onPracticeCompetency(comp.id);
+      } else if (typeof location !== "undefined") {
+        location.hash = "#sec-retos";
+      }
+    },
+  });
 
-      // Dos botones de acción: Ir al Pizarrón N y Practicar en Entrenador
-      const sectionNum = comp.sectionId.replace("sec-", "");
-      const btnGo = h(
-        "button",
-        {
-          type: "button",
-          class: "btn btn--subtle btn--sm exp-dashboard-btn-nav",
-          on: {
-            click: () => {
-              if (typeof onSelectSection === "function") {
-                onSelectSection(comp.sectionId);
-              } else {
-                const link = document.querySelector(`.seq-sidebar__link[data-sec="${comp.sectionId}"]`);
-                if (link) link.click();
-                else location.hash = `#${comp.sectionId}`;
-              }
-            },
-          },
-        },
-        `Ir al Pizarrón ${sectionNum}`,
-      );
-
-      const btnPractice = h(
-        "button",
-        {
-          type: "button",
-          class: "btn btn--sm exp-dashboard-btn-practice",
-          on: {
-            click: () => {
-              if (typeof onPracticeCompetency === "function") {
-                onPracticeCompetency(comp.id);
-              } else {
-                location.hash = "#sec-retos";
-              }
-            },
-          },
-        },
-        chalkIcon("target"),
-        " Practicar en Entrenador",
-      );
-
-      const actions = h(
-        "div",
-        { class: "exp-dashboard-card__actions" },
-        btnGo,
-        btnPractice,
-      );
-
-      return h(
-        "article",
-        { class: `exp-dashboard-card exp-dashboard-card--${badgeInfo.classModifier || item.status}` },
-        header,
-        diagnosticEls.length > 0 ? h("div", { class: "exp-dashboard-errors" }, ...diagnosticEls) : null,
-        actions,
-      );
-    });
-
-    const grid = h("div", { class: "exp-dashboard-grid" }, ...cards);
-
-    const titleHeader = h(
-      "header",
-      { class: "exp-dashboard-header" },
-      h("h3", null, "Mapa de Competencias y Atlas de Errores"),
-      h("p", { class: "muted small" }, "Seguimiento en tiempo real de tu dominio conceptual e independencia analítica en las 10 competencias de la unidad."),
-    );
-
-    mount(host, titleHeader, summaryCard, grid);
-  };
-
+  const render = () => instance?.update();
   dashboardRenderers.add(render);
-  render();
 
   return {
     update: render,
-    destroy: () => dashboardRenderers.delete(render),
+    destroy: () => {
+      dashboardRenderers.delete(render);
+      instance?.destroy();
+    },
   };
 }
 
