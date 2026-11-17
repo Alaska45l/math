@@ -1216,7 +1216,344 @@ const quadOk =
   quadResults.consoleErrors.length === 0 &&
   !quadResults.overflow;
 
-const allResultsOk = allOk && powRadOk && expOk && quadOk;
+const circConsoleErrors = [];
+client.on("Runtime.consoleAPICalled", (params) => {
+  if (params.type === "error")
+    circConsoleErrors.push(
+      params.args?.map((item) => item.value || item.description).join(" "),
+    );
+});
+client.on("Runtime.exceptionThrown", (params) => {
+  circConsoleErrors.push(
+    params.exceptionDetails?.exception?.description ||
+      params.exceptionDetails?.text ||
+      "Exception",
+  );
+});
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/desigualdades.html`,
+});
+await new Promise((r) => setTimeout(r, 1000));
+const circResults = await client.eval(`(async () => {
+  const circSvg = document.getElementById('circuit');
+  const nlSvg = document.getElementById('number-line');
+  document.getElementById('mode-and')?.click();
+  const opA = document.getElementById('op-a');
+  const valA = document.getElementById('val-a');
+  if (opA) { opA.value = '>'; opA.dispatchEvent(new Event('change', { bubbles: true })); }
+  if (valA) { valA.value = '-5'; valA.dispatchEvent(new Event('input', { bubbles: true })); }
+  const xs = document.getElementById('x-slider');
+  if (xs) { xs.value = '0'; xs.dispatchEvent(new Event('input', { bubbles: true })); }
+  const svgsSameNode = Boolean(
+    circSvg && document.getElementById('circuit') === circSvg && circSvg.isConnected &&
+    nlSvg && document.getElementById('number-line') === nlSvg && nlSvg.isConnected
+  );
+  const presetBtn = document.querySelector('#presets button');
+  presetBtn?.click();
+  const retoSel = document.getElementById('reto');
+  if (retoSel) { retoSel.value = '0'; retoSel.dispatchEvent(new Event('change', { bubbles: true })); }
+
+  // 2-stage POE
+  const poeOpt = document.querySelectorAll('#circ-poe .circ-predict-options button')[1];
+  poeOpt?.click();
+  const poeCommitted = (document.querySelector('#circ-poe .circ-predict-feedback')?.textContent || '').includes('Hipótesis registrada');
+  document.querySelector('#circ-poe .circ-predict-verify-btn')?.click();
+  const poeText = document.querySelector('#circ-poe .circ-predict-feedback')?.textContent || '';
+  const poeVerified = !poeText.includes('Hipótesis registrada') &&
+    poeText.includes('conjunto vacío') &&
+    document.getElementById('solution')?.textContent.trim() === '∅';
+
+  // Graduated checks: 3 hints + diagnostic + autonomous solve
+  const q1 = document.querySelector('[data-check-id="circ-sec1-q1"]');
+  const q1HintBtn = q1?.querySelector('.circ-btn-hint');
+  for (let i = 0; i < 3; i++) q1HintBtn?.click();
+  const q1HintsWork = (q1?.querySelector('.circ-check__hint')?.textContent || '').includes('Pista 3/3');
+  const q1Input = q1?.querySelector('.circ-check__input');
+  if (q1Input) {
+    q1Input.value = '(-3; 2)';
+    q1Input.dispatchEvent(new Event('input', { bubbles: true }));
+    q1?.querySelector('.circ-btn-review')?.click();
+  }
+  const q1DiagFeedback = (q1?.querySelector('.circ-check__feedback')?.textContent || '').includes('paréntesis');
+
+  const q2 = document.querySelector('[data-check-id="circ-sec1-q2"]');
+  const q2Input = q2?.querySelector('.circ-check__input');
+  if (q2Input) {
+    q2Input.value = '(-inf; 4)';
+    q2Input.dispatchEvent(new Event('input', { bubbles: true }));
+    q2?.querySelector('.circ-btn-review')?.click();
+  }
+  const q2Solved = Boolean(q2?.classList.contains('is-resolved'));
+
+  const learningState = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const comp1 = learningState?.competencies?.['inequalities.intervals_and_number_line'];
+  const dashboardCards = document.querySelectorAll('#circ-dashboard [data-competency-id]').length;
+
+  return {
+    svgsSameNode,
+    poeCommitted,
+    poeVerified,
+    q1HintsWork,
+    q1DiagFeedback,
+    q2Solved,
+    learningUpdated: Boolean(comp1 && comp1.independentCount >= 1 && comp1.recentDiagnosticIds?.includes('swapped_open_closed_bracket')),
+    dashboardCards,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="desigualdades.html"]')),
+  };
+})()`);
+
+const circWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((r) => setTimeout(r, 100));
+  circWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+circResults.viewportWidths = circWidths;
+circResults.viewportOverflowFree = circWidths.every((item) => !item.overflow);
+circResults.consoleErrors = [...circConsoleErrors];
+console.log("Resultados de interacción en desigualdades.html:", JSON.stringify(circResults, null, 2));
+
+const dimConsoleErrors = [];
+const prevCircErrCount = circConsoleErrors.length;
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/unidades.html`,
+});
+await new Promise((r) => setTimeout(r, 1000));
+const dimResults = await client.eval(`(async () => {
+  localStorage.clear();
+  const probSel = document.getElementById('problem');
+  if (probSel) { probSel.value = '0'; probSel.dispatchEvent(new Event('change', { bubbles: true })); }
+  const firstTool = document.querySelector('#tools button[data-k]');
+  firstTool?.click();
+  const exprHasTokens = document.querySelectorAll('#expr .token').length > 0;
+  document.getElementById('undo')?.click();
+  document.getElementById('reset')?.click();
+
+  // 2-stage POE
+  document.getElementById('predict-up')?.click();
+  const poeStage1 = (document.getElementById('poe-feedback')?.textContent || '').includes('Hipótesis registrada');
+
+  // #solve assisted guard
+  document.getElementById('solve')?.click();
+  const statusAssisted = (document.getElementById('status')?.textContent || '').toLowerCase().includes('asistido');
+  const learningAfterSolve = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const compNeutro = learningAfterSolve?.competencies?.['units.unitary_factor_neutral_one'];
+  const solveGuarded = Boolean(compNeutro && compNeutro.independentCount === 0 && compNeutro.assistedCount >= 1);
+
+  // Graduated check: 3 hints + autonomous numeric solve
+  const q1 = document.querySelector('[data-check-id="dim-sec2-q1"]');
+  const q1HintBtn = q1?.querySelector('.dim-btn-hint');
+  for (let i = 0; i < 3; i++) q1HintBtn?.click();
+  const q1HintsWork = (q1?.querySelector('.dim-check__hint')?.textContent || '').includes('Pista 3/3');
+
+  const q2 = document.querySelector('[data-check-id="dim-sec2-q2"]');
+  const q2Input = q2?.querySelector('.dim-check__input');
+  if (q2Input) {
+    q2Input.value = '2500';
+    q2Input.dispatchEvent(new Event('input', { bubbles: true }));
+    q2?.querySelector('.dim-btn-review')?.click();
+  }
+  const q2Solved = Boolean(q2?.classList.contains('is-resolved'));
+  const learningAfterCheck = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const compPow = learningAfterCheck?.competencies?.['units.compound_rates_and_powers'];
+  const dashboardCards = document.querySelectorAll('#dim-dashboard [data-competency-id]').length;
+
+  return {
+    exprHasTokens,
+    poeStage1,
+    statusAssisted,
+    solveGuarded,
+    q1HintsWork,
+    q2Solved,
+    compPowIndependent: Boolean(compPow && compPow.independentCount >= 1),
+    dashboardCards,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="unidades.html"]')),
+  };
+})()`);
+
+const dimWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((r) => setTimeout(r, 100));
+  dimWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+dimResults.viewportWidths = dimWidths;
+dimResults.viewportOverflowFree = dimWidths.every((item) => !item.overflow);
+dimResults.consoleErrors = circConsoleErrors.slice(prevCircErrCount);
+console.log("Resultados de interacción en unidades.html:", JSON.stringify(dimResults, null, 2));
+
+const prevDimErrCount = circConsoleErrors.length;
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/funciones.html`,
+});
+await new Promise((r) => setTimeout(r, 1000));
+const fnResults = await client.eval(`(async () => {
+  localStorage.clear();
+  const titleHasUnidad02 = document.title.includes('Unidad 02') && !document.title.includes('Unidad 8');
+  const introHasUnidad02 = (document.querySelector('.intro')?.textContent || '').includes('Unidad 02') &&
+    !(document.querySelector('.intro')?.textContent || '').includes('Unidad 8');
+
+  // #sc-reveal assisted guard
+  document.getElementById('sc-reveal')?.click();
+  const scAssistedBadge = (document.getElementById('sc-isfn')?.textContent || '').includes('asistido');
+  const learningAfterReveal = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const compConcept = learningAfterReveal?.competencies?.['functions.concept_and_uniqueness'];
+  const scRevealGuarded = Boolean(compConcept && compConcept.independentCount === 0 && compConcept.assistedCount >= 1);
+
+  // Switch to Radiografia tab & test #rad-quiz
+  document.getElementById('tab-radiografia')?.click();
+  await new Promise((r) => setTimeout(r, 80));
+  const radPanelVisible = !document.getElementById('panel-radiografia')?.hidden;
+  document.querySelector('#rad-quiz button[data-ans="correct"]')?.click();
+  const learningAfterQuiz = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const compMono = learningAfterQuiz?.competencies?.['functions.monotonicity_extrema_and_continuity'];
+  const radQuizRecorded = Boolean(compMono && compMono.independentCount >= 1);
+
+  // Switch to Secante tab & test persistent keyboard handle P1
+  document.getElementById('tab-secante')?.click();
+  await new Promise((r) => setTimeout(r, 80));
+  const secHandle = document.querySelector('#sec-svg [data-handle="p1"]');
+  let secKeyboardWorks = false;
+  if (secHandle) {
+    secHandle.focus();
+    const valBefore = secHandle.getAttribute('aria-valuenow');
+    const cxBefore = secHandle.getAttribute('cx');
+    secHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    const valAfter = secHandle.getAttribute('aria-valuenow');
+    const cxAfter = secHandle.getAttribute('cx');
+    secKeyboardWorks = Boolean(valBefore !== valAfter && cxBefore !== cxAfter && document.activeElement === secHandle);
+  }
+
+  // Switch to Inversa tab & test persistent keyboard handle P1
+  document.getElementById('tab-inversa')?.click();
+  await new Promise((r) => setTimeout(r, 80));
+  const invHandle = document.querySelector('#inv-svg [data-handle="p1"]');
+  let invKeyboardWorks = false;
+  if (invHandle) {
+    invHandle.focus();
+    const valBefore = invHandle.getAttribute('aria-valuenow');
+    const cxBefore = invHandle.getAttribute('cx');
+    invHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    const valAfter = invHandle.getAttribute('aria-valuenow');
+    const cxAfter = invHandle.getAttribute('cx');
+    invKeyboardWorks = Boolean(valBefore !== valAfter && cxBefore !== cxAfter && document.activeElement === invHandle);
+  }
+
+  // Return to scanner tab
+  document.getElementById('tab-scanner')?.click();
+  const dashboardCards = document.querySelectorAll('#fn-competency-panel [data-competency-id]').length;
+
+  return {
+    titleHasUnidad02,
+    introHasUnidad02,
+    scAssistedBadge,
+    scRevealGuarded,
+    radPanelVisible,
+    radQuizRecorded,
+    secKeyboardWorks,
+    invKeyboardWorks,
+    dashboardCards,
+    hasNavLink: Boolean(document.querySelector('.site-nav a[href="funciones.html"]')),
+  };
+})()`);
+
+const fnWidths = [];
+for (const width of [320, 375, 768, 1024, 1440]) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height: 900,
+    deviceScaleFactor: width < 600 ? 2 : 1,
+    mobile: width < 600,
+  });
+  await new Promise((r) => setTimeout(r, 100));
+  fnWidths.push(
+    await client.eval(
+      `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+    ),
+  );
+}
+fnResults.viewportWidths = fnWidths;
+fnResults.viewportOverflowFree = fnWidths.every((item) => !item.overflow);
+fnResults.consoleErrors = circConsoleErrors.slice(prevDimErrCount);
+console.log("Resultados de interacción en funciones.html:", JSON.stringify(fnResults, null, 2));
+
+const circOk =
+  circResults.svgsSameNode &&
+  circResults.poeCommitted &&
+  circResults.poeVerified &&
+  circResults.q1HintsWork &&
+  circResults.q1DiagFeedback &&
+  circResults.q2Solved &&
+  circResults.learningUpdated &&
+  circResults.dashboardCards === 3 &&
+  circResults.hasNavLink &&
+  circResults.viewportOverflowFree &&
+  circResults.consoleErrors.length === 0;
+
+const dimOk =
+  dimResults.exprHasTokens &&
+  dimResults.poeStage1 &&
+  dimResults.statusAssisted &&
+  dimResults.solveGuarded &&
+  dimResults.q1HintsWork &&
+  dimResults.q2Solved &&
+  dimResults.compPowIndependent &&
+  dimResults.dashboardCards === 2 &&
+  dimResults.hasNavLink &&
+  dimResults.viewportOverflowFree &&
+  dimResults.consoleErrors.length === 0;
+
+const fnOk =
+  fnResults.titleHasUnidad02 &&
+  fnResults.introHasUnidad02 &&
+  fnResults.scAssistedBadge &&
+  fnResults.scRevealGuarded &&
+  fnResults.radPanelVisible &&
+  fnResults.radQuizRecorded &&
+  fnResults.secKeyboardWorks &&
+  fnResults.invKeyboardWorks &&
+  fnResults.dashboardCards === 5 &&
+  fnResults.hasNavLink &&
+  fnResults.viewportOverflowFree &&
+  fnResults.consoleErrors.length === 0;
+
+const allResultsOk = allOk && powRadOk && expOk && quadOk && circOk && dimOk && fnOk;
 
 client.close();
 chromeProc.kill();

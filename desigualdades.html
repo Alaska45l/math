@@ -97,6 +97,27 @@
       <select id="reto" class="circ-reto"></select>
       <span id="reto-status" class="status" aria-live="polite"></span>
     </div>
+
+    <section id="circ-poe" class="circ-section" aria-label="Predicción previa sobre el circuito"></section>
+
+    <section id="circ-checks" class="circ-section" aria-label="Chequeos algebraicos de desigualdades e intervalos">
+      <h2>Chequeos graduales de Exactas</h2>
+      <p class="muted small">Escribí tus respuestas en notación de intervalos (usando <code>;</code>, <code>-inf</code>, <code>+inf</code>, <code>U</code>, <code>R</code> o <code>vacio</code>).</p>
+      <div id="sec-intervalos" class="circ-check-group">
+        <h3>1. Intervalos reales y extremos</h3>
+        <div id="circ-checks-intervalos"></div>
+      </div>
+      <div id="sec-compuestas" class="circ-check-group">
+        <h3>2. Desigualdades compuestas (AND / OR)</h3>
+        <div id="circ-checks-compuestas"></div>
+      </div>
+      <div id="sec-inecuaciones" class="circ-check-group">
+        <h3>3. Inecuaciones lineales, dobles y factorizadas</h3>
+        <div id="circ-checks-inecuaciones"></div>
+      </div>
+    </section>
+
+    <section id="circ-dashboard" class="learning-dashboard-host" aria-label="Mapa de competencias y atlas de errores"></section>
   </main>
 </body>
 

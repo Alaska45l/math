@@ -95,9 +95,20 @@ export function renderStatus(root, state, c) {
       msg = ['Elegí un factor: buscá un pin y un hueco con el mismo nombre. Al unirse forman explícitamente el neutro multiplicativo 1.'];
       break;
     case 'solved':
-      msg = ['Listo: ', h('span', { class: 'dim-inline' }, F6(state.v), ' ', unitNode(p.from)), ' = ',
-        h('span', { class: 'dim-inline' }, F6(c.value), ' ', unitNode(p.to)),
-        '. Cada pareja encastrada vale 1; la dimensión que permanece es la pedida.'];
+      if (c.solutionRevealed) {
+        msg = [
+          h('strong', { class: 'dim-status-assisted is-assisted' }, 'Solución revelada (intento asistido — no cuenta como resolución autónoma). '),
+          'Reiniciá el problema para intentar resolverlo por tu cuenta. ',
+          h('span', { class: 'dim-inline' }, F6(state.v), ' ', unitNode(p.from)),
+          ' = ',
+          h('span', { class: 'dim-inline' }, F6(c.value), ' ', unitNode(p.to)),
+          '.',
+        ];
+      } else {
+        msg = ['Listo: ', h('span', { class: 'dim-inline' }, F6(state.v), ' ', unitNode(p.from)), ' = ',
+          h('span', { class: 'dim-inline' }, F6(c.value), ' ', unitNode(p.to)),
+          '. Cada pareja encastrada vale 1; la dimensión que permanece es la pedida.'];
+      }
       break;
     case 'stacked':
       msg = ['Hay unidades apiladas: dos pines o dos huecos no pueden encastrar. Deshacé ese factor y usá la fracción con la orientación opuesta.'];
@@ -106,7 +117,9 @@ export function renderStatus(root, state, c) {
       msg = ['Ahora tenés ', h('span', { class: 'dim-inline' }, unitNode(c.remaining)),
         '. Seguí encastrando las unidades que no pertenecen al objetivo.'];
   }
-  if (c.predictionOk !== null) msg.push(` Tu predicción fue ${c.predictionOk ? 'correcta' : 'al revés'}.`);
+  if (c.predictionOk !== null && !c.solutionRevealed) {
+    msg.push(` Tu predicción fue ${c.predictionOk ? 'correcta' : 'al revés'}.`);
+  }
   mount(root, msg);
 }
 

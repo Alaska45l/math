@@ -133,6 +133,22 @@ export const MODULE_COMPETENCY_IDS = Object.freeze({
     'powers.real_domain_restrictions_and_abs_root',
     'powers.precedence_and_paradox_auditing',
   ],
+  desigualdades: [
+    'inequalities.intervals_and_number_line',
+    'inequalities.compound_and_or_sets',
+    'inequalities.linear_and_factored_solving',
+  ],
+  unidades: [
+    'units.unitary_factor_neutral_one',
+    'units.compound_rates_and_powers',
+  ],
+  funciones: [
+    'functions.concept_and_uniqueness',
+    'functions.domain_image_and_sign_sets',
+    'functions.monotonicity_extrema_and_continuity',
+    'functions.bijectivity_and_inverse',
+    'functions.average_rate_of_change',
+  ],
   'valor-absoluto': [
     'abs.distance_1d_and_equations',
     'abs.cartesian_mirror_parent',

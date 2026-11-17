@@ -3,7 +3,7 @@
  * Un "mapa de unidades" es { unidad: exponente } (positivo = numerador).
  */
 
-/** Equivalencias: 1 a = b  →  factores unitarios b/a  o  a/b (ambos valen 1). */
+/** Equivalencias: 1 a = b -> factores unitarios b/a o a/b (ambos valen 1). */
 export const FACTORS = {
   L_mL: { a: [1, 'L'], b: [1000, 'mL'] },
   min_s: { a: [1, 'min'], b: [60, 's'] },
@@ -34,7 +34,7 @@ export function sameUnits(a, b) {
   return ka.length === Object.keys(cb).length && ka.every((u) => ca[u] === cb[u]);
 }
 
-/** Paso: orientación 0 → b/a (top = b) ; orientación 1 → a/b (top = a). */
+/** Paso: orientación 0 -> b/a (top = b) ; orientación 1 -> a/b (top = a). */
 export function makeStep(k, o) {
   const f = FACTORS[k];
   return Object.freeze(o === 0 ? { k, o, top: f.b, bot: f.a } : { k, o, top: f.a, bot: f.b });
@@ -66,7 +66,7 @@ export function compute(state) {
     n: [{ u: st.top[1] }], d: [{ u: st.bot[1] }], nv: st.top[0], dv: st.bot[0],
   }))];
 
-  /* Emparejamiento pin (numerador) ↔ hueco (denominador) de la misma unidad */
+  /* Emparejamiento pin (numerador) <-> hueco (denominador) de la misma unidad */
   const all = [];
   terms.forEach((t, ti) => {
     t.n.forEach((x) => all.push(Object.assign(x, { side: 'n', term: ti })));
@@ -88,7 +88,7 @@ export function compute(state) {
       x.status = (p.to[x.u] || 0) * (x.side === 'n' ? 1 : -1) > 0 ? 'wanted' : 'pending';
     }
   });
-  // Pares formados en el último paso → animación "fresh"
+  // Pares formados en el último paso -> animación "fresh"
   const freshPairs = new Set(all.filter((x) => x.pair !== undefined && x.term === lastTerm && lastTerm > 0).map((x) => x.pair));
   all.forEach((x) => { x.fresh = x.pair !== undefined && freshPairs.has(x.pair); });
 
@@ -112,6 +112,148 @@ export function compute(state) {
   const predictionOk = solved && state.prediction ? state.prediction === actual : null;
 
   const cubeApplied = state.steps.filter((st) => st.k === 'm_cm' && st.o === 0).length;
+  const solutionRevealed = Boolean(state.solutionRevealed);
+  const solvedAutonomous = solved && !solutionRevealed;
 
-  return { problem: p, terms, remaining, N, D, value, log, solved, stacked, msgKind, predictionOk, cubeApplied };
+  return {
+    problem: p,
+    terms,
+    remaining,
+    N,
+    D,
+    value,
+    actual,
+    log,
+    solved,
+    stacked,
+    msgKind,
+    predictionOk,
+    cubeApplied,
+    solutionRevealed,
+    solvedAutonomous,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Evaluador numérico y diagnóstico cognitivo dimensional             */
+/* ------------------------------------------------------------------ */
+
+export function parseNumericAnswer(raw) {
+  if (typeof raw === 'number') return Number.isFinite(raw) ? raw : NaN;
+  if (typeof raw !== 'string') return NaN;
+  let s = raw.trim().replace(/\u2212/g, '-').replace(/\s+/g, '');
+  if (!s) return NaN;
+
+  if (s.includes('/')) {
+    const parts = s.split('/');
+    if (parts.length !== 2) return NaN;
+    const a = parseNumericAnswer(parts[0]);
+    const b = parseNumericAnswer(parts[1]);
+    if (!Number.isFinite(a) || !Number.isFinite(b) || Math.abs(b) < 1e-12) return NaN;
+    return a / b;
+  }
+
+  if (/^-?\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(s)) {
+    s = s.replace(/\./g, '').replace(',', '.');
+  } else {
+    s = s.replace(',', '.');
+  }
+  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(s)) return NaN;
+  const n = Number(s);
+  return Number.isFinite(n) ? (Object.is(n, -0) ? 0 : n) : NaN;
+}
+
+function matchesTrap(val, trapSpec, tol = 1e-3) {
+  if (trapSpec === undefined || trapSpec === null) return false;
+  const list = Array.isArray(trapSpec) ? trapSpec : [trapSpec];
+  return list.some((t) => Number.isFinite(t) && Math.abs(val - t) <= Math.max(tol, Math.abs(t) * 1e-3));
+}
+
+const DIAG_DEFS = Object.freeze({
+  inverted_conversion_factor: {
+    id: 'inverted_conversion_factor',
+    category: 'procedural',
+    pose: 'sospecha',
+    competencyId: 'units.unitary_factor_neutral_one',
+    message:
+      'Invertiste la fracción unitaria: pusiste la unidad a cancelar del mismo lado en vez de enfrentarla (pin con hueco) para formar el neutro 1.',
+  },
+  forgot_power_exponent_on_unit: {
+    id: 'forgot_power_exponent_on_unit',
+    category: 'conceptual',
+    pose: 'colapso',
+    competencyId: 'units.compound_rates_and_powers',
+    message:
+      'Aplicaste el factor de longitud (100 cm / 1 m) una sola vez, pero cm³ = cm · cm · cm exige elevarlo al cubo (100³ = 1.000.000).',
+  },
+  confused_prefix_scale_power10: {
+    id: 'confused_prefix_scale_power10',
+    category: 'arithmetic',
+    pose: 'pensativa',
+    competencyId: 'units.unitary_factor_neutral_one',
+    message:
+      'Revisá la equivalencia del prefijo o del tiempo: 1 L = 1.000 mL, 1 kg = 1.000 g, 1 km = 1.000 m, 1 h = 60 min y 1 min = 60 s.',
+  },
+  omitted_target_unit_or_direction: {
+    id: 'omitted_target_unit_or_direction',
+    category: 'representation',
+    pose: 'unamused',
+    competencyId: 'units.compound_rates_and_powers',
+    message:
+      'Revisá la dirección de la escala o si convertiste una sola unidad dejando la otra sin transformar.',
+  },
+});
+
+export function diagnoseDimensional(userInput, context = {}) {
+  // 1. Diagnóstico sobre estado del pizarrón manipulativo
+  if (context.state && context.computed) {
+    const { state, computed } = context;
+    if (computed.stacked) {
+      return { ...DIAG_DEFS.inverted_conversion_factor };
+    }
+    if (
+      state.p === CUBE_PROBLEM &&
+      !computed.solved &&
+      computed.cubeApplied > 0 &&
+      computed.cubeApplied < 3 &&
+      sameUnits({ ...computed.remaining, cm: 0, m: 0 }, { kg: 1 })
+    ) {
+      return { ...DIAG_DEFS.forgot_power_exponent_on_unit };
+    }
+    if (computed.solved && computed.predictionOk === false) {
+      return { ...DIAG_DEFS.omitted_target_unit_or_direction };
+    }
+    return null;
+  }
+
+  // 2. Diagnóstico sobre respuestas de chequeos
+  const spec = context.spec || context;
+  if (!spec) return null;
+
+  if (spec.type === 'choice' && spec.trapMap) {
+    const diagId = spec.trapMap[Number(userInput)];
+    return diagId && DIAG_DEFS[diagId] ? { ...DIAG_DEFS[diagId] } : null;
+  }
+
+  const val = parseNumericAnswer(userInput);
+  if (!Number.isFinite(val)) return null;
+
+  if (spec.expected !== undefined && Math.abs(val - spec.expected) <= Math.max(1e-4, Math.abs(spec.expected) * 1e-3)) {
+    return null;
+  }
+
+  if (matchesTrap(val, spec.trapInverted)) {
+    return { ...DIAG_DEFS.inverted_conversion_factor };
+  }
+  if (matchesTrap(val, spec.trapLinearPower)) {
+    return { ...DIAG_DEFS.forgot_power_exponent_on_unit };
+  }
+  if (matchesTrap(val, spec.trapPower10)) {
+    return { ...DIAG_DEFS.confused_prefix_scale_power10 };
+  }
+  if (matchesTrap(val, spec.trapSingleUnitOnly)) {
+    return { ...DIAG_DEFS.omitted_target_unit_or_direction };
+  }
+
+  return null;
 }

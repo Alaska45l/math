@@ -10,6 +10,9 @@
 import { h, s, mount, byId, on, setPressed } from '../../core/dom.js';
 import { fmt, frac } from '../../core/math-format.js';
 import { createPlane, bindSvgDrag, snapTo } from '../../core/plot.js';
+import { createPredictBox } from '../../core/board-kit.js';
+import { CHECKS_DATA, createCheckBlock } from './checks.js';
+import { recordFnAttempt, recordFnPrediction } from './learning-adapter.js';
 
 const X_MIN = -5, X_MAX = 5, Y_MIN = -4, Y_MAX = 4;
 const SNAP_RADIUS = 0.12;
@@ -236,8 +239,10 @@ export function initScanner(container) {
     revealed: false,
     sawCollision: false,
   };
+  const revealedCases = new Set();
 
   mount(container,
+    h('div', { id: 'sc-poe', class: 'fn-poe-host' }),
     h('div', { class: 'panel' },
       h('div', { class: 'row' },
         h('label', { for: 'sc-case', class: 'label-sm' }, 'Caso de estudio'),
@@ -285,16 +290,68 @@ export function initScanner(container) {
         h('p', { id: 'sc-case-verdict', class: 'muted small', hidden: true }),
       ),
     ),
+    h('section', { class: 'fn-checks-section', 'aria-label': 'Chequeos del Escáner de Unicidad y Dominio' },
+      h('h3', null, 'Chequeos: Unicidad, Dominio e Imagen'),
+      h('div', { id: 'sc-checks' }),
+    ),
   );
 
   const el = {
+    poe: byId('sc-poe', container),
     sel: byId('sc-case', container), rng: byId('sc-x', container), out: byId('sc-x-val', container),
     dom: byId('sc-dom-btn', container), im: byId('sc-im-btn', container), svg: byId('sc-svg', container),
     verdict: byId('sc-verdict', container), formula: byId('sc-formula', container),
     isFn: byId('sc-isfn', container), domText: byId('sc-dom', container), imText: byId('sc-im', container),
     xInline: byId('sc-x-inline', container), pts: byId('sc-pts', container),
     caseVerdict: byId('sc-case-verdict', container),
+    checks: byId('sc-checks', container),
   };
+
+  let poePredicted = false;
+  if (el.poe) {
+    const poeBox = createPredictBox({
+      prompt: 'Antes de barrer con el láser: ¿la parábola horizontal x = y² − 2 es función en su dominio [−2; +∞)?',
+      classPrefix: 'fn',
+      optionClass: 'chip chip--ghost pr-chip',
+      options: [
+        {
+          label: 'A) Sí, porque en x = −2 corta una sola vez',
+          correct: false,
+          explanation: 'Que corte una sola vez en el vértice no alcanza: para todo x > −2 la recta vertical corta dos veces (y = ±√(x + 2)).',
+        },
+        {
+          label: 'B) No, porque para x > −2 devuelve dos salidas y distintas',
+          correct: true,
+          explanation: 'Exacto: en x = 2 devuelve y = 2 e y = −2 a la vez. Con una sola entrada con dos salidas ya falla la unicidad.',
+        },
+      ],
+      onVerify: () => {
+        state.caseIdx = 1;
+        state.revealed = false;
+        state.sawCollision = false;
+        el.sel.value = '1';
+        renderCurve(true);
+        setX(2);
+      },
+    });
+    poeBox.addEventListener('click', (evt) => {
+      if (evt.target?.closest?.('.fn-predict-options button') && !poePredicted) {
+        poePredicted = true;
+        recordFnPrediction({
+          exerciseId: 'fn-poe-scanner',
+          competencyId: 'functions.concept_and_uniqueness',
+          representation: 'graphical',
+        });
+      }
+    });
+    mount(el.poe, poeBox);
+  }
+
+  createCheckBlock(
+    el.checks,
+    CHECKS_DATA.filter((q) => q.sectionId === 'panel-scanner'),
+    'panel-scanner',
+  );
 
   const plane = createPlane(el.svg, {
     width: 600, height: 380, xMin: X_MIN, xMax: X_MAX, yMin: Y_MIN, yMax: Y_MAX,
@@ -369,12 +426,19 @@ export function initScanner(container) {
       return;
     }
     const isFn = c.isFunction && !state.sawCollision;
+    const assistedTag = state.revealed
+      ? h('span', { class: 'fn-assisted-badge is-assisted' }, '(revelado — asistido)')
+      : null;
+
     if (isFn) {
-      mount(el.isFn, h('span', { class: ['encerrado', 'text-ok'] }, 'Sí, es función'));
+      mount(el.isFn,
+        h('span', { class: ['encerrado', 'text-ok'] }, state.revealed ? 'Sí, es función (revelado — asistido)' : 'Sí, es función'),
+        state.revealed ? assistedTag : null,
+      );
     } else {
       mount(el.isFn,
         h('span', { class: 'text-err' },
-          'No es función ',
+          state.revealed ? 'No es función (revelado — asistido) ' : 'No es función ',
           s('svg', {
             class: 'chalk-icon chalk-icon--cross',
             viewBox: '0 0 16 16',
@@ -393,6 +457,7 @@ export function initScanner(container) {
           ),
           h('span', { class: 'sr-only' }, 'incorrecta'),
         ),
+        state.revealed ? assistedTag : null,
       );
     }
     el.caseVerdict.hidden = false;
@@ -406,9 +471,9 @@ export function initScanner(container) {
     const c = CASES[state.caseIdx];
     c.draw(plane);
     if (animate) {
-      plane.layers.curve.querySelectorAll('path, ellipse').forEach((el) => {
-        el.setAttribute('pathLength', '1');
-        el.classList.add('curve-anim');
+      plane.layers.curve.querySelectorAll('path, ellipse').forEach((elNode) => {
+        elNode.setAttribute('pathLength', '1');
+        elNode.classList.add('curve-anim');
       });
     }
   }
@@ -476,7 +541,25 @@ export function initScanner(container) {
   on(el.rng, 'input', (e) => setX(Number(e.target.value)));
   on(el.dom, 'click', () => { state.showDom = !state.showDom; render(); });
   on(el.im, 'click', () => { state.showIm = !state.showIm; render(); });
-  on(el.isFn, 'click', '#sc-reveal', () => { state.revealed = true; render(); });
+  on(el.isFn, 'click', '#sc-reveal', () => {
+    const c = CASES[state.caseIdx];
+    state.revealed = true;
+    if (!revealedCases.has(c.id)) {
+      revealedCases.add(c.id);
+      recordFnAttempt({
+        exerciseId: `scanner-reveal-${c.id}`,
+        competencyId: 'functions.concept_and_uniqueness',
+        correct: true,
+        mode: 'assisted',
+        hintsUsed: 0,
+        solutionRevealed: true,
+        representation: 'graphical',
+        stage: 'exploration',
+        transferDistance: 'near',
+      });
+    }
+    render();
+  });
   bindSvgDrag(el.svg, plane, ({ x }) => setX(x));
 
   renderCurve(true);

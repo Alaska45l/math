@@ -18,6 +18,21 @@ import {
 import { MODULE_IDS } from './events.js';
 
 import {
+  CIRCUITOS_COMPETENCIES,
+  CIRCUITOS_DIAGNOSTIC_TAXONOMY,
+  CIRCUITOS_COMPETENCY_ALIASES,
+} from '../../modules/circuitos/competencies-map.js';
+import {
+  UNITS_COMPETENCIES,
+  UNITS_DIAGNOSTIC_TAXONOMY,
+  UNITS_COMPETENCY_ALIASES,
+} from '../../modules/dimensional/competencies-map.js';
+import {
+  FUNCTIONS_COMPETENCIES,
+  FUNCTIONS_DIAGNOSTIC_TAXONOMY,
+  FUNCTIONS_COMPETENCY_ALIASES,
+} from '../../modules/funciones/competencies-map.js';
+import {
   POW_COMPETENCIES,
   POW_DIAGNOSTIC_TAXONOMY,
   POW_COMPETENCY_ALIASES,
@@ -50,6 +65,30 @@ export const ACTIVE_CURRICULUM_MODULES = Object.freeze([
       competencies: POW_COMPETENCIES,
       diagnosticTaxonomy: POW_DIAGNOSTIC_TAXONOMY,
       aliases: POW_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.DESIGUALDADES,
+    data: Object.freeze({
+      competencies: CIRCUITOS_COMPETENCIES,
+      diagnosticTaxonomy: CIRCUITOS_DIAGNOSTIC_TAXONOMY,
+      aliases: CIRCUITOS_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.UNIDADES,
+    data: Object.freeze({
+      competencies: UNITS_COMPETENCIES,
+      diagnosticTaxonomy: UNITS_DIAGNOSTIC_TAXONOMY,
+      aliases: UNITS_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.FUNCIONES,
+    data: Object.freeze({
+      competencies: FUNCTIONS_COMPETENCIES,
+      diagnosticTaxonomy: FUNCTIONS_DIAGNOSTIC_TAXONOMY,
+      aliases: FUNCTIONS_COMPETENCY_ALIASES,
     }),
   }),
   Object.freeze({

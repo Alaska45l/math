@@ -6,59 +6,14 @@
 import { h, s, mount, byId, on, setPressed, chalkIcon } from '../../core/dom.js';
 import { fmt } from '../../core/math-format.js';
 import { createPlane } from '../../core/plot.js';
+import { createPredictBox } from '../../core/board-kit.js';
+import { KNOTS, evalWave, slopeWave } from './logic.js';
+import { CHECKS_DATA, createCheckBlock } from './checks.js';
+import { recordFnAttempt, recordFnPrediction } from './learning-adapter.js';
 
-/* ------------------------------------------------------------------ */
-/* Curva C¹ por tramos (Hermite cúbico)                                 */
-/* ------------------------------------------------------------------ */
-/**
- * Nodos [x, y, pendiente]. Entre nodos consecutivos se usa el polinomio
- * cúbico de Hermite que respeta valor y pendiente en ambos extremos, así
- * que la curva es continua y su derivada también (C¹): no hay quiebres.
- * Las pendientes cumplen la condición de Fritsch–Carlson (α, β ∈ [0; 3]),
- * por lo que cada tramo es estrictamente monótono: las raíces y los
- * extremos están exactamente donde se declaran.
- *
- *   (−4; 2,5) borde · máximo local (no absoluto)
- *   (−3; 0)   raíz
- *   (−1,8; −3) mínimo local (f' = 0)
- *   (0; 0)    raíz, pendiente 2,5 compartida por ambos lados
- *   (2; 4)    máximo local y absoluto (f' = 0)
- *   (4; 0)    raíz
- *   (5; −5)   borde · mínimo absoluto
- */
-const KNOTS = [
-  [-4, 2.5, -2],
-  [-3, 0, -3.5],
-  [-1.8, -3, 0],
-  [0, 0, 2.5],
-  [2, 4, 0],
-  [4, 0, -3.5],
-  [5, -5, -6],
-];
+export { evalWave, slopeWave };
+
 const X0 = KNOTS[0][0], X1 = KNOTS[KNOTS.length - 1][0];
-
-function segmentOf(x) {
-  for (let i = 0; i < KNOTS.length - 1; i++) {
-    if (x <= KNOTS[i + 1][0]) return i;
-  }
-  return KNOTS.length - 2;
-}
-
-export function evalWave(x) {
-  const i = segmentOf(x);
-  const [xa, ya, ma] = KNOTS[i];
-  const [xb, yb, mb] = KNOTS[i + 1];
-  const d = xb - xa, t = (x - xa) / d, t2 = t * t, t3 = t2 * t;
-  return (2 * t3 - 3 * t2 + 1) * ya + (t3 - 2 * t2 + t) * d * ma + (-2 * t3 + 3 * t2) * yb + (t3 - t2) * d * mb;
-}
-
-export function slopeWave(x) {
-  const i = segmentOf(x);
-  const [xa, ya, ma] = KNOTS[i];
-  const [xb, yb, mb] = KNOTS[i + 1];
-  const d = xb - xa, t = (x - xa) / d, t2 = t * t;
-  return ((6 * t2 - 6 * t) * ya + (3 * t2 - 4 * t + 1) * d * ma + (-6 * t2 + 6 * t) * yb + (3 * t2 - 2 * t) * d * mb) / d;
-}
 
 /* ------------------------------------------------------------------ */
 
@@ -121,8 +76,10 @@ const LENSES = [
 
 export function initRadiografia(container) {
   const state = { lens: 'signos' };
+  let quizCorrectRecorded = false;
 
   mount(container,
+    h('div', { id: 'rad-poe', class: 'fn-poe-host' }),
     h('div', { class: 'panel fn-lens-panel' },
       h('span', { class: 'label-sm' }, 'Elegí una lente de rayos X para mirar la misma curva, con Dom(f) = [−4; 5]:'),
       h('div', { class: 'fn-lens-bar', id: 'rad-lenses' },
@@ -162,13 +119,19 @@ export function initRadiografia(container) {
         ),
       ),
     ),
+    h('section', { class: 'fn-checks-section', 'aria-label': 'Chequeos de Radiografía Cartesiana' },
+      h('h3', null, 'Chequeos: Ceros, Signos y Monotonía'),
+      h('div', { id: 'rad-checks' }),
+    ),
   );
 
+  const poeHost = byId('rad-poe', container);
   const svg = byId('rad-svg', container);
   const explain = byId('rad-explain', container);
   const quizMsg = byId('rad-quiz-msg', container);
   const lensesBar = byId('rad-lenses', container);
   const quizBox = byId('rad-quiz', container);
+  const checksHost = byId('rad-checks', container);
 
   const plane = createPlane(svg, {
     width: 620, height: 390, xMin: -4.5, xMax: 5.5, yMin: -5.5, yMax: 5.5,
@@ -293,6 +256,49 @@ export function initRadiografia(container) {
     });
   }
 
+  let poePredicted = false;
+  if (poeHost) {
+    const poeBox = createPredictBox({
+      prompt: 'Si una función está debajo del eje X en (−1,8; 0), ¿puede ser creciente?',
+      classPrefix: 'fn',
+      optionClass: 'chip chip--ghost pr-chip',
+      options: [
+        {
+          label: 'A) Sí: estar abajo del eje indica signo negativo, pero puede ir subiendo hacia y = 0',
+          correct: true,
+          explanation: 'Exacto: entre (−1,8; −3) y (0; 0) f(x) es negativa (C⁻) y creciente (I↑) a la vez.',
+        },
+        {
+          label: 'B) No: si f(x) < 0 entonces necesariamente decrece',
+          correct: false,
+          explanation: 'El signo de f(x) indica altura respecto del eje X, mientras que el crecimiento indica la dirección al avanzar hacia la derecha.',
+        },
+      ],
+      onVerify: () => {
+        state.lens = 'trampa';
+        lensesBar.querySelectorAll('button').forEach((b) => setPressed(b, b.dataset.lens === state.lens));
+        render();
+      },
+    });
+    poeBox.addEventListener('click', (evt) => {
+      if (evt.target?.closest?.('.fn-predict-options button') && !poePredicted) {
+        poePredicted = true;
+        recordFnPrediction({
+          exerciseId: 'fn-poe-radiografia',
+          competencyId: 'functions.monotonicity_extrema_and_continuity',
+          representation: 'graphical',
+        });
+      }
+    });
+    mount(poeHost, poeBox);
+  }
+
+  createCheckBlock(
+    checksHost,
+    CHECKS_DATA.filter((q) => q.sectionId === 'panel-radiografia'),
+    'panel-radiografia',
+  );
+
   on(lensesBar, 'click', 'button[data-lens]', (_e, btn) => {
     state.lens = btn.dataset.lens;
     lensesBar.querySelectorAll('button').forEach((b) => setPressed(b, b.dataset.lens === state.lens));
@@ -305,7 +311,8 @@ export function initRadiografia(container) {
     negative: ['text-err', 'Cuidado, esa es justamente la trampa de la Lente 4: ', 'estar debajo del eje no impide estar subiendo. La función crece en todo (−1,8; 2).'],
   };
   on(quizBox, 'click', 'button[data-ans]', (_e, btn) => {
-    const isCorrect = btn.dataset.ans === 'correct';
+    const ans = btn.dataset.ans;
+    const isCorrect = ans === 'correct';
     quizBox.querySelectorAll('button[data-ans]').forEach((b) => {
       b.classList.remove('is-active', 'is-correct', 'is-incorrect');
       const tag = b.querySelector('.quiz-opt-tag');
@@ -324,9 +331,42 @@ export function initRadiografia(container) {
       );
       tag.after(icon);
     }
-    const [cls, lead, text] = FEEDBACK[btn.dataset.ans];
+    const [cls, lead, text] = FEEDBACK[ans];
     quizMsg.className = 'status';
     mount(quizMsg, h('strong', { class: cls }, lead), text);
+
+    if (isCorrect) {
+      if (!quizCorrectRecorded) {
+        quizCorrectRecorded = true;
+        recordFnAttempt({
+          exerciseId: 'rad-quiz-guillermo',
+          competencyId: 'functions.monotonicity_extrema_and_continuity',
+          correct: true,
+          mode: 'independent',
+          hintsUsed: 0,
+          solutionRevealed: false,
+          representation: 'graphical',
+          stage: 'guided_practice',
+          transferDistance: 'near',
+        });
+      }
+    } else {
+      const diagnosticId = ans === 'brackets'
+        ? 'closed_bracket_on_excluded_point_or_extremum'
+        : 'confused_negative_with_decreasing';
+      recordFnAttempt({
+        exerciseId: 'rad-quiz-guillermo',
+        competencyId: 'functions.monotonicity_extrema_and_continuity',
+        correct: false,
+        mode: 'independent',
+        hintsUsed: 0,
+        solutionRevealed: false,
+        diagnosticId,
+        representation: 'graphical',
+        stage: 'guided_practice',
+        transferDistance: 'near',
+      });
+    }
   });
 
   render();

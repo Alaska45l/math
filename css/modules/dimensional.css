@@ -153,3 +153,157 @@
 .dim-actions {
   margin-top: 12px;
 }
+
+/* ---------- POE, Estado Asistido y Chequeos Graduales ---------- */
+.dim-poe-box {
+  margin: 10px 0 14px;
+  padding: 10px 14px;
+  border: 1px dashed var(--border-strong);
+  background: rgba(14, 22, 18, 0.35);
+}
+
+.dim-poe-feedback {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.dim-poe-box.is-verified .dim-poe-feedback {
+  color: var(--ink);
+}
+
+.dim-status-assisted.is-assisted {
+  color: var(--yellow);
+}
+
+.dim-section {
+  margin-top: 28px;
+}
+
+.dim-check-group {
+  margin: 18px 0 24px;
+}
+
+.dim-check-group h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  color: var(--yellow);
+}
+
+.dim-checks-list {
+  display: grid;
+  gap: 14px;
+}
+
+.dim-check__card {
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+}
+
+.dim-check__card.is-resolved {
+  border-left-color: var(--green);
+}
+
+.dim-check__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.dim-check__num {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dim-check__mode-badge {
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+}
+
+.dim-check__mode-badge.is-independent {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(42, 157, 143, 0.14);
+}
+
+.dim-check__mode-badge.is-assisted {
+  color: var(--yellow);
+  border-color: var(--yellow);
+  background: rgba(233, 196, 106, 0.14);
+}
+
+.dim-check__prompt {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.dim-check__input {
+  width: min(280px, 100%);
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+.dim-choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dim-check__preview {
+  min-height: 1.3em;
+  margin: 6px 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.dim-check__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.dim-check__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dim-check__feedback {
+  min-height: 1.3em;
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+}
+
+.dim-check__feedback.is-correct {
+  color: var(--green);
+}
+
+.dim-check__feedback.is-error {
+  color: var(--pink);
+}
+
+.dim-check__hint,
+.dim-check__solution {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--yellow);
+  background: rgba(236, 242, 232, 0.04);
+  line-height: 1.5;
+}
+
+.dim-check__solution {
+  border-left-color: var(--green);
+}
+

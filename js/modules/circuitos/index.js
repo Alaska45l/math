@@ -1,14 +1,23 @@
 /**
  * circuitos/index.js — Controlador del simulador de desigualdades compuestas.
- * Flujo: eventos → store.set() → compute(state) → render(state, computed).
+ * Flujo: eventos -> store.set() -> compute(state) -> render(state, computed).
  */
 import { byId, h, mount, on, createStore, connect, setPressed } from '../../core/dom.js';
 import { fmt } from '../../core/math-format.js';
 import { renderNav } from '../../core/nav.js';
+import { createPredictBox } from '../../core/board-kit.js';
 import { compute, OPS, PRESETS, RETOS } from './logic.js';
 import { buildCircuit, renderCircuit, renderNumberLine } from './render.js';
+import { CHECKS_DATA, createCheckBlock } from './checks.js';
+import {
+  initCircuitosLearning,
+  recordCircuitosAttempt,
+  recordCircuitosPrediction,
+  mountCircuitosCompetencyDashboard,
+} from './learning-adapter.js';
 
 renderNav();
+initCircuitosLearning();
 
 const V_MIN = -12, V_MAX = 12;
 
@@ -29,6 +38,11 @@ const el = {
   lA: byId('lab-a'), tA: byId('truth-a'), lB: byId('lab-b'), tB: byId('truth-b'), tL: byId('truth-lamp'),
   sol: byId('solution'), ver: byId('verdict'),
   presets: byId('presets'), reto: byId('reto'), retoS: byId('reto-status'),
+  poe: byId('circ-poe'),
+  checksInt: byId('circ-checks-intervalos'),
+  checksComp: byId('circ-checks-compuestas'),
+  checksInec: byId('circ-checks-inecuaciones'),
+  dashboard: byId('circ-dashboard'),
 };
 
 /* ---------- Construcción única de controles a partir de datos ---------- */
@@ -38,8 +52,67 @@ mount(el.reto,
   h('option', { value: '-1' }, 'Sin reto'),
   RETOS.map((r, i) => h('option', { value: i }, r.label)));
 
+/* ---------- POE de 2 etapas + Chequeos + Dashboard ---------- */
+let dashboardHandle = null;
+let poePredicted = false;
+if (el.poe) {
+  const poeBox = createPredictBox({
+    prompt: 'Antes de probarlo en el circuito: si conectás en SERIE (AND) x > −3 y x ≤ −7, ¿qué pasa con la lámpara?',
+    classPrefix: 'circ',
+    optionClass: 'chip chip--ghost pr-chip',
+    options: [
+      {
+        label: 'A) Enciende entre −7 y −3',
+        correct: false,
+        explanation: 'En SERIE (AND) deben cumplirse ambas condiciones a la vez. Entre −7 y −3 falla x > −3 porque esos números son menores que −3.',
+      },
+      {
+        label: 'B) No enciende nunca (∅)',
+        correct: true,
+        explanation: 'Exacto: ningún número real es mayor que −3 y menor o igual que −7 al mismo tiempo. Su intersección es el conjunto vacío ∅.',
+      },
+      {
+        label: 'C) Enciende para todo ℝ',
+        correct: false,
+        explanation: 'Para todo ℝ ocurriría en PARALELO (OR) con x > −7 ∨ x ≤ −3, no en SERIE con condiciones excluyentes.',
+      },
+    ],
+    onVerify: () => {
+      store.set({
+        mode: 'and',
+        A: Object.freeze({ op: '>', v: -3 }),
+        B: Object.freeze({ op: '≤', v: -7 }),
+        error: '',
+      });
+    },
+  });
+  poeBox.addEventListener('click', (evt) => {
+    const btn = evt.target?.closest?.('.circ-predict-options button');
+    if (btn && !poePredicted) {
+      poePredicted = true;
+      recordCircuitosPrediction({
+        exerciseId: 'circ-poe-empty-and',
+        competencyId: 'inequalities.compound_and_or_sets',
+        representation: 'manipulative',
+      });
+    }
+  });
+  mount(el.poe, poeBox);
+}
+
+const bySection = (sec) => CHECKS_DATA.filter((q) => q.sectionId === sec);
+createCheckBlock(el.checksInt, bySection('sec-intervalos'), 'sec-intervalos');
+createCheckBlock(el.checksComp, bySection('sec-compuestas'), 'sec-compuestas');
+createCheckBlock(el.checksInec, bySection('sec-inecuaciones'), 'sec-inecuaciones');
+
+if (el.dashboard) {
+  dashboardHandle = mountCircuitosCompetencyDashboard(el.dashboard);
+}
+
 /* ---------- Render ---------- */
 let circuitRefs = null;
+const recordedRetos = new Set();
+let lastConfigSig = '';
 
 function render(state, c) {
   setPressed(el.bAnd, state.mode === 'and');
@@ -73,6 +146,26 @@ function render(state, c) {
   el.reto.value = String(state.reto);
   el.retoS.textContent = c.reto ? c.reto.text : '';
   el.retoS.classList.toggle('text-ok', !!c.reto?.ok);
+
+  const configSig = `${state.mode}|${state.A.op}${state.A.v}|${state.B.op}${state.B.v}`;
+  const configChanged = configSig !== lastConfigSig;
+  if (configChanged) lastConfigSig = configSig;
+
+  if (c.reto?.ok && state.reto >= 0 && configChanged && !recordedRetos.has(state.reto)) {
+    recordedRetos.add(state.reto);
+    recordCircuitosAttempt({
+      exerciseId: `circ-reto-${state.reto}`,
+      competencyId: 'inequalities.compound_and_or_sets',
+      correct: true,
+      mode: 'independent',
+      hintsUsed: 0,
+      solutionRevealed: false,
+      representation: 'manipulative',
+      stage: 'guided_practice',
+      transferDistance: 'near',
+    });
+    dashboardHandle?.update();
+  }
 }
 
 connect(store, compute, render);
@@ -96,7 +189,11 @@ on(el.vA, 'input', setVal('A'));
 on(el.vB, 'input', setVal('B'));
 
 on(el.xs, 'input', (e) => store.set({ x: parseFloat(e.target.value) }));
-on(el.reto, 'change', (e) => store.set({ reto: parseInt(e.target.value, 10) }));
+on(el.reto, 'change', (e) => {
+  const idx = parseInt(e.target.value, 10);
+  if (idx >= 0) recordedRetos.delete(idx);
+  store.set({ reto: idx });
+});
 on(el.presets, 'click', 'button[data-preset]', (_e, btn) => {
   const p = PRESETS[Number(btn.dataset.preset)];
   store.set({ mode: p.mode, A: Object.freeze({ ...p.A }), B: Object.freeze({ ...p.B }), error: '' });

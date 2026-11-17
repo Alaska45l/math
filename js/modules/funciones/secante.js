@@ -1,12 +1,15 @@
 /**
  * secante.js — Submódulo 3: El Puente Secante y la Tasa de Cambio Promedio.
- * Los puntos P₁ y P₂ se arrastran directamente sobre el gráfico (o con los
- * sliders, paso 0,1). El cálculo se muestra en fracciones de dos pisos (.fr),
- * con paréntesis protectores para los negativos y las unidades a la vista.
+ * Los puntos P₁ y P₂ se arrastran directamente sobre el gráfico (o con teclado / sliders).
+ * Los manejadores SVG viven en una capa persistente para conservar foco durante keydown.
  */
 import { h, s, mount, byId, on } from '../../core/dom.js';
 import { fmt, paren, frac } from '../../core/math-format.js';
 import { createPlane, bindSvgDrag } from '../../core/plot.js';
+import { createPredictBox } from '../../core/board-kit.js';
+import { computeSecantTcp } from './logic.js';
+import { CHECKS_DATA, createCheckBlock } from './checks.js';
+import { recordFnPrediction } from './learning-adapter.js';
 
 const CONTEXTS = [
   {
@@ -46,6 +49,7 @@ export function initSecante(container) {
   let dragTarget = null;
 
   mount(container,
+    h('div', { id: 'sec-poe', class: 'fn-poe-host' }),
     h('div', { class: 'panel' },
       h('div', { class: 'row' },
         h('label', { for: 'sec-ctx', class: 'label-sm' }, 'Contexto'),
@@ -64,7 +68,7 @@ export function initSecante(container) {
     h('div', { class: 'fn-grid' },
       h('div', { class: 'fn-canvas-card' },
         s('svg', { id: 'sec-svg', class: 'plot', viewBox: '0 0 600 380', role: 'img', 'aria-label': 'Curva con recta secante y triángulo de incrementos; arrastrá P₁ o P₂' }),
-        h('p', { class: 'fn-hint' }, 'Tip: agarrá P₁ o P₂ y arrastralos sobre el gráfico. Se mueve el que esté más cerca de tu dedo o del mouse.'),
+        h('p', { class: 'fn-hint' }, 'Tip: agarrá P₁ o P₂ y arrastralos sobre el gráfico, o enfocalos y usá las flechas del teclado.'),
       ),
       h('div', { class: 'fn-side' },
         h('p', { id: 'sec-rule', class: 'muted small' }),
@@ -72,14 +76,39 @@ export function initSecante(container) {
         h('div', { id: 'sec-verdict', class: 'notice', 'aria-live': 'polite' }),
       ),
     ),
+    h('section', { class: 'fn-checks-section', 'aria-label': 'Chequeos de Tasa de Cambio Promedio' },
+      h('h3', null, 'Chequeos: Tasa de Cambio Promedio (TCP)'),
+      h('div', { id: 'sec-checks' }),
+    ),
   );
 
   const el = {
+    poe: byId('sec-poe', container),
     ctx: byId('sec-ctx', container), r1: byId('sec-x1', container), r2: byId('sec-x2', container),
     v1: byId('sec-x1-val', container), v2: byId('sec-x2-val', container), zero: byId('sec-zero-btn', container),
     svg: byId('sec-svg', container), math: byId('sec-math', container), verdict: byId('sec-verdict', container),
     rule: byId('sec-rule', container),
+    checks: byId('sec-checks', container),
   };
+
+  // Manejadores persistentes (nunca se destruyen al re-renderizar o cambiar contexto)
+  const handleP1 = s('circle', {
+    r: 20,
+    class: 'fn-handle',
+    tabindex: '0',
+    role: 'slider',
+    'aria-label': 'Punto P₁ de la recta secante',
+    'data-handle': 'p1',
+  });
+  const handleP2 = s('circle', {
+    r: 20,
+    class: 'fn-handle',
+    tabindex: '0',
+    role: 'slider',
+    'aria-label': 'Punto P₂ de la recta secante',
+    'data-handle': 'p2',
+  });
+  const handlesLayer = s('g', { class: 'plot-layer plot-layer--handles' }, handleP1, handleP2);
 
   let plane = null;
   function buildPlane() {
@@ -90,6 +119,7 @@ export function initSecante(container) {
       yStep: c.yStep, xLabel: c.xLabel, yLabel: c.yLabel,
     });
     plane.layers.curve.append(s('path', { d: plane.fnPath(c.fn, c.xMin, c.xMax, { samples: 200 }), class: 'plot-curve curve-anim', pathLength: '1' }));
+    el.svg.append(handlesLayer);
   }
 
   function setPoint(which, x) {
@@ -98,9 +128,68 @@ export function initSecante(container) {
     render();
   }
 
+  const bindHandleKeys = (handleEl, which) => {
+    handleEl.addEventListener('keydown', (e) => {
+      if (!['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const c = CONTEXTS[state.ctxIdx];
+      const step = e.shiftKey ? 0.5 : 0.1;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') setPoint(which, state[which] + step);
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') setPoint(which, state[which] - step);
+      else if (e.key === 'Home') setPoint(which, c.xMin);
+      else if (e.key === 'End') setPoint(which, c.xMax);
+    });
+  };
+  bindHandleKeys(handleP1, 'x1');
+  bindHandleKeys(handleP2, 'x2');
+
+  let poePredicted = false;
+  if (el.poe) {
+    const poeBox = createPredictBox({
+      prompt: 'Si la temperatura sube de 24 °C (t = 2 h) hasta 26 °C y luego vuelve a 24 °C (t = 6 h), ¿cuánto vale la TCP entre t = 2 h y t = 6 h?',
+      classPrefix: 'fn',
+      optionClass: 'chip chip--ghost pr-chip',
+      options: [
+        {
+          label: 'A) Positiva, porque en el medio alcanzó 26 °C',
+          correct: false,
+          explanation: 'La TCP solo compara el inicio y el final (f(6) − f(2) = 0); no mide el pico intermedio.',
+        },
+        {
+          label: 'B) Cero (0 °C/h), porque el cambio neto ΔT es 0',
+          correct: true,
+          explanation: 'Exacto: aunque en el medio subió y bajó, ΔT = 24 − 24 = 0, por lo que la secante es horizontal y TCP = 0.',
+        },
+      ],
+      onVerify: () => {
+        [state.x1, state.x2] = CONTEXTS[state.ctxIdx].zeroPair;
+        render();
+      },
+    });
+    poeBox.addEventListener('click', (evt) => {
+      if (evt.target?.closest?.('.fn-predict-options button') && !poePredicted) {
+        poePredicted = true;
+        recordFnPrediction({
+          exerciseId: 'fn-poe-secante',
+          competencyId: 'functions.average_rate_of_change',
+          representation: 'graphical',
+        });
+      }
+    });
+    mount(el.poe, poeBox);
+  }
+
+  createCheckBlock(
+    el.checks,
+    CHECKS_DATA.filter((q) => q.sectionId === 'panel-secante'),
+    'panel-secante',
+  );
+
   /* ---------- Render ---------- */
-  function renderMath(c, x1, x2, y1, y2, dx, dy) {
-    if (Math.abs(dx) < 1e-9) {
+  function renderMath(c, x1, x2, y1, y2, tcpRes) {
+    const { dx, dy, tcp, defined, zeroRate } = tcpRes;
+    if (!defined) {
       mount(el.math, h('strong', null, 'Separá los dos instantes'), ': con x₁ = x₂ no hay "puente" que trazar.');
       el.verdict.className = 'notice notice--err';
       mount(el.verdict,
@@ -108,7 +197,6 @@ export function initSecante(container) {
         `Si los dos puntos coinciden, Δx = 0 ${c.xUnit} y la fracción quedaría con un 0 en el denominador, que no está definido. Hacen falta dos instantes distintos para medir un cambio.`);
       return;
     }
-    const tcp = dy / dx;
     const row1 = h('div', { class: 'tcp-row' },
       h('span', { class: 'math' }, 'TCP'), ' = ',
       frac('f(x₂) − f(x₁)', 'x₂ − x₁'),
@@ -126,7 +214,7 @@ export function initSecante(container) {
       ? h('p', { class: 'muted small' }, 'Pusiste x₁ después de x₂. No pasa nada: el numerador y el denominador cambian de signo juntos, y la TCP da exactamente lo mismo.')
       : null;
 
-    if (Math.abs(dy) < 1e-9) {
+    if (zeroRate) {
       el.verdict.className = 'notice notice--warn';
       mount(el.verdict,
         h('strong', null, 'Tasa cero, aunque en el medio pasaron cosas. '),
@@ -153,7 +241,9 @@ export function initSecante(container) {
   function render() {
     const c = CONTEXTS[state.ctxIdx];
     const { x1, x2 } = state;
-    const y1 = c.fn(x1), y2 = c.fn(x2), dx = x2 - x1, dy = y2 - y1;
+    const y1 = c.fn(x1), y2 = c.fn(x2);
+    const tcpRes = computeSecantTcp(c.fn, x1, x2);
+    const { dx, dy } = tcpRes;
 
     el.ctx.value = String(state.ctxIdx);
     el.r1.value = String(x1);
@@ -165,42 +255,50 @@ export function initSecante(container) {
     plane.clear('under', 'marks', 'labels');
     const { under, marks, labels } = plane.layers;
 
-    if (Math.abs(dx) > 1e-9) {
+    if (tcpRes.defined) {
       const m = dy / dx, sec = (x) => y1 + m * (x - x1);
       under.append(s('path', { d: plane.linePath([[c.xMin, sec(c.xMin)], [c.xMax, sec(c.xMax)]]), class: 'fn-secant' }));
       marks.append(
         s('line', { x1: plane.sx(x1), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y1), class: 'fn-triangle-dx' }),
         s('line', { x1: plane.sx(x2), y1: plane.sy(y1), x2: plane.sx(x2), y2: plane.sy(y2), class: 'fn-triangle-dy' }),
       );
-      const midY = (c.yMin + c.yMax) / 2, rightSide = x2 >= (c.xMin + c.xMax) / 2;
       labels.append(
         s('text', {
-          x: plane.sx(3.2), y: plane.sy(y1) - 12,
+          x: plane.sx((x1 + x2) / 2), y: plane.sy(y1) - 12,
           class: 'plot-label', 'text-anchor': 'middle', fill: 'var(--ink)',
         }, `Δx = ${fmt(dx)} ${c.xUnit}`),
         s('text', {
-          x: plane.sx(x2) + 14, y: plane.sy(22.2),
+          x: plane.sx(x2) + 14, y: plane.sy((y1 + y2) / 2),
           class: 'plot-label', 'text-anchor': 'start', fill: 'var(--ink)',
         }, `Δy = ${fmt(dy)} ${c.yUnit}`),
       );
     }
 
-    [[x1, y1, 'P₁', 'p1', 'var(--blue)'], [x2, y2, 'P₂', 'p2', 'var(--blue)']].forEach(([x, y, name, key, color]) => {
+    const updateHandle = (handleNode, x, y, name, key) => {
       const cx = plane.sx(x), cy = plane.sy(y);
       const rot = key === 'p1' ? 12 : -15;
       marks.append(
         s('ellipse', { cx, cy, rx: 13.5, ry: 12.5, class: `fn-handle-ring fn-handle-ring--${key}`, transform: `rotate(${rot} ${cx} ${cy})` }),
-        s('ellipse', { cx, cy, rx: 7.2, ry: 6.8, fill: color, stroke: 'var(--card)', 'stroke-width': 2, transform: `rotate(${rot} ${cx} ${cy})` }),
-        s('circle', { cx, cy, r: 20, class: 'fn-handle' }),
+        s('ellipse', { cx, cy, rx: 7.2, ry: 6.8, fill: 'var(--blue)', stroke: 'var(--card)', 'stroke-width': 2, transform: `rotate(${rot} ${cx} ${cy})`, style: 'pointer-events: none;' }),
       );
+      handleNode.setAttribute('cx', String(cx));
+      handleNode.setAttribute('cy', String(cy));
+      handleNode.setAttribute('aria-valuemin', String(c.xMin));
+      handleNode.setAttribute('aria-valuemax', String(c.xMax));
+      handleNode.setAttribute('aria-valuenow', String(x));
+      handleNode.setAttribute('aria-valuetext', `${name}: x = ${fmt(x)}, y = ${fmt(y)}`);
+
       const isP1 = key === 'p1';
       const labelX = isP1 ? cx + 16 : cx - 14;
       const labelY = isP1 ? cy + 28 : cy - 14;
       const anchor = isP1 ? 'start' : 'end';
       labels.append(s('text', { x: labelX, y: labelY, class: 'plot-label', 'text-anchor': anchor }, `${name}(${fmt(x)}; ${fmt(y)})`));
-    });
+    };
 
-    renderMath(c, x1, x2, y1, y2, dx, dy);
+    updateHandle(handleP1, x1, y1, 'P₁', 'p1');
+    updateHandle(handleP2, x2, y2, 'P₂', 'p2');
+
+    renderMath(c, x1, x2, y1, y2, tcpRes);
   }
 
   /* ---------- Eventos ---------- */

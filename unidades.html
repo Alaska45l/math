@@ -39,6 +39,10 @@
       </div>
     </div>
     <p id="dim-error" class="form-error" aria-live="polite"></p>
+    <div id="poe-box" class="dim-poe-box" hidden>
+      <p id="poe-feedback" class="dim-poe-feedback" aria-live="polite"></p>
+      <button type="button" id="poe-verify" class="chip" hidden>Formalizar observación</button>
+    </div>
 
     <div id="goal" class="notice"></div>
 
@@ -71,6 +75,21 @@
 
     <h2>Registro de pasos</h2>
     <ol id="log" class="steps"></ol>
+
+    <section id="dim-checks" class="dim-section" aria-label="Chequeos graduales de análisis dimensional">
+      <h2>Chequeos graduales de Exactas</h2>
+      <p class="muted small">Usá coma decimal o punto (por ejemplo <code>0,6</code> o <code>2500</code>).</p>
+      <div id="sec-neutro" class="dim-check-group">
+        <h3>1. Factores unitarios y neutro multiplicativo</h3>
+        <div id="dim-checks-neutro"></div>
+      </div>
+      <div id="sec-compuestas" class="dim-check-group">
+        <h3>2. Tasas compuestas y potencias dimensionales</h3>
+        <div id="dim-checks-compuestas"></div>
+      </div>
+    </section>
+
+    <section id="dim-dashboard" class="learning-dashboard-host" aria-label="Mapa de competencias y atlas de errores"></section>
   </main>
 </body>
 
