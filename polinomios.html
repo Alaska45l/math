@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 06: Polinomios — estructura, operaciones, división euclídea, regla de Ruffini (mónica y ax - b), teorema del resto, factorización, teorema de Gauss y modelado."
+    />
+    <title>Polinomios · Unidad 06 · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/polinomios.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/polinomios/index.js"></script>
+  </head>
+  <body data-page="polinomios">
+    <header data-site-nav="polinomios"></header>
+    <main class="page page--wide seq-page poly-page">
+      <header class="page-header">
+        <h1>Polinomios, División y Factorización</h1>
+        <p class="intro">
+          Unidad 06 · Estructura algebraica exacta, algoritmo de división, regla de Ruffini,
+          teorema del resto, seis métodos de factorización, teorema de Gauss y modelado.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 06 · Polinomios</h2>
+          <p class="muted small" id="seq-progress-text">0/7 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Estructura y Operaciones</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-1" data-sec="sec-1">
+                <span>1 · Estructura, Grado e Igualdad</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2">
+                <span>2 · Operaciones y Leyes del Grado</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · División y Ruffini</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3">
+                <span>3 · División Euclídea</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4">
+                <span>4 · Ruffini y Teorema del Resto</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Factorización y Gauss</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-5" data-sec="sec-5">
+                <span>5 · Factorización y Multiplicidad</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6">
+                <span>6 · Teorema de Gauss</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 4 · Modelado y Práctica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-7" data-sec="sec-7">
+                <span>7 · Parámetros y Volúmenes</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso y Competencias</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="poly-hero">
+            <p class="poly-kicker">Unidad 06 · Programa de Ingreso FCEyN UNMDP</p>
+            <h1>Polinomios: de la Estructura Exacta a las Raíces Reales</h1>
+            <p>
+              Construimos el álgebra de polinomios sin recetas ciegas: qué hace que una expresión sea
+              un polinomio, cómo se comportan los grados al operar y dividir, por qué funciona la regla de
+              Ruffini incluso frente a divisores no mónicos y cómo encadenar Gauss con los métodos clásicos
+              de factorización.
+            </p>
+          </section>
+
+          <!-- SECCIÓN 1 -->
+          <section class="seq-section is-active" id="sec-1">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 7</div>
+              <h2 class="seq-section__title">1. Definición, Grado, Polinomio Nulo e Igualdad</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Un <strong>polinomio</strong> en la indeterminada <span class="eq">x</span> es una expresión de la forma
+                <span class="eq">P(x) = a<sub>n</sub>x<sup>n</sup> + ... + a<sub>2</sub>x<sup>2</sup> + a<sub>1</sub>x + a<sub>0</sub></span>,
+                donde todos los exponentes <span class="eq">n</span> son enteros no negativos (<span class="eq">0, 1, 2, ...</span>)
+                y los coeficientes <span class="eq">a<sub>k</sub></span> son números reales.
+                Si aparece <span class="eq">x</span> en un denominador, con exponente negativo o bajo una raíz, la expresión
+                <strong>no es un polinomio</strong>.
+              </p>
+
+              <div data-poly-formula="2x^4 - 3x^2 + 1/2 x - 2"></div>
+
+              <div class="poly-step-box">
+                <h4>Propiedades estructurales clave</h4>
+                <p>
+                  <strong>Grado gr(P):</strong> mayor exponente de <span class="eq">x</span> con coeficiente distinto de cero.
+                  <strong>Polinomio nulo P(x) = 0:</strong> todos sus coeficientes son cero y <strong>no tiene grado</strong>.
+                  <strong>Mónico:</strong> su coeficiente principal vale <span class="eq">1</span>.
+                  <strong>Igualdad y opuestos:</strong> dos polinomios son iguales si y solo si coinciden término a término; son opuestos si sus coeficientes semejantes son opuestos.
+                </p>
+              </div>
+
+              <div class="poly-contrast-box">
+                <h4>Desafío de contraste · Polinomio vs. No-polinomio</h4>
+                <p>
+                  Compará <span class="eq">5x<sup>3</sup> &minus; 2x + 1</span> (polinomio de grado 3) frente a
+                  <span class="eq">5 / (3x &minus; 1)</span> (expresión racional con <span class="eq">x</span> en el divisor) y
+                  <span class="eq">&radic;x + 2</span> (exponente fraccionario <span class="eq">x<sup>1/2</sup></span>).
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec1">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec1-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="inspector-polinomios"></div>
+            <div data-check="sec-1"></div>
+          </section>
+
+          <!-- SECCIÓN 2 -->
+          <section class="seq-section" id="sec-2">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 7</div>
+              <h2 class="seq-section__title">2. Suma, Resta, Producto y Leyes del Grado</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Para sumar o restar polinomios se operan únicamente los coeficientes de términos semejantes (misma potencia de <span class="eq">x</span>).
+                En la resta <span class="eq">P(x) &minus; Q(x)</span>, el signo menos invierte el signo de <strong>todos</strong> los términos de <span class="eq">Q(x)</span>.
+                Al multiplicar <span class="eq">P(x) &middot; Q(x)</span> se aplica propiedad distributiva sumando los exponentes de cada par de monomios.
+              </p>
+
+              <div class="poly-step-box">
+                <h4>Leyes del grado</h4>
+                <p>
+                  <strong>Suma y resta:</strong> <span class="eq">gr(P + Q) &le; máx(gr(P); gr(Q))</span> (el grado baja cuando se cancelan los términos principales opuestos).
+                  <br />
+                  <strong>Producto (no nulos):</strong> <span class="eq">gr(P &middot; Q) = gr(P) + gr(Q)</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec2">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec2-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="constructor-algebraico"></div>
+            <div data-check="sec-2"></div>
+          </section>
+
+          <!-- SECCIÓN 3 -->
+          <section class="seq-section" id="sec-3">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 3 de 7</div>
+              <h2 class="seq-section__title">3. Algoritmo de la División y Divisibilidad</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Dados <span class="eq">P(x)</span> y <span class="eq">Q(x) &ne; 0</span> con <span class="eq">gr(P) &ge; gr(Q)</span>,
+                existen únicos polinomios cociente <span class="eq">C(x)</span> y resto <span class="eq">R(x)</span> tales que:
+                <span class="eq">P(x) = Q(x) &middot; C(x) + R(x)</span>, con <span class="eq">R(x) = 0</span> o <span class="eq">gr(R) &lt; gr(Q)</span>.
+              </p>
+
+              <div class="poly-step-box">
+                <h4>Equivalencias de divisibilidad exacta</h4>
+                <p>
+                  <span class="eq">R(x) = 0 &hArr; P(x)</span> es divisible por <span class="eq">Q(x) &hArr; P(x)</span> es múltiplo de <span class="eq">Q(x) &hArr; Q(x)</span> es divisor de <span class="eq">P(x)</span>.
+                  Cuando <span class="eq">gr(P) &ge; gr(Q)</span>, se cumple <span class="eq">gr(P : Q) = gr(P) &minus; gr(Q)</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec3">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec3-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="division-polinomica"></div>
+            <div data-check="sec-3"></div>
+          </section>
+
+          <!-- SECCIÓN 4 -->
+          <section class="seq-section" id="sec-4">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 7</div>
+              <h2 class="seq-section__title">4. Regla de Ruffini (Mónica y ax − b) y Teorema del Resto</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Cuando el divisor es lineal de la forma <span class="eq">(x &minus; a)</span>, la <strong>Regla de Ruffini</strong>
+                condensa la división trabajando solo con los coeficientes de <span class="eq">P(x)</span> <strong>completo y ordenado en forma decreciente</strong>.
+                Si el divisor es <span class="eq">(ax &minus; b)</span> con <span class="eq">a &ne; 1</span> (por ejemplo <span class="eq">3x + 1</span>), aplicamos Ruffini con
+                <span class="eq">r = b/a</span>: el resto es exacto, pero el cociente de la tabla debe dividirse por <span class="eq">a</span>.
+              </p>
+
+              <div class="poly-contrast-box">
+                <h4>Desafío de contraste · Signo y reescalado</h4>
+                <p>
+                  Dividir por <span class="eq">(x &minus; 2)</span> usa <span class="eq">+2</span>; dividir por <span class="eq">(x + 2)</span> usa <span class="eq">&minus;2</span>;
+                  dividir por <span class="eq">(3x + 1)</span> usa <span class="eq">&minus;1/3</span> y luego divide el cociente <span class="eq">C<sub>0</sub>(x)</span> por <span class="eq">3</span>.
+                  En todos los casos, por el <strong>Teorema del Resto</strong>, <span class="eq">R = P(r)</span>, y <span class="eq">r</span> es raíz si y solo si <span class="eq">R = 0</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec4">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec4-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="laboratorio-ruffini"></div>
+            <div data-check="sec-4"></div>
+          </section>
+
+          <!-- SECCIÓN 5 -->
+          <section class="seq-section" id="sec-5">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 5 de 7</div>
+              <h2 class="seq-section__title">5. Factorización en Factores Primos, los 6 Métodos y Multiplicidad</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Factorizar un polinomio sobre <span class="eq">&Ropf;</span> consiste en expresarlo como producto de su
+                <strong>coeficiente principal</strong> <span class="eq">a<sub>n</sub></span> por <strong>polinomios mónicos primos (irreducibles)</strong>:
+                factores lineales <span class="eq">(x &minus; r)</span> y factores cuadráticos sin raíces reales (<span class="eq">&Delta; &lt; 0</span>).
+                Un polinomio de grado <span class="eq">n</span> posee a lo sumo <span class="eq">n</span> raíces reales contadas con su multiplicidad.
+              </p>
+
+              <div class="poly-step-box">
+                <h4>Los 6 métodos clásicos de factorización</h4>
+                <p>
+                  1. <strong>Factor común</strong> (<span class="eq">2x<sup>3</sup> + 4x<sup>2</sup> + 6x = 2x(x<sup>2</sup> + 2x + 3)</span>).
+                  2. <strong>Factor común por grupos</strong>.
+                  3. <strong>Diferencia de cuadrados</strong> (<span class="eq">u<sup>2</sup> &minus; v<sup>2</sup> = (u &minus; v)(u + v)</span>).
+                  4. <strong>Trinomio de 2.° grado vía resolvente</strong> (<span class="eq">a(x &minus; x<sub>1</sub>)(x &minus; x<sub>2</sub>)</span>).
+                  5. <strong>Trinomio cuadrado perfecto</strong> (<span class="eq">(a &plusmn; b)<sup>2</sup></span>).
+                  6. <strong>Cuatrinomio cubo perfecto</strong> (<span class="eq">a<sup>3</sup> &plusmn; 3a<sup>2</sup>b + 3ab<sup>2</sup> &plusmn; b<sup>3</sup> = (a &plusmn; b)<sup>3</sup></span>).
+                </p>
+              </div>
+
+              <div class="poly-caution-box">
+                <strong>Límite curricular:</strong> El programa oficial de ingreso trabaja la multiplicidad únicamente en forma
+                <strong>algebraica</strong> (factores repetidos doble o triple). El conmutador de trazo cartesiano incluido abajo en el tablero
+                es una <strong>ampliación didáctica opcional fuera del programa</strong> (no se exige graficar curvas de grado &ge; 3 ni analizar sus conjuntos de positividad).
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec5">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec5-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="detector-raices"></div>
+            <div data-check="sec-5"></div>
+          </section>
+
+          <!-- SECCIÓN 6 -->
+          <section class="seq-section" id="sec-6">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 6 de 7</div>
+              <h2 class="seq-section__title">6. Teorema de Gauss y Cadena de Raíces Reales</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Si un polinomio <span class="eq">P(x)</span> tiene <strong>coeficientes enteros</strong> y término independiente
+                <span class="eq">a<sub>0</sub> &ne; 0</span>, toda raíz racional irreducible <span class="eq">p/q</span> cumple
+                que <span class="eq">p</span> divide a <span class="eq">a<sub>0</sub></span> y <span class="eq">q</span> divide a
+                <span class="eq">a<sub>n</sub></span>. Si <span class="eq">a<sub>0</sub> = 0</span>, primero extraemos <span class="eq">x<sup>k</sup></span>
+                de factor común y luego aplicamos Gauss al polinomio reducido.
+              </p>
+
+              <div class="poly-fading-box">
+                <h4>Ejemplo guiado con desvanecimiento gradual (fading)</h4>
+                <div class="poly-fading-stage">
+                  <strong>1. Ejemplo completo:</strong> Factorizar <span class="eq">P(x) = 3x<sup>4</sup> &minus; x<sup>3</sup> &minus; 6x<sup>2</sup> + 2x</span>.
+                  Sacamos factor común <span class="eq">x</span> &rarr; <span class="eq">x(3x<sup>3</sup> &minus; x<sup>2</sup> &minus; 6x + 2)</span>.
+                  Con Gauss hallamos <span class="eq">r = 1/3</span> y queda <span class="eq">3x(x &minus; 1/3)(x<sup>2</sup> &minus; 2) = 3x(x &minus; 1/3)(x &minus; &radic;2)(x + &radic;2)</span>.
+                </div>
+                <div class="poly-fading-stage">
+                  <strong>2. Completar el paso:</strong> En <span class="eq">2x<sup>4</sup> &minus; x<sup>3</sup> &minus; 15x<sup>2</sup> + 7x + 7</span>,
+                  <span class="eq">p | 7</span> y <span class="eq">q | 2</span>. Probá <span class="eq">r = &minus;1/2</span> y <span class="eq">r = 1</span> por Ruffini hasta llegar a <span class="eq">2(x<sup>2</sup> &minus; 7)</span>.
+                </div>
+                <div class="poly-fading-stage">
+                  <strong>3. Esqueleto guiado:</strong> Si falta <span class="eq">a<sub>0</sub></span>, sacá <span class="eq">x<sup>k</sup></span> &rarr; armá candidatos <span class="eq">&plusmn;p/q</span> &rarr; bajá grados por Ruffini &rarr; cerrá el resto cuadrático con resolvente.
+                </div>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec6">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec6-base">Base desde cero</button>
+            </div>
+
+            <div data-widget="explorador-gauss"></div>
+            <div data-check="sec-6"></div>
+          </section>
+
+          <!-- SECCIÓN 7 -->
+          <section class="seq-section" id="sec-7">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 4 · Pizarrón 7 de 7</div>
+              <h2 class="seq-section__title">7. Reconstrucción, Parámetros y Modelado de Volúmenes</h2>
+            </header>
+
+            <div class="poly-prose">
+              <p>
+                Cuando conocemos las raíces de un polinomio de grado <span class="eq">n</span> con sus multiplicidades,
+                su estructura queda determinada salvo el coeficiente principal <span class="eq">a<sub>n</sub></span>. Un dato adicional
+                (como <span class="eq">P(1) = 3</span>) fija un polinomio único; si faltan raíces, quedan infinitos polinomios posibles.
+              </p>
+
+              <div class="poly-contrast-box">
+                <h4>Desafío de contraste · Polinomio único vs. Infinitos polinomios</h4>
+                <p>
+                  Con 3 raíces dadas (<span class="eq">2, &minus;1, 4</span>) y <span class="eq">P(1) = 3</span> existe un
+                  <strong>único</strong> polinomio cúbico (<span class="eq">a = 1/2</span>). En cambio, si solo se pide
+                  <span class="eq">P(0) = P(5) = 0</span> y <span class="eq">P(&minus;1) = 12</span> para grado 3, queda un factor lineal
+                  libre <span class="eq">(x &minus; c)</span> y existen <strong>infinitos</strong> polinomios que cumplen las condiciones.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="chip vn-trigger-btn" data-vn-trigger="sec7">Consultar a Alaska</button>
+              <button type="button" class="chip chip--ghost vn-trigger-btn" data-vn-trigger="sec7-base">Base desde cero</button>
+            </div>
+
+            <div data-check="sec-7"></div>
+          </section>
+
+          <!-- ENTRENADOR Y TRAMPAS -->
+          <section class="seq-section" id="sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Práctica Activa</div>
+              <h2 class="seq-section__title">Entrenador Generativo (6 Familias) y 5 Trampas de Examen</h2>
+            </header>
+            <div id="poly-challenges"></div>
+          </section>
+
+          <!-- REPASO Y DASHBOARD -->
+          <section class="seq-section" id="sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis y Evidencia</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible y Mapa de Competencias</h2>
+            </header>
+
+            <div id="poly-competency-dashboard"></div>
+
+            <div class="poly-widget__actions">
+              <button type="button" class="pr-btn" data-print-sheet="true">Imprimir hoja de repaso</button>
+            </div>
+
+            <div class="poly-cheat-grid">
+              <article class="poly-cheat-card">
+                <h3>1. Estructura y Grados</h3>
+                <p>Polinomio nulo <span class="eq">P(x) = 0</span> no tiene grado. <span class="eq">gr(P+Q) &le; máx(gr(P); gr(Q))</span> y <span class="eq">gr(P&middot;Q) = gr(P)+gr(Q)</span>.</p>
+              </article>
+              <article class="poly-cheat-card">
+                <h3>2. Ruffini y Resto</h3>
+                <p>Completar ceros faltantes. Para <span class="eq">(ax &minus; b)</span> usar <span class="eq">r = b/a</span>, dividir el cociente por <span class="eq">a</span> y conservar <span class="eq">R = P(b/a)</span>.</p>
+              </article>
+              <article class="poly-cheat-card">
+                <h3>3. Factorización y Gauss</h3>
+                <p>No olvidar <span class="eq">a<sub>n</sub></span> adelante. Si <span class="eq">a<sub>0</sub> = 0</span> sacar <span class="eq">x<sup>k</sup></span> primero; luego probar <span class="eq">&plusmn;p/q</span> con <span class="eq">p | a<sub>0</sub></span> y <span class="eq">q | a<sub>n</sub></span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

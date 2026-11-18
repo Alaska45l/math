@@ -1,0 +1,311 @@
+/**
+ * css/modules/jefes.css — Estilos autocontenidos para Evaluadores Integradores (Jefe Integrador 1 y Simulacro Global).
+ * Responsivo 320-1440px, cero saltos de layout.
+ */
+
+:root {
+  --accent: var(--yellow);
+  --border: var(--line, rgba(236, 242, 232, 0.28));
+  --panel: var(--surface, #1b1f23);
+  --text: var(--ink, #ecf2e8);
+  --text-muted: var(--muted, #a7b8ae);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.boss-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 18px 64px;
+  box-sizing: border-box;
+}
+
+.boss-hero {
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line, var(--border));
+}
+
+.boss-kicker {
+  margin: 0;
+  color: var(--yellow);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.boss-hero h1 {
+  margin: 0.2em 0;
+  font-family: var(--font-hand);
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--ink);
+}
+
+.boss-encounter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.boss-phase-stepper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.boss-phase-pill {
+  padding: 8px 10px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.boss-phase-pill.is-active {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: rgba(230, 211, 138, 0.12);
+}
+
+.boss-phase-pill.is-indep {
+  border-bottom: 3px solid var(--green);
+}
+
+.boss-phase-pill.is-assisted {
+  border-bottom: 3px solid var(--yellow);
+}
+
+.boss-phase-card,
+.boss-debrief-card {
+  padding: 20px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(11, 14, 16, 0.68);
+}
+
+.boss-phase-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.boss-encounter-tag {
+  font-size: 0.82rem;
+  color: var(--blue);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.boss-phase-title {
+  margin: 4px 0 0;
+  font-family: var(--font-hand);
+  font-size: 1.6rem;
+  color: var(--yellow);
+}
+
+.boss-evidence-pill {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+.boss-evidence-pill.is-assisted {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.boss-phase-prompt {
+  font-size: 1.08rem;
+  line-height: 1.55;
+  margin: 12px 0 16px;
+}
+
+.boss-hints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.boss-hint-item {
+  padding: 8px 12px;
+  border-left: 3px solid var(--blue);
+  background: rgba(74, 144, 226, 0.08);
+  font-size: 0.92rem;
+}
+
+.boss-debrief-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.boss-kpi {
+  padding: 14px;
+  border: 1px solid var(--line, var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.boss-kpi strong {
+  font-size: 1.75rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.boss-kpi.is-indep {
+  border-left: 3px solid var(--green);
+}
+
+.boss-kpi.is-assisted {
+  border-left: 3px solid var(--yellow);
+}
+
+.boss-kpi.is-pending {
+  border-left: 3px solid var(--muted);
+}
+
+.boss-debrief-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.boss-debrief-col {
+  padding: 14px;
+  border: 1px solid var(--line, var(--border));
+}
+
+.boss-repair-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line, var(--border));
+}
+
+.pr-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pr-chip,
+.pr-btn,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  min-height: 36px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--surface, #1b1f23);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pr-chip.is-active,
+.chip.is-active,
+.pr-btn:not(.pr-btn-secondary) {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: rgba(230, 211, 138, 0.12);
+}
+
+.pr-check-input {
+  min-width: 0;
+  flex: 1 1 220px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+.pr-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pr-option {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--surface, #1b1f23);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pr-option.is-correct {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.pr-check-feedback {
+  margin-top: 12px;
+  font-size: 0.94rem;
+}
+
+.pr-check-feedback.is-ok {
+  color: var(--green);
+}
+
+.pr-check-feedback.is-warn {
+  color: var(--yellow);
+}
+
+@media (max-width: 480px) {
+  .boss-page {
+    padding: 14px 12px 48px;
+  }
+
+  .boss-phase-card,
+  .boss-debrief-card {
+    padding: 14px;
+    min-width: 0;
+  }
+
+  .boss-phase-stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pr-options,
+  .boss-debrief-lists {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.boss-phase-meta,
+.boss-phase-prompt,
+.boss-hint-item,
+.boss-debrief-col li {
+  overflow-wrap: anywhere;
+}
+
+.boss-encounter-bar .chip,
+.boss-phase-card .pr-option {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}

@@ -1,0 +1,813 @@
+/**
+ * css/modules/polinomios.css — Estilos autocontenidos para Unidad 06: Polinomios.
+ * Sin bordes redondeados excesivos y sin desborde horizontal (320-1440px).
+ */
+
+:root {
+  --accent: var(--yellow);
+  --border: var(--line, rgba(236, 242, 232, 0.28));
+  --panel: var(--surface, #1b1f23);
+  --text: var(--ink, #ecf2e8);
+  --text-muted: var(--muted, #a7b8ae);
+  --orange: #f4a261;
+  --purple: #c3a6ff;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.poly-page {
+  --poly-nav-h: 56px;
+  --poly-sidebar-w: 256px;
+}
+
+.poly-page.page--wide {
+  width: 88%;
+  max-width: none;
+  padding-inline: 0;
+}
+
+.poly-page.page--wide > .page-header {
+  display: none;
+}
+
+.poly-page .seq-layout {
+  display: block;
+  width: auto;
+  max-width: none;
+  margin: 24px 24px 0 calc(var(--poly-sidebar-w) + 24px);
+  padding: 0 0 64px;
+  box-sizing: border-box;
+  transition: margin-left 220ms ease;
+}
+
+.poly-page .seq-sidebar {
+  position: fixed;
+  z-index: 8;
+  top: var(--poly-nav-h);
+  left: 0;
+  width: var(--poly-sidebar-w);
+  height: calc(100vh - var(--poly-nav-h));
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 16px 28px;
+  background: color-mix(in srgb, var(--bg) 96%, var(--surface));
+  border-right: 1px solid var(--line, var(--border));
+  transition: transform 220ms ease;
+}
+
+.poly-page.is-sidebar-collapsed .seq-layout {
+  margin-left: 24px;
+}
+
+.poly-page.is-sidebar-collapsed .seq-sidebar {
+  transform: translateX(calc(-1 * var(--poly-sidebar-w)));
+}
+
+.poly-page .seq-sidebar__title {
+  margin: 0 0 8px;
+  color: var(--yellow);
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+}
+
+.poly-page .seq-sidebar__chapter {
+  margin: 14px 0 6px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.poly-page .seq-sidebar__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.poly-page .seq-sidebar__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.poly-page .seq-sidebar__link:hover,
+.poly-page .seq-sidebar__link.is-active {
+  background: color-mix(in srgb, var(--yellow) 16%, transparent);
+  color: var(--yellow);
+}
+
+.poly-page .seq-sidebar__status.is-done {
+  color: var(--green);
+}
+
+.poly-page .seq-blackboard-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--bg);
+}
+
+.poly-page .seq-blackboard-toolbar__info {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.poly-page .seq-blackboard-toolbar__badge {
+  color: var(--yellow);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.poly-page .poly-hero {
+  margin-bottom: 26px;
+  padding: 14px 0 24px;
+  border-bottom: 1px solid var(--line, var(--border));
+}
+
+.poly-page .poly-kicker {
+  margin: 0;
+  color: var(--yellow);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.poly-page .poly-hero h1 {
+  margin: 0.2em 0;
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+}
+
+.poly-page .seq-content.mode-blackboard .seq-section:not(.is-active),
+.poly-page .seq-content.mode-blackboard #sec-retos:not(.is-active),
+.poly-page .seq-content.mode-blackboard #sec-repaso:not(.is-active) {
+  display: none;
+}
+
+.poly-page .seq-section {
+  min-width: 0;
+  padding-top: 12px;
+  margin-bottom: 36px;
+}
+
+.poly-page .seq-section__tag {
+  color: var(--yellow);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.poly-page .seq-section__title {
+  margin: 6px 0 14px;
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: clamp(1.6rem, 3.1vw, 2.25rem);
+}
+
+/* Bloques de lectura y ejemplos con fading */
+.poly-prose p {
+  max-width: 82ch;
+  line-height: 1.68;
+}
+
+.poly-step-box,
+.poly-fading-box,
+.poly-contrast-box {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--yellow);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.poly-fading-box {
+  border-left-color: var(--blue);
+}
+
+.poly-contrast-box {
+  border-left-color: var(--pink);
+}
+
+.poly-fading-stage {
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(236, 242, 232, 0.16);
+}
+
+.poly-fading-stage:last-child {
+  border-bottom: none;
+}
+
+.poly-caution-box {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--pink);
+  background: rgba(235, 120, 100, 0.06);
+}
+
+.poly-scope-banner {
+  padding: 10px 14px;
+  border-left: 3px solid var(--blue);
+  background: rgba(74, 144, 226, 0.08);
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.poly-scope-banner.is-extension {
+  border-left-color: var(--orange);
+  background: rgba(244, 162, 97, 0.10);
+}
+
+/* Fórmula anotada */
+.poly-annotated-formula {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--line, var(--border));
+}
+
+.poly-annotated-eq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.poly-formula-token {
+  background: transparent;
+  border: 1px dashed var(--yellow);
+  color: var(--yellow);
+  font: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.poly-formula-token.tok-blue {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.poly-formula-token.tok-green {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.poly-annotated-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 2.4em;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Chips, botones y widgets SVG aislados */
+.pr-chip-row,
+.pr-chip-group,
+.vn-trigger-row,
+.poly-retos-tabs,
+.poly-check-bar,
+.poly-predict-options,
+.poly-inline-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.vn-trigger-row {
+  margin: 12px 0 18px;
+}
+
+.pr-chip,
+.pr-btn,
+.chip,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  min-height: 36px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--surface, #1b1f23);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.pr-chip.is-active,
+.chip.is-active,
+.pr-btn:not(.pr-btn-secondary) {
+  border-color: var(--yellow);
+  color: var(--yellow);
+  background: color-mix(in srgb, var(--yellow) 12%, var(--surface));
+}
+
+.poly-widget,
+.pr-widget {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(11, 14, 16, 0.55);
+}
+
+.poly-widget__controls,
+.pr-widget__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.poly-widget__actions,
+.pr-widget__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.poly-board-svg,
+.pr-board-svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  user-select: none;
+  border: 1px dashed var(--line, var(--border));
+  background: rgba(10, 14, 16, 0.72);
+}
+
+.poly-drag-handle {
+  cursor: grab;
+  outline: none;
+}
+
+.poly-drag-handle:focus-visible {
+  stroke: var(--yellow);
+  stroke-width: 4px;
+}
+
+.poly-readout,
+.pr-readout {
+  min-height: 4.5em;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line, var(--border));
+}
+
+.pr-readout h4 {
+  margin: 0 0 8px;
+  color: var(--yellow);
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+}
+
+.pr-readout__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.pr-readout__item p {
+  margin: 2px 0 0;
+  color: var(--ink);
+}
+
+.poly-factor-tree {
+  padding: 12px;
+  border: 1px dashed var(--line, var(--border));
+}
+
+.poly-factor-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.poly-factor-badge {
+  padding: 6px 10px;
+  border: 1px solid var(--blue);
+  font-size: 0.88rem;
+}
+
+.poly-factor-badge.is-lead {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.poly-factor-badge.is-linear {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.poly-factor-badge.is-irred {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+.poly-cand-root {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+}
+
+.poly-cand-miss {
+  opacity: 0.55;
+}
+
+.poly-predict-box {
+  padding: 12px 14px;
+  border: 1px dashed var(--yellow);
+  background: rgba(230, 211, 138, 0.05);
+}
+
+.poly-predict-prompt {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.poly-predict-feedback {
+  margin-top: 8px;
+  font-size: 0.92rem;
+}
+
+/* Chequeos */
+.poly-checks-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.poly-checks-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.poly-check-card {
+  padding: 16px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.poly-check-card.is-solved {
+  border-color: rgba(142, 219, 159, 0.5);
+}
+
+.pr-check-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pr-check-num {
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.poly-comp-tag {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-family: var(--font-mono, monospace);
+}
+
+.pr-check-input {
+  min-width: 0;
+  flex: 1 1 220px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+.pr-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pr-option {
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line, var(--border));
+  background: var(--surface, #1b1f23);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pr-option.is-correct {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.pr-option.is-wrong {
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+.poly-hint-item {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--blue);
+  background: rgba(74, 144, 226, 0.08);
+  font-size: 0.9rem;
+}
+
+.pr-check-feedback {
+  margin-top: 10px;
+  font-size: 0.92rem;
+}
+
+.pr-check-feedback.is-ok {
+  color: var(--green);
+}
+
+.pr-check-feedback.is-error {
+  color: var(--pink);
+}
+
+.pr-check-feedback.is-warn {
+  color: var(--yellow);
+}
+
+/* Retos y Trampas */
+.exp-trainer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 14px;
+  margin: 16px 0;
+  border: 1px solid var(--line, var(--border));
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.exp-trainer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.exp-trainer-field--grow {
+  flex: 1 1 220px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.exp-trainer-field .pr-check-input {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.exp-trainer-progress-pill {
+  padding: 6px 10px;
+  border: 1px solid var(--yellow);
+  color: var(--yellow);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.exp-challenges-cascade {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.exp-challenge-card {
+  padding: 16px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.exp-challenge-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.exp-challenge-card__badge {
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.poly-trap-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 12px 0;
+}
+
+.poly-trap-col {
+  padding: 12px;
+  border: 1px solid var(--line, var(--border));
+}
+
+.poly-trap-col.is-wrong {
+  border-left: 3px solid var(--pink);
+}
+
+.poly-trap-col.is-right {
+  border-left: 3px solid var(--green);
+}
+
+.poly-trap-col-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Bandeja inferior y repaso */
+.poly-page .seq-chalk-tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line, var(--border));
+}
+
+.poly-cheat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.poly-cheat-card {
+  padding: 14px;
+  border: 1px solid var(--line, var(--border));
+  background: color-mix(in srgb, var(--surface) 82%, var(--bg));
+}
+
+.poly-cheat-card h3 {
+  margin: 0 0 8px;
+  color: var(--yellow);
+  font-family: var(--font-hand);
+}
+
+/* Dashboard de competencias */
+#poly-competency-dashboard {
+  margin: 24px 0 32px;
+}
+
+.poly-dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.poly-dashboard-kpi {
+  padding: 14px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(11, 14, 16, 0.72);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.poly-dashboard-kpi__num {
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.poly-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 14px;
+}
+
+.poly-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border: 1px solid var(--line, var(--border));
+  background: rgba(11, 14, 16, 0.65);
+}
+
+.poly-dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.poly-dashboard-card__title {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.poly-dashboard-badge {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border: 1px solid var(--line, var(--border));
+  white-space: nowrap;
+}
+
+.poly-dashboard-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* Responsivo estricto hasta 320px */
+@media (max-width: 1024px) {
+  .poly-page.page--wide {
+    width: 100%;
+    padding-inline: 12px;
+    box-sizing: border-box;
+  }
+
+  .poly-page .seq-layout {
+    margin: 14px 0 0 0 !important;
+    padding: 0 0 48px;
+  }
+
+  .poly-page .seq-sidebar {
+    top: 0;
+    height: 100vh;
+    z-index: 120;
+    width: min(84vw, 280px);
+    box-shadow: 0 0 24px rgb(0 0 0 / 45%);
+  }
+
+  .poly-page.is-sidebar-collapsed .seq-sidebar {
+    transform: translateX(-105%);
+  }
+}
+
+@media print {
+  .seq-sidebar,
+  .seq-blackboard-toolbar,
+  .vn-trigger-row,
+  .seq-chalk-tray,
+  #sec-retos,
+  .seq-section {
+    display: none !important;
+  }
+
+  #sec-repaso {
+    display: block !important;
+    color: #000 !important;
+    background: #fff !important;
+  }
+}

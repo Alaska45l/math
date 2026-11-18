@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 03 de Alaska Math Lab: Función lineal, pendiente, recta vertical, formas explícita, implícita y segmentaria, paralelismo, perpendicularidad, mediatriz, distancia punto-recta y tramos."
+    />
+    <title>Unidad 03 · Función Lineal y Geometría Analítica · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/lineal.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/lineal/index.js"></script>
+  </head>
+  <body data-page="lineal">
+    <header data-site-nav="lineal"></header>
+    <main class="page page--wide seq-page lin-page">
+      <header class="page-header">
+        <h1>Función Lineal y Geometría Analítica en el Plano</h1>
+        <p class="intro">
+          Unidad 03 · De la escalera constante de la pendiente a las tres ecuaciones de la recta,
+          posiciones relativas, mediatriz, distancia exacta y funciones por tramos.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 03 · Función Lineal</h2>
+          <p class="muted small" id="seq-progress-text">0/5 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · La Recta como Función</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-pendiente-estudio" data-sec="sec-pendiente-estudio">
+                <span>1 · Pendiente y Estudio</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-formas-angulo" data-sec="sec-formas-angulo">
+                <span>2 · Ángulo y 3 Formas</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Posiciones y Métrica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-paralelas-perpendiculares" data-sec="sec-paralelas-perpendiculares">
+                <span>3 · Paralelas y Perpendiculares</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-geometria-analitica" data-sec="sec-geometria-analitica">
+                <span>4 · Mediatriz y Distancia</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Modelos y Práctica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-modelizacion-tramos" data-sec="sec-modelizacion-tramos">
+                <span>5 · Modelos y Tramos</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso Imprimible</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="lin-hero">
+            <p class="lin-kicker">Unidad 03 · Programa Oficial UNMDP FCEyN (Cap. 3)</p>
+            <h1>Función Lineal y Geometría Analítica en el Plano</h1>
+            <p>
+              Explorá por qué toda función lineal <span class="eq">f(x) = mx + b</span> mantiene invariante su razón de cambio,
+              cuándo una recta vertical deja de ser función, cómo traducir entre las tres ecuaciones sin perder casos degenerados,
+              y cómo medir distancias exactas, mediatrices y funciones por tramos.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · DEFINICIÓN, PENDIENTE, VERTICAL Y ESTUDIO COMPLETO
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-pendiente-estudio">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 5</div>
+              <h2 class="seq-section__title">1. Definición, Pendiente entre Dos Puntos, Recta Vertical y Estudio Analítico</h2>
+            </header>
+
+            <p class="lin-phrase">
+              <strong>En una frase:</strong> Una recta no vertical es el lugar donde la razón entre lo que cambia <span class="eq">y</span> y lo que avanza <span class="eq">x</span> vale siempre la misma constante <span class="eq">m</span>.
+            </p>
+
+            <div class="lin-prose">
+              <p>
+                <span class="lin-curriculum-tag is-official">UNMDP Cap. 3 (pp. 37–38)</span>
+                Llamamos <strong>función lineal</strong> a toda función <span class="eq">f: &Ropf; &rarr; &Ropf;</span> definida por
+                <span class="eq">f(x) = mx + b</span>, donde <span class="eq">m</span> es la
+                <span class="gloss-term" data-gloss="pendiente_recta">pendiente</span> y <span class="eq">b = f(0)</span> es la
+                <span class="gloss-term" data-gloss="ordenada_al_origen">ordenada al origen</span>. Un punto <span class="eq">P(x<sub>0</sub>; y<sub>0</sub>)</span> pertenece a la recta si y solo si satisface <span class="eq">y<sub>0</sub> = m&middot;x<sub>0</sub> + b</span>.
+              </p>
+              <p>
+                Dados dos puntos <span class="eq">P(x<sub>1</sub>; y<sub>1</sub>)</span> y <span class="eq">Q(x<sub>2</sub>; y<sub>2</sub>)</span> con
+                <strong><span class="eq">x<sub>1</sub> &ne; x<sub>2</sub></span></strong>, la pendiente vale
+                <span class="eq">m = <span class="fr"><span class="top">y<sub>2</sub> &minus; y<sub>1</sub></span><span class="bot">x<sub>2</sub> &minus; x<sub>1</sub></span></span></span>.
+                Si <span class="eq">x<sub>1</sub> = x<sub>2</sub></span>, el avance horizontal es cero: obtenemos una <strong>recta vertical <span class="eq">x = k</span></strong> que <strong>no tiene pendiente</strong> y <strong>no es función</strong>.
+              </p>
+
+              <div data-lin-formula="explicit" data-m="-2.6666667" data-b="4"></div>
+
+              <div class="lin-extension-box">
+                <p>
+                  <span class="lin-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Metáfora de la escalera constante y tabla rápida:</strong> Sin importar qué par de puntos elijas sobre una recta oblicua, el triángulo rectángulo formado por <span class="eq">&Delta;x</span> y <span class="eq">&Delta;y</span> siempre es semejante y conserva el cociente <span class="eq">&Delta;y/&Delta;x</span>.
+                </p>
+                <div class="lin-table-wrap">
+                  <table class="lin-table">
+                    <thead>
+                      <tr><th>Tipo de recta</th><th>Ecuación</th><th>Pendiente m</th><th>¿Es función?</th><th>Imagen y Biyectividad</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Oblicua</td><td><span class="eq">y = mx + b (m &ne; 0)</span></td><td><span class="eq">m &ne; 0</span></td><td>Sí</td><td><span class="eq">Im = &Ropf;</span>, biyectiva</td></tr>
+                      <tr><td>Horizontal (constante)</td><td><span class="eq">y = b</span></td><td><span class="eq">m = 0</span></td><td>Sí</td><td><span class="eq">Im = {b}</span>, ni inyectiva ni suryectiva en <span class="eq">&Ropf;</span></td></tr>
+                      <tr><td>Vertical</td><td><span class="eq">x = k</span></td><td>No existe (<span class="eq">&Delta;x = 0</span>)</td><td>No</td><td>No aplica estudio funcional</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1-pendiente">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="constructor-rectas"></div>
+            </div>
+
+            <div class="lin-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Hallar la recta por P(&minus;2; 1), Q(&minus;3; &minus;2) y estudiar f(x) = &minus;(8/3)x + 4</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> Calculamos <span class="eq">m = (&minus;2 &minus; 1) / (&minus;3 &minus; (&minus;2)) = &minus;3 / (&minus;1) = 3</span>.</p>
+                <p><strong>2.</strong> Reemplazamos <span class="eq">P(&minus;2; 1)</span> en <span class="eq">y = 3x + b</span>: <span class="eq">1 = 3(&minus;2) + b &rArr; b = 7</span> &rArr; <span class="eq">y = 3x + 7</span>.</p>
+                <p><strong>3.</strong> Para <span class="eq">f(x) = &minus;(8/3)x + 4</span>: <span class="eq">C<sub>0</sub> = {3/2}</span>, <span class="eq">C<sup>+</sup> = (&minus;&infin;; 3/2)</span>, <span class="eq">C<sup>&minus;</sup> = (3/2; +&infin;)</span>, biyectiva.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>1.</strong> Con <span class="eq">P(&minus;2; 1)</span> y <span class="eq">Q(&minus;3; &minus;2)</span>, completá mentalmente: <span class="eq">&Delta;y = &minus;3</span>, <span class="eq">&Delta;x = ?</span> &rArr; <span class="eq">m = 3</span>.</p>
+                <p><strong>2.</strong> Sustituí <span class="eq">x = &minus;2, y = 1</span> para despejar <span class="eq">b</span>.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> En <span class="eq">f(x) = &minus;(8/3)x + 4</span>, ubicá la raíz <span class="eq">x<sub>0</sub></span> y decidí qué intervalo queda arriba del eje <span class="eq">X</span>.</p>
+              </div>
+            </div>
+
+            <div class="lin-contrast-box">
+              <h4>Desafío de contraste · y = 3 vs x = 3</h4>
+              <div class="lin-contrast-cols">
+                <div class="lin-contrast-col">
+                  <strong>y = 3 (Función constante)</strong>
+                  <p>Cada <span class="eq">x &isin; &Ropf;</span> recibe un único valor <span class="eq">y = 3</span>. Pendiente <span class="eq">m = 0</span>, <span class="eq">Dom = &Ropf;</span>, <span class="eq">Im = {3}</span>.</p>
+                </div>
+                <div class="lin-contrast-col">
+                  <strong>x = 3 (Recta vertical)</strong>
+                  <p>Al único valor <span class="eq">x = 3</span> le corresponden infinitos <span class="eq">y</span>. No tiene pendiente (<span class="eq">&Delta;x = 0</span>) y <strong>no es función</strong>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lin-warning-box">
+              <strong>Cuidado con los signos y el eje de lectura:</strong> Al calcular <span class="eq">m</span>, si arriba hacés <span class="eq">y<sub>2</sub> &minus; y<sub>1</sub></span>, abajo respetá <span class="eq">x<sub>2</sub> &minus; x<sub>1</sub></span>. Y al escribir <span class="eq">C<sup>+</sup></span> y <span class="eq">C<sup>&minus;</sup></span>, leé siempre intervalos del eje <span class="eq">X</span> alrededor de la raíz <span class="eq">x<sub>0</sub></span>, nunca la ordenada <span class="eq">b</span>.
+            </div>
+
+            <div data-check="sec-pendiente-estudio"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · ÁNGULO Y LAS 3 FORMAS DE LA RECTA
+               ================================================================ -->
+          <section class="seq-section" id="sec-formas-angulo">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 5</div>
+              <h2 class="seq-section__title">2. Pendiente Trigonométrica m = tg(&alpha;) y las 3 Ecuaciones de la Recta</h2>
+            </header>
+
+            <p class="lin-phrase">
+              <strong>En una frase:</strong> La misma recta admite tres ecuaciones equivalentes (explícita, implícita y segmentaria), aunque las rectas verticales, horizontales o por el origen apagan la segmentaria.
+            </p>
+
+            <div class="lin-prose">
+              <p>
+                <span class="lin-curriculum-tag is-official">UNMDP Cap. 3 (pp. 37–38)</span>
+                Cuando una recta no vertical forma un ángulo <span class="eq">&alpha; &isin; [0&deg;; 180&deg;)</span> con el semieje positivo <span class="eq">+X</span>, su pendiente coincide exactamente con <span class="eq">m = tg(&alpha;)</span>.
+                Las tres formas oficiales de escribir la recta son: <strong>explícita</strong> (<span class="eq">y = mx + b</span>),
+                <span class="gloss-term" data-gloss="ecuacion_segmentaria"><strong>segmentaria</strong></span> (<span class="eq"><span class="fr"><span class="top">x</span><span class="bot">a</span></span> + <span class="fr"><span class="top">y</span><span class="bot">b</span></span> = 1</span>, donde <span class="eq">a</span> es la raíz y <span class="eq">b</span> la ordenada al origen) e
+                <span class="gloss-term" data-gloss="ecuacion_implicita"><strong>implícita</strong></span> (<span class="eq">ax + by + c = 0</span>).
+              </p>
+
+              <div data-lin-strip data-a="2" data-b="3" data-c="-6"></div>
+
+              <div class="lin-extension-box">
+                <p>
+                  <span class="lin-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Tabla sistemática de casos degenerados (implícita &harr; segmentaria):</strong>
+                </p>
+                <div class="lin-table-wrap">
+                  <table class="lin-table">
+                    <thead>
+                      <tr><th>Condición en ax + by + c = 0</th><th>Geometría</th><th>¿Tiene explícita?</th><th>¿Tiene segmentaria?</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td><span class="eq">a &ne; 0, b &ne; 0, c &ne; 0</span></td><td>Oblicua fuera de <span class="eq">(0; 0)</span></td><td>Sí: <span class="eq">y = &minus;(a/b)x &minus; c/b</span></td><td>Sí: <span class="eq">x/(&minus;c/a) + y/(&minus;c/b) = 1</span></td></tr>
+                      <tr><td><span class="eq">c = 0</span></td><td>Pasa por el origen <span class="eq">(0; 0)</span></td><td>Sí (si <span class="eq">b &ne; 0</span>)</td><td>No (<span class="eq">a = 0</span> y <span class="eq">b = 0</span> dividirían por 0)</td></tr>
+                      <tr><td><span class="eq">a = 0, b &ne; 0</span></td><td>Horizontal <span class="eq">y = &minus;c/b</span></td><td>Sí (<span class="eq">m = 0</span>)</td><td>No (no corta al eje <span class="eq">X</span>)</td></tr>
+                      <tr><td><span class="eq">b = 0, a &ne; 0</span></td><td>Vertical <span class="eq">x = &minus;c/a</span></td><td>No (no es función)</td><td>No (no corta al eje <span class="eq">Y</span>)</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2-formas">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="traductor-formas"></div>
+            </div>
+
+            <div class="lin-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Convertir 2x + 3y &minus; 6 = 0 a explícita y segmentaria</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="1">
+                <p><strong>Explícita:</strong> <span class="eq">3y = &minus;2x + 6 &rArr; y = &minus;(2/3)x + 2</span>.</p>
+                <p><strong>Segmentaria:</strong> <span class="eq">2x + 3y = 6</span>, dividimos todo por <span class="eq">6</span>: <span class="eq">x/3 + y/2 = 1</span> (corta X en 3, Y en 2).</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="2" hidden>
+                <p>De <span class="eq">2x + 3y = 6</span>, ¿por qué número dividís toda la ecuación para fabricar el <span class="eq">1</span> obligatorio de la segmentaria?</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> Verificá que si ponés <span class="eq">y = 0</span> obtenés <span class="eq">x = 3</span> y si ponés <span class="eq">x = 0</span> obtenés <span class="eq">y = 2</span>.</p>
+              </div>
+            </div>
+
+            <div class="lin-contrast-box">
+              <h4>Desafío de contraste · 2x + 3y = 0 vs 2x + 3y &minus; 6 = 0</h4>
+              <div class="lin-contrast-cols">
+                <div class="lin-contrast-col">
+                  <strong>2x + 3y = 0 (c = 0)</strong>
+                  <p>Tiene explícita <span class="eq">y = &minus;(2/3)x</span>, pero pasa por <span class="eq">(0; 0)</span> y <strong>no tiene forma segmentaria</strong>.</p>
+                </div>
+                <div class="lin-contrast-col">
+                  <strong>2x + 3y &minus; 6 = 0 (c &ne; 0)</strong>
+                  <p>Corta ambos ejes fuera del origen y vive en las tres formas: explícita, implícita y <span class="eq">x/3 + y/2 = 1</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lin-warning-box">
+              <strong>Cuidado con la segmentaria:</strong> El denominador de <span class="eq">x</span> siempre es el corte con el eje <span class="eq">X</span> (<span class="eq">a</span>) y el de <span class="eq">y</span> es la ordenada al origen (<span class="eq">b</span>). Si ves <span class="eq">c = 0</span>, nunca inventes <span class="eq">x/0 + y/0 = 1</span>.
+            </div>
+
+            <div data-check="sec-formas-angulo"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · POSICIONES RELATIVAS (PARALELAS Y PERPENDICULARES)
+               ================================================================ -->
+          <section class="seq-section" id="sec-paralelas-perpendiculares">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 3 de 5</div>
+              <h2 class="seq-section__title">3. Posiciones Relativas en el Plano: Paralelismo y Perpendicularidad</h2>
+            </header>
+
+            <p class="lin-phrase">
+              <strong>En una frase:</strong> Dos rectas no verticales son paralelas si igualan pendientes (<span class="eq">m<sub>1</sub> = m<sub>2</sub></span>) y perpendiculares si sus pendientes son opuestas e inversas (<span class="eq">m<sub>1</sub>&middot;m<sub>2</sub> = &minus;1</span>).
+            </p>
+
+            <div class="lin-prose">
+              <p>
+                <span class="lin-curriculum-tag is-official">UNMDP Cap. 3 (p. 39)</span>
+                Dos rectas en el plano pueden ser: <strong>paralelas coincidentes</strong> (<span class="eq">m<sub>1</sub> = m<sub>2</sub></span> y <span class="eq">b<sub>1</sub> = b<sub>2</sub></span>),
+                <strong>paralelas no coincidentes</strong> (<span class="eq">m<sub>1</sub> = m<sub>2</sub></span> y <span class="eq">b<sub>1</sub> &ne; b<sub>2</sub></span>),
+                <strong>secantes oblicuas</strong> (<span class="eq">m<sub>1</sub> &ne; m<sub>2</sub></span> y <span class="eq">m<sub>1</sub>&middot;m<sub>2</sub> &ne; &minus;1</span>) o
+                <strong>secantes perpendiculares</strong> (<span class="eq">m<sub>2</sub> = &minus;1/m<sub>1</sub> &hArr; m<sub>1</sub>&middot;m<sub>2</sub> = &minus;1</span>).
+              </p>
+              <div class="lin-extension-box">
+                <p>
+                  <span class="lin-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Caso singular horizontal &perp; vertical:</strong> Una recta horizontal (<span class="eq">m = 0</span>) es perpendicular a cualquier recta vertical (<span class="eq">x = k</span>). No intentes calcular <span class="eq">&minus;1/0</span>: en implícita <span class="eq">A<sub>1</sub>A<sub>2</sub> + B<sub>1</sub>B<sub>2</sub> = 0</span> abarca todos los casos sin división por cero.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3-posiciones">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="paralelas-perpendiculares"></div>
+            </div>
+
+            <div class="lin-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Simulacro 2019: perpendicular a x/2 + y/3 = 1 con raíz 6</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> De <span class="eq">x/2 + y/3 = 1</span> pasa por <span class="eq">(2; 0)</span> y <span class="eq">(0; 3)</span>, así que <span class="eq">m<sub>1</sub> = &minus;3/2</span>.</p>
+                <p><strong>2.</strong> La perpendicular invierte y cambia de signo: <span class="eq">m<sub>2</sub> = +2/3</span>.</p>
+                <p><strong>3.</strong> Raíz <span class="eq">6</span> significa punto <span class="eq">(6; 0)</span>: <span class="eq">0 = (2/3)&middot;6 + b &rArr; b = &minus;4</span> &rArr; <span class="eq">y = (2/3)x &minus; 4</span>.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>1.</strong> De <span class="eq">x/2 + y/3 = 1</span>, hallá <span class="eq">m<sub>1</sub> = &minus;3/2</span>. ¿Cuánto vale <span class="eq">m<sub>2</sub> = &minus;1/m<sub>1</sub></span>?</p>
+                <p><strong>2.</strong> Usá que "raíz 6" es el punto <span class="eq">(6; 0)</span> para despejar <span class="eq">b</span>.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> Verificá que <span class="eq">(&minus;3/2)&middot;(2/3) = &minus;1</span> y evaluá tu recta en <span class="eq">x = 6</span>.</p>
+              </div>
+            </div>
+
+            <div class="lin-contrast-box">
+              <h4>Desafío de contraste · +1/m vs &minus;1/m y Horizontal &perp; Vertical</h4>
+              <div class="lin-contrast-cols">
+                <div class="lin-contrast-col">
+                  <strong>Error común: m<sub>2</sub> = +1/m<sub>1</sub></strong>
+                  <p>Para <span class="eq">m<sub>1</sub> = 2</span>, usar <span class="eq">1/2</span> deja ambas rectas crecientes: <span class="eq">2&middot;(1/2) = +1 &ne; &minus;1</span>.</p>
+                </div>
+                <div class="lin-contrast-col">
+                  <strong>Perpendicular genuina: m<sub>2</sub> = &minus;1/m<sub>1</sub></strong>
+                  <p>Exige invertir Y cambiar el signo: <span class="eq">2&middot;(&minus;1/2) = &minus;1</span>. Y si <span class="eq">m<sub>1</sub> = 0</span> (<span class="eq">y = 2</span>), la perpendicular es <span class="eq">x = 5</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lin-warning-box">
+              <strong>Cuidado con la trampa de examen:</strong> Nunca leas la pendiente directo de la forma implícita <span class="eq">2x + 3y + 4 = 0</span> sin despejar <span class="eq">y</span> primero (<span class="eq">m = &minus;2/3</span>, no <span class="eq">2</span>).
+            </div>
+
+            <div data-check="sec-paralelas-perpendiculares"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · GEOMETRÍA ANALÍTICA (DISTANCIA, MEDIATRIZ, PUNTO-RECTA)
+               ================================================================ -->
+          <section class="seq-section" id="sec-geometria-analitica">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 5</div>
+              <h2 class="seq-section__title">4. Geometría Analítica: Punto Medio, Distancia, Mediatriz y Distancia Punto-Recta</h2>
+            </header>
+
+            <p class="lin-phrase">
+              <strong>En una frase:</strong> Pitágoras mide segmentos en coordenadas, la mediatriz reúne los puntos equidistantes de dos extremos y la proyección ortogonal mide la distancia mínima a una recta.
+            </p>
+
+            <div class="lin-prose">
+              <p>
+                <span class="lin-curriculum-tag is-official">UNMDP Cap. 3 (pp. 40, 45)</span>
+                Dados <span class="eq">P(x<sub>1</sub>; y<sub>1</sub>)</span> y <span class="eq">Q(x<sub>2</sub>; y<sub>2</sub>)</span>, el <strong>punto medio</strong> es
+                <span class="eq">M(<span class="fr"><span class="top">x<sub>1</sub>+x<sub>2</sub></span><span class="bot">2</span></span>; <span class="fr"><span class="top">y<sub>1</sub>+y<sub>2</sub></span><span class="bot">2</span></span>)</span>
+                y la <strong>distancia exacta</strong> es <span class="eq">d(P; Q) = &radic;((x<sub>2</sub>&minus;x<sub>1</sub>)<sup>2</sup> + (y<sub>2</sub>&minus;y<sub>1</sub>)<sup>2</sup>)</span>.
+                La <span class="gloss-term" data-gloss="mediatriz"><strong>mediatriz</strong></span> del segmento <span class="eq">PQ</span> es la recta perpendicular a <span class="eq">PQ</span> que pasa por su punto medio <span class="eq">M</span>.
+                La <strong>distancia de un punto <span class="eq">P(x<sub>0</sub>; y<sub>0</sub>)</span> a una recta <span class="eq">ax + by + c = 0</span></strong> es
+                <span class="eq">d(P; r) = <span class="fr"><span class="top">|ax<sub>0</sub> + by<sub>0</sub> + c|</span><span class="bot">&radic;(a<sup>2</sup> + b<sup>2</sup>)</span></span></span>.
+              </p>
+              <div class="lin-extension-box">
+                <p>
+                  <span class="lin-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Lugar geométrico y pie ortogonal H:</strong> En el tablero interactivo podés deslizar un punto <span class="eq">X</span> sobre la mediatriz para ver en vivo que <span class="eq">d(X; P) = d(X; Q)</span>, y visualizar el pie ortogonal <span class="eq">H</span> sobre <span class="eq">r</span> en la distancia punto-recta.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4-geometria">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="geometria-analitica"></div>
+            </div>
+
+            <div class="lin-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Mediatriz de P(1; 0), Q(&minus;1; 6) y distancia de P(4; 2) a y = 2x &minus; 1</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="1">
+                <p><strong>Mediatriz:</strong> <span class="eq">M = (0; 3)</span>, <span class="eq">m<sub>PQ</sub> = &minus;3 &rArr; m<sub>&perp;</sub> = 1/3</span> &rArr; <span class="eq">y = (1/3)x + 3</span>.</p>
+                <p><strong>Distancia punto-recta:</strong> Escribimos <span class="eq">2x &minus; y &minus; 1 = 0</span>. Luego <span class="eq">d = |2(4) &minus; 2 &minus; 1| / &radic;(2<sup>2</sup> + (&minus;1)<sup>2</sup>) = 5 / &radic;5 = &radic;5</span>.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>1.</strong> Calculá <span class="eq">M</span> de <span class="eq">P(1; 0)</span> y <span class="eq">Q(&minus;1; 6)</span>. <strong>2.</strong> Usá <span class="eq">m<sub>&perp;</sub> = 1/3</span> pasando por <span class="eq">M</span> (no por <span class="eq">P</span>).</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> En <span class="eq">d(P(4;2); 2x &minus; y &minus; 1 = 0)</span>, racionalizá <span class="eq">5 / &radic;5</span> para dejar el radical exacto limpio.</p>
+              </div>
+            </div>
+
+            <div class="lin-contrast-box">
+              <h4>Desafío de contraste · Perpendicular por P vs Mediatriz de PQ</h4>
+              <div class="lin-contrast-cols">
+                <div class="lin-contrast-col">
+                  <strong>Perpendicular que pasa por P(1; 0)</strong>
+                  <p>Da <span class="eq">y = (1/3)x &minus; 1/3</span>: forma <span class="eq">90&deg;</span> con <span class="eq">PQ</span>, pero NO parte al segmento en dos mitades iguales.</p>
+                </div>
+                <div class="lin-contrast-col">
+                  <strong>Mediatriz de PQ (pasa por M(0; 3))</strong>
+                  <p>Da <span class="eq">y = (1/3)x + 3</span>: forma <span class="eq">90&deg;</span> Y pasa por el punto medio <span class="eq">M</span>, garantizando <span class="eq">d(X; P) = d(X; Q)</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lin-warning-box">
+              <strong>Cuidado con la distancia:</strong> Devolver <span class="eq">d<sup>2</sup></span> en vez de <span class="eq">&radic;d<sup>2</sup></span>, o aplicar la fórmula punto-recta sin pasar primero todos los términos a <span class="eq">ax + by + c = 0</span> y sin poner barras de valor absoluto <span class="eq">|&middot;|</span>, rompe el resultado.
+            </div>
+
+            <div data-check="sec-geometria-analitica"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 5 · MODELIZACIÓN Y FUNCIÓN LINEAL POR TRAMOS
+               ================================================================ -->
+          <section class="seq-section" id="sec-modelizacion-tramos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 5 de 5</div>
+              <h2 class="seq-section__title">5. Modelización Lineal en Contexto y Función Lineal por Tramos</h2>
+            </header>
+
+            <p class="lin-phrase">
+              <strong>En una frase:</strong> Los modelos lineales traducen tasas constantes reales con dominio físico acotado, y las funciones por tramos combinan reglas lineales según el intervalo donde cae <span class="eq">x</span>.
+            </p>
+
+            <div class="lin-prose">
+              <p>
+                <span class="lin-curriculum-tag is-official">UNMDP Cap. 3 (pp. 41, 46, 130, 137)</span>
+                En problemas reales como el vaciado de una represa (<span class="eq">y = 1056 &minus; 12x</span>), la conversión Celsius&ndash;Fahrenheit (<span class="eq">y = 1,8x + 32</span>) o tarifas de tren (<span class="eq">p = (1/10)d + 3</span>), <span class="eq">m</span> representa la tasa unitaria y <span class="eq">b</span> el valor inicial.
+                En la <strong>función lineal por tramos</strong> (Ej. 10: <span class="eq">&minus;2x&minus;1</span> si <span class="eq">x&lt;0</span>; <span class="eq">3</span> si <span class="eq">0&le;x&lt;4</span>; <span class="eq">x/2+3</span> si <span class="eq">x&ge;4</span>), cada rama rige exclusivamente en su intervalo y los extremos abiertos o cerrados definen la Imagen.
+              </p>
+              <div class="lin-extension-box">
+                <p>
+                  <span class="lin-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Tarifas escalonadas y empalmes continuos:</strong> En el simulador inferior podés comparar saltos discontinuos con uniones continuas deslizando la sonda <span class="eq">x</span> por cada frontera.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec5-tramos">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec5-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="tramos-lineal"></div>
+            </div>
+
+            <div class="lin-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Estudio de la función por tramos (Ej. 10) y Represa (Ej. 9)</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="1">
+                <p><strong>Tramos (Ej. 10):</strong> <span class="eq">Dom = &Ropf;</span>; como <span class="eq">&minus;2x &minus; 1</span> vale solo para <span class="eq">x &lt; 0</span>, tiende a <span class="eq">&minus;1</span> sin tocarlo y <span class="eq">Im = (&minus;1; +&infin;)</span>.</p>
+                <p>Raíz en el primer tramo: <span class="eq">C<sub>0</sub> = {&minus;1/2}</span>; <span class="eq">C<sup>+</sup> = (&minus;&infin;; &minus;1/2) &cup; [0; +&infin;)</span>; <span class="eq">C<sup>&minus;</sup> = (&minus;1/2; 0)</span>. No biyectiva.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="2" hidden>
+                <p>¿En qué tramo entra <span class="eq">x = 0</span>? Como <span class="eq">0 &le; x &lt; 4</span> incluye al <span class="eq">0</span>, <span class="eq">f(0) = 3</span> y el punto <span class="eq">(0; &minus;1)</span> queda abierto.</p>
+              </div>
+              <div class="lin-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> En la represa <span class="eq">y = 1056 &minus; 12x</span>, despejá cuántos días tarda en quedar vacía (<span class="eq">y = 0</span>) o en llegar a <span class="eq">144</span> millones.</p>
+              </div>
+            </div>
+
+            <div class="lin-contrast-box">
+              <h4>Desafío de contraste · Empalme continuo vs Salto con extremo abierto</h4>
+              <div class="lin-contrast-cols">
+                <div class="lin-contrast-col">
+                  <strong>Empalme continuo en la frontera</strong>
+                  <p>Ambos tramos alcanzan la misma altura en <span class="eq">x = c</span>: no hay salto y el vértice queda incluido en la Imagen.</p>
+                </div>
+                <div class="lin-contrast-col">
+                  <strong>Salto discontinuo (Ej. 10 en x = 0)</strong>
+                  <p>La rama <span class="eq">x &lt; 0</span> termina con círculo hueco en <span class="eq">(0; &minus;1)</span> y la curva salta a <span class="eq">f(0) = 3</span>: el extremo <span class="eq">&minus;1</span> queda con paréntesis abierto en <span class="eq">Im(f)</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lin-warning-box">
+              <strong>Cuidado con la frontera:</strong> Un único punto <span class="eq">x = c</span> jamás puede activar dos fórmulas cerradas (<span class="eq">&le;</span> y <span class="eq">&ge;</span>) con alturas distintas, porque violaría la unicidad de función.
+            </div>
+
+            <div data-check="sec-modelizacion-tramos"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN RETOS Y 5 TRAMPAS
+               ================================================================ -->
+          <section id="sec-retos" class="seq-section">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Práctica Activa y Transferencia</div>
+              <h2 class="seq-section__title">Entrenador Infinito por Semilla (8 Familias) y 5 Trampas de Examen</h2>
+            </header>
+            <div id="lin-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               HOJA DE REPASO Y PANEL DE COMPETENCIAS
+               ================================================================ -->
+          <section id="sec-repaso" class="seq-section">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis y Evidencia de Dominio</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible · Función Lineal</h2>
+            </header>
+
+            <div class="lin-no-print" style="margin-bottom: 14px;">
+              <button type="button" class="pr-btn" data-print-sheet="true">Imprimir o guardar en PDF</button>
+            </div>
+
+            <div id="lin-competency-dashboard" class="lin-no-print"></div>
+
+            <div class="lin-cheat-grid">
+              <article class="lin-cheat-card">
+                <h3>1. Pendiente y Recta Vertical</h3>
+                <p><span class="eq">m = (y<sub>2</sub> &minus; y<sub>1</sub>)/(x<sub>2</sub> &minus; x<sub>1</sub>)</span> para <span class="eq">x<sub>1</sub> &ne; x<sub>2</sub></span>. Además <span class="eq">m = tg(&alpha;)</span>.</p>
+                <p>Si <span class="eq">x<sub>1</sub> = x<sub>2</sub></span>: recta vertical <span class="eq">x = k</span>, sin pendiente y no es función.</p>
+              </article>
+              <article class="lin-cheat-card">
+                <h3>2. Las 3 Ecuaciones</h3>
+                <p><strong>Explícita:</strong> <span class="eq">y = mx + b</span></p>
+                <p><strong>Implícita:</strong> <span class="eq">ax + by + c = 0</span></p>
+                <p><strong>Segmentaria:</strong> <span class="eq">x/a + y/b = 1</span> (solo si <span class="eq">a, b, c &ne; 0</span>).</p>
+              </article>
+              <article class="lin-cheat-card">
+                <h3>3. Paralelas y Perpendiculares</h3>
+                <p><strong>Paralelas:</strong> <span class="eq">m<sub>1</sub> = m<sub>2</sub></span> (<span class="eq">b<sub>1</sub> = b<sub>2</sub></span> coincidentes).</p>
+                <p><strong>Perpendiculares:</strong> <span class="eq">m<sub>1</sub>&middot;m<sub>2</sub> = &minus;1</span>, y caso singular horizontal (<span class="eq">y = b</span>) &perp; vertical (<span class="eq">x = k</span>).</p>
+              </article>
+              <article class="lin-cheat-card">
+                <h3>4. Geometría Analítica</h3>
+                <p><strong>Punto medio:</strong> <span class="eq">M((x<sub>1</sub>+x<sub>2</sub>)/2; (y<sub>1</sub>+y<sub>2</sub>)/2)</span></p>
+                <p><strong>Mediatriz:</strong> perpendicular a <span class="eq">PQ</span> que pasa por <span class="eq">M</span>.</p>
+                <p><strong>Distancia punto-recta:</strong> <span class="eq">|ax<sub>0</sub>+by<sub>0</sub>+c| / &radic;(a<sup>2</sup>+b<sup>2</sup>)</span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

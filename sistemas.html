@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 04 de Alaska Math Lab: Sistemas de ecuaciones lineales 2×2, métodos de sustitución, igualación y reducción, clasificación SCD/SCI/SI, sistemas con parámetros, reconstrucción gráfica y modelización."
+    />
+    <title>Unidad 04 · Sistemas de Ecuaciones Lineales 2×2 · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/sistemas.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/sistemas/index.js"></script>
+  </head>
+  <body data-page="sistemas">
+    <header data-site-nav="sistemas"></header>
+    <main class="page page--wide seq-page sys-page">
+      <header class="page-header">
+        <h1>Sistemas de Ecuaciones Lineales 2×2</h1>
+        <p class="intro">
+          Unidad 04 · Del cruce de dos rectas y los tres métodos analíticos a la clasificación SCD/SCI/SI,
+          sistemas con parámetros y modelización de problemas reales.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 04 · Sistemas 2×2</h2>
+          <p class="muted small" id="seq-progress-text">0/4 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Resolución y Clasificación</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-metodos-interseccion" data-sec="sec-metodos-interseccion">
+                <span>1 · Métodos e Intersección</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-clasificacion-scd-sci-si" data-sec="sec-clasificacion-scd-sci-si">
+                <span>2 · Clasificación SCD / SCI / SI</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Parámetros y Modelos</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-sistemas-parametricos" data-sec="sec-sistemas-parametricos">
+                <span>3 · Sistemas con Parámetros</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-modelizacion-reconstruccion" data-sec="sec-modelizacion-reconstruccion">
+                <span>4 · Gráficas y Modelización</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso Imprimible</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="sys-hero">
+            <p class="sys-kicker">Unidad 04 · Programa Oficial UNMDP FCEyN (Cap. 3 §Sistemas)</p>
+            <h1>Sistemas de Ecuaciones Lineales 2×2</h1>
+            <p>
+              Todo sistema lineal de dos ecuaciones con dos incógnitas (<span class="eq">ax + by = c</span>,
+              <span class="eq">a&prime;x + b&prime;y = c&prime;</span>) describe dos rectas en el plano. Resolverlo significa
+              encontrar todos los pares ordenados <span class="eq">(x<sub>0</sub>; y<sub>0</sub>)</span> que pertenecen simultáneamente a ambas.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · MÉTODOS ANALÍTICOS E INTERSECCIÓN
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-metodos-interseccion">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 4</div>
+              <h2 class="seq-section__title">1. Sistema Lineal 2×2: Sustitución, Igualación, Reducción e Intersección</h2>
+            </header>
+
+            <p class="sys-phrase">
+              <strong>En una frase:</strong> Resolver un sistema lineal 2×2 es hallar el punto común <span class="eq">(x<sub>0</sub>; y<sub>0</sub>)</span> donde se intersecan dos rectas mediante sustitución, igualación o reducción.
+            </p>
+
+            <div class="sys-prose">
+              <p>
+                <span class="sys-curriculum-tag is-official">UNMDP Cap. 3 (pp. 42, 45)</span>
+                Un sistema <span class="eq">2&times;2</span> vincula dos rectas <span class="eq">r<sub>1</sub>: ax + by = c</span> y
+                <span class="eq">r<sub>2</sub>: a&prime;x + b&prime;y = c&prime;</span>. Cuando aparecen denominadores o paréntesis (como en los Ejercicios 11b y 21f),
+                el primer paso siempre es distribuir y limpiar fracciones multiplicando por el mínimo común denominador antes de elegir entre
+                <strong>sustitución</strong>, <strong>igualación</strong> o <strong>reducción por suma y resta</strong>.
+              </p>
+              <div data-sys-formula></div>
+              <div class="sys-extension-box">
+                <p>
+                  <span class="sys-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Sincronización paso a paso:</strong> En el tablero inferior podés alternar entre los tres métodos y avanzar paso por paso observando cómo cada operación algebraica converge al mismo punto de cruce en el plano.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1-metodos">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="laboratorio-intersecciones"></div>
+            </div>
+
+            <div class="sys-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Limpiar fracciones y distributivas (Ej. 11b)</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> En <span class="eq">(6x &minus; 3)/3 + 3y = 14</span> simplificamos <span class="eq">2x &minus; 1 + 3y = 14 &rArr; 2x + 3y = 15</span>.</p>
+                <p><strong>2.</strong> En <span class="eq">x &minus; 3(2y &minus; 1) = 3y</span> distribuimos el signo menos: <span class="eq">x &minus; 6y + 3 = 3y &rArr; x = 9y &minus; 3</span>.</p>
+                <p><strong>3.</strong> Sustituimos: <span class="eq">2(9y &minus; 3) + 3y = 15 &rArr; 21y = 21 &rArr; y = 1</span>, luego <span class="eq">x = 6</span> &rArr; <span class="eq">S = {(6; 1)}</span>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="2" hidden>
+                <p>Limpiá la segunda ecuación <span class="eq">x &minus; 3(2y &minus; 1) = 3y</span> cuidando el producto <span class="eq">(&minus;3)(&minus;1)</span> para expresar <span class="eq">x</span> en función de <span class="eq">y</span>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> Verificá que <span class="eq">(6; 1)</span> cumple ambas ecuaciones originales antes de cerrar <span class="eq">S = {(6; 1)}</span>.</p>
+              </div>
+            </div>
+
+            <div class="sys-contrast-box">
+              <h4>Desafío de contraste · Sustitución vs Reducción en 3x + 2y = 7, 5x &minus; 2y = 9</h4>
+              <div class="sys-contrast-cols">
+                <div class="sys-contrast-col">
+                  <strong>Por sustitución directa</strong>
+                  <p>Obliga a despejar fracciones como <span class="eq">y = (7 &minus; 3x)/2</span> y arrastrar denominadores.</p>
+                </div>
+                <div class="sys-contrast-col">
+                  <strong>Por reducción (suma/resta)</strong>
+                  <p>Como <span class="eq">+2y</span> y <span class="eq">&minus;2y</span> son opuestos, sumarlas da directo <span class="eq">8x = 16 &rArr; x = 2, y = 1/2</span> sin fracciones intermedias.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sys-warning-box">
+              <strong>Cuidado con la respuesta incompleta:</strong> No te frenes al hallar <span class="eq">x<sub>0</sub></span>. Un sistema <span class="eq">2&times;2</span> exige entregar el par ordenado completo <span class="eq">S = {(x<sub>0</sub>; y<sub>0</sub>)}</span> separado con punto y coma.
+            </div>
+
+            <div data-check="sec-metodos-interseccion"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · CLASIFICACIÓN SCD / SCI / SI
+               ================================================================ -->
+          <section class="seq-section" id="sec-clasificacion-scd-sci-si">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 4</div>
+              <h2 class="seq-section__title">2. Clasificación: Compatible Determinado (SCD), Indeterminado (SCI) e Incompatible (SI)</h2>
+            </header>
+
+            <p class="sys-phrase">
+              <strong>En una frase:</strong> Dos rectas en el plano se cortan una vez (SCD), coinciden en infinitos puntos (SCI, <span class="eq">0 = 0</span>) o son paralelas separadas (SI, <span class="eq">0 = k &ne; 0</span>).
+            </p>
+
+            <div class="sys-prose">
+              <p>
+                <span class="sys-curriculum-tag is-official">UNMDP Cap. 3 (p. 42) &middot; Int. 1 (p. 74)</span>
+                Un sistema lineal <span class="eq">2&times;2</span> se clasifica en
+                <span class="gloss-term" data-gloss="sistema_compatible_determinado"><strong>Compatible Determinado (SCD)</strong></span>,
+                <span class="gloss-term" data-gloss="sistema_compatible_indeterminado"><strong>Compatible Indeterminado (SCI)</strong></span> o
+                <span class="gloss-term" data-gloss="sistema_incompatible"><strong>Incompatible (SI)</strong></span>
+                comparando pendientes y ordenadas al origen, o mediante reducción algebraica (<span class="eq">0x = 0</span> frente a <span class="eq">0x = k &ne; 0</span>).
+              </p>
+              <div data-sys-strip></div>
+              <div class="sys-extension-box">
+                <p>
+                  <span class="sys-curriculum-tag is-extension">Ampliación didáctica (no atribuida al cuadernillo)</span>
+                  <strong>Indicador geométrico &Delta; = ab&prime; &minus; a&prime;b:</strong> Usamos <span class="eq">&Delta;</span> como detector visual rápido de paralelismo (<span class="eq">&Delta; = 0</span>). Cuando <span class="eq">&Delta; = 0</span>, sigue siendo obligatorio comprobar los términos independientes para distinguir SCI de SI. En este nivel trabajamos únicamente sistemas <span class="eq">2&times;2</span> (sin sistemas <span class="eq">3&times;3</span>).
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2-clasificacion">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="clasificador-scd-sci-si"></div>
+            </div>
+
+            <div class="sys-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Integración 1 Ej. 1c: 2x + y = 3, 4x &minus; 6 = &minus;2y</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> Ordenamos la segunda ecuación: <span class="eq">4x + 2y = 6</span>.</p>
+                <p><strong>2.</strong> Sustituimos <span class="eq">y = 3 &minus; 2x</span>: <span class="eq">4x + 2(3 &minus; 2x) = 6 &rArr; 4x + 6 &minus; 4x = 6 &rArr; 0 = 0</span>.</p>
+                <p><strong>3.</strong> Identidad siempre verdadera: sistema <strong>SCI</strong> con <span class="eq">S = {(x; &minus;2x + 3) / x &isin; &Ropf;}</span>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="2" hidden>
+                <p>Al reordenar <span class="eq">4x &minus; 6 = &minus;2y</span> queda <span class="eq">4x + 2y = 6</span>. ¿Qué múltiplo de la primera ecuación es?</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> Escribí el conjunto solución infinito parametrizando <span class="eq">y</span> en función de <span class="eq">x &isin; &Ropf;</span>.</p>
+              </div>
+            </div>
+
+            <div class="sys-contrast-box">
+              <h4>Desafío de contraste · 0x = 0 (SCI) vs 0x = 5 (SI)</h4>
+              <div class="sys-contrast-cols">
+                <div class="sys-contrast-col">
+                  <strong>0x = 0 (Identidad)</strong>
+                  <p>Todo <span class="eq">x &isin; &Ropf;</span> satisface la igualdad: las dos rectas son idénticas y hay infinitas soluciones (SCI).</p>
+                </div>
+                <div class="sys-contrast-col">
+                  <strong>0x = 5 (Absurdo)</strong>
+                  <p>Ningún número real multiplicado por cero da 5: rectas paralelas separadas y <span class="eq">S = &empty;</span> (SI).</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sys-warning-box">
+              <strong>Cuidado con la trampa:</strong> Que las dos rectas tengan igual pendiente (<span class="eq">m<sub>1</sub> = m<sub>2</sub></span> o <span class="eq">&Delta; = 0</span>) jamás alcanza por sí solo para decidir si el sistema es SCI o SI: siempre chequeá también la ordenada al origen.
+            </div>
+
+            <div data-check="sec-clasificacion-scd-sci-si"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · SISTEMAS CON PARÁMETROS
+               ================================================================ -->
+          <section class="seq-section" id="sec-sistemas-parametricos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 3 de 4</div>
+              <h2 class="seq-section__title">3. Sistemas con Parámetros (k &isin; &Ropf; &minus; {a}) para SCD, SCI y SI</h2>
+            </header>
+
+            <p class="sys-phrase">
+              <strong>En una frase:</strong> Para clasificar un sistema con parámetro <span class="eq">k</span>, primero descartás los valores prohibidos por el dominio, luego hallás los <span class="eq">k</span> críticos de paralelismo y evaluás cada uno por separado.
+            </p>
+
+            <div class="sys-prose">
+              <p>
+                <span class="sys-curriculum-tag is-official">UNMDP Cap. 3 (pp. 42, 46)</span>
+                En los sistemas con un parámetro real restringido (como <span class="eq">k &isin; &Ropf; &minus; {0}</span> en Ej. 12a&ndash;b o <span class="eq">a &isin; &Ropf; &minus; {1}</span> en Ej. 21h),
+                buscamos los valores que anulan la diferencia de pendientes (o <span class="eq">&Delta;(k) = 0</span>) y sustituimos cada raíz crítica en el sistema original para distinguir SCI de SI.
+              </p>
+              <div class="sys-extension-box">
+                <p>
+                  <span class="sys-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Barrido continuo y recta 1D del parámetro:</strong> En el explorador interactivo podés deslizar <span class="eq">k</span> para ver el «giro de tijera» de la recta dependiente y observar el hueco de dominio prohibido sobre la recta superior.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3-parametros">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="explorador-parametrico"></div>
+            </div>
+
+            <div class="sys-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Ej. 12b: { kx + y = 7 ; (k + 2)x + ky = 14 } con k &isin; &Ropf; &minus; {0}</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> Despejamos <span class="eq">y = 7 &minus; kx</span> y sustituimos: <span class="eq">(k + 2)x + k(7 &minus; kx) = 14 &rArr; (k<sup>2</sup> &minus; k &minus; 2)x = 7(k &minus; 2)</span>.</p>
+                <p><strong>2.</strong> Factorizamos: <span class="eq">(k &minus; 2)(k + 1)x = 7(k &minus; 2)</span>. Raíces críticas: <span class="eq">k = 2</span> y <span class="eq">k = &minus;1</span>.</p>
+                <p><strong>3.</strong> En <span class="eq">k = 2</span>: <span class="eq">0x = 0</span> (<strong>SCI</strong>). En <span class="eq">k = &minus;1</span>: <span class="eq">0x = &minus;21</span> (<strong>SI</strong>). En <span class="eq">k &notin; {&minus;1; 0; 2}</span>: <strong>SCD</strong>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="2" hidden>
+                <p>De <span class="eq">(k &minus; 2)(k + 1)x = 7(k &minus; 2)</span>, evaluá qué queda en ambos miembros al poner <span class="eq">k = 2</span> frente a <span class="eq">k = &minus;1</span>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> Al escribir los valores para SCD, recordá excluir también <span class="eq">k = 0</span> por el dominio del enunciado.</p>
+              </div>
+            </div>
+
+            <div class="sys-contrast-box">
+              <h4>Desafío de contraste · Exclusión de dominio k &ne; 0 vs valores críticos</h4>
+              <div class="sys-contrast-cols">
+                <div class="sys-contrast-col">
+                  <strong>Olvidar el dominio inicial</strong>
+                  <p>Escribir <span class="eq">SCD: k &ne; 2, k &ne; &minus;1</span> deja adentro <span class="eq">k = 0</span>, violando <span class="eq">k &isin; &Ropf; &minus; {0}</span>.</p>
+                </div>
+                <div class="sys-contrast-col">
+                  <strong>Clasificación completa exacta</strong>
+                  <p><strong>SCD:</strong> <span class="eq">&Ropf; &minus; {&minus;1; 0; 2}</span> · <strong>SCI:</strong> <span class="eq">k = 2</span> · <strong>SI:</strong> <span class="eq">k = &minus;1</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sys-warning-box">
+              <strong>Cuidado con las divisiones por (k &minus; 2):</strong> Nunca simplifiques un factor con el parámetro <span class="eq">(k &minus; 2)</span> dividiendo ambos miembros sin analizar antes qué pasa exactamente cuando <span class="eq">k = 2</span>.
+            </div>
+
+            <div data-check="sec-sistemas-parametricos"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · MODELIZACIÓN Y RECONSTRUCCIÓN GRÁFICA
+               ================================================================ -->
+          <section class="seq-section" id="sec-modelizacion-reconstruccion">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 4</div>
+              <h2 class="seq-section__title">4. Reconstrucción desde Gráficas y Modelización de Problemas</h2>
+            </header>
+
+            <p class="sys-phrase">
+              <strong>En una frase:</strong> Reconstruir desde una gráfica exige leer dos puntos exactos (o usar <span class="eq">m<sub>2</sub> = &minus;1/m<sub>1</sub></span> en perpendiculares), y modelar en contexto exige traducir porcentajes pagados y validar factibilidad física.
+            </p>
+
+            <div class="sys-prose">
+              <p>
+                <span class="sys-curriculum-tag is-official">UNMDP Cap. 3 (pp. 43–45, 131, 146, 154)</span>
+                Tanto en problemas gráficos con rectas perpendiculares (Ej. 14 y 15) como en enunciados de mezclas, encuentro cinemático,
+                edades, monedas, geometría y descuentos comerciales (Simulacro 2019 Ej. 3, Global 2025 Ej. 3), cada dato independiente aporta una ecuación lineal.
+              </p>
+              <div class="sys-extension-box">
+                <p>
+                  <span class="sys-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Matriz traductora coloquial &harr; simbólico:</strong> Recordá traducir «10% de descuento» al monto efectivamente abonado (<span class="eq">0,90h</span>), «<span class="eq">h</span> excede en 5500 a <span class="eq">c</span>» como <span class="eq">h &minus; 5500 = c</span>, y descartar resultados negativos o sistemas incompatibles (como el rectángulo imposible de Ej. 13c).
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4-modelado">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="traductor-problemas"></div>
+            </div>
+
+            <div class="sys-worked-fading">
+              <h4>Ejemplo resuelto con retiro gradual · Reconstrucción perpendicular (Ej. 15) y Heladera/Cocina (Simulacro 2019)</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Completá el cierre</button>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="1">
+                <p><strong>Ej. 15:</strong> <span class="eq">r<sub>1</sub></span> pasa por <span class="eq">(0; &minus;2)</span> y <span class="eq">(4; 0)</span> &rArr; <span class="eq">y = (1/2)x &minus; 2</span>. Perpendicular por <span class="eq">(0; 10)</span>: <span class="eq">y = &minus;2x + 10</span> &rArr; <span class="eq">S = {(24/5; 2/5)}</span>.</p>
+                <p><strong>Descuento:</strong> <span class="eq">h &minus; 5500 = c</span> y <span class="eq">0,90h + 0,95c = 36400</span> &rArr; <span class="eq">h = $22.500, c = $17.000</span>.</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="2" hidden>
+                <p>Si <span class="eq">r<sub>1</sub></span> tiene <span class="eq">m<sub>1</sub> = 1/2</span> y <span class="eq">r<sub>2</sub> &perp; r<sub>1</sub></span> corta al eje <span class="eq">Y</span> en <span class="eq">10</span>, ¿cuál es <span class="eq">m<sub>2</sub></span>?</p>
+              </div>
+              <div class="sys-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Tu cierre:</strong> En el problema del descuento, verificá sustituyendo <span class="eq">0,90(22500) + 0,95(17000) = 20250 + 16150 = 36400</span>.</p>
+              </div>
+            </div>
+
+            <div class="sys-contrast-box">
+              <h4>Desafío de contraste · 0,10h + 0,05c vs 0,90h + 0,95c</h4>
+              <div class="sys-contrast-cols">
+                <div class="sys-contrast-col">
+                  <strong>Trampa del porcentaje descontado</strong>
+                  <p><span class="eq">0,10h + 0,05c = 36400</span> iguala el ahorro al monto pagado en caja: dispara precios irreales gigantes.</p>
+                </div>
+                <div class="sys-contrast-col">
+                  <strong>Fracción efectivamente pagada</strong>
+                  <p>Pagar con 10% y 5% de descuento equivale a abonar el <span class="eq">90%</span> y <span class="eq">95%</span>: <span class="eq">0,90h + 0,95c = 36400</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sys-warning-box">
+              <strong>Cuidado con el cierre de contexto:</strong> Si al resolver obtenés un sistema incompatible (como el rectángulo de Ej. 13c) o cantidades negativas para personas/monedas, explicá explícitamente que la configuración es imposible.
+            </div>
+
+            <div data-check="sec-modelizacion-reconstruccion"></div>
+          </section>
+
+          <!-- ================================================================
+               SECCIÓN RETOS Y 5 TRAMPAS
+               ================================================================ -->
+          <section id="sec-retos" class="seq-section">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Práctica Activa y Transferencia</div>
+              <h2 class="seq-section__title">Entrenador Infinito por Semilla (8 Familias) y 5 Trampas de Examen</h2>
+            </header>
+            <div id="sys-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               HOJA DE REPASO Y PANEL DE COMPETENCIAS
+               ================================================================ -->
+          <section id="sec-repaso" class="seq-section">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis y Evidencia de Dominio</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible · Sistemas 2×2</h2>
+            </header>
+
+            <div class="sys-no-print" style="margin-bottom: 14px;">
+              <button type="button" class="pr-btn" data-print-sheet="true">Imprimir o guardar en PDF</button>
+            </div>
+
+            <div id="sys-competency-dashboard" class="sys-no-print"></div>
+
+            <div class="sys-cheat-grid">
+              <article class="sys-cheat-card">
+                <h3>1. Tres Métodos Analíticos</h3>
+                <p><strong>Sustitución:</strong> despejar una incógnita y reemplazar en la otra.</p>
+                <p><strong>Igualación:</strong> despejar la misma incógnita en ambas e igualar.</p>
+                <p><strong>Reducción:</strong> igualar coeficientes y sumar/restar filas.</p>
+              </article>
+              <article class="sys-cheat-card">
+                <h3>2. Clasificación SCD / SCI / SI</h3>
+                <p><strong>SCD:</strong> secantes, solución única <span class="eq">{(x<sub>0</sub>; y<sub>0</sub>)}</span>.</p>
+                <p><strong>SCI:</strong> coincidentes (<span class="eq">0 = 0</span>), infinitas soluciones.</p>
+                <p><strong>SI:</strong> paralelas separadas (<span class="eq">0 = k &ne; 0</span>), <span class="eq">S = &empty;</span>.</p>
+              </article>
+              <article class="sys-cheat-card">
+                <h3>3. Sistemas con Parámetros</h3>
+                <p>1) Anotar exclusiones del dominio (<span class="eq">k &ne; 0, a &ne; 1</span>).</p>
+                <p>2) Buscar raíces críticas de paralelismo.</p>
+                <p>3) Sustituir cada crítico en el sistema original para decidir SCI vs SI.</p>
+              </article>
+              <article class="sys-cheat-card">
+                <h3>4. Gráficas y Porcentajes</h3>
+                <p>Perpendiculares: <span class="eq">m<sub>2</sub> = &minus;1/m<sub>1</sub></span>.</p>
+                <p>Descuento del <span class="eq">d%</span> &rArr; se abona <span class="eq">(1 &minus; d/100)</span> del precio de lista.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
