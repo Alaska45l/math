@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 11 de Alaska Math Lab: Funciones trigonométricas (congruencia angular y clases C_α, definición cartesiana, gráficas, dominios diferenciados, biyectividad, identidad pitagórica, reducción al I cuadrante y ecuaciones periódicas)."
+    />
+    <title>Unidad 11 · Funciones Trigonométricas · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/funciones-trigonometricas.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/funciones-trigonometricas/index.js"></script>
+  </head>
+  <body data-page="funciones-trigonometricas">
+    <header data-site-nav="funciones-trigonometricas"></header>
+    <main class="page page--wide seq-page trigf-page">
+      <header class="page-header">
+        <h1>Funciones Trigonométricas y Ecuaciones Periódicas</h1>
+        <p class="intro">
+          Unidad 11 · De los sistemas angulares y clases de congruencia C<sub>&alpha;</sub> a las seis funciones
+          trigonométricas con dominios diferenciados, relaciones pitagóricas exactas y ecuaciones periódicas en &Ropf;.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 11 · Funciones Trigonométricas</h2>
+          <p class="muted small" id="seq-progress-text">0/7 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Congruencia y Plano Cartesiano</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-1" data-sec="sec-1">
+                <span>1 · Congruencia y Clases C<sub>&alpha;</sub></span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2">
+                <span>2 · Definición Cartesiana</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Las 6 Funciones y sus Gráficas</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3">
+                <span>3 · Seno y Coseno</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4">
+                <span>4 · Tg, Cotg, Sec y Cosec</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Identidades y Ecuaciones</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-5" data-sec="sec-5">
+                <span>5 · Identidades y Reducción</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6">
+                <span>6 · Ecuaciones Periódicas</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-7" data-sec="sec-7">
+                <span>7 · Restricciones e Inversas</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 4 · Práctica y Síntesis</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso y Competencias</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="trigf-hero">
+            <p class="trigf-kicker">Unidad 11 · Programa Oficial UNMDP FCEyN</p>
+            <h1>Funciones Trigonométricas y Ecuaciones Periódicas</h1>
+            <p>
+              Extendemos las razones trigonométricas a cualquier ángulo real mediante clases de congruencia
+              <span class="eq">C<sub>&alpha;</sub></span> y la definición cartesiana <span class="eq">(abs, ord, r.v.)</span>.
+              Analizamos con precisión los dominios diferenciados, imágenes, períodos y restricciones biyectivas
+              de las seis funciones hasta resolver ecuaciones periódicas con control estricto de polos.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · SISTEMAS ANGULARES, CONGRUENCIA Y CLASES C_α
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-1">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 7</div>
+              <h2 class="seq-section__title">1. Sistemas Angulares, Congruencia y Clases C<sub>&alpha;</sub></h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Dos ángulos son congruentes si y solo si su diferencia es un múltiplo entero de <span class="eq">2&pi;</span> radianes (o <span class="eq">360&deg;</span>); toda su familia comparte el mismo rayo terminal y se resume en una clase <span class="eq">C<sub>&alpha;</sub></span> con representante principal en <span class="eq">[0; 2&pi;)</span>.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En el sistema sexagesimal la unidad es el grado (<span class="eq">1&deg;</span>) y en el sistema circular es el <strong>radián</strong>
+                (razón entre arco y radio, <span class="eq">s = r &middot; &theta;</span>), vinculados por la regla exacta <span class="eq">&pi; rad &harr; 180&deg;</span>.
+                Dos ángulos <span class="eq">&alpha;</span> y <span class="eq">&beta;</span> son <strong>congruentes</strong> (<span class="eq">&alpha; &equiv; &beta;</span>)
+                cuando <span class="eq">&alpha; &minus; &beta; = 2k&pi;</span> (<span class="eq">k &isin; &#8484;</span>). La clase de congruencia es
+                <span class="eq">C<sub>&alpha;&#770;</sub> = { x &isin; &Ropf; / x = &alpha;&#770; + 2k&pi;, k &isin; &#8484; }</span>,
+                eligiendo por convención el representante principal <span class="eq">0 &le; &alpha;&#770; &lt; 2&pi;</span> (o <span class="eq">0&deg; &le; &alpha;&#770; &lt; 360&deg;</span>).
+              </p>
+
+              <div data-trigf-formula="congruence"></div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1-congruencia">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="explorador-congruencia"></div>
+            </div>
+
+            <div class="trigf-worked-fading">
+              <h4>Ejemplo con retiro gradual · Reducción al representante principal</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="1">
+                <p><strong>1. Comparar sistemas mixtos:</strong> Convertimos <span class="eq">&minus;870&deg;</span> a radianes: <span class="eq">&minus;870 &middot; &pi;/180 = &minus;29&pi;/6</span>. Al sumar <span class="eq">3</span> giros (<span class="eq">+36&pi;/6</span>) resulta <span class="eq">7&pi;/6 = 210&deg;</span>.</p>
+                <p><strong>2. Comparar con <span class="eq">31&pi;/6</span>:</strong> Restamos <span class="eq">2</span> giros (<span class="eq">&minus;24&pi;/6</span>) y también da <span class="eq">7&pi;/6</span>. Ambos pertenecen a <span class="eq">C<sub>7&pi;/6</sub></span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> Para reducir <span class="eq">12&pi;/5</span> a <span class="eq">[0; 2&pi;)</span>, restale <span class="eq">2&pi; = 10&pi;/5</span>: queda <span class="eq">____</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> Para <span class="eq">&minus;500&deg;</span>, sumá múltiplos de <span class="eq">360&deg;</span> (<span class="eq">2 &middot; 360&deg; = 720&deg;</span>) hasta entrar en <span class="eq">[0&deg;; 360&deg;)</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Resolvé los tres chequeos de reducción y congruencia abajo.</p>
+              </div>
+            </div>
+
+            <div class="trigf-contrast-box">
+              <h4>Desafío de contraste · Representante negativo vs. representante principal</h4>
+              <div class="trigf-contrast-cols">
+                <div class="trigf-contrast-col">
+                  <strong>Sin reducir: <span class="eq">C<sub>&minus;&pi;/3</sub></span></strong>
+                  <p>Nombra el rayo correcto, pero <span class="eq">&minus;&pi;/3 &lt; 0</span> está fuera de <span class="eq">[0; 2&pi;)</span>.</p>
+                </div>
+                <div class="trigf-contrast-col">
+                  <strong>Representante principal: <span class="eq">C<sub>5&pi;/3</sub></span></strong>
+                  <p>Sumando <span class="eq">2&pi; = 6&pi;/3</span> cae en <span class="eq">5&pi;/3 &isin; [0; 2&pi;)</span>, forma canónica de examen.</p>
+                </div>
+              </div>
+            </div>
+
+            <div data-check="sec-1"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · DEFINICIÓN CARTESIANA Y SIGNOS POR CUADRANTE
+               ================================================================ -->
+          <section class="seq-section" id="sec-2">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 7</div>
+              <h2 class="seq-section__title">2. Definición Cartesiana y Signos en los 4 Cuadrantes</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Dado un punto <span class="eq">P(abs; ord) &ne; (0; 0)</span> sobre el lado terminal y su radio vector <span class="eq">r.v. = &radic;(abs&sup2; + ord&sup2;) &gt; 0</span>, la ordenada gobierna al seno, la abscisa al coseno y su cociente a la tangente.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En un sistema cartesiano definimos las seis funciones trigonométricas de un ángulo <span class="eq">&alpha;</span> cualquiera como:
+                <span class="eq">sen(&alpha;) = ord / r.v.</span>, <span class="eq">cos(&alpha;) = abs / r.v.</span>, <span class="eq">tg(&alpha;) = ord / abs</span> (si <span class="eq">abs &ne; 0</span>),
+                <span class="eq">cosec(&alpha;) = r.v. / ord</span> (si <span class="eq">ord &ne; 0</span>), <span class="eq">sec(&alpha;) = r.v. / abs</span> (si <span class="eq">abs &ne; 0</span>) y
+                <span class="eq">cotg(&alpha;) = abs / ord</span> (si <span class="eq">ord &ne; 0</span>).
+                Por signos de cuadrante: en <strong>I</strong> todas son positivas; en <strong>II</strong> solo <span class="eq">sen, cosec &gt; 0</span>; en <strong>III</strong> solo <span class="eq">tg, cotg &gt; 0</span>; en <strong>IV</strong> solo <span class="eq">cos, sec &gt; 0</span>.
+              </p>
+
+              <div data-trigf-formula="cartesian"></div>
+
+              <div class="trigf-extension-box">
+                <p>
+                  <span class="trigf-curriculum-tag is-extension">Ampliación didáctica · Circunferencia trigonométrica unitaria</span>
+                  El programa oficial define las razones con radio vector general <span class="eq">r.v.</span> en el plano cartesiano.
+                  Como <strong>ampliación didáctica</strong>, podés conmutar el tablero al caso particular <span class="eq">r = 1</span> para visualizar los <strong>6 segmentos geométricos</strong>
+                  (<span class="eq">sen, cos, tg, cotg, sec, cosec</span>) directamente en la circunferencia unitaria.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2-cartesiana">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="circulo-trigonometrico"></div>
+            </div>
+
+            <div class="trigf-warning-box">
+              <strong>Cuidado con intercambiar abs y ord:</strong> <span class="eq">sen(&alpha;)</span> siempre usa la coordenada vertical (<span class="eq">ord</span>) y <span class="eq">cos(&alpha;)</span> siempre usa la horizontal (<span class="eq">abs</span>). Nunca omitas dividir por <span class="eq">r.v. = &radic;(abs&sup2; + ord&sup2;)</span> cuando <span class="eq">r.v. &ne; 1</span>.
+            </div>
+
+            <div data-check="sec-2"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · SENO Y COSENO: GRÁFICAS, ANÁLISIS Y BIYECTIVIDAD
+               ================================================================ -->
+          <section class="seq-section" id="sec-3">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 3 de 7</div>
+              <h2 class="seq-section__title">3. Seno y Coseno: Gráficas, Análisis y Biyectividad</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Tanto <span class="eq">sen x</span> como <span class="eq">cos x</span> viven en <span class="eq">Dom = &Ropf;</span>, oscilan en <span class="eq">Im = [&minus;1; 1]</span> con período <span class="eq">2&pi;</span> y no son ni inyectivas ni suryectivas sobre <span class="eq">&Ropf;</span>, pero se vuelven biyectivas al restringirlas a <span class="eq">[&minus;&pi;/2; &pi;/2]</span> y <span class="eq">[0; &pi;]</span> con codominio <span class="eq">[&minus;1; 1]</span>.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Para <span class="eq">f(x) = sen x</span>: <span class="eq">Dom = &Ropf;</span>, <span class="eq">Im = [&minus;1; 1]</span>, ceros en <span class="eq">C<sub>0</sub> &cup; C<sub>&pi;</sub></span>, positiva en <span class="eq">(0; &pi;)</span> y negativa en <span class="eq">(&pi;; 2&pi;)</span>.
+                Para <span class="eq">g(x) = cos x</span>: <span class="eq">Dom = &Ropf;</span>, <span class="eq">Im = [&minus;1; 1]</span>, ceros en <span class="eq">C<sub>&pi;/2</sub> &cup; C<sub>3&pi;/2</sub></span>, positiva en <span class="eq">[0; &pi;/2) &cup; (3&pi;/2; 2&pi;)</span> y negativa en <span class="eq">(&pi;/2; 3&pi;/2)</span>.
+              </p>
+
+              <div class="trigf-extension-box">
+                <p>
+                  <span class="trigf-curriculum-tag is-extension">Ampliación didáctica · Transformación sinusoidal A&middot;sen(Bx &minus; C) + D</span>
+                  El programa de ingreso evalúa únicamente las 6 funciones trigonométricas canónicas sin desplazamientos ni escalamientos.
+                  Como <strong>ampliación didáctica</strong>, podés activar en el sincronizador el modo <span class="eq">A&middot;sen(Bx &minus; C) + D</span> para explorar amplitud, período y fase.
+                </p>
+                <div data-trigf-formula="sinusoid"></div>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3-senocoseno">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="sincronizador-graficas"></div>
+            </div>
+
+            <div data-check="sec-3"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · TANGENTE, COTANGENTE, SECANTE Y COSECANTE
+               ================================================================ -->
+          <section class="seq-section" id="sec-4">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 7</div>
+              <h2 class="seq-section__title">4. Tangente, Cotangente, Secante y Cosecante (Dominios Diferenciados)</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Jamás agrupes las cuatro funciones derivadas bajo un mismo dominio: <span class="eq">tg x</span> y <span class="eq">sec x</span> excluyen donde <span class="eq">cos x = 0</span> (<span class="eq">C<sub>&pi;/2</sub> &cup; C<sub>3&pi;/2</sub></span>), mientras <span class="eq">cotg x</span> y <span class="eq">cosec x</span> excluyen donde <span class="eq">sen x = 0</span> (<span class="eq">C<sub>0</sub> &cup; C<sub>&pi;</sub></span>).
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Cada función trigonométrica posee una identidad propia de dominio, imagen, ceros, período y suryectividad.
+                Observá la matriz comparativa completa de las 6 funciones canónicas (y probá superponer <span class="eq">cos</span>/<span class="eq">sen</span> con <span class="eq">tg</span>, <span class="eq">cotg</span>, <span class="eq">sec</span> y <span class="eq">cosec</span> en el Sincronizador del Pizarrón 3):
+              </p>
+
+              <div data-trigf-matrix></div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4-derivadas">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="trigf-contrast-box">
+              <h4>Desafío de contraste · Dos parejas con propiedades opuestas</h4>
+              <div class="trigf-contrast-cols">
+                <div class="trigf-contrast-col">
+                  <strong>Cocientes <span class="eq">tg x</span> y <span class="eq">cotg x</span></strong>
+                  <p>Período <span class="eq">&pi;</span>, <span class="eq">Im = &Ropf;</span> (suryectivas sobre <span class="eq">&Ropf;</span>), pero <strong>dominios distintos</strong> (<span class="eq">cos x &ne; 0</span> vs. <span class="eq">sen x &ne; 0</span>) y ceros distintos (<span class="eq">C<sub>0</sub>&cup;C<sub>&pi;</sub></span> vs. <span class="eq">C<sub>&pi;/2</sub>&cup;C<sub>3&pi;/2</sub></span>).</p>
+                </div>
+                <div class="trigf-contrast-col">
+                  <strong>Recíprocas <span class="eq">sec x</span> y <span class="eq">cosec x</span></strong>
+                  <p>Período <span class="eq">2&pi;</span>, <span class="eq">Im = (&minus;&infin;; &minus;1] &cup; [1; +&infin;)</span> (no suryectivas sobre <span class="eq">&Ropf;</span>), sin ceros (<span class="eq">C<sub>0</sub> = &empty;</span>) y dominios distintos (<span class="eq">cos x &ne; 0</span> vs. <span class="eq">sen x &ne; 0</span>).</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="trigf-warning-box">
+              <strong>Cuidado con la trampa del período y el dominio:</strong> ni <span class="eq">tg x</span> tiene período <span class="eq">2&pi;</span> (es <span class="eq">&pi;</span>), ni todas las funciones con asíntotas fallan en los mismos puntos (<span class="eq">tg(0) = 0</span> existe, pero <span class="eq">cosec(0)</span> y <span class="eq">cotg(0)</span> no existen).
+            </div>
+
+            <div data-check="sec-4"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 5 · ÁNGULOS NOTABLES, REDUCCIÓN AL I CUADRANTE E IDENTIDADES
+               ================================================================ -->
+          <section class="seq-section" id="sec-5">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 5 de 7</div>
+              <h2 class="seq-section__title">5. Ángulos Notables, Relación Pitagórica, Reducción e Identidades</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Conociendo un valor y el cuadrante, la identidad pitagórica <span class="eq">sen&sup2;&alpha; + cos&sup2;&alpha; = 1</span> entrega el valor absoluto exacto de todas las demás razones, mientras el cuadrante fija el signo y la reducción al I cuadrante evalúa cualquier ángulo notable.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                De <span class="eq">sen&sup2;&alpha; + cos&sup2;&alpha; = 1</span> se deduce <span class="eq">cos&alpha; = &plusmn;&radic;(1 &minus; sen&sup2;&alpha;)</span> y <span class="eq">sen&alpha; = &plusmn;&radic;(1 &minus; cos&sup2;&alpha;)</span>,
+                eligiendo el signo según el cuadrante. Para reducir al I cuadrante:
+                en <strong>II</strong> usamos <span class="eq">&pi; &minus; &alpha;</span> (<span class="eq">180&deg; &minus; &alpha;</span>);
+                en <strong>III</strong> usamos <span class="eq">&alpha; &minus; &pi;</span> (<span class="eq">&alpha; &minus; 180&deg;</span>);
+                en <strong>IV</strong> usamos <span class="eq">2&pi; &minus; &alpha;</span> (<span class="eq">360&deg; &minus; &alpha;</span>), conservando el signo del cuadrante original.
+              </p>
+
+              <div data-trigf-formula="pythagorean"></div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec5-identidades">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec5-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="detector-cuadrantes"></div>
+            </div>
+
+            <div class="trigf-worked-fading">
+              <h4>Ejemplo con retiro gradual · Dado sen(&alpha;) = &minus;3/4 y tg(&alpha;) &gt; 0, hallar las 6 exactas</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="1">
+                <p><strong>1. Cuadrante:</strong> <span class="eq">sen &alpha; &lt; 0</span> (III o IV) y <span class="eq">tg &alpha; &gt; 0</span> (I o III) &rArr; <span class="eq">&alpha; &isin; III</span> (<span class="eq">cos &alpha; &lt; 0</span>).</p>
+                <p><strong>2. Pitagórica y recíprocas racionalizadas:</strong> <span class="eq">cos &alpha; = &minus;&radic;(1 &minus; 9/16) = &minus;&radic;7/4</span> &rArr; <span class="eq">sec &alpha; = &minus;4/&radic;7 = &minus;4&radic;7/7</span>, <span class="eq">cosec &alpha; = &minus;4/3</span>, <span class="eq">tg &alpha; = 3&radic;7/7</span>, <span class="eq">cotg &alpha; = &radic;7/3</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> Si <span class="eq">cos &alpha; = &minus;1/5</span> en el II cuadrante, <span class="eq">sen &alpha; = +&radic;(1 &minus; 1/25) = ____</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> Para verificar <span class="eq">tg x + cotg x = sec x &middot; cosec x</span>, convertí todo a <span class="eq">sen x</span> y <span class="eq">cos x</span>, sacá denominador común <span class="eq">sen x &middot; cos x</span> y aplicá <span class="eq">sen&sup2; x + cos&sup2; x = 1</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Resolvé los tres chequeos de valores exactos y reducción al I cuadrante.</p>
+              </div>
+            </div>
+
+            <div data-check="sec-5"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 6 · ECUACIONES TRIGONOMÉTRICAS Y SOLUCIONES PERIÓDICAS
+               ================================================================ -->
+          <section class="seq-section" id="sec-6">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 6 de 7</div>
+              <h2 class="seq-section__title">6. Ecuaciones Trigonométricas, Clases C<sub>&alpha;</sub> y Aduana de Polos</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Toda ecuación trigonométrica en <span class="eq">&Ropf;</span> exige encontrar todas las ramas simétricas dentro de <span class="eq">[0; 2&pi;)</span>, descartar las candidatas que anulan denominadores o tocan polos, y recién entonces unir las clases <span class="eq">C<sub>&alpha;</sub></span>.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Según el dominio pedido, expresamos las soluciones como un valor en <span class="eq">[0; &pi;/2]</span>, un conjunto finito en <span class="eq">[0; 2&pi;)</span>,
+                o una unión de clases de congruencia <span class="eq">C<sub>&alpha;<sub>1</sub></sub> &cup; C<sub>&alpha;<sub>2</sub></sub> &cup; &dots;</span> en <span class="eq">&Ropf;</span>.
+                En ecuaciones con fracciones o <span class="eq">tg, cotg, sec, cosec</span>, es obligatorio verificar la <strong>condición de existencia</strong>
+                (ej. <span class="eq">cos x &ne; 0</span> o <span class="eq">sen x &ne; 0</span>) antes de aceptar cualquier raíz.
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec6-ecuaciones">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec6-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="soluciones-periodicas"></div>
+            </div>
+
+            <div class="trigf-worked-fading">
+              <h4>Ejemplo con retiro gradual · Resolver 4cos&sup2; x &minus; 1 = 0 y [(1 &minus; sen x)(&radic;3 &minus; tg x)]/cos x = 0</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="1">
+                <p><strong>1. Ecuación cuadrática <span class="eq">4cos&sup2; x &minus; 1 = 0</span>:</strong> <span class="eq">cos x = &plusmn;1/2</span> aporta 4 ángulos en <span class="eq">[0; 2&pi;)</span>: <span class="eq">{&pi;/3; 2&pi;/3; 4&pi;/3; 5&pi;/3}</span>.</p>
+                <p><strong>2. Aduana de polos en <span class="eq">[(1 &minus; sen x)(&radic;3 &minus; tg x)]/cos x = 0</span>:</strong> <span class="eq">1 &minus; sen x = 0</span> da <span class="eq">x = &pi;/2</span>, pero como <span class="eq">cos(&pi;/2) = 0</span> anula el denominador, se descarta. Solo sobrevive <span class="eq">tg x = &radic;3 &rArr; C<sub>&pi;/3</sub> &cup; C<sub>4&pi;/3</sub></span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> En <span class="eq">2sen&sup2; x + cos x = 1</span>, al reemplazar <span class="eq">sen&sup2; x = 1 &minus; cos&sup2; x</span> obtenés <span class="eq">2cos&sup2; x &minus; cos x &minus; 1 = 0</span>, cuyas raíces para <span class="eq">cos x</span> son <span class="eq">1</span> y <span class="eq">____</span>.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> En <span class="eq">2cosec x &minus; 2sen x = cotg x</span>, multiplicá por <span class="eq">sen x</span> (recordando <span class="eq">sen x &ne; 0</span>), factorizá en <span class="eq">cos x</span> y verificá que ninguna raíz anule el seno.</p>
+              </div>
+              <div class="trigf-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Resolvé las tres ecuaciones con control de ramas y polos abajo.</p>
+              </div>
+            </div>
+
+            <div data-check="sec-6"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 7 · ESTUDIO INTEGRAL DE RESTRICCIONES, VALIDEZ E INVERSAS
+               ================================================================ -->
+          <section class="seq-section" id="sec-7">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 7 de 7</div>
+              <h2 class="seq-section__title">7. Estudio Integral de Restricciones, Validez e Inversas</h2>
+            </header>
+
+            <p class="trigf-phrase">
+              <strong>En una frase:</strong> Ninguna función trigonométrica es biyectiva sobre todo su dominio natural; para admitir inversa debemos recortar el dominio a una sola rama monótona y ajustar el codominio exactamente a su conjunto imagen.
+            </p>
+
+            <div class="trigf-prose">
+              <p>
+                <span class="trigf-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Para validar proposiciones sobre ecuaciones e intervalos: chequeá siempre que el valor buscado pertenezca a la <strong>imagen real</strong>
+                (por ejemplo <span class="eq">sen x = 7/2</span> es falsa porque <span class="eq">7/2 &notin; [&minus;1; 1]</span>, mientras <span class="eq">tg x = &minus;8</span> es verdadera porque <span class="eq">Im(tg) = &Ropf;</span>),
+                y al restringir para biyectividad cuidá si los extremos son cerrados (<span class="eq">[&minus;&pi;/2; &pi;/2]</span> para seno, <span class="eq">[0; &pi;]</span> para coseno)
+                o abiertos por presencia de asíntotas (<span class="eq">(&minus;&pi;/2; &pi;/2)</span> para tangente, <span class="eq">(0; &pi;)</span> para cotangente).
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec7-restricciones">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec7-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="analizador-dominio-imagen"></div>
+            </div>
+
+            <div class="trigf-warning-box">
+              <strong>Cuidado con la biyectividad de <span class="eq">cotg x</span> vs. <span class="eq">cosec x</span>:</strong> aunque <span class="eq">Im(cotg) = &Ropf;</span> vuelve suryectiva a <span class="eq">cotg: Dom &rarr; &Ropf;</span>, NO es inyectiva hasta restringirla a <span class="eq">(0; &pi;)</span>. Por su parte, <span class="eq">cosec: Dom &rarr; &Ropf;</span> no es ni inyectiva ni suryectiva.
+            </div>
+
+            <div data-check="sec-7"></div>
+          </section>
+
+          <!-- ================================================================
+               ENTRENADOR PRNG + 5 TRAMPAS CLÁSICAS
+               ================================================================ -->
+          <section id="sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Entrenamiento Generativo · Unidad 11</div>
+              <h2 class="seq-section__title">Entrenador Infinito por Semilla y las 5 Trampas Clásicas de Examen</h2>
+            </header>
+            <div id="trigf-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               HOJA DE REPASO IMPRIMIBLE + PANEL DE COMPETENCIAS
+               ================================================================ -->
+          <section id="sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis · Autoevaluación y Repaso</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible · Funciones Trigonométricas</h2>
+            </header>
+
+            <div class="trigf-no-print" style="margin-bottom: 14px;">
+              <button type="button" class="pr-btn" data-print-sheet="1">Imprimir hoja de repaso</button>
+            </div>
+
+            <div id="trigf-competency-dashboard"></div>
+
+            <div class="trigf-cheat-grid">
+              <article class="trigf-cheat-card">
+                <h3>1. Congruencia y Clases C<sub>&alpha;</sub></h3>
+                <p><span class="eq">&alpha; &equiv; &beta; &hArr; &alpha; &minus; &beta; = 2k&pi;</span> (<span class="eq">k &isin; &#8484;</span>). Reducir siempre al representante principal en <span class="eq">[0; 2&pi;)</span> o <span class="eq">[0&deg;; 360&deg;)</span>.</p>
+              </article>
+              <article class="trigf-cheat-card">
+                <h3>2. Definición Cartesiana</h3>
+                <p><span class="eq">sen = ord/r.v.</span>, <span class="eq">cos = abs/r.v.</span>, <span class="eq">tg = ord/abs</span>. Signos positivos: I Todas, II Sen/Cosec, III Tg/Cotg, IV Cos/Sec.</p>
+              </article>
+              <article class="trigf-cheat-card">
+                <h3>3. Dominios e Imágenes</h3>
+                <p><span class="eq">tg, sec</span> excluyen <span class="eq">C<sub>&pi;/2</sub> &cup; C<sub>3&pi;/2</sub></span>; <span class="eq">cotg, cosec</span> excluyen <span class="eq">C<sub>0</sub> &cup; C<sub>&pi;</sub></span>. Período <span class="eq">&pi;</span> en <span class="eq">tg/cotg</span>, <span class="eq">2&pi;</span> en el resto.</p>
+              </article>
+              <article class="trigf-cheat-card">
+                <h3>4. Notables y Pitagórica</h3>
+                <p><span class="eq">sen&sup2;&alpha; + cos&sup2;&alpha; = 1</span> (elegir signo <span class="eq">&plusmn;</span> según el cuadrante). Notables <span class="eq">0, &pi;/6, &pi;/4, &pi;/3, &pi;/2</span> y racionalización exacta.</p>
+              </article>
+              <article class="trigf-cheat-card">
+                <h3>5. Reducción al I Cuadrante</h3>
+                <p>II: <span class="eq">&pi; &minus; &alpha;</span> · III: <span class="eq">&alpha; &minus; &pi;</span> · IV: <span class="eq">2&pi; &minus; &alpha;</span>, conservando siempre el signo del cuadrante original.</p>
+              </article>
+              <article class="trigf-cheat-card">
+                <h3>6. Ecuaciones y Restricciones</h3>
+                <p>Buscar todas las ramas en <span class="eq">[0; 2&pi;)</span>, excluir polos (<span class="eq">cos x = 0</span> o <span class="eq">sen x = 0</span>), y unir clases <span class="eq">C<sub>&alpha;</sub></span> en <span class="eq">&Ropf;</span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
