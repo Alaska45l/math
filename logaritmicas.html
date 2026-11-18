@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 09 de Alaska Math Lab: Definición y existencia de logaritmos en ℝ, las 5 propiedades operativas, ecuaciones y sistemas 2×2, función inversa por reflexión y modelos reales."
+    />
+    <title>Unidad 09 · Funciones y Ecuaciones Logarítmicas · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/logaritmicas.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/logaritmicas/index.js"></script>
+  </head>
+  <body data-page="logaritmicas">
+    <header data-site-nav="logaritmicas"></header>
+
+    <main class="page page--wide seq-page log-page">
+      <header class="page-header">
+        <h1>Funciones y Ecuaciones Logarítmicas</h1>
+        <p class="intro">
+          Unidad 09 · De la pregunta inversa a la potencia y la aduana de existencia en ℝ
+          a las propiedades operativas, ecuaciones con filtro de dominio, reflexión especular y escalas logarítmicas.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" id="log-sidebar-index" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 09 · Logarítmicas</h2>
+          <div class="seq-sidebar__progress">
+            <span id="seq-progress-text" class="small muted">Progreso: 0/6</span>
+            <div class="seq-progress-bar" aria-hidden="true">
+              <div id="seq-progress-fill" class="seq-progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Fundamentos</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-1" data-sec="sec-1">
+                <span>1 · Definición y bases</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2">
+                <span>2 · Propiedades y cambio de base</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Ecuaciones</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3">
+                <span>3 · Ecuaciones y sistemas</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Función Logarítmica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4">
+                <span>4 · Inversa y espejo y = x</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-5" data-sec="sec-5">
+                <span>5 · Radiografía funcional</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 4 · Aplicaciones</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6">
+                <span>6 · Modelos y escala Richter</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 5 · Práctica</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Competencias y Repaso</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="log-hero">
+            <p class="log-kicker">Alaska Math Lab · Unidad 09 · Programa Oficial UNMDP FCEyN</p>
+            <h1>Funciones y Ecuaciones Logarítmicas</h1>
+            <p>
+              El logaritmo es la operación inversa de la potenciación exponencial: responde a qué exponente
+              debemos elevar una base admitida <span class="eq">a &isin; &Ropf;<sup>+</sup> &minus; {1}</span> para
+              alcanzar un argumento positivo <span class="eq">x &gt; 0</span>. Su gráfica refleja la curva
+              exponencial respecto de <span class="eq">y = x</span> y permite despejar el tiempo en modelos reales.
+            </p>
+            <p class="pr-progress" data-progress>Chequeos resueltos: 0/18</p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · DEFINICIÓN, EXISTENCIA EN ℝ Y BASES ESPECIALES
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-1" aria-labelledby="title-sec-1">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Fundamentos · Pizarrón 1 de 6</div>
+              <h2 id="title-sec-1" class="seq-section__title">1. Definición, Existencia en ℝ y Bases Especiales (log, ln)</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec1-definicion">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec1-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <!-- 1. En una frase -->
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  Calcular <span class="eq">log<sub>a</sub>(x)</span> es buscar el exponente <span class="eq">y &isin; &Ropf;</span> que verifica <span class="eq">a<sup>y</sup> = x</span>, exigiendo siempre base <span class="eq">a &gt; 0, a &ne; 1</span> y argumento <span class="eq">x &gt; 0</span>.
+                </blockquote>
+              </div>
+
+              <!-- 2. Cómo se ve -->
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    La <strong>logaritmación</strong> se define como <span class="eq">log<sub>a</sub>(x) = y &hArr; a<sup>y</sup> = x</span>
+                    para <span class="eq">a &isin; &Ropf;<sup>+</sup> &minus; {1}</span> y <span class="eq">x &isin; &Ropf;<sup>+</sup></span>.
+                    Cuando la base es <span class="eq">10</span> se habla de <strong>logaritmo decimal</strong> y se escribe simplemente
+                    <span class="eq">log(x)</span>; cuando la base es la constante irracional
+                    <span class="gloss-term" data-gloss="base_natural_e">número e</span> (&approx; 2,71828), se llama
+                    <strong>logaritmo natural o neperiano</strong> y se escribe <span class="eq">ln(x)</span>.
+                  </p>
+                  <div class="seq-annotated" data-log-formula="sec-1"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Evaluar y convertir entre formas</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                      <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Aduana sin ayuda</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>1. Completo:</strong> <span class="eq">log<sub>2</sub>(64) = 6</span> porque <span class="eq">2<sup>6</sup> = 64</span>; y <span class="eq">ln(e) = 1</span> porque <span class="eq">e<sup>1</sup> = e</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>2. Paso faltante:</strong> Para <span class="eq">log<sub>1/3</sub>(9) = y</span> planteamos <span class="eq">(1/3)<sup>y</sup> = 9 = 3<sup>2</sup></span>. Reescribí <span class="eq">1/3</span> como <span class="eq">3<sup>&minus;1</sup></span> para despejar <span class="eq">y = &minus;2</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>3. Esqueleto guiado:</strong> En <span class="eq">log<sub>3</sub>(1/27)</span>, escribí <span class="eq">1/27 = 3<sup>&minus;3</sup></span> y completá el valor del exponente resultado.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="4" hidden>
+                      <p><strong>4. Autónomo:</strong> Verificá si existen en <span class="eq">&Ropf;</span> las expresiones <span class="eq">log<sub>3</sub>(0)</span> y <span class="eq">log<sub>1</sub>(2)</span> aplicando las restricciones de base y argumento.</p>
+                    </div>
+                  </div>
+
+                  <div class="log-contrast-box">
+                    <h4>Desafío de contraste · Bases válidas vs colapso en la aduana</h4>
+                    <div class="log-contrast-cols">
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>10</sub>(100) = 2</span> y <span class="eq">ln(e<sup>2</sup>) = 2</span></strong>
+                        <p>Bases admitidas (<span class="eq">10 &gt; 0, e &gt; 0</span>) con argumentos positivos: devuelven un exponente único.</p>
+                      </div>
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>1</sub>(2) = &nexists;</span> en <span class="eq">&Ropf;</span></strong>
+                        <p>Si la base fuera <span class="eq">1</span>, <span class="eq">1<sup>y</sup> = 1</span> sería constante y jamás podría igualar a <span class="eq">2</span> ni tener inversa.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Probalo -->
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Probalo en el pizarrón</span>
+                <div class="pr-workbench">
+                  <div id="log-widget-1" class="pr-widget" data-widget="explorador-bases"></div>
+                </div>
+              </div>
+
+              <!-- 4. Cuidado con -->
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>Confundir el argumento con el resultado:</strong> dentro del paréntesis el argumento <span class="eq">x</span> debe ser estrictamente positivo (<span class="eq">x &gt; 0</span>), pero el resultado afuera <strong>sí puede ser negativo o cero</strong> (por ejemplo <span class="eq">log<sub>2</sub>(1/8) = &minus;3</span> y <span class="eq">log<sub>a</sub>(1) = 0</span>).
+                </div>
+              </div>
+
+              <!-- 5. Chequeo 1 -->
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 1 · Comprensión y Existencia</span>
+                <div data-check="sec-1"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · LAS 5 PROPIEDADES OPERATIVAS Y CAMBIO DE BASE
+               ================================================================ -->
+          <section class="seq-section" id="sec-2" aria-labelledby="title-sec-2">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Fundamentos · Pizarrón 2 de 6</div>
+              <h2 id="title-sec-2" class="seq-section__title">2. Las 5 Propiedades Operativas y Cambio de Base</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec2-propiedades">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec2-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  Los logaritmos transforman multiplicaciones en sumas, divisiones en restas y exponentes del argumento en factores externos; y el cambio de base traduce cualquier base a una conocida.
+                </blockquote>
+              </div>
+
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    Para <span class="eq">a, b &isin; &Ropf;<sup>+</sup> &minus; {1}</span>, <span class="eq">x, y &gt; 0</span> y <span class="eq">n &isin; &Nopf;</span> (o real en potencias) rigen exactamente las <strong>5 propiedades operativas</strong>:
+                  </p>
+                  <div class="log-table-wrap">
+                    <table class="log-table">
+                      <thead>
+                        <tr>
+                          <th>Propiedad</th>
+                          <th>Fórmula oficial</th>
+                          <th>Error prohibido que evita</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>1. Producto</td>
+                          <td><span class="eq">log<sub>a</sub>(x &middot; y) = log<sub>a</sub>(x) + log<sub>a</sub>(y)</span></td>
+                          <td><span class="eq">log<sub>a</sub>(x + y) &ne; log<sub>a</sub>(x) + log<sub>a</sub>(y)</span></td>
+                        </tr>
+                        <tr>
+                          <td>2. Cociente</td>
+                          <td><span class="eq">log<sub>a</sub>(x : y) = log<sub>a</sub>(x) &minus; log<sub>a</sub>(y)</span></td>
+                          <td><span class="eq">log<sub>a</sub>(x) / log<sub>a</sub>(y) &ne; log<sub>a</sub>(x &minus; y)</span></td>
+                        </tr>
+                        <tr>
+                          <td>3. Potencia del argumento</td>
+                          <td><span class="eq">log<sub>a</sub>(x<sup>n</sup>) = n &middot; log<sub>a</sub>(x)</span></td>
+                          <td><span class="eq">(log<sub>a</sub> x)<sup>2</sup> &ne; 2 &middot; log<sub>a</sub>(x)</span></td>
+                        </tr>
+                        <tr>
+                          <td>4. Raíz del argumento</td>
+                          <td><span class="eq">log<sub>a</sub>(<sup>n</sup>&radic;x) = (1/n) &middot; log<sub>a</sub>(x)</span></td>
+                          <td>Olvidar convertir raíces a exponente <span class="eq">1/n</span></td>
+                        </tr>
+                        <tr>
+                          <td>5. Cambio de base</td>
+                          <td><span class="eq">log<sub>a</sub>(x) = log<sub>b</sub>(x) / log<sub>b</sub>(a)</span></td>
+                          <td>Invertir el cociente poniendo <span class="eq">a</span> arriba</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="log-extension-box">
+                    <p>
+                      <span class="log-curriculum-tag is-extension">Ampliación didáctica</span>
+                      <strong>Laboratorio sistemático de falsas identidades:</strong> En el pizarrón de abajo podés contrastar en tiempo real las 5 leyes válidas frente a las 4 identidades tramposas clásicas mediante barras de longitud y contraejemplos numéricos.
+                    </p>
+                  </div>
+
+                  <div class="seq-annotated" data-log-formula="sec-2"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Condensar y cambiar de base</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>1. Completo:</strong> <span class="eq">2&middot;log<sub>a</sub>(4) + (1/2)&middot;log<sub>a</sub>(25) &minus; (2/3)&middot;log<sub>a</sub>(8) = log<sub>a</sub>(16) + log<sub>a</sub>(5) &minus; log<sub>a</sub>(4) = log<sub>a</sub>(16 &middot; 5 / 4) = log<sub>a</sub>(20)</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>2. Cambio de base:</strong> En <span class="eq">log<sub>&radic;b</sub>(2) &minus; log<sub>b</sub>(27)/3</span>, aplicá <span class="eq">log<sub>b</sub>(2) / log<sub>b</sub>(b<sup>1/2</sup>) = 2&middot;log<sub>b</sub>(2) = log<sub>b</sub>(4)</span> y restá <span class="eq">log<sub>b</sub>(3)</span> para llegar a <span class="eq">log<sub>b</sub>(4/3)</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>3. Esqueleto guiado:</strong> En <span class="eq">ln(e<sup>2</sup> &middot; &radic;e / e<sup>5/3</sup>)</span>, transformá cada raíz en exponente fraccionario y sumá/restá los exponentes aprovechando <span class="eq">ln(e) = 1</span>.</p>
+                    </div>
+                  </div>
+
+                  <div class="log-contrast-box">
+                    <h4>Desafío de contraste · Producto de logaritmos vs suma de logaritmos</h4>
+                    <div class="log-contrast-cols">
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>a</sub>(&radic;8) + log<sub>a</sub>(4)</span></strong>
+                        <p>Es una suma de logaritmos de igual base: sí se unifica como <span class="eq">log<sub>a</sub>(4&radic;8)</span>.</p>
+                      </div>
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>a</sub>(&radic;8) &middot; log<sub>a</sub>(4)</span></strong>
+                        <p>Es una multiplicación externa de dos logaritmos: jamás se fusiona multiplicando ni sumando argumentos.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Probalo en el pizarrón</span>
+                <div class="pr-workbench">
+                  <div id="log-widget-2" class="pr-widget" data-widget="diagnostico-propiedades"></div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>Dónde está el exponente:</strong> <span class="eq">log<sub>2</sub>(8<sup>2</sup>) = 2 &middot; log<sub>2</sub>(8) = 6</span>, pero <span class="eq">(log<sub>2</sub> 8)<sup>2</sup> = 3<sup>2</sup> = 9</span>. Solo baja multiplicando cuando el exponente afecta exclusivamente al argumento interior.
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 2 · Propiedades y Cambio de Base</span>
+                <div data-check="sec-2"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · ECUACIONES LOGARÍTMICAS, EXPONENCIALES NO COMUNES Y SISTEMAS
+               ================================================================ -->
+          <section class="seq-section" id="sec-3" aria-labelledby="title-sec-3">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Ecuaciones · Pizarrón 3 de 6</div>
+              <h2 id="title-sec-3" class="seq-section__title">3. Ecuaciones Logarítmicas, Exponenciales No Comunes y Sistemas 2×2</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec3-ecuaciones">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec3-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  Toda ecuación logarítmica exige declarar antes que cada argumento sea mayor que cero, unificar con propiedades o sustituir y verificar al final para descartar raíces extrañas.
+                </blockquote>
+              </div>
+
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    Al condensar <span class="eq">log<sub>2</sub>(x + 1) + log<sub>2</sub>(x &minus; 2) = log<sub>2</sub>(4)</span> en
+                    <span class="eq">log<sub>2</sub>((x + 1)(x &minus; 2)) = log<sub>2</sub>(4)</span>, la multiplicación interior permite que dos factores negativos den positivo, introduciendo candidatas falsas como <span class="eq">x = &minus;2</span> que la aduana de dominio (<span class="eq">x &gt; 2</span>) debe eliminar.
+                  </p>
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    También usamos logaritmos para destrabar ecuaciones exponenciales de bases no comunes como <span class="eq">4<sup>x</sup> = 9</span> o
+                    <span class="eq">5<sup>2x+4</sup> &minus; 20 = 0</span>, ecuaciones cuadráticas con base <span class="eq">e</span> (<span class="eq">e<sup>2x</sup> &minus; e<sup>x</sup> &minus; 6 = 0</span>), y sistemas <span class="eq">2&times;2</span> donde sustituimos <span class="eq">u = log(x)</span> y <span class="eq">v = log(y)</span>.
+                  </p>
+
+                  <div class="seq-annotated" data-log-formula="sec-3"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Filtro de dominio en log<sub>2</sub>(x+1) + log<sub>2</sub>(x−2) = log<sub>2</sub>(4)</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Sin filtro final</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Sustitución en eˣ</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>1.</strong> Existencia: <span class="eq">x + 1 &gt; 0</span> y <span class="eq">x &minus; 2 &gt; 0 &rArr; x &gt; 2</span>. <strong>2.</strong> Producto: <span class="eq">(x + 1)(x &minus; 2) = 4 &rArr; x<sup>2</sup> &minus; x &minus; 6 = 0</span>. <strong>3.</strong> Candidatas: <span class="eq">3</span> y <span class="eq">&minus;2</span>. <strong>4.</strong> Solo <span class="eq">3 &gt; 2</span> cumple &rArr; <span class="eq">S = { 3 }</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>Tu paso faltante:</strong> Llegaste a <span class="eq">x<sub>1</sub> = 3</span> y <span class="eq">x<sub>2</sub> = &minus;2</span>. Evaluá <span class="eq">x + 1</span> y <span class="eq">x &minus; 2</span> en ambos valores para decidir el conjunto solución real.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>En <span class="eq">e<sup>2x</sup> &minus; e<sup>x</sup> &minus; 6 = 0</span>:</strong> Con <span class="eq">u = e<sup>x</sup> &gt; 0</span> queda <span class="eq">u<sup>2</sup> &minus; u &minus; 6 = 0</span> (<span class="eq">u = 3</span> o <span class="eq">u = &minus;2</span>). Como <span class="eq">e<sup>x</sup> &gt; 0</span>, solo sobrevive <span class="eq">e<sup>x</sup> = 3 &rArr; x = ln(3)</span>.</p>
+                    </div>
+                  </div>
+
+                  <div class="log-contrast-box">
+                    <h4>Desafío de contraste · Signo de la variable auxiliar u</h4>
+                    <div class="log-contrast-cols">
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">u = e<sup>x</sup> &gt; 0</span> (<span class="eq">e<sup>2x</sup> &minus; e<sup>x</sup> &minus; 6 = 0</span>)</strong>
+                        <p>La exponencial siempre es positiva: toda raíz auxiliar <span class="eq">u &le; 0</span> (como <span class="eq">u = &minus;2</span>) se descarta obligatoriamente.</p>
+                      </div>
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">u = log<sub>3</sub>(x &minus; 1) &isin; &Ropf;</span> (<span class="eq">u<sup>2</sup> + u = 6</span>)</strong>
+                        <p>La imagen del logaritmo es todo <span class="eq">&Ropf;</span>: <span class="eq">u = &minus;3</span> SÍ es válida y genera <span class="eq">x &minus; 1 = 3<sup>&minus;3</sup> &rArr; x = 28/27</span>, junto con <span class="eq">x = 10</span>.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Probalo en el pizarrón</span>
+                <div class="pr-workbench">
+                  <div id="log-widget-3" class="pr-widget" data-widget="balanza-logaritmica"></div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>No confundir restricción del argumento con restricción del resultado:</strong> en <span class="eq">(log<sub>3</sub>(x &minus; 1))<sup>2</sup> + log<sub>3</sub>(x &minus; 1) = 6</span>, la incógnita sustituida <span class="eq">u</span> representa al logaritmo entero (que sí puede ser negativo), no a una potencia exponencial.
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 3 · Ecuaciones y Sistemas</span>
+                <div data-check="sec-3"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · INVERSA DE LA EXPONENCIAL Y REFLEXIÓN y = x
+               ================================================================ -->
+          <section class="seq-section" id="sec-4" aria-labelledby="title-sec-4">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Función Logarítmica · Pizarrón 4 de 6</div>
+              <h2 id="title-sec-4" class="seq-section__title">4. Inversa de la Exponencial y Reflexión respecto de y = x</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec4-espejo">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec4-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  La función logarítmica <span class="eq">f<sup>&minus;1</sup>(x) = log<sub>a</sub>(x)</span> es la inversa exacta de <span class="eq">f(x) = a<sup>x</sup></span>: al reflejarse sobre la recta <span class="eq">y = x</span> intercambia coordenadas, dominio por imagen y asíntota horizontal por vertical.
+                </blockquote>
+              </div>
+
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    Si definimos la función exponencial con codominio igual a su imagen, <span class="eq">f: &Ropf; &rarr; &Ropf;<sup>+</sup></span>, resulta biyectiva y su inversa es <span class="eq">f<sup>&minus;1</sup>: &Ropf;<sup>+</sup> &rarr; &Ropf;</span> dada por <span class="eq">f<sup>&minus;1</sup>(x) = log<sub>a</sub>(x)</span> (y en particular <span class="eq">ln(x)</span> es inversa de <span class="eq">e<sup>x</sup></span>).
+                    Para invertir una exponencial desplazada como <span class="eq">f(x) = 2e<sup>x</sup> &minus; 3</span>, primero aislás <span class="eq">e<sup>x</sup></span> y luego aplicás <span class="eq">ln</span>, restringiendo su dominio a la imagen abierta <span class="eq">(&minus;3; +&infin;)</span>.
+                  </p>
+
+                  <div class="log-extension-box">
+                    <p>
+                      <span class="log-curriculum-tag is-extension">Ampliación didáctica</span>
+                      <strong>Espejo continuo sobre <span class="eq">y = x</span>:</strong> En el pizarrón interactivo podés deslizar el punto azul <span class="eq">P(t; f(t))</span> con el mouse o con las flechas del teclado para ver cómo su reflejo amarillo <span class="eq">P'(f(t); t)</span> mantiene la simetría perpendicular exacta respecto de <span class="eq">y = x</span>.
+                    </p>
+                  </div>
+
+                  <div class="seq-annotated" data-log-formula="sec-4"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Hallar la inversa de f(x) = 2eˣ − 3</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Aislar la potencia</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Declarar dominio</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>1.</strong> <span class="eq">y = 2e<sup>x</sup> &minus; 3 &rArr; (y + 3)/2 = e<sup>x</sup></span>. <strong>2.</strong> Aplicamos <span class="eq">ln</span>: <span class="eq">x = ln((y + 3)/2)</span>. <strong>3.</strong> Intercambiamos variables y fijamos dominio: <span class="eq">f<sup>&minus;1</sup>: (&minus;3; +&infin;) &rarr; &Ropf;</span>, <span class="eq">f<sup>&minus;1</sup>(x) = ln((x + 3)/2)</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>Paso guiado:</strong> Si despejás <span class="eq">e<sup>x</sup></span> de <span class="eq">y = 2e<sup>x</sup> &minus; 3</span> antes de aplicar logaritmo, ¿qué expresión queda en el numerador y qué número divide?</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>Dominio de la inversa:</strong> Como la <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span> de <span class="eq">f</span> es <span class="eq">y = &minus;3</span> con <span class="eq">Im(f) = (&minus;3; +&infin;)</span>, ese intervalo abierto pasa a ser <span class="eq">Dom(f<sup>&minus;1</sup>)</span> y su asíntota vertical es <span class="eq">x = &minus;3</span>.</p>
+                    </div>
+                  </div>
+
+                  <div class="log-contrast-box">
+                    <h4>Desafío de contraste · Permutación exacta entre f y f⁻¹</h4>
+                    <div class="log-contrast-cols">
+                      <div class="log-contrast-col">
+                        <strong>Exponencial <span class="eq">f(x) = 2<sup>x</sup></span></strong>
+                        <p><span class="eq">Dom = &Ropf;</span>, <span class="eq">Im = (0; +&infin;)</span>, asíntota horizontal <span class="eq">y = 0</span>, pasa por <span class="eq">(0; 1)</span>.</p>
+                      </div>
+                      <div class="log-contrast-col">
+                        <strong>Logarítmica <span class="eq">f<sup>&minus;1</sup>(x) = log<sub>2</sub>(x)</span></strong>
+                        <p><span class="eq">Dom = (0; +&infin;)</span>, <span class="eq">Im = &Ropf;</span>, asíntota vertical <span class="eq">x = 0</span>, pasa por <span class="eq">(1; 0)</span>.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Probalo en el pizarrón</span>
+                <div class="pr-workbench">
+                  <div id="log-widget-4" class="pr-widget" data-widget="espejo-exp-log"></div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>Olvidar el dominio de la inversa o conservar la asíntota horizontal:</strong> en <span class="eq">f<sup>&minus;1</sup>(x) = ln((x + 3)/2)</span>, la asíntota ya no es horizontal (<span class="eq">y = &minus;3</span>) sino vertical (<span class="eq">x = &minus;3</span>), y el dominio es el intervalo abierto <span class="eq">(&minus;3; +&infin;)</span>.
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 4 · Simetría e Inversas</span>
+                <div data-check="sec-4"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 5 · RADIOGRAFÍA FUNCIONAL, DESPLAZAMIENTOS Y CORTES
+               ================================================================ -->
+          <section class="seq-section" id="sec-5" aria-labelledby="title-sec-5">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Función Logarítmica · Pizarrón 5 de 6</div>
+              <h2 id="title-sec-5" class="seq-section__title">5. Radiografía Funcional, Desplazamientos y Cortes</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec5-radiografia">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec5-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  La condición <span class="eq">mx + d &gt; 0</span> fija la asíntota vertical <span class="eq">x = &minus;d/m</span> y el lado donde vive el dominio abierto; como <span class="eq">Im(f) = &Ropf;</span>, toda función logarítmica tiene exactamente una raíz real y es biyectiva sobre <span class="eq">&Ropf;</span>.
+                </blockquote>
+              </div>
+
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    Para <span class="eq">f(x) = k &middot; log<sub>a</sub>(mx + d) + c</span>:
+                    si <span class="eq">m &gt; 0</span> el dominio es <span class="eq">(&minus;d/m; +&infin;)</span>; si <span class="eq">m &lt; 0</span> (como en <span class="eq">log<sub>2</sub>(4 &minus; x)</span>)
+                    el dominio apunta hacia la izquierda: <span class="eq">(&minus;&infin;; &minus;d/m)</span>.
+                    La raíz <span class="eq">C<sub>0</sub></span> siempre existe y se despeja haciendo <span class="eq">mx + d = a<sup>&minus;c/k</sup></span>, mientras que la ordenada al origen <span class="eq">P<sub>y</sub>(0; f(0))</span> existe solo cuando <span class="eq">0 &isin; Dom(f)</span>.
+                  </p>
+                  <div class="seq-annotated" data-log-formula="sec-5"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Estudio de f(x) = log₁/₂(x + 1) e intersección</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Radiografía completa</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Intersección de dos curvas</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Inversa explícita</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>f(x) = log<sub>1/2</sub>(x + 1):</strong> <span class="eq">Dom(f) = (&minus;1; +&infin;)</span>, <span class="eq">Im(f) = &Ropf;</span>, A.V. <span class="eq">x = &minus;1</span>, raíz y ordenada en <span class="eq">(0; 0)</span>, estrictamente decreciente (<span class="eq">0 &lt; 1/2 &lt; 1</span>), <span class="eq">C<sup>+</sup> = (&minus;1; 0)</span>, <span class="eq">C<sup>&minus;</sup> = (0; +&infin;)</span> y biyectiva <span class="eq">(&minus;1; +&infin;) &rarr; &Ropf;</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>Corte entre <span class="eq">log<sub>2</sub>(4x + 8)</span> y <span class="eq">3 + log<sub>2</sub>(x &minus; 2)</span>:</strong> Dominio común <span class="eq">x &gt; 2</span>. Reemplazando <span class="eq">3 = log<sub>2</sub>(8)</span> queda <span class="eq">4x + 8 = 8(x &minus; 2) &rArr; x = 6</span> y <span class="eq">y = log<sub>2</sub>(32) = 5</span> &rArr; punto <span class="eq">(6; 5)</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>Inversa de <span class="eq">log<sub>1/2</sub>(x + 1)</span>:</strong> De <span class="eq">y = log<sub>1/2</sub>(x + 1)</span> pasamos a <span class="eq">(1/2)<sup>y</sup> = x + 1</span> &rArr; <span class="eq">f<sup>&minus;1</sup>(x) = (1/2)<sup>x</sup> &minus; 1</span> con <span class="eq">Dom = &Ropf;</span> e <span class="eq">Im = (&minus;1; +&infin;)</span>.</p>
+                    </div>
+                  </div>
+
+                  <div class="log-contrast-box">
+                    <h4>Desafío de contraste · Cambio de signo dentro del argumento</h4>
+                    <div class="log-contrast-cols">
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>2</sub>(x &minus; 4)</span></strong>
+                        <p><span class="eq">x &minus; 4 &gt; 0 &rArr; Dom = (4; +&infin;)</span>. Es estrictamente <strong>creciente</strong> a la derecha de <span class="eq">x = 4</span>.</p>
+                      </div>
+                      <div class="log-contrast-col">
+                        <strong><span class="eq">log<sub>2</sub>(4 &minus; x)</span></strong>
+                        <p><span class="eq">4 &minus; x &gt; 0 &rArr; Dom = (&minus;&infin;; 4)</span>. Al invertir <span class="eq">x</span> se vuelve <strong>decreciente</strong> a la izquierda de <span class="eq">x = 4</span>.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Probalo en el pizarrón</span>
+                <div class="pr-workbench">
+                  <div id="log-widget-5" class="pr-widget" data-widget="radiografia-log"></div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>Corchetes prohibidos en el borde del dominio:</strong> la asíntota vertical anula el argumento y nunca pertenece a <span class="eq">Dom(f)</span>. Además, recordá acotar <span class="eq">C<sup>+</sup></span> y <span class="eq">C<sup>&minus;</sup></span> dentro de <span class="eq">Dom(f)</span> (para <span class="eq">log<sub>2</sub>(4 &minus; x)</span>, <span class="eq">C<sup>&minus;</sup> = (3; 4)</span>, jamás <span class="eq">(3; +&infin;)</span>).
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 5 · Radiografía Logarítmica</span>
+                <div data-check="sec-5"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 6 · MODELOS REALES DE TIEMPO Y ESCALAS LOGARÍTMICAS
+               ================================================================ -->
+          <section class="seq-section" id="sec-6" aria-labelledby="title-sec-6">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 4 · Aplicaciones · Pizarrón 6 de 6</div>
+              <h2 id="title-sec-6" class="seq-section__title">6. Modelos Reales de Tiempo y Escalas Logarítmicas (Richter)</h2>
+              <div class="vn-trigger-row">
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="why" data-vn-script="sec6-modelos">
+                  <span>¿Por qué pasa esto? · Explicación de Alaska</span>
+                </button>
+                <button type="button" class="btn btn--subtle vn-trigger-btn" data-tutor="base" data-vn-script="sec6-base">
+                  <span>Base desde cero: lo que nadie te explica</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="log-workbench">
+              <div class="seq-block seq-block--phrase">
+                <span class="seq-block__label">1. En una frase</span>
+                <blockquote class="log-phrase">
+                  El logaritmo despeja el tiempo atrapado en el exponente de un modelo de crecimiento o decaimiento y comprime variaciones multiplicativas enormes (como la potencia sísmica en Richter) en escalones aditivos manejables.
+                </blockquote>
+              </div>
+
+              <div class="seq-block seq-block--visual">
+                <span class="seq-block__label">2. Cómo se ve</span>
+                <div class="log-prose">
+                  <p>
+                    <span class="log-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                    Cuando una magnitud física o biológica responde a <span class="eq">N(t) = N<sub>0</sub> &middot; e<sup>kt</sup></span> (cultivos, fármacos, isótopos, descontaminación de lagos) o a modelos logísticos como
+                    <span class="eq">P(t) = 75 / (1 + 1,5 &middot; e<sup>&minus;0,89t</sup>)</span>, primero aislás el término exponencial y recién después aplicás <span class="eq">ln</span> en ambos miembros para bajar la incógnita <span class="eq">t</span>.
+                    En escalas logarítmicas como <strong>Richter</strong> <span class="eq">M = log(p)</span>, la razón de potencias entre dos sismos es <span class="eq">p<sub>2</sub>/p<sub>1</sub> = 10<sup>M<sub>2</sub> &minus; M<sub>1</sub></sup></span>.
+                  </p>
+                  <div class="seq-annotated" data-log-formula="sec-6"></div>
+
+                  <div class="log-worked-fading">
+                    <h4>Ejemplo con retiro gradual · Lago contaminado, modelo logístico y crecimiento del árbol</h4>
+                    <div class="pr-chip-row">
+                      <button type="button" class="pr-chip is-active" data-fade-btn="1">Caso 1 · Lago (50%)</button>
+                      <button type="button" class="pr-chip" data-fade-btn="2">Caso 2 · Logístico (meta 50)</button>
+                      <button type="button" class="pr-chip" data-fade-btn="3">Caso 3 · Árbol (cm ↔ m)</button>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="1">
+                      <p><strong>Descontaminación <span class="eq">y(t) = y<sub>0</sub>&middot;e<sup>&minus;0,231t</sup></span>:</strong> Para eliminar el 50%, queda <span class="eq">0,5&middot;y<sub>0</sub> = y<sub>0</sub>&middot;e<sup>&minus;0,231t</sup> &rArr; e<sup>&minus;0,231t</sup> = 0,5 &rArr; t = &minus;ln(0,5)/0,231 &approx; 3 años</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="2" hidden>
+                      <p><strong>Población logística <span class="eq">P(t) = 75 / (1 + 1,5&middot;e<sup>&minus;0,89t</sup>) = 50</span>:</strong> Despejando el denominador: <span class="eq">1 + 1,5&middot;e<sup>&minus;0,89t</sup> = 75/50 = 1,5 &rArr; e<sup>&minus;0,89t</sup> = 0,5/1,5 = 1/3 &rArr; t = ln(3)/0,89 &approx; 1,23 años</span>.</p>
+                    </div>
+                    <div class="log-fade-panel" data-fade-panel="3" hidden>
+                      <p><strong>Árbol <span class="eq">h(t) = 25 + 12&middot;log<sub>1,5</sub>(t)</span> (cm, meses):</strong> Al primer mes (<span class="eq">t = 1</span>) mide <span class="eq">25 cm</span>; a los 4 meses mide <span class="eq">66 cm</span>; para llegar a <span class="eq">2 m = 200 cm</span>, planteamos <span class="eq">log<sub>1,5</sub>(t) = 175/12 &rArr; t = 1,5<sup>175/12</sup> &approx; 370 meses</span> (30 años y 10 meses).</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--try">
+                <span class="seq-block__label">3. Comparador de casos y escalas reales</span>
+                <div id="sec-6-modelos" class="log-contrast-box">
+                  <h4>Contraste crítico · Proporción lineal vs escala logarítmica de Richter</h4>
+                  <div class="log-contrast-cols">
+                    <div class="log-contrast-col">
+                      <strong>Terremoto A (<span class="eq">M<sub>1</sub> = 4,1</span>) vs B (<span class="eq">M<sub>2</sub> = 8,2</span>)</strong>
+                      <p>Aunque <span class="eq">8,2</span> es el doble de <span class="eq">4,1</span>, la magnitud mide el exponente en base 10. La diferencia es <span class="eq">&Delta;M = 4,1</span>.</p>
+                    </div>
+                    <div class="log-contrast-col">
+                      <strong>Razón real de potencia (<span class="eq">p<sub>2</sub> / p<sub>1</sub> = 10<sup>4,1</sup></span>)</strong>
+                      <p>El sismo de magnitud <span class="eq">8,2</span> es <span class="eq">10<sup>4,1</sup> &approx; 12.589 veces</span> más potente que el de <span class="eq">4,1</span>, jamás el doble.</p>
+                    </div>
+                  </div>
+                  <div class="log-extension-box">
+                    <p>
+                      <span class="log-curriculum-tag is-extension">Ampliación didáctica</span>
+                      <strong>Regla de oro de modelos reales:</strong> Antes de aplicar <span class="eq">ln</span> o convertir a exponencial, verificá dos cosas: (1) que la potencia o el logaritmo estén completamente aislados sin sumandos externos, y (2) que todas las unidades del enunciado coincidan (metros a centímetros, horas a días o minutos).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--caution">
+                <span class="seq-block__label">4. Cuidado con</span>
+                <div class="log-warning-box">
+                  <strong>Errores de unidad y de escala:</strong> no reemplaces <span class="eq">h(t) = 2</span> cuando <span class="eq">h</span> está expresado en centímetros y el enunciado pide 2 metros (<span class="eq">200 cm</span>). Y en escalas logarítmicas nunca dividas magnitudes entre sí para comparar intensidades: restalas y elevá <span class="eq">10</span> a esa diferencia.
+                </div>
+              </div>
+
+              <div class="seq-block seq-block--check">
+                <span class="seq-block__label">5. Chequeo 6 · Modelos Temporales y Escalas</span>
+                <div data-check="sec-6"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+               ENTRENADOR PRNG + LAS 5 TRAMPAS CLÁSICAS
+               ================================================================ -->
+          <section id="sec-retos" aria-labelledby="title-sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 5 · Práctica Activa</div>
+              <h2 id="title-sec-retos" class="seq-section__title">Entrenador Infinito PRNG y Las 5 Trampas Clásicas de Examen</h2>
+            </header>
+            <div id="log-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               MAPA DE COMPETENCIAS Y HOJA DE REPASO IMPRIMIBLE
+               ================================================================ -->
+          <section id="sec-repaso" aria-labelledby="title-sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 5 · Síntesis y Seguimiento</div>
+              <h2 id="title-sec-repaso" class="seq-section__title">Mapa de Competencias y Hoja de Repaso Imprimible</h2>
+              <button type="button" class="btn log-no-print" data-print-sheet>Imprimir hoja de repaso</button>
+            </header>
+
+            <div id="log-competency-dashboard"></div>
+
+            <div class="log-cheat-grid">
+              <article class="log-cheat-card">
+                <h3>1. Definición y Aduana en ℝ</h3>
+                <p><span class="eq">log<sub>a</sub>(x) = y &hArr; a<sup>y</sup> = x</span></p>
+                <p>Condiciones estrictas: <span class="eq">a &gt; 0, a &ne; 1</span> y argumento <span class="eq">x &gt; 0</span>.</p>
+                <p>Especiales: <span class="eq">log(x) = log<sub>10</sub>(x)</span> y <span class="eq">ln(x) = log<sub>e</sub>(x)</span>.</p>
+              </article>
+              <article class="log-cheat-card">
+                <h3>2. Las 5 Leyes vs 4 Trampas</h3>
+                <p><span class="eq">log<sub>a</sub>(xy) = log<sub>a</sub>x + log<sub>a</sub>y</span>; <span class="eq">log<sub>a</sub>(x/y) = log<sub>a</sub>x &minus; log<sub>a</sub>y</span></p>
+                <p><span class="eq">log<sub>a</sub>(x<sup>n</sup>) = n&middot;log<sub>a</sub>x</span>; <span class="eq">log<sub>a</sub>(x) = log<sub>b</sub>(x)/log<sub>b</sub>(a)</span></p>
+                <p>Prohibido: <span class="eq">log(x+y) &ne; log x + log y</span>; <span class="eq">(log x)<sup>2</sup> &ne; 2 log x</span>.</p>
+              </article>
+              <article class="log-cheat-card">
+                <h3>3. Ecuaciones y Sustituciones</h3>
+                <p>Controlar <span class="eq">arg &gt; 0</span> en todas las candidatas (descartar raíces extrañas).</p>
+                <p>En <span class="eq">u = a<sup>x</sup></span>: exigir <span class="eq">u &gt; 0</span>. En <span class="eq">u = log<sub>a</sub>(x)</span>: <span class="eq">u &isin; &Ropf;</span> (negativos sí valen).</p>
+              </article>
+              <article class="log-cheat-card">
+                <h3>4. Inversa, Dominio y Escalas</h3>
+                <p>Reflexión <span class="eq">y = x</span>: <span class="eq">Dom(f<sup>&minus;1</sup>) = Im(f)</span> y A.H. <span class="eq">y = c &hArr;</span> A.V. <span class="eq">x = c</span>.</p>
+                <p>Dominio maximal siempre abierto <span class="eq">(h; +&infin;)</span> o <span class="eq">(&minus;&infin;; h)</span>.</p>
+                <p>Richter: <span class="eq">p<sub>2</sub>/p<sub>1</sub> = 10<sup>M<sub>2</sub>&minus;M<sub>1</sub></sup></span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
