@@ -635,7 +635,6 @@ export function initBlackboardController() {
 
   const page = document.querySelector('.seq-page');
   const sidebar = document.querySelector('.seq-sidebar');
-  const menuGlyph = String.fromCodePoint(0x2630);
   const sidebarToggle = h(
     'button',
     {
@@ -665,7 +664,9 @@ export function initBlackboardController() {
   const setSidebar = (collapsed, persist = true) => {
     page?.classList.toggle('is-sidebar-collapsed', collapsed);
     sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
-    sidebarToggle.textContent = collapsed ? `${menuGlyph} Índice` : '◀ Ocultar índice';
+    sidebarToggle.replaceChildren(
+      ...(collapsed ? [chalkIcon('book', 14), ' Índice'] : ['◀ Ocultar índice'])
+    );
     if (persist) {
       try {
         localStorage.setItem(sidebarKey, collapsed ? 'collapsed' : 'open');

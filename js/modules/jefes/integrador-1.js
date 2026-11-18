@@ -114,7 +114,14 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'A' || String(v).includes('54')
               ? { ok: true, feedback: '¡Correcto! 3∛2 + 2∛2 = 5∛2, mientras las otras dos distribuyen ilegalmente o multiplican bases con distinto exponente.' }
-              : { ok: false, diagnosticId: 'binomial_non_distributivity', feedback: 'Cuidado: ni (a − b)² es a² − b², ni 4 · 2ⁿ es 8ⁿ.' },
+              : {
+                  ok: false,
+                  diagnosticId:
+                    v === 'C' || String(v).includes('8ⁿ')
+                      ? 'multiplied_bases_in_same_base_prod'
+                      : 'distributed_power_over_sum',
+                  feedback: 'Cuidado: ni (a − b)² es a² − b², ni 4 · 2ⁿ es 8ⁿ.',
+                },
         },
         {
           id: 'boss1-enc1-predecir',
@@ -138,7 +145,7 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'open' || String(v).startsWith('No pertenecen')
               ? { ok: true, feedback: '¡Bien anticipado! Los bordes −4 y 8 están exactamente a distancia 6, así que quedan excluidos: B = (−4; 8).' }
-              : { ok: false, feedback: 'Verificá la desigualdad estricta (< 6): 6 < 6 es falso.' },
+              : { ok: false, diagnosticId: 'swapped_open_closed_bracket', feedback: 'Verificá la desigualdad estricta (< 6): 6 < 6 es falso.' },
         },
         {
           id: 'boss1-enc1-modelar',
@@ -160,7 +167,10 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '(-inf; 1/2)',
               '¡Exacto! A = (−∞; 1/2).',
-              'Revisá el signo al despejar −x/2 > −1/4: multiplicar por −2 invierte la desigualdad hacia x < 1/2.'
+              'Revisá el signo al despejar −x/2 > −1/4: multiplicar por −2 invierte la desigualdad hacia x < 1/2.',
+              String(raw ?? '').includes('[') || String(raw ?? '').includes(']')
+                ? 'swapped_open_closed_bracket'
+                : 'forgot_flip_on_negative_div'
             ),
         },
         {
@@ -183,7 +193,10 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '(-4; 1/2)',
               '¡Impecable! A ∩ B = (−4; 1/2) (y A ∪ B = (−∞; 8)).',
-              'Recordá tomar los valores que pertenecen a AMBOS intervalos simultáneamente.'
+              'Recordá tomar los valores que pertenecen a AMBOS intervalos simultáneamente.',
+              String(raw ?? '').includes('[') || String(raw ?? '').includes(']')
+                ? 'swapped_open_closed_bracket'
+                : 'confused_and_with_or'
             ),
         },
         {
@@ -206,7 +219,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '(-1; 2]',
               '¡Transferencia lograda! El extremo −1 queda abierto y el extremo 2 queda cerrado: (−1; 2].',
-              'Verificá el intervalo [−8; 2] interceptado con (−1; +∞) y sus extremos abierto/cerrado.'
+              'Verificá el intervalo [−8; 2] interceptado con (−1; +∞) y sus extremos abierto/cerrado.',
+              'swapped_open_closed_bracket'
             ),
         },
       ],
@@ -238,7 +252,7 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'perp' || String(v).includes('−1')
               ? { ok: true, feedback: '¡Exacto! m₁ · m₂ = −1.' }
-              : { ok: false, feedback: 'Igualar pendientes da paralelismo; para perpendicularidad el producto debe dar −1.' },
+              : { ok: false, diagnosticId: 'confused_parallel_with_perpendicular', feedback: 'Igualar pendientes da paralelismo; para perpendicularidad el producto debe dar −1.' },
         },
         {
           id: 'boss1-enc2-predecir',
@@ -262,7 +276,7 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'pay' || String(v).includes('0,85')
               ? { ok: true, feedback: '¡Bien visto! Descontar 15% y 25% equivale a multiplicar por 0,85 y 0,75 respectivamente.' }
-              : { ok: false, feedback: 'Cuidado: 0,15 y 0,25 serían el ahorro, no el monto efectivamente pagado en caja.' },
+              : { ok: false, diagnosticId: 'discount_instead_of_paid_percentage', feedback: 'Cuidado: 0,15 y 0,25 serían el ahorro, no el monto efectivamente pagado en caja.' },
         },
         {
           id: 'boss1-enc2-modelar',
@@ -284,7 +298,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               8 / 3,
               '¡Exacto! k = 8/3.',
-              'Revisá el signo al despejar m₁ = −k/2 y m₂ = 3/4.'
+              'Revisá el signo al despejar m₁ = −k/2 y m₂ = 3/4.',
+              'confused_parallel_with_perpendicular'
             ),
         },
         {
@@ -307,7 +322,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '(13200; 41200)',
               '¡Perfecto! Cuaderno $13.200 y Libro $41.200.',
-              'Verificá la sustitución L = C + 28000 en 3,4C + 2,25L = 137580.'
+              'Verificá la sustitución L = C + 28000 en 3,4C + 2,25L = 137580.',
+              'sign_error_in_elimination_or_substitution'
             ),
         },
         {
@@ -330,7 +346,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               -2,
               '¡Excelente! Con k = −2 ambas ecuaciones son proporcionales (rectas coincidentes -> SCI).',
-              'Compará las razones de coeficientes: −4/2 = −2 y −6/3 = −2.'
+              'Compará las razones de coeficientes: −4/2 = −2 y −6/3 = −2.',
+              'confused_sci_with_si'
             ),
         },
       ],
@@ -431,7 +448,10 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '(-inf; 9/8)',
               '¡Correcto! k ∈ (−∞; 9/8).',
-              'Revisá el despeje de 9 − 8k > 0 y recordá que el extremo 9/8 es abierto.'
+              'Revisá el despeje de 9 − 8k > 0 y recordá que el extremo 9/8 es abierto.',
+              String(raw ?? '').includes(']')
+                ? 'closed_bracket_on_excluded_point_or_extremum'
+                : 'neg_b_or_square_sign_in_resolvente'
             ),
         },
         {
@@ -454,7 +474,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               1,
               '¡Tangencia exacta! Con d = 1 se tocan en un único punto (1; 3).',
-              'Planteá x² − 2x + (2 − d) = 0 e igualá su discriminante a 0.'
+              'Planteá x² − 2x + (2 − d) = 0 e igualá su discriminante a 0.',
+              'neg_b_or_square_sign_in_resolvente'
             ),
         },
       ],
@@ -508,7 +529,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               0,
               '¡Exacto! −1 es raíz de P(x) para todo k ∈ ℝ.',
-              'Revisá los signos: (−1)⁴ = +1 y (−1)³ = −1.'
+              'Revisá los signos: (−1)⁴ = +1 y (−1)³ = −1.',
+              'ruffini_sign_error'
             ),
         },
         {
@@ -531,7 +553,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               5 / 3,
               '¡Exacto! Con k = 5/3 resulta P(1) = 0.',
-              'Igualá P(1) = 2k − 10/3 a cero.'
+              'Igualá P(1) = 2k − 10/3 a cero.',
+              'ruffini_sign_error'
             ),
         },
         {
@@ -578,7 +601,8 @@ export const INTEGRADOR_1_CONFIG = {
               '3x(x - 1/3)(x - sqrt(2))(x + sqrt(2))',
               'factored',
               '¡Jefe Integrador superado! Factorización completa 3x(x − 1/3)(x − √2)(x + √2).',
-              'Verificá conservar 3x y descomponer (x² − 2) en factores lineales sobre ℝ.'
+              'Verificá conservar 3x y descomponer (x² − 2) en factores lineales sobre ℝ.',
+              'forgot_leading_coeff_factoring'
             ),
         },
       ],

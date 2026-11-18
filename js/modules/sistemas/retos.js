@@ -25,7 +25,12 @@ import {
 } from './logic.js';
 import { DIAGNOSE_REACTIONS, STREAK_REACTIONS } from './vn-scripts.js';
 import { SYS_COMPETENCIES } from './competencies-map.js';
-import { recordSystemAttempt, getSystemsCompetencyReport } from './learning-adapter.js';
+import {
+  MODULE_ID as SYSTEMS_MODULE_ID,
+  getProgressStore,
+  recordSystemAttempt,
+  getSystemsCompetencyReport,
+} from './learning-adapter.js';
 import { notifyCompetencyDashboardUpdate } from './components.js';
 
 export function mulberry32(seed) {
@@ -481,6 +486,20 @@ export const TRAPS = [
    Montaje del Entrenador + Trampas (#sec-retos)
    ========================================================================== */
 
+export function selectAdaptiveSystemFamily({
+  store = getProgressStore(),
+  now = new Date(),
+  previousCompetencyId = null,
+} = {}) {
+  return selectAdaptiveExercise({
+    moduleId: SYSTEMS_MODULE_ID,
+    availableExercises: CHALLENGE_TYPES,
+    store,
+    now,
+    previousCompetencyId,
+  });
+}
+
 export function mountSystemsRetos(host) {
   if (!host) return null;
   clear(host);
@@ -488,6 +507,7 @@ export function mountSystemsRetos(host) {
   let currentSeed = 2026;
   let currentMode = 'adaptativo';
   let streak = 0;
+  let previousCompetencyId = null;
 
   const tabBar = h('div', { class: 'sys-retos-tabs pr-chip-row' });
   const btnTabPrng = h('button', { type: 'button', class: 'pr-chip is-active' }, '1. Entrenador Infinito por Semilla PRNG (8 Familias)');
@@ -722,17 +742,18 @@ export function mountSystemsRetos(host) {
     let chosenFamily = currentMode;
     if (currentMode === 'adaptativo') {
       try {
-        const report = getSystemsCompetencyReport();
-        const selection = selectAdaptiveExercise({
-          moduleId: 'sistemas',
-          competencies: SYS_COMPETENCIES,
-          report,
-          families: CHALLENGE_TYPES,
-          seed: currentSeed,
+        getSystemsCompetencyReport();
+        const selection = selectAdaptiveSystemFamily({
+          store: getProgressStore(),
+          now: new Date(),
+          previousCompetencyId,
         });
-        chosenFamily = selection?.familyId || 'all';
-        adaptiveBanner.textContent = selection?.reason
-          ? `Selección inteligente: ${selection.reason}`
+        chosenFamily = selection?.exercise?.id || 'all';
+        if (selection?.targetCompetencyId || selection?.exercise?.competencyId) {
+          previousCompetencyId = selection.targetCompetencyId || selection.exercise.competencyId;
+        }
+        adaptiveBanner.textContent = selection?.selectionReason
+          ? `Selección inteligente: ${selection.selectionReason}${selection?.exercise?.label ? ` · ${selection.exercise.label}` : ''}`
           : 'Modo adaptativo: combinando las 8 familias según tu historial.';
       } catch {
         chosenFamily = 'all';

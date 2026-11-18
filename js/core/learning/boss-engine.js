@@ -269,6 +269,15 @@ export function requestPhaseHint(session) {
 
   const { phase, phaseState } = cur;
   const hints = Array.isArray(phase.hints) ? phase.hints : [];
+  if (hints.length === 0) {
+    return {
+      hintText: '',
+      hintsUsed: phaseState.hintsUsed,
+      totalHints: 0,
+      phaseState,
+    };
+  }
+
   phaseState.lockedAssisted = true;
   if (phaseState.solved && phaseState.outcome === 'independent') {
     phaseState.outcome = 'assisted';
@@ -363,7 +372,7 @@ export function submitPhaseAnswer(session, rawInput, { confidence } = {}) {
       outcome: phaseState.outcome,
       assistance: phaseState.solutionRevealed
         ? ASSISTANCE_LEVELS.SOLUTION_REVEALED
-        : phaseState.hintsUsed > 0 || phaseState.lockedAssisted
+        : phaseState.hintsUsed > 0
           ? ASSISTANCE_LEVELS.HINTS
           : ASSISTANCE_LEVELS.NONE,
       feedback: evalRes.feedback || 'Ingresá una respuesta antes de comprobar.',
@@ -381,7 +390,7 @@ export function submitPhaseAnswer(session, rawInput, { confidence } = {}) {
       outcome: phaseState.outcome,
       assistance: phaseState.solutionRevealed
         ? ASSISTANCE_LEVELS.SOLUTION_REVEALED
-        : phaseState.hintsUsed > 0 || phaseState.lockedAssisted
+        : phaseState.hintsUsed > 0
           ? ASSISTANCE_LEVELS.HINTS
           : ASSISTANCE_LEVELS.NONE,
       feedback: evalRes.syntaxError,
@@ -398,7 +407,7 @@ export function submitPhaseAnswer(session, rawInput, { confidence } = {}) {
   let assistance = ASSISTANCE_LEVELS.NONE;
   if (phaseState.solutionRevealed) {
     assistance = ASSISTANCE_LEVELS.SOLUTION_REVEALED;
-  } else if (phaseState.hintsUsed > 0 || phaseState.lockedAssisted) {
+  } else if (phaseState.hintsUsed > 0) {
     assistance = ASSISTANCE_LEVELS.HINTS;
   }
 

@@ -53,7 +53,7 @@ const ROOT_PRESETS = [
   },
   {
     id: 'grouping',
-    label: 'Por grupos: x³ − 2x² − 3x + 6? (ej. x³ − 2x² + 3x − 6)',
+    label: 'Por grupos: x³ − 2x² + 3x − 6',
     poly: polyFromDescending([1, -2, 3, -6]),
     methodNote: 'Factor común por grupos: x²(x−2) + 3(x−2) = (x−2)(x²+3).',
   },
