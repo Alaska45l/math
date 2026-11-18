@@ -31,55 +31,63 @@ El repositorio combina capacidades implementadas con una arquitectura de aprendi
 
 | Área | Estado actual |
 |---|---|
-| Laboratorios interactivos y planos SVG | Implementado en los módulos publicados (10 widgets interactivos POE en Exponenciales y Cuadráticas) |
-| Evaluadores algebraicos mediante AST | Implementado en módulos que aceptan fórmulas (`expr.js`, `logic.js`) |
-| Diagnósticos de errores conceptuales | Implementado con catálogo de 10 diagnósticos cognitivos por módulo y poses de Alaska |
-| Tutora Visual Novel, guiones, poses y audio procedural | Implementado |
-| Glosario contextual y pizarra de trabajo | Implementado en los módulos que los integran |
-| Progreso local por sección y competencia | Implementado con almacén centralizado (`alaska:learning:v1`) y migración no destructiva |
-| Motor central de competencias y dominio | Implementado (`js/core/learning/mastery.js` máquina conservadora de 7 estados) |
+| Laboratorios interactivos y planos SVG | Implementado en las 11 unidades del programa UNMDP Exactas (15 laboratorios + 2 evaluaciones integradoras) |
+| Primitivas compartidas de UI y matemática pura | Implementado (`js/core/board-kit.js`, `js/core/math/{polynomials,trigonometry}.js`) |
+| Evaluadores algebraicos y trigonométricos mediante AST | Implementado (`expr.js`, `logic.js`, `polynomials.js`, `trigonometry.js`, `transfer-classifiers/shared-ast.js`) |
+| Diagnósticos de errores conceptuales | Implementado en los 15 laboratorios con taxonomía normalizada y poses contextuales de Alaska |
+| Tutora Visual Novel, guiones, poses y audio procedural | Implementado (`js/core/vn.js`, `js/core/sound.js`) |
+| Glosario contextual y pizarra de trabajo | Implementado (`js/core/glossary.js`: 54 términos resolviendo el 100% de `data-gloss` en las 18 páginas) |
+| Progreso local por sección y competencia | Implementado con almacén centralizado (`alaska:learning:v1`) y migración no destructiva legacy |
+| Motor central de competencias y DAG en 2 pasos | Implementado (`curriculum-registry.js`: 15 módulos, 88 competencias, DAG acíclico con evidencia estricta) |
 | Repetición espaciada adaptativa | Implementado (`js/core/learning/scheduler.js` ventanas deterministas `review_due`) |
-| Selección global de práctica intercalada | Implementado (`js/core/learning/exercise-selector.js` Modo Inteligente en Retos) |
-| Motor de transferencia inter-módulo | Implementado (`js/core/learning/transfer.js` discriminación Lineal vs. Exponencial vs. Cuadrática) |
+| Intercalación global de práctica | Implementado (`js/core/learning/exercise-selector.js`: `excludeUnseen: true` global y prioridad de reparación) |
+| Motor modular de transferencia inter-módulo | Implementado (`transfer.js` + `transfer-classifiers/*`: 8 familias incl. Radical/Irracional, 9 familias de retos, guardia `unseen`) |
+| Cuaderno de Misterios Abiertos y reentrada en el hub | Implementado (`js/core/learning/mysteries.js`: 13 entradas U01–U11, tope 5 abiertos, invariante de no-maestría; `#hub-reentry`) |
+| Atlas longitudinal de errores | Implementado en los 15 laboratorios (`js/core/learning/dashboard.js` `mountCompetencyDashboard`) |
 | Calibración metacognitiva de confianza | Planificado |
-| Atlas longitudinal de errores | Implementado en dashboards de Exponenciales y Cuadráticas (`mountCompetencyDashboard`) |
 | Campamento persistente y autónomo | Exploración futura |
-| Jefes como evaluaciones integradoras | Dirección de diseño; motor unificado pendiente |
+| Evaluaciones integradoras de 6 fases (Jefes) | Implementado (`js/core/learning/boss-engine.js`, `jefe-integrador-1.html`, `simulacro-global.html`) |
 
 El estado detallado de implementación y las dependencias entre tareas se mantienen en [ROADMAP.md](ROADMAP.md). La arquitectura pedagógica objetivo, sus fundamentos y las referencias científicas están en [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
 
-### Cobertura Pedagógica Comparativa (Módulos Homogeneizados)
+### Cobertura Pedagógica y Técnica Verificada (11 Unidades · 15 Laboratorios · 2 Integradores · 88 Competencias)
 
-| Módulo | Secciones | Widgets POE | Chequeos Guiados | Pistas Artesanales | Familias PRNG | Trampas de Examen | Competencias Mapeadas | Diagnósticos Cognitivos | Estado de Verificación |
-|---|---|---|---|---|---|---|---|---|---|
-| **Funciones Exponenciales** (`exponenciales.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (134 tests, 9/9 auditoría) |
-| **Función Cuadrática** (`cuadraticas.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (88 tests, 100% auditoría) |
+Los 15 módulos de unidad exponen `competencies-map.js` + `learning-adapter.js`, metadatos uniformes de 8-tupla en chequeos y retos, y `mountCompetencyDashboard` en `#sec-repaso`. Suite verificada: **650 / 650 PASS** en **115 archivos de prueba** (`node --test tests/*.test.mjs tests/*/*.test.mjs`) y 18/18 páginas verificadas en Chromium Headless.
 
 ## Qué ofrece actualmente
 
-El hub presenta ocho laboratorios:
+El hub (`index.html`, `js/core/nav.js`) cubre las **11 unidades** del programa de ingreso de UNMDP Exactas mediante **15 laboratorios** y **2 evaluaciones integradoras sin cronómetro**:
 
-| Laboratorio | Entrada | Enfoque |
-|---|---|---|
-| Desigualdades compuestas | [desigualdades.html](desigualdades.html) | Desigualdades como circuitos en serie y paralelo, inversión de polaridad, intervalos y conjuntos solución. |
-| Unidades y análisis dimensional | [unidades.html](unidades.html) | Conversión mediante factores, conectores dimensionales, operaciones equivalentes y neutro multiplicativo. |
-| Funciones | [funciones.html](funciones.html) | Unicidad, dominio e imagen, conjuntos de positividad, monotonía, secante y función inversa. |
-| Sucesiones | [sucesiones.html](sucesiones.html) | Sucesiones aritméticas y geométricas, reglas recursivas y explícitas, conteo de saltos, signos y límites. |
-| Valor absoluto y funciones por partes | [valor-absoluto.html](valor-absoluto.html) | Distancia, vértice, transformaciones, ramas, dominio, imagen, fronteras y unicidad. |
-| Potencias y raíces | [potencias-raices.html](potencias-raices.html) | Exponentes, raíces, propiedades, restricciones de dominio y relaciones entre representaciones. |
-| Funciones exponenciales | [exponenciales.html](exponenciales.html) | Crecimiento y decaimiento, base, factor inicial, tablas, modelos y asíntotas. |
-| Función cuadrática, factorización y parábolas | [cuadraticas.html](cuadraticas.html) | Producto de binomios, factorización, formas canónica/factorizada/polinómica, completar el cuadrado, discriminante, Cardano-Vieta, intersección recta-parábola y optimización. |
+| Unidad | Laboratorio / Evaluación | Entrada | Enfoque |
+|---|---|---|---|
+| U01 · Números reales | Potencias y Raíces | [potencias-raices.html](potencias-raices.html) | Dos mundos (+0 vs ×1), exponentes, raíces, racionalización y restricciones en ℝ. |
+| U01 · Números reales | Desigualdades compuestas | [desigualdades.html](desigualdades.html) | Desigualdades como circuitos en serie (AND) y paralelo (OR), polaridad e intervalos Exactas. |
+| U01 · Números reales | Unidades y análisis dimensional | [unidades.html](unidades.html) | Conversión mediante factores unitarios, potencias de unidades y neutro multiplicativo `1`. |
+| U02 · Funciones | Laboratorio de Funciones | [funciones.html](funciones.html) | Unicidad, dominio e imagen, conjuntos de positividad, monotonía, secante e inversa. |
+| U02 · Funciones | Valor Absoluto y Partes | [valor-absoluto.html](valor-absoluto.html) | Distancia 1D (también U01 `#sec-1`), espejo cartesiano `a|x−h|+k`, tramos y escalonadas. |
+| U02 · Funciones | Sucesiones (Dominio en $\mathbb{N}$) | [sucesiones.html](sucesiones.html) | Sucesiones aritméticas y geométricas, reglas recursivas y explícitas, signos y límites. |
+| U03 · Función lineal | Función Lineal y Geometría | [lineal.html](lineal.html) | Pendiente $m = \operatorname{tg}(\alpha)$, formas explícita/implícita/segmentaria, paralelismo, perpendicularidad y mediatriz. |
+| U04 · Sistemas | Sistemas de Ecuaciones 2×2 | [sistemas.html](sistemas.html) | Resolución algebraica y gráfica, clasificación SCD / SCI / SI, sistemas paramétricos y modelado. |
+| U05 · Cuadrática | Función Cuadrática y Parábolas | [cuadraticas.html](cuadraticas.html) | Modelo de área, factorización, formas canónica/factorizada/polinómica, completar cuadrado, $\Delta$, Vieta y optimización. |
+| U06 · Polinomios | Polinomios, Ruffini y Gauss | [polinomios.html](polinomios.html) | Grado, división euclídea, Ruffini con reescalado $(ax-b)$, Resto, Gauss y multiplicidades. |
+| U07 · Racional e irracional | Racionales e Irracionales | [racionales-irracionales.html](racionales-irracionales.html) | MCM polinómico, dominio, agujeros evitables vs. asíntotas, ecuaciones irracionales y raíces extraviadas. |
+| U08 · Exponencial | Funciones Exponenciales | [exponenciales.html](exponenciales.html) | Modelos $k \cdot a^x$, base natural $e$, asíntotas horizontales, estudio completo y ecuaciones. |
+| U09 · Logarítmica | Funciones Logarítmicas | [logaritmicas.html](logaritmicas.html) | Existencia, propiedades operativas, cambio de base, espejo inverso de $a^x$ y ecuaciones. |
+| U10 · Razones trig. | Razones Trigonométricas | [razones-trigonometricas.html](razones-trigonometricas.html) | Triángulos rectángulos, Pitágoras, SOHCAHTOA, elevación/depresión, grados/radianes, arcos y cuerpos. |
+| U11 · Funciones trig. | Funciones Trigonométricas | [funciones-trigonometricas.html](funciones-trigonometricas.html) | Clases $C_\alpha$, seis funciones con dominios y polos diferenciados, identidades y ecuaciones periódicas. |
+| U01–U06 · Síntesis | Jefe Integrador 1 | [jefe-integrador-1.html](jefe-integrador-1.html) | Evaluación integradora de 6 fases (`Reconocer` $\to$ `Debrief`) sin cronómetro punitivo. |
+| U01–U11 · Global | Simulacro Integrador Global | [simulacro-global.html](simulacro-global.html) | Recorrido transversal completo con seguimiento independiente vs. asistido y rutas de reparación. |
 
-La página de Unidades conserva además una entrada alternativa en el repositorio: [laboratorio_unidades.html](laboratorio_unidades.html). La navegación principal del hub utiliza actualmente **unidades.html**.
+La página de Unidades conserva además una redirección legacy en el repositorio: [laboratorio_unidades.html](laboratorio_unidades.html). La navegación principal utiliza **unidades.html**.
 
 ### Principios matemáticos del proyecto
 
 - **Primeros principios antes que trucos:** explicar las transformaciones mediante propiedades y equivalencias, no mediante expresiones como “pasa al otro lado y cambia de signo”.
-- **Equivalencia antes que coincidencia textual:** cuando el módulo lo permite, las fórmulas se interpretan mediante árboles sintácticos y se comparan matemáticamente.
-- **Diagnóstico antes que una cruz roja:** los errores conocidos deben asociarse a una hipótesis conceptual y a una intervención útil.
-- **Manipulación con significado:** mover un objeto debe permitir observar una relación matemática, no ser una animación sin consecuencias.
-- **Precisión formal:** gráficos, dominios, fronteras, signos y resultados deben conservar su significado matemático.
-- **Retirada gradual de ayudas:** el acompañamiento tiene que conducir a la resolución independiente, no crear dependencia de la interfaz o de Alaska.
+- **Equivalencia antes que coincidencia textual:** fórmulas, polinomios, intervalos y ángulos se analizan mediante árboles sintácticos y capas matemáticas exactas en vez de comparar cadenas.
+- **Diagnóstico antes que una cruz roja:** los errores conocidos se asocian a una hipótesis conceptual y a una intervención útil.
+- **Manipulación con significado:** mover un objeto permite observar una relación matemática, no ser una animación sin consecuencias.
+- **Precisión formal:** gráficos, dominios, fronteras, signos y resultados conservan su significado matemático.
+- **Retirada gradual de ayudas:** el acompañamiento conduce a la resolución independiente, sin crear dependencia de la interfaz o de Alaska.
 
 ## Cómo debería funcionar el aprendizaje
 
@@ -99,7 +107,7 @@ La arquitectura completa está especificada en [LEARNING_ARCHITECTURE.md](LEARNI
 
 ## Alaska: tutora, no sustituta del razonamiento
 
-Alaska es una presencia narrativa que debe intervenir de forma contextual:
+Alaska es una presencia narrativa que interviene de forma contextual:
 
 - Explica un prerrequisito cuando detecta una laguna.
 - Señala qué propiedad o paso necesita revisión.
@@ -112,43 +120,51 @@ Su personalidad puede ser irónica, expresiva y tsundere. El humor nunca debe co
 
 ## Arquitectura técnica
 
-El proyecto utiliza HTML, CSS y módulos JavaScript nativos, sin dependencias de ejecución. No utiliza frameworks de UI, bibliotecas externas de graficación, eval() ni new Function().
+El proyecto utiliza HTML, CSS y módulos JavaScript nativos, sin dependencias de ejecución. No utiliza frameworks de UI, bibliotecas externas de graficación, `eval()` ni `new Function()`.
 
-La lógica matemática se separa de la representación y de los eventos DOM. En los módulos que lo necesitan, las expresiones se analizan como AST y los validadores trabajan sobre estructuras matemáticas en vez de comparar cadenas.
+La lógica matemática se separa de la representación y de los eventos DOM. Expresiones, polinomios, intervalos y ángulos se analizan mediante AST y capas de aritmética exacta (`js/core/math/` y `js/modules/*/expr.js`).
 
 ### Núcleo compartido (`js/core/`)
 
 | Archivo / Directorio | Responsabilidad |
 |---|---|
 | `js/core/dom.js` | Helpers DOM/SVG, montaje, delegación de eventos y store reactivo. |
-| `js/core/plot.js` | Conversión de coordenadas, planos SVG y arrastre persistente. |
-| `js/core/math-format.js` | Formato matemático (`fmt()` con coma decimal es-AR, signo menos Unicode `−`, fracciones). |
-| `js/core/vn.js` | HUD Visual Novel, diálogo, poses y reacciones de Alaska. |
+| `js/core/plot.js` y `js/core/board-kit.js` | Conversión de coordenadas, planos SVG, `attachSvgDrag` con soporte de teclado y POE en 2 etapas (`createPredictBox`). |
+| `js/core/math-format.js` | Formato matemático (`fmt()` con coma decimal es-AR, signo menos Unicode `−`, fracciones horizontales). |
+| `js/core/math/{polynomials,trigonometry}.js` | Aritmética exacta de polinomios/Ruffini/Gauss (U06–U07) y trigonometría exacta/congruencias $C_\alpha$ (U10–U11). |
+| `js/core/vn.js` | HUD Visual Novel, diálogo, 17 poses y reacciones de Alaska. |
 | `js/core/sound.js` | Síntesis procedural de sonidos (Web Audio API) y preferencias de audio. |
-| `js/core/nav.js` | Navegación global, mega-menú curricular y controles compartidos. |
-| `js/core/glossary.js` | Glosario contextual y consulta de términos. |
+| `js/core/nav.js` | Navegación global de 11 unidades / 18 páginas, mega-menú curricular, integradores y controles compartidos. |
+| `js/core/glossary.js` | Glosario contextual con 54 términos (`GLOSSARY_TERMS`) resolviendo el 100% de `data-gloss` en todas las páginas. |
 | `js/core/scratchpad.js` | Pizarra de trabajo auxiliar. |
-| `js/core/learning/events.js` | Contrato, fábrica y validación de eventos inmutables `LearningEvent`. |
-| `js/core/learning/competencies.js` | Registro unificado de competencias y validador topológico acíclico de DAG. |
-| `js/core/learning/progress-store.js` | Persistencia local (`alaska:learning:v1`), log acotado (200 eventos) y reportes KPI. |
-| `js/core/learning/mastery.js` | Máquina de estados conservadora de 7 estados (elimina consolidación por único acierto). |
+| `js/core/learning/events.js` | Contrato, fábrica y validación de eventos inmutables `LearningEvent` (15 módulos + 2 integradores). |
+| `js/core/learning/competencies.js` y `curriculum-registry.js` | Registro global en 2 pasos que valida el DAG acíclico de 15 módulos y 88 competencias. |
+| `js/core/learning/progress-store.js` | Persistencia local (`alaska:learning:v1`), log acotado (200 eventos), `state.mysteries` y reportes KPI. |
+| `js/core/learning/mastery.js` | Máquina de estados conservadora de 7 estados (`unseen` $\to$ `durable`) sin consolidación por único acierto. |
 | `js/core/learning/scheduler.js` | Planificador determinista de ventanas de repaso espaciado (`review_due`). |
-| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalado según urgencia pedagógica (`needs_repair` $\to$ `review_due` $\to$ `developing`). |
-| `js/core/learning/transfer.js` | Motor de discriminación inter-módulo (Lineal vs. Exponencial vs. Cuadrática) en tablas, geometría y álgebra. |
-| `js/core/learning/migrations.js` | Utilidades de migración no destructiva con preservación de claves locales previas. |
+| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalación global (`selectGlobalInterleavedBatch`, `excludeUnseen: true`, reparación de prerrequisitos). |
+| `js/core/learning/transfer.js` y `transfer-classifiers/*` | Motor modular por plugins para 8 familias de modelos (`linear`, `quadratic`, `polynomial`, `rational`, `radical`, `exponential`, `logarithmic`, `trigonometric`) + `shared-ast.js` (0 imports hacia `js/modules/*`, guardia `unseen`). |
+| `js/core/learning/mysteries.js` | Cuaderno de Misterios Abiertos (`OPEN_MYSTERIES`: 13 misterios U01–U11, tope 5 abiertos, invariante de no-maestría, `mountMysteriesNotebook`). |
+| `js/core/learning/dashboard.js` | Dashboard unificado de competencias y Atlas de Errores (`mountCompetencyDashboard`). |
+| `js/core/learning/boss-engine.js` | Motor de evaluaciones integradoras de 6 fases sin cronómetro (`Reconocer` $\to$ `Debrief`). |
+| `js/core/learning/migrations.js` | Utilidades de migración no destructiva preservando claves legacy de módulos homogeneizados. |
 
 ### Módulos matemáticos (`js/modules/`)
 
-- **js/modules/circuitos/**: lógica y renderizado de desigualdades compuestas.
-- **js/modules/dimensional/**: cálculo y representación de análisis dimensional.
-- **js/modules/funciones/**: scanner de unicidad, radiografía, secante e inversa.
-- **js/modules/potencias-raices/**: lógica, parser, componentes, retos y widgets.
-- **js/modules/sucesiones/**: lógica, parser, diagnóstico, retos, guiones y widgets.
-- **js/modules/valor-absoluto/**: lógica, parser, diagnóstico, retos, guiones y widgets.
-- **js/modules/exponenciales/**: 10 widgets interactivos, 30 chequeos guiados con 8-tupla, 90 pistas artesanales, 10 familias PRNG, 5 trampas de examen, mapa de competencias, adaptador de aprendizaje y dashboard Error Atlas.
-- **js/modules/cuadraticas/**: 10 widgets interactivos, parser AST, 30 chequeos guiados con 8-tupla, 90 pistas artesanales, 10 familias PRNG, 5 trampas de examen, mapa de competencias, adaptador de aprendizaje y dashboard Error Atlas.
+- **Unidad 01:** `potencias-raices/`, `circuitos/` (`desigualdades.html`), `dimensional/` (`unidades.html`).
+- **Unidad 02:** `funciones/`, `valor-absoluto/`, `sucesiones/`.
+- **Unidad 03:** `lineal/`.
+- **Unidad 04:** `sistemas/`.
+- **Unidad 05:** `cuadraticas/`.
+- **Unidad 06:** `polinomios/`.
+- **Unidad 07:** `racionales-irracionales/`.
+- **Unidad 08:** `exponenciales/`.
+- **Unidad 09:** `logaritmicas/`.
+- **Unidad 10:** `razones-trigonometricas/`.
+- **Unidad 11:** `funciones-trigonometricas/`.
+- **Integradores:** `jefes/integrador-1.js` (`jefe-integrador-1.html`) y `jefes/simulacro-global.js` (`simulacro-global.html`).
 
-No todos los módulos comparten aún el mismo modelo de lección, persistencia o chequeo. La futura arquitectura adaptativa deberá integrarse progresivamente, sin forzar una migración masiva ni duplicar motores existentes.
+Los 15 módulos de unidad comparten el contrato pedagógico unificado (`competencies-map.js`, `learning-adapter.js`, 8-tupla uniforme, `mountCompetencyDashboard` y `alaska:learning:v1`), conservando representaciones y motores matemáticos propios por dominio.
 
 ## Documentación del proyecto
 

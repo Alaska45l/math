@@ -313,6 +313,9 @@ export function diagnoseFunction(userInput, context = {}) {
   if (spec.type === 'interval' || spec.type === 'set') {
     const parsed = parseIntervalSet(raw);
     if (!parsed.ok) return null;
+    if (parsed.rawFlags?.closedInfinity) {
+      return { ...FN_DIAG_DEFS.closed_bracket_on_excluded_point_or_extremum };
+    }
     if (spec.expectedSet && sameIntervalSet(parsed.intervals, spec.expectedSet)) {
       return null;
     }

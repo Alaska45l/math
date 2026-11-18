@@ -692,7 +692,7 @@ export function createCheckBlock(host, questions, sectionId, onComplete) {
           recordCompetencyAttempt({
             exerciseId,
             competencyId: compId,
-            correct: false,
+            correct: true,
             mode: "assisted",
             hintsUsed: hintStep,
             solutionRevealed: true,

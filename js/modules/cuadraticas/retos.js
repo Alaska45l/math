@@ -1930,13 +1930,25 @@ export function mountQuadraticRetos(root, { seed, vn } = {}) {
       const firstReason = challenges[0]?._selectionReason || 'Refuerzo adaptativo según tu progreso.';
       adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}». Alaska recomienda: ${firstReason}`;
     } else if (state.family === 'transferencia') {
-      challenges = Array.from({ length: 8 }, (_, i) => {
-        const ch = generateTransferChallenge(state.seed, 'all', i);
-        ch.isTransfer = true;
-        return ch;
-      });
+      challenges = Array.from({ length: 8 }, (_, i) => generateTransferChallenge(state.seed, 'all', i))
+        .filter(Boolean)
+        .map((ch) => {
+          ch.isTransfer = true;
+          return ch;
+        });
       adaptiveNote.removeAttribute('hidden');
-      adaptiveNote.textContent = 'Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales y Cuadráticos.';
+      if (challenges.length === 0) {
+        adaptiveNote.textContent = 'La transferencia inter-módulo se habilita cuando al menos una competencia de la unidad haya sido introducida.';
+        cascadeList.appendChild(
+          h(
+            'li',
+            { class: 'quad-transfer-empty muted' },
+            'Todavía no hay competencias introducidas para transferencia inter-módulo. Explorá o resolvé al menos una sección de la unidad para desbloquear estos retos.'
+          )
+        );
+      } else {
+        adaptiveNote.textContent = 'Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales, Cuadráticos y demás familias introducidas.';
+      }
     } else {
       challenges = generateQuadChallenges(state.seed, state.family, 8);
     }

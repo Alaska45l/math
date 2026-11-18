@@ -7,14 +7,23 @@ const ROOT_DIR = path.resolve(".");
 const PORT = 3456;
 const PAGES = [
   "index.html",
+  "potencias-raices.html",
   "desigualdades.html",
   "unidades.html",
   "funciones.html",
-  "sucesiones.html",
   "valor-absoluto.html",
-  "potencias-raices.html",
-  "exponenciales.html",
+  "sucesiones.html",
+  "lineal.html",
+  "sistemas.html",
   "cuadraticas.html",
+  "polinomios.html",
+  "jefe-integrador-1.html",
+  "racionales-irracionales.html",
+  "exponenciales.html",
+  "logaritmicas.html",
+  "razones-trigonometricas.html",
+  "funciones-trigonometricas.html",
+  "simulacro-global.html",
 ];
 
 const MIME_MAP = {
@@ -25,6 +34,7 @@ const MIME_MAP = {
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
   ".png": "image/png",
+  ".woff2": "font/woff2",
   ".json": "application/json",
 };
 
@@ -214,7 +224,8 @@ for (const pageName of PAGES) {
     explore.click();
     const drawerOpens = explore.getAttribute('aria-expanded') === 'true' &&
       drawer.getAttribute('aria-hidden') === 'false' &&
-      drawer.querySelectorAll('.curriculum-card').length === 9;
+      drawer.querySelectorAll('.curriculum-card').length === 11 &&
+      drawer.querySelectorAll('.site-nav__integrators a').length === 2;
     backdrop.click();
     const backdropCloses = explore.getAttribute('aria-expanded') === 'false';
     explore.click();
@@ -329,7 +340,8 @@ for (const pageName of PAGES) {
     innerWidth: window.innerWidth,
     docScrollWidth: document.documentElement.scrollWidth,
     overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
-    menuHasNineUnits: document.querySelectorAll('#site-curriculum-drawer .curriculum-card').length === 9,
+    menuHasElevenUnits: document.querySelectorAll('#site-curriculum-drawer .curriculum-card').length === 11,
+    hasTwoIntegrators: document.querySelectorAll('#site-curriculum-drawer .site-nav__integrators a').length === 2,
   }))()`);
 
   const intermediateWidths = [];
@@ -367,7 +379,8 @@ for (const pageName of PAGES) {
     !evalMobile320.overflow320 &&
     !evalMobile390.overflow390 &&
     !evalDesktop.overflow &&
-    evalWide.menuHasNineUnits &&
+    evalWide.menuHasElevenUnits &&
+    evalWide.hasTwoIntegrators &&
     !evalWide.overflow &&
     intermediateWidths.every((item) => !item.overflow);
 
@@ -398,7 +411,7 @@ for (const pageName of PAGES) {
   );
   console.log(`  Desktop 1280px desborde: ${evalDesktop.overflow}`);
   console.log(`  Desktop 1440px desborde: ${evalWide.overflow}`);
-  console.log(`  Mega menú: abre=${evalMobile.drawerOpens}, backdrop=${evalMobile.backdropCloses}, Escape=${evalMobile.escapeCloses}, 9 unidades=${evalWide.menuHasNineUnits}`);
+  console.log(`  Mega menú: abre=${evalMobile.drawerOpens}, backdrop=${evalMobile.backdropCloses}, Escape=${evalMobile.escapeCloses}, 11 unidades=${evalWide.menuHasElevenUnits}, 2 integradores=${evalWide.hasTwoIntegrators}`);
   for (const item of intermediateWidths)
     console.log(`  Ancho ${item.width}px desborde: ${item.overflow}`);
   console.log(`  Resultado página: ${pageOk ? "PASÓ [OK]" : "FALLÓ [ERROR]"}`);

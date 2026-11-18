@@ -386,6 +386,8 @@ El cuaderno debe limitar la cantidad de preguntas abiertas. Una lista interminab
 
 **Qué lo diferencia de un cliffhanger:** el alumno controla si guarda la pregunta, puede ver la respuesta inmediatamente y no pierde acceso a ninguna actividad por dejarla pendiente.
 
+**Estado implementado (`js/core/learning/mysteries.js` + `#hub-mysteries`):** catálogo curado de 13 misterios voluntarios cubriendo las Unidades 01–11 (combinando exploraciones puramente conceptuales `evaluation: null` y variantes evaluables opcionales con criterio explícito), acotado a un máximo de `MAX_OPEN_MYSTERIES = 5` misterios guardados en `alaska:learning:v1` (`state.mysteries`). Guardar, explorar pistas/explicaciones, descartar o cerrar misterios nunca altera `independentCount` ni el estado de dominio; únicamente una entrega evaluable explícita sin haber consultado previamente pista ni explicación aporta evidencia independiente.
+
 **Evidencia y límites:** Kang et al. (2009) y Gruber, Gelman y Ranganath (2014) encontraron asociaciones entre estados de curiosidad y mejor memoria para información de interés; Gruber et al. también observaron beneficios para material incidental presentado durante estados de curiosidad. Esos estudios utilizaron preguntas de trivia y tareas experimentales, no cursos universitarios de matemática. Por ello, el cuaderno de misterios es una extrapolación de diseño prometedora que debe evaluarse, no una garantía de aprendizaje profundo.
 
 ### 5.5. El laboratorio vivo y el campamento
@@ -598,26 +600,45 @@ Como punto de partida, se puede usar una política transparente por prioridad, n
 
 ### 6.8. Integración con módulos existentes y estado de implementación
 
-La infraestructura pedagógica común reside en `js/core/learning/` y se comunica con los módulos mediante adaptadores livianos:
+La infraestructura pedagógica común reside en `js/core/learning/` (apoyada en primitivas compartidas de `js/core/board-kit.js` y `js/core/math/`) y se comunica con los 15 laboratorios curriculares y las 2 evaluaciones integradoras mediante adaptadores livianos:
 
 | Módulo / Archivo | Responsabilidad e Integración | Estado |
 |---|---|---|
-| `js/core/learning/events.js` | Contrato, fábrica y validación inmutable de `LearningEvent` (7 tipos, 5 representaciones, 5 etapas). | Implementado y Validado |
-| `js/core/learning/competencies.js` | Registro global de competencias, consulta unificada y validación de DAG estrictamente acíclico. | Implementado y Validado |
-| `js/core/learning/progress-store.js` | Persistencia unificada local-first (`alaska:learning:v1`), log acotado (máx 200 eventos) y reportes KPI. | Implementado y Validado |
-| `js/core/learning/mastery.js` | Máquina de estados conservadora de dominio (7 estados: `unseen`, `introduced`, `developing`, `needs_repair`, `consolidating`, `review_due`, `durable`). Regla anti-grinding: 1 acierto $\to$ `developing`; se requieren al menos 2 aciertos independientes en ejercicios distintos para `consolidating`. | Implementado y Validado |
+| `js/core/learning/events.js` | Contrato, fábrica y validación inmutable de `LearningEvent` (7 tipos, 5 representaciones, 5 etapas; cubre 15 módulos + 2 integradores). | Implementado y Validado |
+| `js/core/learning/competencies.js` | Registro global en 2 pasos de competencias y validador topológico de DAG estrictamente acíclico. | Implementado y Validado |
+| `js/core/learning/curriculum-registry.js` | Punto de entrada determinista que registra los 15 mapas de competencias (88 competencias totales) y valida las aristas inter-módulo con `ignoreMissingCrossPrereqs = false`. | Implementado y Validado |
+| `js/core/learning/progress-store.js` | Persistencia unificada local-first (`alaska:learning:v1`), log acotado (máx 200 eventos), `MODULE_COMPETENCY_IDS` (15 módulos / 88 IDs), `state.mysteries` y reportes KPI. | Implementado y Validado |
+| `js/core/learning/mastery.js` | Máquina de estados conservadora de dominio (7 estados: `unseen`, `introduced`, `developing`, `needs_repair`, `consolidating`, `review_due`, `durable`). Regla anti-grinding: 1 acierto $\to$ `developing`; al menos 2 aciertos independientes en ejercicios distintos para `consolidating`. | Implementado y Validado |
 | `js/core/learning/scheduler.js` | Planificador determinista de ventanas de repaso (+4h en reparación, +24h tras consolidar, +72h, +168h, +336h). | Implementado y Validado |
-| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalado según urgencia pedagógica (`needs_repair` $\to$ `review_due` $\to$ `developing` $\to$ `consolidating` $\to$ `durable`) con desempate determinista y justificaciones en español rioplatense. | Implementado y Validado |
-| `js/core/learning/transfer.js` | Motor de discriminación inter-módulo (Lineal vs. Exponencial vs. Cuadrática) por invariantes ($\Delta y$, $y_{i+1}/y_i$, $\Delta^2 y$), geometría (asíntota vs. vértice/simetría) y álgebra. Registra eventos con `stage: "transfer"` y `transferDistance: "far"`. | Implementado y Validado |
-| `js/core/learning/migrations.js` | Migraciones no destructivas y retrocompatibles desde `exponenciales:progreso:v1` y `cuadraticas:progreso:v1` con corrección retroactiva de estados. | Implementado y Validado |
-| `js/modules/exponenciales/learning-adapter.js` | Adaptador pedagógico de Exponenciales: emite eventos normalizados y conecta `recordExpAttempt` con el almacén central. | Implementado y Validado |
-| `js/modules/exponenciales/competencies-map.js` | Mapa de 10 competencias y 10 diagnósticos cognitivos de Exponenciales en grafo DAG acíclico. | Implementado y Validado |
-| `js/modules/cuadraticas/learning-adapter.js` | Adaptador pedagógico de Cuadráticas: emite eventos normalizados y conecta `recordQuadAttempt` con el almacén central. | Implementado y Validado |
-| `js/modules/cuadraticas/competencies-map.js` | Mapa de 10 competencias y 10 diagnósticos cognitivos de Cuadráticas en grafo DAG acíclico. | Implementado y Validado |
+| `js/core/learning/exercise-selector.js` | Selector adaptativo e intercalación global (`selectAdaptiveExercise`, `selectGlobalInterleavedBatch`, `buildGlobalExerciseCatalog`) con filtro `excludeUnseen: true` en modo global, prioridad de reparación de prerrequisitos en `needs_repair` y diversidad entre módulos. | Implementado y Validado |
+| `js/core/learning/transfer.js` + `transfer-classifiers/*` | Arquitectura modular por plugins (`shared-ast.js`, `linear.js`, `quadratic.js`, `polynomial.js`, `rational.js`, `radical.js`, `exponential.js`, `logarithmic.js`, `trigonometric.js`) para 8 familias de modelos y 9 familias de retos (`TRANSFER_FAMILIES`), cero imports de `js/modules/*` y guardia estricta contra competencias `unseen`. | Implementado y Validado |
+| `js/core/learning/mysteries.js` | Cuaderno de Misterios Abiertos: catálogo de 13 misterios (Unidades 01–11), tope de 5 abiertos, invariante estricta de no-maestría en exploración abierta y `mountMysteriesNotebook` en `index.html`. | Implementado y Validado |
+| `js/core/learning/dashboard.js` | Panel unificado de competencias y Atlas de Errores (`mountCompetencyDashboard`) reutilizado en los 15 laboratorios. | Implementado y Validado |
+| `js/core/learning/boss-engine.js` | Motor de evaluaciones integradoras de 6 fases (`Reconocer`, `Predecir`, `Modelar`, `Resolver`, `Transferir`, `Debrief`) sin cronómetro punitivo y con registro independiente vs. asistido. | Implementado y Validado |
+| `js/core/learning/migrations.js` | Migraciones no destructivas desde `exponenciales:progreso:v1`, `cuadraticas:progreso:v1`, `potencias_raices:progreso:v1`, `valor_absoluto:progreso:v1` y `sucesiones:progreso:v1`. | Implementado y Validado |
+| `js/core/board-kit.js`, `js/core/math/{polynomials,trigonometry}.js` | Primitivas compartidas POE en 2 etapas (`createPredictBox`), `attachSvgDrag` accesible por teclado, aritmética racional exacta de polinomios/Ruffini/Gauss y trigonometría exacta/congruencias $C_\alpha$. | Implementado y Validado |
+| `js/modules/<modulo>/{competencies-map,learning-adapter}.js` | Adaptadores y mapas de competencias para los 15 laboratorios (`potencias-raices`, `circuitos`/`desigualdades`, `dimensional`/`unidades`, `funciones`, `valor-absoluto`, `sucesiones`, `lineal`, `sistemas`, `cuadraticas`, `polinomios`, `racionales-irracionales`, `exponenciales`, `logaritmicas`, `razones-trigonometricas`, `funciones-trigonometricas`). | Implementado y Validado |
+| `js/modules/jefes/{integrador-1,simulacro-global}.js` | Evaluaciones integradoras sobre `boss-engine.js` para Unidades 01–06 y recorrido global 01–11. | Implementado y Validado |
 
-### 6.9. Matriz de Cobertura Pedagógica Integral (Exponenciales y Cuadráticas)
+### 6.9. Matriz de Cobertura Pedagógica Integral (11 Unidades · 15 Módulos · 88 Competencias)
 
-Cada competencia del currículo posee una correspondencia 1 a 1 entre sección instruccional, widget manipulable POE, familia generativa de retos PRNG, taxonomía diagnóstica y criterios de dominio:
+Las 88 competencias del currículo se distribuyen en un grafo acíclico único validado en cada arranque (`initCurriculumRegistry()`):
+
+| Unidad | Módulo (`MODULE_IDS`) | Competencias | Laboratorio |
+|---|---|---|---|
+| U01 · Números reales | `potencias-raices`, `desigualdades`, `unidades` | 10 + 3 + 2 = 15 | `potencias-raices.html`, `desigualdades.html`, `unidades.html` |
+| U02 · Funciones | `funciones`, `valor-absoluto`, `sucesiones` | 5 + 10 + 6 = 21 | `funciones.html`, `valor-absoluto.html`, `sucesiones.html` |
+| U03 · Función lineal | `lineal` | 5 | `lineal.html` |
+| U04 · Sistemas de ecuaciones | `sistemas` | 4 | `sistemas.html` |
+| U05 · Función cuadrática | `cuadraticas` | 10 | `cuadraticas.html` |
+| U06 · Polinomios | `polinomios` | 5 | `polinomios.html` |
+| U07 · Racional e irracional | `racionales-irracionales` | 5 | `racionales-irracionales.html` |
+| U08 · Función exponencial | `exponenciales` | 10 | `exponenciales.html` |
+| U09 · Función logarítmica | `logaritmicas` | 5 | `logaritmicas.html` |
+| U10 · Razones trigonométricas | `razones-trigonometricas` | 4 | `razones-trigonometricas.html` |
+| U11 · Funciones trigonométricas | `funciones-trigonometricas` | 4 | `funciones-trigonometricas.html` |
+
+Cada competencia posee correspondencia directa entre sección instruccional, widget manipulable POE, chequeos/retos generativos, taxonomía diagnóstica y criterios de dominio. A modo de referencia extendida se detallan las matrices de Exponenciales y Función Cuadrática:
 
 #### Módulo de Exponenciales (`exponenciales.html`)
 | Competencia | Sección & Widget | Familia Retos PRNG | Diagnósticos Clave | Evidencia de Dominio |

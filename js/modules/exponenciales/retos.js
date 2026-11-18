@@ -1262,15 +1262,27 @@ function createTrainer(root) {
       const firstReason = challenges[0]?._selectionReason || "Refuerzo adaptativo según tu progreso.";
       adaptiveNote.textContent = `Motivo de selección: Reforzar «${firstTitle}» (pendiente de resolución independiente / se detectó confusión previa). Alaska recomienda: ${firstReason}`;
     } else if (requested === "transferencia") {
-      challenges = Array.from({ length: 8 }, (_, i) => {
-        const ch = generateTransferChallenge(seed, "all", i);
-        ch.isTransfer = true;
-        ch.displayAnswer = ch.expected;
-        ch.answer = ch.expected;
-        return ch;
-      });
+      challenges = Array.from({ length: 8 }, (_, i) => generateTransferChallenge(seed, "all", i))
+        .filter(Boolean)
+        .map((ch) => {
+          ch.isTransfer = true;
+          ch.displayAnswer = ch.expected;
+          ch.answer = ch.expected;
+          return ch;
+        });
       adaptiveNote.hidden = false;
-      adaptiveNote.textContent = "Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales y Cuadráticos.";
+      if (challenges.length === 0) {
+        adaptiveNote.textContent = "La transferencia inter-módulo se habilita cuando al menos una competencia de la unidad haya sido introducida.";
+        cascadeList.appendChild(
+          h(
+            "li",
+            { class: "exp-transfer-empty muted" },
+            "Todavía no hay competencias introducidas para transferencia inter-módulo. Explorá o resolvé al menos una sección de la unidad para desbloquear estos retos."
+          )
+        );
+      } else {
+        adaptiveNote.textContent = "Desafío de Transferencia Inter-Módulo: discriminación entre modelos Lineales, Exponenciales y Cuadráticos.";
+      }
     } else if (requested === "contrastivo") {
       challenges = Array.from({ length: 8 }, (_, i) => {
         const pairIdx = Math.floor(i / 2) % contrastPairs.length;

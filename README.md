@@ -31,55 +31,63 @@ The repository combines implemented capabilities with a learning architecture th
 
 | Area | Current Status |
 |---|---|
-| Interactive laboratories and SVG boards | Implemented across hub modules (10 interactive POE widgets in Exponentials & Quadratics) |
-| AST-based algebraic evaluators | Implemented in modules that accept formulas (`expr.js`, `logic.js`) |
-| Conceptual error diagnostics | Implemented with 10 cognitive diagnostics catalog per module and Alaska VN poses |
-| Visual Novel tutor, scripts, poses, and procedural audio | Implemented |
-| Contextual glossary and working scratchpad | Implemented in the modules that integrate them |
+| Interactive laboratories and SVG boards | Implemented across all 11 UNMDP Exactas units (15 interactive labs + 2 integrator evaluations) |
+| Shared mathematical & UI primitives | Implemented (`js/core/board-kit.js`, `js/core/math/{polynomials,trigonometry}.js`) |
+| AST-based algebraic & trig evaluators | Implemented (`expr.js`, `logic.js`, `polynomials.js`, `trigonometry.js`, `transfer-classifiers/shared-ast.js`) |
+| Conceptual error diagnostics | Implemented across all 15 modules with normalized taxonomy and contextual Alaska poses |
+| Visual Novel tutor, scripts, poses, and procedural audio | Implemented (`js/core/vn.js`, `js/core/sound.js`) |
+| Contextual glossary and working scratchpad | Implemented (`js/core/glossary.js`: 54 terms resolving 100% of `data-gloss` tags across 18 pages) |
 | Local progress by section & competency | Implemented with unified store (`alaska:learning:v1`) and non-destructive legacy migration |
-| Core competency and mastery engine | Implemented (`js/core/learning/mastery.js` 7-state conservative state machine) |
+| Core competency & 2-step DAG engine | Implemented (`curriculum-registry.js`: 15 modules, 88 competencies, acyclic strict-evidence DAG) |
 | Adaptive spaced repetition | Implemented (`js/core/learning/scheduler.js` deterministic `review_due` windows) |
-| Global interleaved practice selection | Implemented (`js/core/learning/exercise-selector.js` Smart Adaptive Mode in Retos) |
-| Inter-module transfer engine | Implemented (`js/core/learning/transfer.js` Linear vs. Exponential vs. Quadratic discrimination) |
+| Global interleaved practice selection | Implemented (`js/core/learning/exercise-selector.js`: `excludeUnseen: true` global interleaving & root-cause repair) |
+| Modular inter-module transfer engine | Implemented (`transfer.js` + `transfer-classifiers/*`: 8 model families incl. Radical/Irrational, 9 challenge families, strict `unseen` guard) |
+| Open Mysteries Notebook & Hub re-entry | Implemented (`js/core/learning/mysteries.js`: 13 entries across Units 01–11, max 5 open, non-mastery invariant; `#hub-reentry` in `index.html`) |
+| Longitudinal error atlas | Implemented across all 15 laboratories (`js/core/learning/dashboard.js` `mountCompetencyDashboard`) |
 | Metacognitive confidence calibration | Planned |
-| Longitudinal error atlas | Implemented in Exponentials and Quadratics dashboards (`mountCompetencyDashboard`) |
 | Persistent and autonomous base camp | Future exploration |
-| Bosses as integrative assessments | Design direction; unified engine pending |
+| Integrative 6-phase boss evaluations | Implemented (`js/core/learning/boss-engine.js`, `jefe-integrador-1.html`, `simulacro-global.html`) |
 
 Detailed implementation status and task dependencies are maintained in [ROADMAP.md](ROADMAP.md). The target pedagogical architecture, its foundations, and scientific references are in [LEARNING_ARCHITECTURE.md](LEARNING_ARCHITECTURE.md).
 
-### Comparative Pedagogical Coverage (Homogenized Modules)
+### Verified Pedagogical & Technical Coverage (11 Units · 15 Labs · 2 Integrators · 88 Competencies)
 
-| Module | Sections | POE Widgets | Guided Checks | Artisanal Hints | PRNG Families | Exam Traps | Mapped Competencies | Cognitive Diagnostics | Test Suite Status |
-|---|---|---|---|---|---|---|---|---|---|
-| **Exponential Functions** (`exponenciales.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (134 tests, 9/9 audit) |
-| **Quadratic Functions** (`cuadraticas.html`) | 10 | 10 | 30 | 90 | 10 | 5 | 10 | 10 | 100% PASS (88 tests, 100% audit) |
+All 15 unit modules expose `competencies-map.js` + `learning-adapter.js`, uniform 8-tuple metadata on checks and challenges, and `mountCompetencyDashboard` in `#sec-repaso`. Total verified test suite: **650 / 650 PASS** across **115 test files** (`node --test tests/*.test.mjs tests/*/*.test.mjs`) plus 18/18 headless Chromium page & interaction gates.
 
 ## What It Currently Offers
 
-The hub features eight laboratories:
+The hub (`index.html`, `js/core/nav.js`) spans all **11 units** of the UNMDP FCEyN entry curriculum with **15 laboratories** and **2 untimed 6-phase integrator evaluations**:
 
-| Laboratory | Entry Point | Focus |
-|---|---|---|
-| Compound Inequalities | [desigualdades.html](desigualdades.html) | Inequalities as series and parallel circuits, polarity inversion, intervals, and solution sets. |
-| Units and Dimensional Analysis | [unidades.html](unidades.html) | Factor-based conversion, dimensional connectors, equivalent operations, and the multiplicative identity. |
-| Functions | [funciones.html](funciones.html) | Uniqueness, domain and range, positivity sets, monotonicity, secant line, and inverse function. |
-| Sequences | [sucesiones.html](sucesiones.html) | Arithmetic and geometric sequences, recursive and explicit rules, step counting, signs, and limits. |
-| Absolute Value and Piecewise Functions | [valor-absoluto.html](valor-absoluto.html) | Distance, vertex, transformations, branches, domain, range, boundaries, and uniqueness. |
-| Powers and Roots | [potencias-raices.html](potencias-raices.html) | Exponents, roots, properties, domain restrictions, and relationships between representations. |
-| Exponential Functions | [exponenciales.html](exponenciales.html) | Growth and decay, base, initial factor, tables, models, and asymptotes. |
-| Quadratic Functions and Parabolas | [cuadraticas.html](cuadraticas.html) | Binomial multiplication, factoring, canonical/factored/polynomial forms, completing the square, discriminant, Vieta's formulas, line-parabola systems, and optimization. |
+| Unit | Laboratory / Evaluation | Entry Point | Focus |
+|---|---|---|---|
+| U01 · Real Numbers | Powers and Roots | [potencias-raices.html](potencias-raices.html) | Exponents, roots, additive vs. multiplicative worlds, domain restrictions, rationalization. |
+| U01 · Real Numbers | Compound Inequalities | [desigualdades.html](desigualdades.html) | Inequalities as series (AND) and parallel (OR) circuits, polarity inversion, Exactas intervals. |
+| U01 · Real Numbers | Units and Dimensional Analysis | [unidades.html](unidades.html) | Factor-based conversion, dimensional connectors, powers on units, multiplicative identity `1`. |
+| U02 · Functions | Functions | [funciones.html](funciones.html) | Uniqueness scanner, domain and range, positivity sets, monotonicity, secant line, inverse function. |
+| U02 · Functions | Absolute Value and Piecewise | [valor-absoluto.html](valor-absoluto.html) | 1D distance (also U01 `#sec-1`), Cartesian mirror, `a|x−h|+k`, piecewise branches, step functions. |
+| U02 · Functions | Sequences (Domain in $\mathbb{N}$) | [sucesiones.html](sucesiones.html) | Arithmetic and geometric sequences, recursive vs. explicit rules, fencepost counting, limits. |
+| U03 · Linear | Linear Functions & Analytic Geometry | [lineal.html](lineal.html) | Slope $m = \tan(\alpha)$, explicit/implicit/segmentary forms, parallel/perpendicular, midpoint, bisector. |
+| U04 · Systems | 2×2 Linear Systems | [sistemas.html](sistemas.html) | Algebraic & graphical solving, SCD / SCI / SI classification, parametric systems, modeling. |
+| U05 · Quadratic | Quadratic Functions and Parabolas | [cuadraticas.html](cuadraticas.html) | Area model, factoring, canonical/factored/polynomial forms, completing the square, $\Delta$, Vieta, optimization. |
+| U06 · Polynomials | Polynomials, Ruffini & Gauss | [polinomios.html](polinomios.html) | Degree laws, Euclidean division, Ruffini with $(ax-b)$ rescaling, Remainder & Gauss theorems, multiplicity. |
+| U07 · Rational & Irrational | Rational & Irrational Functions | [racionales-irracionales.html](racionales-irracionales.html) | Polynomial LCM, domain exclusions, removable holes vs. vertical/horizontal asymptotes, extraneous roots. |
+| U08 · Exponential | Exponential Functions | [exponenciales.html](exponenciales.html) | Growth and decay $k \cdot a^x$, natural base $e$, horizontal asymptotes, full analysis, real equations. |
+| U09 · Logarithmic | Logarithmic Functions | [logaritmicas.html](logaritmicas.html) | Existence conditions, operational laws, change of base, inverse reflection of $a^x$, equations. |
+| U10 · Trig Ratios | Trigonometric Ratios & Geometry | [razones-trigonometricas.html](razones-trigonometricas.html) | Right triangles, Pythagoras, SOHCAHTOA, elevation/depression, sexagesimal vs. radians, arcs & solids. |
+| U11 · Trig Functions | Trigonometric Functions | [funciones-trigonometricas.html](funciones-trigonometricas.html) | Congruence classes $C_\alpha$, all 6 trig functions with distinct domains/poles, identities, periodic equations. |
+| U01–U06 · Synthesis | Integrative Boss 1 | [jefe-integrador-1.html](jefe-integrador-1.html) | 6-phase integrative assessment (`Reconocer` $\to$ `Debrief`) without countdown timers. |
+| U01–U11 · Global | Global Integrative Simulacro | [simulacro-global.html](simulacro-global.html) | Full-curriculum UNMDP synthesis assessment with independent vs. assisted tracking and repair links. |
 
-The Units page also retains an alternative entry point in the repository: [laboratorio_unidades.html](laboratorio_unidades.html). The main hub navigation currently uses **unidades.html**.
+The Units page also retains a legacy redirect in the repository: [laboratorio_unidades.html](laboratorio_unidades.html). The main hub navigation uses **unidades.html**.
 
 ### Mathematical Principles of the Project
 
 - **First principles before tricks:** explain transformations through properties and equivalences, not through phrases like “move it to the other side and flip the sign.”
-- **Equivalence before text matching:** when supported by the module, formulas are parsed via syntax trees and compared mathematically.
-- **Diagnosis before a red cross:** known errors must be associated with a conceptual hypothesis and a useful intervention.
-- **Meaningful manipulation:** moving an object must allow observing a mathematical relationship, not serve as an inconsequential animation.
-- **Formal precision:** graphs, domains, boundaries, signs, and results must preserve their mathematical meaning.
-- **Gradual fading of scaffolding:** guidance must lead to independent problem-solving, not create dependence on the interface or on Alaska.
+- **Equivalence before text matching:** formulas, polynomials, intervals, and trigonometric angles are parsed via syntax trees and exact math layers instead of string matching.
+- **Diagnosis before a red cross:** known errors are associated with a conceptual hypothesis and a useful intervention.
+- **Meaningful manipulation:** moving an object allows observing a mathematical relationship, not serving as an inconsequential animation.
+- **Formal precision:** graphs, domains, boundaries, signs, and results preserve their mathematical meaning.
+- **Gradual fading of scaffolding:** guidance leads to independent problem-solving, not dependence on the interface or on Alaska.
 
 ## How Learning Should Work
 
@@ -112,43 +120,51 @@ Her personality can be ironic, expressive, and tsundere. Humor must never turn i
 
 ## Technical Architecture
 
-The project uses HTML, CSS, and native JavaScript modules, with zero runtime dependencies. It does not use UI frameworks, external graphing libraries, eval(), or new Function().
+The project uses HTML, CSS, and native JavaScript modules, with zero runtime dependencies. It does not use UI frameworks, external graphing libraries, `eval()`, or `new Function()`.
 
-Mathematical logic is separated from rendering and DOM events. In modules that require it, expressions are parsed as ASTs and validators work on mathematical structures instead of comparing strings.
+Mathematical logic is separated from rendering and DOM events. Expressions, polynomials, intervals, and angles are parsed via dedicated AST and exact-arithmetic layers (`js/core/math/` and `js/modules/*/expr.js`).
 
 ### Shared Core (`js/core/`)
 
 | File / Directory | Responsibility |
 |---|---|
 | `js/core/dom.js` | DOM/SVG helpers, mounting, event delegation, and reactive store. |
-| `js/core/plot.js` | Coordinate conversion, SVG boards, and persistent dragging. |
-| `js/core/math-format.js` | Mathematical formatting (`fmt()` with es-AR comma, unicode minus `−`, fractions). |
-| `js/core/vn.js` | Visual Novel HUD, dialogue, poses, and Alaska's reactions. |
+| `js/core/plot.js` & `js/core/board-kit.js` | Coordinate conversion, SVG boards, keyboard-accessible `attachSvgDrag`, and 2-stage POE `createPredictBox`. |
+| `js/core/math-format.js` | Mathematical formatting (`fmt()` with es-AR comma, unicode minus `−`, horizontal fractions). |
+| `js/core/math/{polynomials,trigonometry}.js` | Shared pure exact polynomial/rational/Ruffini/Gauss arithmetic (U06–U07) and exact trigonometry/congruences (U10–U11). |
+| `js/core/vn.js` | Visual Novel HUD, dialogue, 17 poses, and Alaska's reactions. |
 | `js/core/sound.js` | Procedural sound synthesis (Web Audio API) and audio preferences. |
-| `js/core/nav.js` | Global navigation, curriculum mega-menu, and shared controls. |
-| `js/core/glossary.js` | Contextual glossary and term lookup. |
+| `js/core/nav.js` | Global 11-unit / 18-page navigation, curriculum mega-menu, integrator links, and shared controls. |
+| `js/core/glossary.js` | Contextual glossary with 54 terms (`GLOSSARY_TERMS`) resolving 100% of `data-gloss` attributes across all pages. |
 | `js/core/scratchpad.js` | Auxiliary working scratchpad. |
-| `js/core/learning/events.js` | Contract, factory, and validation for immutable `LearningEvent` objects. |
-| `js/core/learning/competencies.js` | Unified competency registry and acyclic DAG topological validator. |
-| `js/core/learning/progress-store.js` | Local-first persistence (`alaska:learning:v1`), bounded event log (200 items), and KPI reports. |
-| `js/core/learning/mastery.js` | Conservative 7-state pedagogical mastery machine eliminating spurious single-success consolidation. |
+| `js/core/learning/events.js` | Contract, factory, and validation for immutable `LearningEvent` objects (15 lab modules + 2 integrators). |
+| `js/core/learning/competencies.js` & `curriculum-registry.js` | 2-step deterministic global competency registry validating the 15-module / 88-competency acyclic DAG. |
+| `js/core/learning/progress-store.js` | Local-first persistence (`alaska:learning:v1`), bounded event log (200 items), `state.mysteries`, and KPI reports. |
+| `js/core/learning/mastery.js` | Conservative 7-state pedagogical mastery machine (`unseen` $\to$ `durable`) preventing single-success over-crediting. |
 | `js/core/learning/scheduler.js` | Deterministic spaced review scheduler computing review windows (`review_due`). |
-| `js/core/learning/exercise-selector.js` | Adaptive interleaved exercise selector prioritizing `needs_repair` $\to$ `review_due` $\to$ `developing`. |
-| `js/core/learning/transfer.js` | Inter-module model discrimination engine (Linear vs. Exponential vs. Quadratic) across tables, geometry, and formulas. |
-| `js/core/learning/migrations.js` | Non-destructive migration utilities preserving existing legacy localStorage keys. |
+| `js/core/learning/exercise-selector.js` | Adaptive selector and global interleaving (`selectGlobalInterleavedBatch`, `excludeUnseen: true`, prerequisite-first repair). |
+| `js/core/learning/transfer.js` & `transfer-classifiers/*` | Modular plugin engine for 8 model families (`linear`, `quadratic`, `polynomial`, `rational`, `radical`, `exponential`, `logarithmic`, `trigonometric`) + `shared-ast.js` (0 `js/modules/*` imports, unseen guard). |
+| `js/core/learning/mysteries.js` | Open Mysteries Notebook (`OPEN_MYSTERIES`: 13 entries across U01–U11, max 5 open, strict non-mastery invariant, `mountMysteriesNotebook`). |
+| `js/core/learning/dashboard.js` | Unified competency & Error Atlas dashboard (`mountCompetencyDashboard`). |
+| `js/core/learning/boss-engine.js` | Untimed 6-phase integrative assessment engine (`Reconocer`, `Predecir`, `Modelar`, `Resolver`, `Transferir`, `Debrief`). |
+| `js/core/learning/migrations.js` | Non-destructive migration utilities preserving existing legacy localStorage keys across homogenized modules. |
 
 ### Mathematical Modules (`js/modules/`)
 
-- **js/modules/circuitos/**: logic and rendering for compound inequalities.
-- **js/modules/dimensional/**: calculation and representation for dimensional analysis.
-- **js/modules/funciones/**: uniqueness scanner, X-ray view, secant line, and inverse function.
-- **js/modules/potencias-raices/**: logic, parser, components, challenges, and widgets.
-- **js/modules/sucesiones/**: logic, parser, diagnostics, challenges, scripts, and widgets.
-- **js/modules/valor-absoluto/**: logic, parser, diagnostics, challenges, scripts, and widgets.
-- **js/modules/exponenciales/**: 10 interactive widgets, 30 checks with full 8-tuple metadata, 90 artisanal hints, 10 PRNG families, 5 exam traps, competency map, learning adapter, and Error Atlas dashboard.
-- **js/modules/cuadraticas/**: 10 interactive widgets, AST parser, 30 checks with full 8-tuple metadata, 90 artisanal hints, 10 PRNG families, 5 exam traps, competency map, learning adapter, and Error Atlas dashboard.
+- **Unit 01:** `potencias-raices/`, `circuitos/` (`desigualdades.html`), `dimensional/` (`unidades.html`).
+- **Unit 02:** `funciones/`, `valor-absoluto/`, `sucesiones/`.
+- **Unit 03:** `lineal/`.
+- **Unit 04:** `sistemas/`.
+- **Unit 05:** `cuadraticas/`.
+- **Unit 06:** `polinomios/`.
+- **Unit 07:** `racionales-irracionales/`.
+- **Unit 08:** `exponenciales/`.
+- **Unit 09:** `logaritmicas/`.
+- **Unit 10:** `razones-trigonometricas/`.
+- **Unit 11:** `funciones-trigonometricas/`.
+- **Integrators:** `jefes/integrador-1.js` (`jefe-integrador-1.html`) and `jefes/simulacro-global.js` (`simulacro-global.html`).
 
-Not all modules share the same lesson, persistence, or validation model yet. The future adaptive architecture must be integrated progressively, without forcing a massive migration or duplicating existing engines.
+All 15 unit modules share a unified pedagogical contract (`competencies-map.js`, `learning-adapter.js`, uniform 8-tuple metadata, `mountCompetencyDashboard`, and `alaska:learning:v1`), while retaining domain-specific interactive visualizations and parsers.
 
 ## Project Documentation
 

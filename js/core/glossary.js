@@ -569,6 +569,398 @@ export const GLOSSARY_TERMS = {
     contrast:
       "Si Δ_int > 0 la recta corta en dos puntos y se llama secante; si Δ_int < 0 no se tocan nunca y se llama exterior.",
   },
+  pendiente_recta: {
+    title: "Pendiente de una recta (m)",
+    pose: "explicando",
+    text: "Mide la inclinación constante de una recta no vertical: indica cuántas unidades cambia la coordenada vertical y por cada unidad que avanzamos horizontalmente en x. Se calcula como el cociente incremental Δy sobre Δx entre dos puntos distintos cualesquiera de la recta y coincide con la tangente trigonométrica del ángulo de inclinación.",
+    example:
+      "La recta que pasa por A(1; 2) y B(4; 8) tiene pendiente m = (8 − 2)/(4 − 1) = 6/3 = 2: sube 2 por cada paso a la derecha.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "m = ",
+        frac("y₂ − y₁", "x₂ − x₁"),
+        " = ",
+        frac("Δy", "Δx"),
+        " = tg(α);   x₁ ≠ x₂",
+      ),
+    contrast:
+      "¡Ojo con el orden y el divisor! Invertir el cociente como Δx/Δy arruina la pendiente; además, las rectas verticales tienen Δx = 0 y no poseen pendiente definida en ℝ.",
+  },
+  ordenada_al_origen: {
+    title: "Ordenada al origen (b)",
+    pose: "base",
+    text: "Es la coordenada vertical donde la gráfica de una función o de una recta no vertical corta al eje Y, es decir, el valor que toma la salida cuando x = 0. En la ecuación explícita y = mx + b aparece a simple vista como el término independiente y funciona como punto de ancla inicial.",
+    example:
+      "En y = −3x + 5, al reemplazar x = 0 obtenemos y = 5, por lo que la recta corta al eje vertical en el punto (0; 5).",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "f(0) = b;   P₀ = (0; b);   y = mx + b ⟹ b = y − mx;   ",
+        frac("b", "1"),
+        " = f(0)",
+      ),
+    contrast:
+      "No confundir ordenada al origen (corte con el eje Y donde x = 0) con raíz o abscisa al origen (corte con el eje X donde y = 0).",
+  },
+  ecuacion_segmentaria: {
+    title: "Ecuación segmentaria (canónica de la recta)",
+    pose: "lentes-brillo",
+    text: "Es la forma de la recta que deja al desnudo sus dos intersecciones con los ejes coordenados: p marca el corte con el eje X en (p; 0) y q marca el corte con el eje Y en (0; q). Sólo existe cuando la recta corta a ambos ejes fuera del origen, es decir, cuando p ≠ 0 y q ≠ 0.",
+    example:
+      "La recta 2x + 3y = 6 se divide miembro a miembro por 6 para igualar a 1 y queda x/3 + y/2 = 1: corta en (3; 0) y (0; 2).",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        frac("x", "p"),
+        " + ",
+        frac("y", "q"),
+        " = 1;   p ≠ 0,  q ≠ 0;   m = −",
+        frac("q", "p"),
+      ),
+    contrast:
+      "Las rectas horizontales, verticales o que pasan por el origen (0; 0) no admiten ecuación segmentaria porque no se puede dividir por cero.",
+  },
+  ecuacion_implicita: {
+    title: "Ecuación general o implícita (Ax + By + C = 0)",
+    pose: "pensativa",
+    text: "Es la escritura universal de cualquier recta en el plano cartesiano, incluyendo las rectas verticales que no son funciones. Exige que los coeficientes A y B no sean simultáneamente nulos. Despejando y cuando B ≠ 0 recuperamos la forma explícita con pendiente −A/B y ordenada al origen −C/B.",
+    example:
+      "La recta 3x − 2y + 8 = 0 tiene A = 3, B = −2 y C = 8; si despejamos y resulta y = (3/2)x + 4, con pendiente 3/2.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "Ax + By + C = 0;   m = −",
+        frac("A", "B"),
+        ",   b = −",
+        frac("C", "B"),
+        "   (B ≠ 0)",
+      ),
+    contrast:
+      "Si B = 0 y A ≠ 0, queda Ax + C = 0, es decir x = −C/A: representa una recta vertical que no tiene forma explícita y = mx + b.",
+  },
+  mediatriz: {
+    title: "Mediatriz de un segmento",
+    pose: "complice",
+    text: "Es la recta perpendicular a un segmento dado AB que pasa exactamente por su punto medio M. Geométricamente reúne todos los puntos del plano que están a la misma distancia de A que de B. Para hallar su ecuación calculamos el punto medio M y usamos la pendiente opuesta e inversa respecto del segmento.",
+    example:
+      "Para A(0; 0) y B(4; 2), el punto medio es M(2; 1), la pendiente del segmento es 1/2 y la mediatriz tiene pendiente −2: y = −2(x − 2) + 1.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "M = (",
+        frac("x_A + x_B", "2"),
+        "; ",
+        frac("y_A + y_B", "2"),
+        ");   m_⊥ = −",
+        frac("1", "m_{AB}"),
+      ),
+    contrast:
+      "Si el segmento AB es horizontal (m = 0), su mediatriz es una recta vertical x = x_M y no se calcula haciendo −1/0.",
+  },
+  sistema_compatible_determinado: {
+    title: "Sistema compatible determinado (SCD)",
+    pose: "evaluando",
+    text: "Es un sistema de ecuaciones lineales 2×2 que posee exactamente una única solución (x₀; y₀). En el plano cartesiano corresponde a dos rectas secantes con distinta inclinación que se cruzan en un único punto común. Al resolver algebraicamente se obtiene un valor concreto para cada incógnita.",
+    example:
+      "El sistema x + y = 5 y x − y = 1 tiene pendientes −1 y +1 distintas; sus rectas se cruzan únicamente en el punto S = {(3; 2)}.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "m₁ ≠ m₂ ⟺ ",
+        frac("a₁", "a₂"),
+        " ≠ ",
+        frac("b₁", "b₂"),
+        " ⟹ S = {(x₀; y₀)}",
+      ),
+    contrast:
+      "Una solución de un sistema 2×2 siempre es un par ordenado (x₀; y₀), nunca dos números sueltos desconectados.",
+  },
+  sistema_compatible_indeterminado: {
+    title: "Sistema compatible indeterminado (SCI)",
+    pose: "lentes-brillo",
+    text: "Es un sistema de ecuaciones lineales 2×2 que admite infinitas soluciones porque ambas ecuaciones describen exactamente la misma recta (son proporcionales en todos sus coeficientes). Al reducir por sustitución o igualación aparece una identidad verdadera como 0·x = 0 o 5 = 5, indicando rectas coincidentes.",
+    example:
+      "En 2x − y = 4 y 4x − 2y = 8, la segunda ecuación es el doble de la primera: comparten todos sus puntos y S = {(x; 2x − 4) / x ∈ ℝ}.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        frac("a₁", "a₂"),
+        " = ",
+        frac("b₁", "b₂"),
+        " = ",
+        frac("c₁", "c₂"),
+        " ⟹ 0·x = 0   (∞ soluciones)",
+      ),
+    contrast:
+      "¡Cuidado! Infinitas soluciones no significa «cualquier par del plano»: sólo pertenecen al conjunto solución los puntos que yacen sobre esa recta.",
+  },
+  sistema_incompatible: {
+    title: "Sistema incompatible (SI)",
+    pose: "sospecha",
+    text: "Es un sistema de ecuaciones que no posee ninguna solución real porque sus condiciones se contradicen simultáneamente. Gráficamente corresponde a dos rectas paralelas no coincidentes: tienen exactamente la misma pendiente pero distinta ordenada al origen, de modo que nunca se intersecan. Algebraicamente conduce a un absurdo como 0·x = 5.",
+    example:
+      "El sistema y = 2x + 1 e y = 2x − 3 iguala las rectas dando 2x + 1 = 2x − 3 ⇒ 0 = −4, absurdo; el conjunto solución es S = ∅.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        frac("a₁", "a₂"),
+        " = ",
+        frac("b₁", "b₂"),
+        " ≠ ",
+        frac("c₁", "c₂"),
+        " ⟹ 0·x = k ≠ 0;   S = ∅",
+      ),
+    contrast:
+      "No confundir 0·x = 0 (identidad verdadera ⇒ SCI) con 0·x = k ≠ 0 (absurdo ⇒ SI, conjunto solución vacío ∅).",
+  },
+  grado_polinomio: {
+    title: "Grado de un polinomio",
+    pose: "explicando",
+    text: "Es el mayor exponente natural con coeficiente distinto de cero que aparece en la variable x del polinomio. Define la cota máxima de raíces reales, el comportamiento en los extremos y se mantiene o suma en operaciones: al multiplicar polinomios no nulos sus grados se suman, mientras al sumar pueden cancelarse los términos líderes.",
+    example:
+      "En P(x) = 0·x⁴ + 5x³ − 2x + 7, el coeficiente de x⁴ es cero, por lo que el término líder real es 5x³ y gr(P) = 3.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "gr(P · Q) = gr(P) + gr(Q);   gr(P + Q) ≤ máx(gr(P); gr(Q));   ",
+        frac("P(x)", "xⁿ"),
+        " → aₙ ≠ 0",
+      ),
+    contrast:
+      "El polinomio nulo P(x) = 0 no tiene grado definido; además, al sumar P + Q el grado puede bajar si sus coeficientes principales son opuestos.",
+  },
+  teorema_del_resto: {
+    title: "Teorema del Resto",
+    pose: "complice",
+    text: "Establece que el resto R de dividir un polinomio P(x) por un divisor lineal de la forma (x − c) coincide exactamente con el valor numérico del polinomio evaluado en c, es decir, R = P(c). Permite comprobar divisibilidad de forma instantánea sin ejecutar toda la división larga ni la tabla de Ruffini.",
+    example:
+      "El resto de dividir P(x) = x³ − 2x + 5 por (x − 2) es directamente P(2) = 2³ − 2·2 + 5 = 9; y si da 0, (x − 2) es divisor exacto.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        frac("P(x)", "x − c"),
+        " ⟹ R = P(c);   (x − c) | P(x) ⟺ P(c) = 0",
+      ),
+    contrast:
+      "¡Atención al signo del divisor! Al dividir por (x + 3) = (x − (−3)), tenés que evaluar en x = −3, no en +3.",
+  },
+  regla_de_ruffini: {
+    title: "Regla de Ruffini",
+    pose: "evaluando",
+    text: "Es el algoritmo sintético abreviado para dividir un polinomio P(x) por un binomio mónico de grado uno (x − c). Exige escribir todos los coeficientes del dividendo ordenados en forma decreciente y completos con ceros donde falten potencias. Entrega de una sola pasada los coeficientes del cociente C(x) y el resto numérico final.",
+    example:
+      "Para dividir x³ − 4x + 1 por (x − 2), ordenamos los coeficientes completos [1, 0, −4, 1] y aplicamos Ruffini con c = 2, obteniendo cociente x² + 2x y resto 1.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "P(x) = (x − c) · C(x) + R;   ",
+        frac("P(x)", "ax − b"),
+        " = ",
+        frac("1", "a"),
+        " · ",
+        frac("P(x)", "x − b/a"),
+      ),
+    contrast:
+      "¡Dos trampas clásicas! Nunca te saltees los ceros de los términos faltantes; y si dividís por (ax − b) con a ≠ 1, después de usar c = b/a debés dividir el cociente obtenido por a.",
+  },
+  teorema_de_gauss: {
+    title: "Teorema de Gauss (raíces racionales)",
+    pose: "lentes-brillo",
+    text: "Para todo polinomio P(x) con coeficientes enteros cuyo término independiente a₀ y coeficiente principal aₙ son no nulos, cualquier raíz racional p/q (expresada como fracción irreducible) cumple necesariamente que p divide a a₀ y q divide a aₙ. Acota la búsqueda de raíces racionales a una lista finita de candidatos.",
+    example:
+      "En 2x³ − 3x² − 2x + 3, los divisores de a₀ = 3 son ±1, ±3 y los de aₙ = 2 son ±1, ±2; los candidatos posibles p/q son ±1, ±3, ±1/2 y ±3/2.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "x = ",
+        frac("p", "q"),
+        "   (mcd(p; q) = 1) ⟹ p | a₀  ∧  q | aₙ",
+      ),
+    contrast:
+      "El Teorema de Gauss sólo propone candidatos racionales: un polinomio puede no tener raíces racionales y sí poseer raíces irracionales como √2 o ninguna raíz real.",
+  },
+  discontinuidad_evitable_agujero: {
+    title: "Discontinuidad evitable (agujero)",
+    pose: "sospecha",
+    text: "Se produce en una función racional P(x)/Q(x) cuando un valor x₀ anula simultáneamente al numerador y al denominador, pero su factor (x − x₀) tiene mayor o igual multiplicidad en el numerador que en el denominador. Al simplificar el factor común la curva parece continua, pero x₀ sigue excluido del dominio original formando un punto vacío.",
+    example:
+      "En f(x) = (x² − 1)/(x − 1), para x ≠ 1 vale x + 1, pero en x = 1 no existe división por cero: la gráfica es la recta y = x + 1 con un agujero en (1; 2).",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "f(x) = ",
+        frac("(x − 1)(x + 1)", "x − 1"),
+        " = x + 1   (x ≠ 1);   Dom(f) = ℝ − {1}",
+      ),
+    contrast:
+      "¡Error fatal de simplificación! Nunca calcules el dominio después de tachar factores comunes: la restricción Q(x) ≠ 0 nace de la fórmula original.",
+  },
+  asintota_vertical: {
+    title: "Asíntota vertical (x = x₀)",
+    pose: "pensativa",
+    text: "Es una recta vertical x = x₀ que actúa como barrera infranqueable para la gráfica de una función: al acercarse a x₀, los valores de |f(x)| crecen sin límite hacia +∞ o −∞. Aparece en funciones racionales cuando un polo del denominador no queda neutralizado por el numerador, y también en el borde del dominio de toda función logarítmica.",
+    example:
+      "En f(x) = (x − 1)/(x − 1)² = 1/(x − 1) sobrevive un factor (x − 1) en el denominador, generando asíntota vertical en x = 1.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "f(x) = ",
+        frac("x − 1", "(x − 1)²"),
+        " = ",
+        frac("1", "x − 1"),
+        " ⟹ AV: x = 1;   Dom = ℝ − {1}",
+      ),
+    contrast:
+      "Que Q(x₀) = 0 no alcanza por sí solo para asegurar una asíntota vertical: primero verificá las multiplicidades para distinguir si es polo (asíntota) o agujero.",
+  },
+  solucion_extraviada: {
+    title: "Solución extraviada (raíz extraña)",
+    pose: "enojada",
+    text: "Es un valor numérico que surge válidamente al elevar ambos miembros de una ecuación irracional al cuadrado (u otra potencia par), pero que NO satisface la ecuación original al verificarlo. Aparece porque elevar al cuadrado no es una operación reversible cuando un miembro puede ser negativo frente a una raíz principal no negativa.",
+    example:
+      "Al resolver √(x + 2) = x, elevar al cuadrado da x² − x − 2 = 0 con candidatos x = 2 y x = −1; al verificar, √(−1 + 2) = 1 ≠ −1, por lo que x = −1 es extraviada.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "√(g(x)) = h(x) ⟹ g(x) ≥ 0  ∧  h(x) ≥ 0;   ",
+        frac("√(−1 + 2)", "−1"),
+        " = −1 ≠ 1",
+      ),
+    contrast:
+      "En ecuaciones irracionales es obligatorio verificar cada candidato en la ecuación original (y chequear el dominio del radicando) antes de escribir el conjunto solución.",
+  },
+  logaritmo: {
+    title: "Logaritmo en base a (logₐ(x))",
+    pose: "explicando",
+    text: "El logaritmo en base a de un argumento x es el exponente y al que debemos elevar la base a para obtener x: logₐ(x) = y equivale exactamente a aʸ = x. En los números reales exige tres condiciones simultáneas: argumento estrictamente positivo (x > 0), base positiva (a > 0) y base distinta de uno (a ≠ 1).",
+    example:
+      "Como 2⁵ = 32, el logaritmo en base 2 de 32 vale 5; del mismo modo, log₃(1/9) = −2 porque 3⁻² = 1/9.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "logₐ(x) = y ⟺ aʸ = x;   logₐ(",
+        frac("1", "a"),
+        ") = −1;   x > 0,  a > 0,  a ≠ 1",
+      ),
+    contrast:
+      "¡Prohibido inventar propiedades! logₐ(x + y) NO es logₐ(x) + logₐ(y); el logaritmo convierte multiplicaciones en sumas, nunca sumas en sumas.",
+  },
+  cambio_de_base: {
+    title: "Cambio de base logarítmica",
+    pose: "complice",
+    text: "Identidad fundamental que permite expresar un logaritmo de base arbitraria a como un cociente de logaritmos en cualquier otra base válida b (como base 10 o base natural e). Se deduce despejando y en aʸ = x mediante log_b a ambos lados y resulta clave para calcular valores aproximados o igualar bases en ecuaciones.",
+    example:
+      "Para evaluar log₄(8) usando base 2 escribimos log₂(8) / log₂(4) = 3 / 2 = 1,5, ya que 4^(3/2) = 8.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "logₐ(x) = ",
+        frac("log_b(x)", "log_b(a)"),
+        " = ",
+        frac("ln(x)", "ln(a)"),
+        ";   a, b > 0;  a, b ≠ 1",
+      ),
+    contrast:
+      "No confundir el cociente de dos logaritmos log_b(x) / log_b(a) con el logaritmo de un cociente log_b(x / a) = log_b(x) − log_b(a).",
+  },
+  razones_trigonometricas_sohcahtoa: {
+    title: "Razones trigonométricas (SOHCAHTOA)",
+    pose: "explicando",
+    text: "Son los cocientes invariantes entre los lados de un triángulo rectángulo respecto de uno de sus ángulos agudos α: seno (opuesto sobre hipotenusa), coseno (adyacente sobre hipotenusa) y tangente (opuesto sobre adyacente). Sólo dependen de la medida angular porque todos los triángulos rectángulos con el mismo ángulo son semejantes.",
+    example:
+      "En un triángulo rectángulo de catetos 3 y 4 e hipotenusa 5, para el ángulo α opuesto al cateto 3 vale sen(α) = 3/5, cos(α) = 4/5 y tg(α) = 3/4.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "sen(α) = ",
+        frac("Op", "Hip"),
+        ";   cos(α) = ",
+        frac("Ady", "Hip"),
+        ";   tg(α) = ",
+        frac("Op", "Ady"),
+        " = ",
+        frac("sen(α)", "cos(α)"),
+      ),
+    contrast:
+      "La hipotenusa es siempre el lado mayor opuesto al ángulo recto, mientras que opuesto y adyacente se intercambian al cambiar de ángulo agudo.",
+  },
+  sistema_circular_radian: {
+    title: "Sistema circular y radián",
+    pose: "evaluando",
+    text: "Un radián es el ángulo central de una circunferencia que subtiende un arco s de longitud exactamente igual al radio r. Como la circunferencia completa mide 2π·r, una vuelta entera equivale a 2π radianes (360°) y media vuelta equivale a π radianes (180°). Simplifica directamente la fórmula de longitud de arco s = r·θ.",
+    example:
+      "Un ángulo de 60° equivale a π/3 radianes; si el radio mide 6 cm, el arco abarcado vale s = 6 · (π/3) = 2π cm.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "θ = ",
+        frac("s", "r"),
+        " (rad);   ",
+        frac("α°", "180°"),
+        " = ",
+        frac("θ_rad", "π"),
+        ";   π rad = 180°",
+      ),
+    contrast:
+      "¡Verificá el modo de tu calculadora y las expresiones! En funciones reales f(x) = sen(x), la variable x representa radianes (número real), no grados sexagesimales.",
+  },
+  clase_de_congruencia: {
+    title: "Clase de congruencia angular (C_α)",
+    pose: "lentes-brillo",
+    text: "Agrupa a todos los ángulos orientados que comparten exactamente el mismo lado terminal sobre la circunferencia trigonométrica, difiriendo entre sí por un número entero de vueltas completas (2kπ radianes o 360°·k con k ∈ ℤ). Su representante principal es el único ángulo de la clase perteneciente al intervalo [0; 2π).",
+    example:
+      "Los ángulos −π/3, 5π/3 y 11π/3 pertenecen todos a la misma clase de congruencia porque 11π/3 = 5π/3 + 2π y −π/3 = 5π/3 − 2π.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "C_α = { α + 2kπ  /  k ∈ ℤ };   α₀ ∈ [0; 2π);   ",
+        frac("11π", "3"),
+        " ≡ ",
+        frac("5π", "3"),
+      ),
+    contrast:
+      "Dos ángulos congruentes tienen exactamente los mismos valores para las seis razones trigonométricas, aunque correspondan a distinta cantidad de giros.",
+  },
+  periodo_trigonometrico: {
+    title: "Período trigonométrico (T)",
+    pose: "pensativa",
+    text: "Es la menor longitud positiva T sobre el eje real después de la cual los valores de una función trigonométrica se repiten exactamente: f(x + T) = f(x) para todo x del dominio. El seno, coseno, cosecante y secante tienen período fundamental 2π, mientras que la tangente y la cotangente repiten su ciclo cada π radianes.",
+    example:
+      "La función f(x) = cos(2x) completa dos ciclos en 2π, de modo que su período reducido es T = 2π / 2 = π.",
+    formula: () =>
+      h(
+        "span",
+        { class: "eq" },
+        "T_{sen, cos} = ",
+        frac("2π", "|b|"),
+        ";   T_{tg, cotg} = ",
+        frac("π", "|b|"),
+        ";   f(x + T) = f(x)",
+      ),
+    contrast:
+      "No asignes el mismo dominio ni el mismo período a las seis funciones: tg(x) y sec(x) excluyen π/2 + kπ, mientras cotg(x) y cosec(x) excluyen kπ.",
+  },
 };
 
 function wordCount(term) {

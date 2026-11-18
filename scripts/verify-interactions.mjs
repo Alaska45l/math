@@ -14,6 +14,7 @@ const MIME_MAP = {
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
   ".png": "image/png",
+  ".woff2": "font/woff2",
   ".json": "application/json",
 };
 
@@ -1553,7 +1554,324 @@ const fnOk =
   fnResults.viewportOverflowFree &&
   fnResults.consoleErrors.length === 0;
 
-const allResultsOk = allOk && powRadOk && expOk && quadOk && circOk && dimOk && fnOk;
+// ============================================================================
+// Stage F.2 · Hub (index.html), 7 nuevos laboratorios y 2 evaluaciones integradoras
+// ============================================================================
+
+async function checkViewportWidths() {
+  const widths = [];
+  for (const width of [320, 375, 768, 1024, 1440]) {
+    await client.send("Emulation.setDeviceMetricsOverride", {
+      width,
+      height: 900,
+      deviceScaleFactor: width < 600 ? 2 : 1,
+      mobile: width < 600,
+    });
+    await new Promise((r) => setTimeout(r, 90));
+    widths.push(
+      await client.eval(
+        `(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, overflow: document.documentElement.scrollWidth > innerWidth + 1 }))()`,
+      ),
+    );
+  }
+  return widths;
+}
+
+// 1. index.html: 17 hub entries, zero .hub-badge-new, #hub-reentry, #hub-mysteries non-mastery
+const prevIdxErrCount = circConsoleErrors.length;
+await client.send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+await client.send("Page.navigate", {
+  url: `http://127.0.0.1:${PORT}/index.html`,
+});
+await new Promise((r) => setTimeout(r, 900));
+await client.eval(`(() => { localStorage.clear(); })()`);
+await client.send("Page.reload", {});
+await new Promise((r) => setTimeout(r, 900));
+
+const hubResults = await client.eval(`(() => {
+  const hubEntries = document.querySelectorAll('.hub-entry').length;
+  const noNewBadges = document.querySelectorAll('.hub-badge-new').length === 0;
+  const reentryItems = document.querySelectorAll('#hub-reentry .hub-reentry__item').length;
+  const mysteryRows = document.querySelectorAll('#hub-mysteries .mystery-row').length;
+
+  const firstRow = document.querySelector('#hub-mysteries .mystery-row');
+  const btnExplain = Array.from(firstRow?.querySelectorAll('button') || []).find((b) => b.textContent.includes('explicación'));
+  const btnSave = Array.from(firstRow?.querySelectorAll('button') || []).find((b) => b.textContent.trim() === 'Guardar');
+  btnExplain?.click();
+  btnSave?.click();
+
+  const afterSave = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const openAfterSave = afterSave?.mysteries?.openIds?.length || 0;
+  const exploredAfterSave = afterSave?.mysteries?.exploredIds?.length || 0;
+  const compsUntouchedOnExplore = Object.keys(afterSave?.competencies || {}).length === 0;
+
+  const savedTab = Array.from(document.querySelectorAll('#hub-mysteries [role="tab"]')).find((t) => t.textContent.includes('Guardados'));
+  savedTab?.click();
+  const savedRowsCount = document.querySelectorAll('#hub-mysteries .mystery-row').length;
+
+  const btnDismiss = Array.from(document.querySelectorAll('#hub-mysteries .mystery-row button')).find((b) => b.textContent.includes('Quitar'));
+  btnDismiss?.click();
+  const afterDismiss = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+  const openAfterDismiss = afterDismiss?.mysteries?.openIds?.length || 0;
+  const compsStillUntouched = Object.keys(afterDismiss?.competencies || {}).length === 0;
+
+  return {
+    hubEntries,
+    noNewBadges,
+    reentryItems,
+    mysteryRows,
+    openAfterSave,
+    exploredAfterSave,
+    compsUntouchedOnExplore,
+    savedRowsCount,
+    openAfterDismiss,
+    compsStillUntouched,
+  };
+})()`);
+const hubWidths = await checkViewportWidths();
+hubResults.viewportOverflowFree = hubWidths.every((w) => !w.overflow);
+hubResults.consoleErrors = circConsoleErrors.slice(prevIdxErrCount);
+console.log("Resultados de interacción en index.html:", JSON.stringify(hubResults, null, 2));
+
+const hubOk =
+  hubResults.hubEntries === 17 &&
+  hubResults.noNewBadges &&
+  hubResults.reentryItems >= 2 &&
+  hubResults.mysteryRows === 13 &&
+  hubResults.openAfterSave === 1 &&
+  hubResults.exploredAfterSave === 1 &&
+  hubResults.compsUntouchedOnExplore &&
+  hubResults.savedRowsCount === 1 &&
+  hubResults.openAfterDismiss === 0 &&
+  hubResults.compsStillUntouched &&
+  hubResults.viewportOverflowFree &&
+  hubResults.consoleErrors.length === 0;
+
+// 2. All 7 new labs
+const NEW_LABS = [
+  { file: "lineal.html", dashboardId: "lin-competency-dashboard", expectedComps: 5 },
+  { file: "sistemas.html", dashboardId: "sys-competency-dashboard", expectedComps: 4 },
+  { file: "polinomios.html", dashboardId: "poly-competency-dashboard", expectedComps: 5 },
+  { file: "racionales-irracionales.html", dashboardId: "ri-competency-dashboard", expectedComps: 5 },
+  { file: "logaritmicas.html", dashboardId: "log-competency-dashboard", expectedComps: 5 },
+  { file: "razones-trigonometricas.html", dashboardId: "trigr-competency-dashboard", expectedComps: 4 },
+  { file: "funciones-trigonometricas.html", dashboardId: "trigf-competency-dashboard", expectedComps: 4 },
+];
+
+const newLabResults = [];
+for (const lab of NEW_LABS) {
+  const prevErrCount = circConsoleErrors.length;
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 1440,
+    height: 900,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await client.send("Page.navigate", {
+    url: `http://127.0.0.1:${PORT}/${lab.file}`,
+  });
+  await new Promise((r) => setTimeout(r, 900));
+
+  const res = await client.eval(`(() => {
+    localStorage.clear();
+    const widgets = Array.from(document.querySelectorAll('[data-widget]'));
+    const svgs = document.querySelectorAll('[data-widget] svg').length;
+
+    // 1. Widget DOM persistence (sameNodeReference)
+    let sameNode = false;
+    const firstWidget = widgets.find((w) => w.querySelector('svg') && (w.querySelector('input[type="range"]') || w.querySelector('button:not(.learning-predict-options button):not(.learning-predict-verify-btn)')));
+    if (firstWidget) {
+      const svgBefore = firstWidget.querySelector('svg');
+      const range = firstWidget.querySelector('input[type="range"]');
+      if (range) {
+        const nextVal = Number(range.value) === Number(range.max) ? Number(range.min) : Number(range.max);
+        range.value = String(nextVal);
+        range.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        const ctrlBtns = Array.from(firstWidget.querySelectorAll('button')).filter(
+          (b) => !b.closest('.learning-predict-box') && !b.disabled
+        );
+        const targetBtn = ctrlBtns[1] || ctrlBtns[0];
+        targetBtn?.click();
+      }
+      const svgAfter = firstWidget.querySelector('svg');
+      sameNode = Boolean(svgBefore && svgAfter && svgBefore === svgAfter);
+    }
+
+    // 2. Two-stage POE verification
+    const poeBox = document.querySelector('.learning-predict-box');
+    let poeWorks = false;
+    if (poeBox) {
+      const optBtn = poeBox.querySelector('.learning-predict-options button');
+      const verifyBtn = poeBox.querySelector('.learning-predict-verify-btn');
+      const feedback = poeBox.querySelector('.learning-predict-feedback');
+      optBtn?.click();
+      const stage1 = Boolean(feedback && feedback.textContent.includes('Hipótesis registrada') && verifyBtn && !verifyBtn.disabled);
+      verifyBtn?.click();
+      const stage2 = Boolean(verifyBtn?.disabled && feedback && !feedback.textContent.includes('Hipótesis registrada'));
+      poeWorks = stage1 && stage2;
+    }
+
+    // 3. Keyboard SVG handle if present in DOM
+    const sliderHandle = document.querySelector('[data-widget] svg [role="slider"][tabindex="0"]');
+    let keyboardOk = true;
+    if (sliderHandle) {
+      const valBefore = sliderHandle.getAttribute('aria-valuenow');
+      const cxBefore = sliderHandle.getAttribute('cx');
+      sliderHandle.focus();
+      sliderHandle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      const valAfter = sliderHandle.getAttribute('aria-valuenow');
+      const cxAfter = sliderHandle.getAttribute('cx');
+      keyboardOk = valBefore !== valAfter || cxBefore !== cxAfter;
+    }
+
+    // 4. Submit / reveal check & verify alaska:learning:v1 + dashboard
+    const checkHost = document.querySelector('[data-check]');
+    if (checkHost) {
+      const revealBtn = Array.from(checkHost.querySelectorAll('button')).find(
+        (b) => b.textContent.includes('Ver solución') || b.textContent.includes('solución')
+      );
+      if (revealBtn) {
+        revealBtn.click();
+      } else {
+        const opt = checkHost.querySelector('.pr-option');
+        opt?.click();
+      }
+    }
+
+    const learningStore = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+    const learningRecorded = Array.isArray(learningStore?.events) && learningStore.events.length >= 1;
+    const dashboardCards = document.querySelectorAll('#${lab.dashboardId} [data-competency-id]').length;
+
+    return {
+      widgetsCount: widgets.length,
+      svgs,
+      sameNode,
+      poeWorks,
+      keyboardOk,
+      learningRecorded,
+      dashboardCards,
+    };
+  })()`);
+
+  const labWidths = await checkViewportWidths();
+  res.file = lab.file;
+  res.expectedComps = lab.expectedComps;
+  res.viewportOverflowFree = labWidths.every((w) => !w.overflow);
+  res.consoleErrors = circConsoleErrors.slice(prevErrCount);
+  res.ok =
+    res.widgetsCount >= 4 &&
+    res.svgs >= 4 &&
+    res.sameNode &&
+    res.poeWorks &&
+    res.keyboardOk &&
+    res.learningRecorded &&
+    res.dashboardCards === lab.expectedComps &&
+    res.viewportOverflowFree &&
+    res.consoleErrors.length === 0;
+
+  console.log(`Resultados de interacción en ${lab.file}:`, JSON.stringify(res, null, 2));
+  newLabResults.push(res);
+}
+
+const newLabsOk = newLabResults.every((r) => r.ok);
+
+// 3. Both Integrators (jefe-integrador-1.html & simulacro-global.html)
+const INTEGRATORS = [
+  { file: "jefe-integrador-1.html", arenaId: "boss-integrador-1-arena" },
+  { file: "simulacro-global.html", arenaId: "boss-simulacro-global-arena" },
+];
+
+const integratorResults = [];
+for (const boss of INTEGRATORS) {
+  const prevErrCount = circConsoleErrors.length;
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    width: 1440,
+    height: 900,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await client.send("Page.navigate", {
+    url: `http://127.0.0.1:${PORT}/${boss.file}`,
+  });
+  await new Promise((r) => setTimeout(r, 900));
+
+  const res = await client.eval(`(() => {
+    localStorage.clear();
+    const arena = document.getElementById('${boss.arenaId}');
+    if (!arena) return { error: 'Arena not mounted' };
+    const noTimer = !document.querySelector('[data-timer], .countdown, .boss-timer');
+    const phasePillsCount = arena.querySelectorAll('.boss-phase-pill').length;
+
+    // Request hint -> locks assisted, then reveal solution so outcome becomes 'assisted' for Debrief repairLinks
+    const hintBtn = Array.from(arena.querySelectorAll('button')).find((b) => b.textContent.includes('Pedir pista'));
+    hintBtn?.click();
+    const assistedLocked = Boolean(arena.querySelector('.boss-evidence-pill.is-assisted'));
+    const solBtn = Array.from(arena.querySelectorAll('button')).find((b) => b.textContent.includes('Ver solución'));
+    solBtn?.click();
+
+    // Advance to Phase 2
+    const nextBtn = Array.from(arena.querySelectorAll('button')).find((b) => b.textContent.includes('Siguiente fase'));
+    nextBtn?.click();
+    const phase2Title = arena.querySelector('.boss-phase-title')?.textContent || '';
+    const phaseAdvanced = phase2Title.includes('Fase 2');
+
+    // Jump to Debrief
+    const debriefBtn = Array.from(arena.querySelectorAll('button')).find((b) => b.textContent.includes('6. Debrief'));
+    debriefBtn?.click();
+    const debriefRendered = Boolean(arena.querySelector('.boss-debrief-card'));
+    const repairLinksCount = arena.querySelectorAll('.boss-repair-box a').length;
+    const bossStore = JSON.parse(localStorage.getItem('alaska:learning:v1') || '{}');
+    const bossEventRecorded = Array.isArray(bossStore?.events) && bossStore.events.length >= 1;
+
+    return {
+      noTimer,
+      phasePillsCount,
+      assistedLocked,
+      phaseAdvanced,
+      debriefRendered,
+      repairLinksCount,
+      bossEventRecorded,
+    };
+  })()`);
+
+  const bossWidths = await checkViewportWidths();
+  res.file = boss.file;
+  res.viewportOverflowFree = bossWidths.every((w) => !w.overflow);
+  res.consoleErrors = circConsoleErrors.slice(prevErrCount);
+  res.ok =
+    res.noTimer &&
+    res.phasePillsCount === 6 &&
+    res.assistedLocked &&
+    res.phaseAdvanced &&
+    res.debriefRendered &&
+    res.repairLinksCount >= 1 &&
+    res.bossEventRecorded &&
+    res.viewportOverflowFree &&
+    res.consoleErrors.length === 0;
+
+  console.log(`Resultados de interacción en ${boss.file}:`, JSON.stringify(res, null, 2));
+  integratorResults.push(res);
+}
+
+const integratorsOk = integratorResults.every((r) => r.ok);
+
+const allResultsOk =
+  allOk &&
+  powRadOk &&
+  expOk &&
+  quadOk &&
+  circOk &&
+  dimOk &&
+  fnOk &&
+  hubOk &&
+  newLabsOk &&
+  integratorsOk;
 
 client.close();
 chromeProc.kill();

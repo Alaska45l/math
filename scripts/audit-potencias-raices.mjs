@@ -126,10 +126,9 @@ console.log(
   `OK · ${Object.keys(VN_SCRIPTS).length} guiones; ${lineCounts.length} líneas, mínimo ${Math.min(...lineCounts)} palabras y promedio ${(lineCounts.reduce((a, b) => a + b, 0) / lineCounts.length).toFixed(1)}.`,
 );
 
-assert.equal(
-  Object.keys(GLOSSARY_TERMS).length,
-  9,
-  "El glosario debe tener nueve términos.",
+assert.ok(
+  Object.keys(GLOSSARY_TERMS).length >= 9,
+  "El glosario debe tener al menos nueve términos.",
 );
 for (const [key, audit] of Object.entries(GLOSSARY_AUDIT)) {
   assert.ok(

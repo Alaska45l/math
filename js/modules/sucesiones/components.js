@@ -989,7 +989,7 @@ export function createCheckBlock(root, questions = [], sectionId = '', onComplet
           if (opening) {
             qState.solutionRevealed = true;
             qState.modeLockedAssisted = true;
-            emitAttempt(q, qState, idx, { isCorrect: false, diagnosticId: null });
+            emitAttempt(q, qState, idx, { isCorrect: true, diagnosticId: null });
           }
           render();
           if (qState.showSolution) {

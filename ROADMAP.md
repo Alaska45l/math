@@ -88,42 +88,43 @@ Esta sección describe capacidades presentes en el repositorio al momento de la 
 
 | Área | Estado observado | Próxima necesidad |
 |---|---|---|
-| Núcleo DOM/SVG y store reactivo | Implementado | Reutilizar antes de crear nuevos mecanismos UI. |
-| Planos y controles arrastrables | Implementado en módulos existentes | Conectar manipulación a tareas de predicción y observación. |
-| Evaluadores AST | Implementados en módulos de expresiones | Reutilizar equivalencia y parsing para problemas adaptativos. |
-| Diagnósticos conceptuales | Implementado (Exponenciales y Cuadráticas) | Normalizar taxonomía y asociar errores a competencias/prerrequisitos en módulos restantes. |
-| Generadores por semilla | Implementado (10 familias por módulo en Exponenciales y Cuadráticas) | Extender modo adaptativo a Sucesiones y Valor Absoluto. |
-| Chequeos con pistas y soluciones | Implementado (30 checks con 3 pistas no filtrantes c/u) | Estandarizar módulos restantes al formato de 8-tupla. |
-| Visual Novel de Alaska | Implementado | Hacer las intervenciones contextuales y gradualmente menos necesarias. |
-| Glosario contextual | Implementado | Ampliar vínculos a prerrequisitos y representaciones cuando corresponda. |
-| Pizarra de trabajo | Implementada | Integrarla con sesiones y explicaciones sin convertirla en un panel invasivo. |
-| Progreso local por sección | Migrado y Unificado (`alaska:learning:v1`) | Conservar retrocompatibilidad con claves legacy. |
-| Motor central de competencias | Implementado y Validado (`js/core/learning/`) | Núcleo común de eventos, competencias, progreso, maestría conservadora de 7 estados. |
+| Núcleo DOM/SVG y store reactivo | Implementado y Validado (`dom.js`, `board-kit.js`) | Mantener accesibilidad por teclado y zero-eval. |
+| Planos y controles arrastrables | Implementado y Validado en las 11 unidades | Conservar `sameNodeReference` y `role="slider"`. |
+| Evaluadores AST y matemática pura | Implementado y Validado (`expr.js`, `logic.js`, `polynomials.js`, `trigonometry.js`, `shared-ast.js`) | Mantener cobertura de borde y notación Exactas UNMDP. |
+| Diagnósticos conceptuales | Implementado y Validado en los 15 laboratorios | Enriquecer guiones contextuales según uso real. |
+| Generadores por semilla | Implementado y Validado en los módulos con entrenador PRNG | Conservar determinismo y no-fuga en Hint 3. |
+| Chequeos con pistas y soluciones | Implementado y Validado (esquema uniforme de 8-tupla en los 15 módulos) | Mantener paridad ante futuras adiciones curriculares. |
+| Visual Novel de Alaska | Implementado y Validado | Hacer las intervenciones contextuales y gradualmente menos necesarias. |
+| Glosario contextual | Implementado y Validado (`glossary.js`: 54 términos, resolución 100% en 18 HTML) | Ampliar vínculos cuando se incorporen términos nuevos. |
+| Pizarra de trabajo | Implementada (`scratchpad.js`) | Integrarla con sesiones sin convertirla en panel invasivo. |
+| Progreso local unificado | Implementado y Validado (`alaska:learning:v1` + migración no destructiva legacy) | Conservar retrocompatibilidad ante futuras versiones de esquema. |
+| Motor central de competencias y DAG | Implementado y Validado (`curriculum-registry.js`: 15 módulos, 88 competencias, DAG acíclico) | Validar en cada cambio curricular. |
 | Planificador de repasos | Implementado y Validado (`scheduler.js`) | Ventanas deterministas de repaso espaciado (`review_due`). |
-| Intercalación global | Implementado y Validado (`exercise-selector.js`) | Modo Inteligente conectado en Retos de Exponenciales y Cuadráticas. |
-| Transferencia inter-módulo | Implementado y Validado (`transfer.js`) | Motor de discriminación Lineal vs. Exponencial vs. Cuadrática con 4 familias. |
+| Intercalación global | Implementado y Validado (`exercise-selector.js`: `excludeUnseen: true` y reparación por prerrequisitos) | Sintonizar batch global según evidencia real. |
+| Transferencia inter-módulo | Implementado y Validado (`transfer.js` + 8 clasificadores en `transfer-classifiers/*`, 9 familias, guardia `unseen`) | Conservar cero imports hacia `js/modules/*`. |
+| Cuaderno de Misterios Abiertos | Implementado y Validado (`mysteries.js`: 13 misterios U01–U11, tope 5 abiertos, invariante de no-maestría) | Evaluar uso voluntario en cohortes reales. |
+| Motor de jefes e integradores | Implementado y Validado (`boss-engine.js`, `jefe-integrador-1.html`, `simulacro-global.html`) | Ampliar bancos integradores con nuevos parciales oficiales. |
 | Confianza metacognitiva | Planificado | Debe ser opcional y no interpretarse como medición perfecta. |
 | Campamento autónomo | Idea futura | Sólo después de validar el núcleo de aprendizaje y motivación. |
-| Motor de jefes unificado | Planificado | Debe evaluar transferencia y justificar decisiones, no sólo velocidad. |
-| Confianza metacognitiva | Planificado | Debe ser opcional y no interpretarse como medición perfecta. |
-| Campamento autónomo | Idea futura | Sólo después de validar el núcleo de aprendizaje y motivación. |
-| Motor de jefes unificado | Planificado | Debe evaluar transferencia y justificar decisiones, no sólo velocidad. |
 
 ### 3.1. Laboratorios publicados en el hub
 
-El hub actual ofrece ocho áreas: Desigualdades, Unidades, Funciones, Sucesiones, Valor Absoluto y Funciones por Partes, Potencias y Raíces, Exponenciales, y Función Cuadrática y Parábolas.
+El hub (`index.html`, `js/core/nav.js`) cubre las **11 unidades** del programa de Ingreso FCEyN UNMDP mediante **15 laboratorios interactivos** y **2 evaluaciones integradoras** (18 páginas canónicas en total):
 
-Entradas principales:
-- desigualdades.html
-- unidades.html
-- funciones.html
-- sucesiones.html
-- valor-absoluto.html
-- potencias-raices.html
-- exponenciales.html
-- cuadraticas.html
+- Unidad 01 · Números reales: `potencias-raices.html`, `desigualdades.html`, `unidades.html` (y `valor-absoluto.html#sec-1`)
+- Unidad 02 · Funciones: `funciones.html`, `valor-absoluto.html`, `sucesiones.html`
+- Unidad 03 · Función lineal: `lineal.html`
+- Unidad 04 · Sistemas de ecuaciones: `sistemas.html`
+- Unidad 05 · Función cuadrática: `cuadraticas.html`
+- Unidad 06 · Polinomios: `polinomios.html`
+- Unidad 07 · Función racional e irracional: `racionales-irracionales.html`
+- Unidad 08 · Función exponencial: `exponenciales.html`
+- Unidad 09 · Función logarítmica: `logaritmicas.html`
+- Unidad 10 · Razones trigonométricas: `razones-trigonometricas.html`
+- Unidad 11 · Funciones trigonométricas: `funciones-trigonometricas.html`
+- Evaluaciones integradoras: `jefe-integrador-1.html` (Unidades 01–06) y `simulacro-global.html` (Unidades 01–11)
 
-Existe también laboratorio_unidades.html como entrada alternativa en el repositorio; la navegación principal utiliza unidades.html.
+Existe también `laboratorio_unidades.html` como redirección legacy en el repositorio; la navegación principal utiliza `unidades.html`.
 
 ---
 
@@ -246,32 +247,28 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 4 — Exploración productiva, andamiaje y transferencia
 
-**Estado:** Implementado y Validado (Transferencia Inter-Módulo Exponencial vs. Cuadrática).
+**Estado:** Implementado y Validado (8 familias de modelos, 9 familias `TRANSFER_FAMILIES` y POE en 2 etapas vía `board-kit.js`).
 **Prioridad:** P1.
 **Dependencias:** Fase 0; integración con Fase 1.
 
 #### Tareas
 
-- [x] Implementar motor de discriminación de modelos (`js/core/learning/transfer.js`):
-  - Invariantes numéricos: $\Delta y$ constante (lineal), razón $y_{i+1}/y_i$ constante (exponencial), $\Delta^2 y$ constante (cuadrática).
-  - Geometría cualitativa: asíntota horizontal (exponencial) vs. eje de simetría y vértice (parábola).
-  - Identificación analítica: $k \cdot a^x$ vs. $a(x-h)^2+k$ vs. $m \cdot x+b$.
-- [x] Conectar modo de Transferencia Inter-Módulo en los entrenadores generativos de ambos módulos.
+- [x] Implementar motor modular de discriminación de modelos (`js/core/learning/transfer.js` + `transfer-classifiers/*`):
+  - 8 familias: Lineal, Cuadrática, Polinómica, Racional, Radical/Irracional, Exponencial, Logarítmica y Trigonométrica.
+  - Invariantes numéricos ($\Delta y$, $\Delta^2 y$, $\Delta^3 y$, razón $y_{i+1}/y_i$, $\Delta(y^2)$, recurrencia periódica), geometría cualitativa y equivalencia AST en `shared-ast.js` sin imports de `js/modules/*`.
+- [x] Conectar modo de Transferencia Inter-Módulo con guardia estricta contra competencias `unseen` (`allowUnseen: false` por defecto).
 - [x] Registrar eventos de transferencia con `stage: "transfer"` y `transferDistance: "far"`.
 - [x] Probar suites de transferencia unitaria y no-fuga (`tests/learning/transfer.test.mjs`).
-
-#### Tareas
-
-- [ ] Crear un patrón reusable de predicción antes de revelar el resultado del widget.
-- [ ] Registrar predicción y observación sin penalizar hipótesis razonables que resulten falsas.
-- [ ] Diseñar ciclos de hipótesis, experimentación, observación y formalización.
-- [ ] Incorporar ejemplos resueltos con pasos que se retiran progresivamente.
-- [ ] Diseñar autoexplicaciones breves: justificar por qué un paso es válido.
-- [ ] Incorporar actividades para explicar o corregir el procedimiento de un personaje.
-- [ ] Crear desafíos de traducción entre manipulador, gráfico, tabla, expresión simbólica y explicación verbal.
-- [ ] Invertir la dirección de la traducción: del gráfico a la fórmula y de la fórmula al gráfico.
-- [ ] Diseñar problemas de transferencia sin el widget que sirvió de apoyo.
-- [ ] Evitar presentar varias representaciones simultáneas si no añaden una función cognitiva distinta.
+- [x] Crear patrón reusable de predicción en 2 etapas antes de revelar (`createPredictBox` en `js/core/board-kit.js`).
+- [x] Registrar predicción y observación sin penalizar hipótesis razonables que resulten falsas.
+- [x] Diseñar ciclos de hipótesis, experimentación, observación y formalización en las 11 unidades.
+- [ ] Incorporar ejemplos resueltos con pasos interactivos de completar en módulos que aún sólo muestran solución completa.
+- [ ] Diseñar autoexplicaciones breves estructuradas para pasos algebraicos seleccionados.
+- [ ] Incorporar actividades guiadas de corrección de procedimiento sobre personaje ficticio.
+- [x] Crear desafíos de traducción entre manipulador, gráfico, tabla, expresión simbólica y explicación verbal.
+- [x] Invertir la dirección de la traducción: del gráfico a la fórmula y de la fórmula al gráfico.
+- [x] Diseñar problemas de transferencia sin el widget que sirvió de apoyo (`transfer.js` y fase `Transferir` de `boss-engine.js`).
+- [x] Evitar presentar varias representaciones simultáneas si no añaden una función cognitiva distinta.
 
 #### Criterios de aceptación
 
@@ -285,7 +282,7 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 5 — Metacognición y acompañamiento contextual
 
-**Estado:** Planificado.
+**Estado:** Parcial (glosario contextual ampliado a 54 términos y reducción gradual de ayudas; calibración voluntaria de confianza planificada).
 **Prioridad:** P1.
 **Dependencias:** Fases 1 y 3.
 
@@ -294,11 +291,11 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 - [ ] Añadir Convicción de Tiza: estimación voluntaria de confianza antes de comprobar.
 - [ ] Comparar confianza y acierto a través del tiempo sin usarlo como diagnóstico psicológico.
 - [ ] Detectar patrones de falsa seguridad y conocimiento frágil.
-- [ ] Añadir modos de intervención de Alaska vinculados a necesidades pedagógicas.
-- [ ] Adaptar el tono a la situación sin juzgar al estudiante.
-- [ ] Hacer que Alaska señale el objeto, variable o paso relevante del widget.
-- [ ] Añadir explicaciones contextuales desde el glosario.
-- [ ] Reducir ayudas y mensajes cuando el estudiante ya puede resolver independientemente.
+- [x] Añadir modos de intervención de Alaska vinculados a necesidades pedagógicas.
+- [x] Adaptar el tono a la situación sin juzgar al estudiante.
+- [x] Hacer que Alaska señale el objeto, variable o paso relevante del widget.
+- [x] Añadir explicaciones contextuales desde el glosario (`js/core/glossary.js`, 54 términos).
+- [x] Reducir ayudas y mensajes cuando el estudiante ya puede resolver independientemente.
 
 #### Criterios de aceptación
 
@@ -311,20 +308,19 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 6 — Experiencia, reentrada y mundo narrativo
 
-**Estado:** En evaluación / planificado.
+**Estado:** Parcial — Experiencia de navegación 11 unidades, reentrada de baja fricción (`#hub-reentry`) y Cuaderno de Misterios Abiertos (`#hub-mysteries`) implementados y validados; mundo narrativo autónomo planificado.
 **Prioridad:** P2.
 **Dependencias:** Fases 1 y 2 para eventos de progreso; Fase 4 para integrar actividades pedagógicas.
 
 #### Tareas de experiencia
 
-- [ ] Implementar Split-Workbench para Sucesiones y Valor Absoluto, conservando vista de lectura.
-- [ ] Mantener el plano cerca de la explicación y del chequeo correspondiente.
-- [ ] Mejorar navegación entre secciones y acceso a términos.
-- [ ] Incorporar un cierre de sesión que resuma lo aprendido y sugiera el siguiente paso.
-- [ ] Implementar un plan de reentrada voluntario y editable.
-- [ ] Construir un Cuaderno de Misterios: preguntas matemáticas opcionales que se pueden guardar, resolver o descartar.
-- [ ] Limitar las preguntas abiertas para evitar crear una lista de deudas.
-- [ ] Permitir cerrar un misterio y ver su resolución sin penalización.
+- [x] Mantener el plano cerca de la explicación y del chequeo correspondiente.
+- [x] Mejorar navegación entre secciones, mega-menú curricular de 11 unidades (`js/core/nav.js`) y acceso a términos (`glossary.js`).
+- [x] Implementar entrada de baja fricción en el hub (`#hub-reentry`: Continuar / Repasar competencias introducidas / Explorar).
+- [x] Construir el Cuaderno de Misterios Abiertos (`js/core/learning/mysteries.js`: 13 misterios voluntarios, tope de 5 abiertos, invariante de no-maestría).
+- [x] Permitir cerrar o descartar un misterio y ver su resolución sin penalización.
+- [ ] Implementar Split-Workbench opcional para Sucesiones y Valor Absoluto, conservando vista de lectura.
+- [ ] Implementar un plan de reentrada voluntario y editable al cierre de sesión.
 
 #### Tareas narrativas
 
@@ -334,7 +330,7 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 - [ ] Asociar artefactos a descubrimientos matemáticos concretos.
 - [ ] Permitir gastar recursos en personalización y construcción elegida.
 - [ ] Mantener eventos narrativos breves, pausables y no intrusivos.
-- [ ] Respetar preferencias de sonido, movimiento y visibilidad.
+- [x] Respetar preferencias de sonido, movimiento y visibilidad.
 
 #### Criterios de aceptación
 
@@ -347,52 +343,52 @@ Split-Workbench, accesibilidad, rendimiento y correcciones de UX pueden avanzar 
 
 ### Fase 7 — Jefes, evaluaciones integradoras y simulación de examen
 
-**Estado:** Planificado.
+**Estado:** Implementado y Validado (`js/core/learning/boss-engine.js`, `jefe-integrador-1.html`, `simulacro-global.html`).
 **Prioridad:** P2.
 **Dependencias:** Fases 0, 1, 3 y 4.
 
 #### Regla de diseño
 
-Un jefe no es un formulario decorado ni una prueba de reflejos. Debe exigir reconocimiento, anticipación, manipulación, formalización y transferencia.
+Un jefe no es un formulario decorado ni una prueba de reflejos. Exige reconocimiento, predicción, modelado, resolución, transferencia y debrief sin cronómetro punitivo.
 
-#### Estructura recomendada
+#### Estructura implementada (`boss-engine.js`)
 
-1. Identificar el tipo de objeto o problema.
-2. Predecir su comportamiento.
-3. Manipular el modelo y comprobar la hipótesis.
-4. justificar una decisión o corregir un paso.
-5. Resolver una variante nueva sin el andamiaje principal.
+1. **Reconocer:** identificar el tipo de objeto o problema.
+2. **Predecir:** anticipar su comportamiento.
+3. **Modelar:** elegir variables, restricciones y representación.
+4. **Resolver:** ejecutar operaciones y justificar condiciones.
+5. **Transferir:** resolver una variante nueva sin el andamiaje principal.
+6. **Debrief:** informe de fases independientes vs. asistidas y enlaces directos de reparación por unidad.
 
-#### Dirección por módulo
+#### Simulacro y evaluaciones integradoras
 
-- **Desigualdades:** condiciones AND/OR, inversión del sentido, extremos y conjunto solución.
-- **Unidades:** coherencia dimensional, factores equivalentes y unidades resultantes.
-- **Funciones:** unicidad, dominio, imagen, monotonía, secante e inversa.
-- **Potencias y raíces:** restricciones, equivalencias, signos y estructura de exponentes.
-- **Sucesiones:** clasificación, razón, ancla, fórmula explícita y comportamiento de términos.
-- **Valor absoluto:** distancia, vértice, ramas, fronteras y conjuntos solución.
-- **Exponenciales:** base, factor inicial, crecimiento/decaimiento, asíntotas y modelos.
-
-#### Simulación de examen
-
-- [ ] Reproducir formato, tiempos y convenciones de evaluaciones reales sólo cuando exista material autorizado y verificado.
-- [ ] Separar modo práctica y modo examen.
-- [ ] Informar criterios de corrección y equivalencias aceptadas.
-- [ ] Permitir revisión paso a paso después de entregar.
-- [ ] Generar un informe de competencias que necesitan trabajo.
-- [ ] No usar el examen para borrar progreso del laboratorio.
+- [x] Reproducir convenciones de exámenes y actividades integradoras oficiales UNMDP en `jefe-integrador-1.html` (U01–U06) y `simulacro-global.html` (U01–U11).
+- [x] Separar modo práctica de laboratorio de evaluaciones integradoras sin borrar el progreso del laboratorio.
+- [x] Informar criterios de corrección, equivalencias aceptadas y distinción estricto independiente vs. asistido.
+- [x] Generar informe de competencias y rutas de reparación en Fase 6 Debrief.
 
 ---
 
 ### Fase 8 — Validación pedagógica y expansión curricular
 
-**Estado:** Planificado.
-**Prioridad:** P1 continua; expansión P3.
-**Dependencias:** instrumentación de Fase 1 y funciones suficientes de Fases 2–4.
+**Estado:** Expansión curricular de las 11 unidades Implementada y Validada (15 laboratorios, 88 competencias, DAG verificado); validación empírica longitudinal Planificada.
+**Prioridad:** P1 continua; validación empírica P3.
+**Dependencias:** instrumentación de Fase 1 y funciones de Fases 2–4.
 
-#### Validación
+#### Expansión curricular (Unidades 01–11 UNMDP Exactas)
 
-- [ ] Definir resultados de aprendizaje antes de cada experimento.
+- [x] Unidad 01–02 homogéneas: Potencias y Raíces, Desigualdades, Unidades, Funciones, Valor Absoluto y Sucesiones instrumentadas al motor central.
+- [x] Unidad 03 · Función lineal (`lineal.html`) y Unidad 04 · Sistemas de ecuaciones (`sistemas.html`).
+- [x] Unidad 05 · Función cuadrática (`cuadraticas.html`) y Unidad 06 · Polinomios (`polinomios.html`, contrato compartido `js/core/math/polynomials.js`).
+- [x] Unidad 07 · Función racional e irracional (`racionales-irracionales.html`).
+- [x] Unidad 08 · Función exponencial (`exponenciales.html`) y Unidad 09 · Función logarítmica (`logaritmicas.html`).
+- [x] Unidad 10 · Razones trigonométricas (`razones-trigonometricas.html`) y Unidad 11 · Funciones trigonométricas (`funciones-trigonometricas.html`, contrato compartido `js/core/math/trigonometry.js`).
+
+Cada módulo reutiliza la arquitectura de competencias, diagnósticos y evidencia, conservando una representación visual apropiada a su estructura matemática.
+
+#### Validación empírica (pendiente de campo)
+
+- [ ] Definir resultados de aprendizaje antes de cada experimento piloto.
 - [ ] Comparar estrategias con contenidos y dificultad equivalentes.
 - [ ] Medir retención inmediata y demorada.
 - [ ] Medir transferencia a problemas nuevos.
@@ -400,16 +396,6 @@ Un jefe no es un formulario decorado ni una prueba de reflejos. Debe exigir reco
 - [ ] Revisar diferencias entre estudiantes y posibles efectos adversos.
 - [ ] Documentar tamaño de muestra, limitaciones y criterios de análisis.
 - [ ] No afirmar causalidad con muestras pequeñas o sin grupo de comparación adecuado.
-
-#### Expansión curricular
-
-La expansión no debe adelantarse al mantenimiento de calidad de los módulos existentes. Posibles áreas:
-- Función cuadrática y parábolas.
-- Sistemas de ecuaciones.
-- Trigonometría y círculo unitario.
-- Otros contenidos de ingreso y Análisis I.
-
-Cada módulo nuevo debe reutilizar la arquitectura de competencias y evidencia, pero conservar una representación visual apropiada a su estructura matemática.
 
 ---
 

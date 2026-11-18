@@ -153,7 +153,7 @@ export function parseNumericAnswer(raw) {
     return a / b;
   }
 
-  if (/^-?\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(s)) {
+  if (/^-?[1-9]\d{0,2}(?:\.\d{3})+(?:,\d+)?$/.test(s)) {
     s = s.replace(/\./g, '').replace(',', '.');
   } else {
     s = s.replace(',', '.');

@@ -7,14 +7,23 @@ import { initScratchpad } from './scratchpad.js';
 
 export const PAGES = [
   { id: 'inicio', href: 'index.html', label: 'Inicio' },
+  { id: 'potencias-raices', href: 'potencias-raices.html', label: 'Potencias y Raíces' },
   { id: 'desigualdades', href: 'desigualdades.html', label: 'Desigualdades' },
   { id: 'unidades', href: 'unidades.html', label: 'Unidades' },
-  { id: 'potencias-raices', href: 'potencias-raices.html', label: 'Potencias y Raíces' },
   { id: 'funciones', href: 'funciones.html', label: 'Funciones' },
   { id: 'valor-absoluto', href: 'valor-absoluto.html', label: 'Valor Absoluto' },
   { id: 'sucesiones', href: 'sucesiones.html', label: 'Sucesiones' },
+  { id: 'lineal', href: 'lineal.html', label: 'Función Lineal' },
+  { id: 'sistemas', href: 'sistemas.html', label: 'Sistemas de Ecuaciones' },
   { id: 'cuadraticas', href: 'cuadraticas.html', label: 'Función Cuadrática' },
+  { id: 'polinomios', href: 'polinomios.html', label: 'Polinomios' },
+  { id: 'jefe-integrador-1', href: 'jefe-integrador-1.html', label: 'Integración 1 (U01–U06)' },
+  { id: 'racionales-irracionales', href: 'racionales-irracionales.html', label: 'Racionales e Irracionales' },
   { id: 'exponenciales', href: 'exponenciales.html', label: 'Funciones Exponenciales' },
+  { id: 'logaritmicas', href: 'logaritmicas.html', label: 'Función Logarítmica' },
+  { id: 'razones-trigonometricas', href: 'razones-trigonometricas.html', label: 'Razones Trigonométricas' },
+  { id: 'funciones-trigonometricas', href: 'funciones-trigonometricas.html', label: 'Funciones Trigonométricas' },
+  { id: 'simulacro-global', href: 'simulacro-global.html', label: 'Simulacro Global (U01–U11)' },
 ];
 
 export const CURRICULUM_UNITS = [
@@ -44,18 +53,22 @@ export const CURRICULUM_UNITS = [
   {
     number: 3,
     title: 'Función lineal',
-    status: 'soon',
-    subtitle: 'Pendiente m = tg(α), ordenada al origen, formas de la recta, paralelismo y perpendicularidad',
-    concepts: ['Pendiente y ángulo', 'Ordenada al origen', 'Paralelismo y perpendicularidad'],
-    items: [],
+    status: 'active',
+    subtitle: 'Pendiente m = tg(α), ordenada al origen, formas explícita/implícita/segmentaria, paralelismo, perpendicularidad y mediatriz',
+    concepts: ['Pendiente y ángulo', 'Tres formas de la recta', 'Paralelismo, perpendicularidad y distancia'],
+    items: [
+      { id: 'lineal', href: 'lineal.html', label: 'Laboratorio de Función Lineal', detail: 'Constructor de rectas, traductor de formas, distancia, punto medio y mediatriz' },
+    ],
   },
   {
     number: 4,
     title: 'Sistemas de ecuaciones',
-    status: 'soon',
-    subtitle: 'Sistemas lineales 2×2, clasificación geométrica (SCD, SCI, SI) y problemas de modelado',
-    concepts: ['Sistemas lineales 2×2', 'Clasificación geométrica', 'Problemas de modelado'],
-    items: [],
+    status: 'active',
+    subtitle: 'Sistemas lineales 2×2, clasificación geométrica (SCD, SCI, SI), sistemas con parámetros y modelización',
+    concepts: ['Sistemas lineales 2×2', 'Clasificación SCD / SCI / SI', 'Sistemas paramétricos'],
+    items: [
+      { id: 'sistemas', href: 'sistemas.html', label: 'Laboratorio de Sistemas 2×2', detail: 'Intersecciones en el plano, clasificación SCD/SCI/SI y traductor de problemas' },
+    ],
   },
   {
     number: 5,
@@ -75,18 +88,22 @@ export const CURRICULUM_UNITS = [
   {
     number: 6,
     title: 'Polinomios',
-    status: 'soon',
-    subtitle: 'Grado, operaciones, algoritmo de división, Regla de Ruffini, Teorema del Resto y Gauss',
+    status: 'active',
+    subtitle: 'Grado, operaciones, división euclídea, Regla de Ruffini, Teorema del Resto, factorización y Gauss',
     concepts: ['Grado y operaciones', 'División y Ruffini', 'Teorema del Resto y Gauss'],
-    items: [],
+    items: [
+      { id: 'polinomios', href: 'polinomios.html', label: 'Laboratorio de Polinomios', detail: 'Estructura, aritmética, Ruffini con reescalado, raíces racionales y multiplicidades' },
+    ],
   },
   {
     number: 7,
     title: 'Función racional e irracional',
-    status: 'soon',
-    subtitle: 'Expresiones algebraicas racionales, dominio de validez, asíntotas, agujeros y radicales',
-    concepts: ['Expresiones racionales', 'Dominio y asíntotas', 'Agujeros y radicales'],
-    items: [],
+    status: 'active',
+    subtitle: 'Expresiones algebraicas racionales, dominio, agujeros vs. asíntotas, radicales y soluciones extraviadas',
+    concepts: ['Dominio y MCM polinómico', 'Agujeros vs. asíntotas', 'Ecuaciones irracionales'],
+    items: [
+      { id: 'racionales-irracionales', href: 'racionales-irracionales.html', label: 'Racionales e Irracionales', detail: 'Simplificación, discontinuidades evitables, asíntotas y verificación en ecuaciones con raíces' },
+    ],
   },
   {
     number: 8,
@@ -101,12 +118,49 @@ export const CURRICULUM_UNITS = [
   {
     number: 9,
     title: 'Función logarítmica',
-    status: 'soon',
-    subtitle: 'Definición logₐ(x), propiedades operativas, cambio de base e inversa de la exponencial',
-    concepts: ['Definición y propiedades', 'Cambio de base', 'Inversa de la exponencial'],
-    items: [],
+    status: 'active',
+    subtitle: 'Definición logₐ(x), existencia, propiedades operativas, cambio de base, inversa exponencial y ecuaciones',
+    concepts: ['Definición y existencia', 'Propiedades y cambio de base', 'Inversa de la exponencial'],
+    items: [
+      { id: 'logaritmicas', href: 'logaritmicas.html', label: 'Laboratorio de Logarítmicas', detail: 'Espejo exponencial-logarítmico, asíntota vertical, balanza de propiedades y ecuaciones' },
+    ],
+  },
+  {
+    number: 10,
+    title: 'Razones trigonométricas',
+    status: 'active',
+    subtitle: 'Triángulo rectángulo, Pitágoras, SOHCAHTOA, sistemas sexagesimal y circular, arcos y geometría',
+    concepts: ['SOHCAHTOA y Pitágoras', 'Grados y radianes', 'Polígonos, cuerdas y arcos'],
+    items: [
+      { id: 'razones-trigonometricas', href: 'razones-trigonometricas.html', label: 'Razones Trigonométricas', detail: 'Resolución de triángulos, elevación/depresión, conversor angular y geometría' },
+    ],
+  },
+  {
+    number: 11,
+    title: 'Funciones trigonométricas',
+    status: 'active',
+    subtitle: 'Congruencia C_α, las seis funciones, dominios con polos, imágenes, períodos y ecuaciones periódicas',
+    concepts: ['Clases de congruencia C_α', 'Seis funciones y dominios', 'Ecuaciones periódicas'],
+    items: [
+      { id: 'funciones-trigonometricas', href: 'funciones-trigonometricas.html', label: 'Funciones Trigonométricas', detail: 'Círculo unitario, gráficas periódicas, identidades pitagóricas y ecuaciones en ℝ' },
+    ],
   },
 ];
+
+export const INTEGRATOR_EVALUATIONS = Object.freeze([
+  {
+    id: 'jefe-integrador-1',
+    href: 'jefe-integrador-1.html',
+    label: 'Integración 1 (Unidades 01–06)',
+    detail: 'Evaluación integradora sin cronómetro sobre reales, funciones, rectas, sistemas, cuadráticas y polinomios',
+  },
+  {
+    id: 'simulacro-global',
+    href: 'simulacro-global.html',
+    label: 'Simulacro Global (Unidades 01–11)',
+    detail: 'Recorrido integrador completo del programa de ingreso FCEyN UNMDP',
+  },
+]);
 
 /**
  * Colección curada de leyes fundamentales de la física, teoremas de la matemática
@@ -331,19 +385,34 @@ function updateSoundBtn(btn, enabled) {
   btn.replaceChildren(...createSoundBtnContent(enabled));
 }
 
-function resolveCurrentUnit(current) {
-  if (current === 'valor-absoluto' && location.hash === '#sec-1') {
+const SINGLE_PAGE_UNIT_MAP = Object.freeze({
+  lineal: { unit: 3, itemId: 'lineal' },
+  sistemas: { unit: 4, itemId: 'sistemas' },
+  cuadraticas: { unit: 5, itemId: 'cuadraticas' },
+  polinomios: { unit: 6, itemId: 'polinomios' },
+  'racionales-irracionales': { unit: 7, itemId: 'racionales-irracionales' },
+  exponenciales: { unit: 8, itemId: 'exponenciales' },
+  logaritmicas: { unit: 9, itemId: 'logaritmicas' },
+  'razones-trigonometricas': { unit: 10, itemId: 'razones-trigonometricas' },
+  'funciones-trigonometricas': { unit: 11, itemId: 'funciones-trigonometricas' },
+});
+
+export function resolveCurrentUnit(current) {
+  const currentHash = typeof location !== 'undefined' ? location.hash : '';
+  if (current === 'valor-absoluto' && currentHash === '#sec-1') {
     return { unit: 1, itemId: 'valor-absoluto-1d' };
   }
   if (['potencias-raices', 'valor-absoluto-1d', 'desigualdades', 'unidades'].includes(current)) {
-    const itemId = current === 'valor-absoluto-1d' ? current : current;
-    return { unit: 1, itemId };
+    return { unit: 1, itemId: current };
   }
   if (['funciones', 'valor-absoluto', 'sucesiones'].includes(current)) {
     return { unit: 2, itemId: current };
   }
-  if (current === 'exponenciales') {
-    return { unit: 8, itemId: 'exponenciales' };
+  if (current && Object.prototype.hasOwnProperty.call(SINGLE_PAGE_UNIT_MAP, current)) {
+    return { ...SINGLE_PAGE_UNIT_MAP[current] };
+  }
+  if (current === 'jefe-integrador-1' || current === 'simulacro-global') {
+    return { unit: null, itemId: current, integrator: true };
   }
   return { unit: null, itemId: null };
 }
@@ -407,6 +476,9 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
   const current = root.dataset.siteNav || PAGES.find((page) => location.pathname.endsWith(page.href))?.id;
   const currentContext = resolveCurrentUnit(current);
   const currentUnit = CURRICULUM_UNITS.find((unit) => unit.number === currentContext.unit);
+  const currentIntegrator = currentContext.integrator
+    ? INTEGRATOR_EVALUATIONS.find((ev) => ev.id === currentContext.itemId)
+    : null;
   root.classList.add('site-nav');
   root._navAbortController?.abort();
   root._navBackdrop?.remove();
@@ -432,7 +504,11 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       class: 'site-nav__explore',
       'aria-expanded': 'false',
       'aria-controls': 'site-curriculum-drawer',
-      title: currentUnit ? `U${currentUnit.number} · ${currentUnit.title}` : 'Módulos y unidades',
+      title: currentUnit
+        ? `U${currentUnit.number} · ${currentUnit.title}`
+        : currentIntegrator
+          ? currentIntegrator.label
+          : 'Módulos y unidades',
     },
     h('span', null, 'Módulos'),
     h('span', { class: 'site-nav__explore-caret', 'aria-hidden': 'true' }, '▾'),
@@ -460,12 +536,22 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
     if (next) playClick();
   });
 
+  const totalUnits = CURRICULUM_UNITS.length;
+  const activeUnits = CURRICULUM_UNITS.filter((u) => u.status === 'active').length;
+  const soonUnits = totalUnits - activeUnits;
+  const uniqueLabCount = new Set(
+    CURRICULUM_UNITS.flatMap((u) => u.items.map((it) => it.pageId || it.id)),
+  ).size;
+  const countSummary = soonUnits === 0
+    ? `${activeUnits} unidades activas · ${uniqueLabCount} laboratorios y ${INTEGRATOR_EVALUATIONS.length} evaluaciones integradoras`
+    : `${activeUnits} unidades con laboratorios activos · ${soonUnits} unidades en construcción`;
+
   const drawer = h(
     'section',
     {
       id: 'site-curriculum-drawer',
       class: 'site-nav__drawer',
-      'aria-label': 'Mapa curricular de las nueve unidades',
+      'aria-label': `Mapa curricular de las ${totalUnits} unidades`,
       'aria-hidden': 'true',
       inert: true,
     },
@@ -475,10 +561,10 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       h(
         'div',
         null,
-        h('p', { class: 'site-nav__drawer-kicker' }, 'Mapa curricular · 9 unidades'),
+        h('p', { class: 'site-nav__drawer-kicker' }, `Mapa curricular · ${totalUnits} unidades`),
         h('h2', null, 'Ruta de Aprendizaje · Ingreso de UNMDP Exactas'),
       ),
-      h('p', { class: 'site-nav__drawer-count' }, '3 unidades con laboratorios activos · 6 unidades en construcción'),
+      h('p', { class: 'site-nav__drawer-count' }, countSummary),
     ),
     h(
       'div',
@@ -486,6 +572,33 @@ export function renderNav(root = document.querySelector('[data-site-nav]')) {
       CURRICULUM_UNITS.map((unit) => makeCurriculumCard(unit, {
         activeItemId: currentContext.unit === unit.number ? currentContext.itemId : null,
       })),
+    ),
+    h(
+      'div',
+      { class: 'site-nav__integrators', 'aria-label': 'Evaluaciones integradoras' },
+      h('h3', { class: 'site-nav__integrators-title' }, 'Evaluaciones integradoras (sin cronómetro)'),
+      h(
+        'div',
+        { class: 'site-nav__integrators-grid' },
+        INTEGRATOR_EVALUATIONS.map((ev) => {
+          const selected = Boolean(currentContext.integrator && currentContext.itemId === ev.id);
+          return h(
+            'a',
+            {
+              class: `site-nav__integrator-link${selected ? ' is-active' : ''}`,
+              href: ev.href,
+              'aria-current': selected ? 'page' : null,
+            },
+            h(
+              'span',
+              { class: 'curriculum-card__link-heading' },
+              h('strong', null, ev.label),
+              selected ? h('span', { class: 'curriculum-card__here' }, '← Estás acá') : null,
+            ),
+            h('span', { class: 'curriculum-card__detail' }, ev.detail),
+          );
+        }),
+      ),
     ),
   );
   const backdrop = h('button', {
