@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 07 de Alaska Math Lab: Expresiones y funciones racionales (simplificación con dominio, M(x), ecuaciones, inecuaciones, agujeros y asíntotas) y funciones y ecuaciones irracionales (dominio par/impar, soluciones extraviadas y gráficas por tramos)."
+    />
+    <title>Unidad 07 · Funciones y Ecuaciones Racionales e Irracionales · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/racionales-irracionales.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/racionales-irracionales/index.js"></script>
+  </head>
+  <body data-page="racionales-irracionales">
+    <header data-site-nav="racionales-irracionales"></header>
+    <main class="page page--wide seq-page ri-page">
+      <header class="page-header">
+        <h1>Ecuaciones e Inecuaciones Racionales e Irracionales</h1>
+        <p class="intro">
+          Unidad 07 · Del dominio preservado y los agujeros vs. asíntotas en cocientes polinómicos
+          al filtro de índice par y soluciones extraviadas en radicales y funciones por tramos.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 07 · Racionales e Irracionales</h2>
+          <p class="muted small" id="seq-progress-text">0/6 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Submódulo Racionales</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-1" data-sec="sec-1">
+                <span>1 · Simplificación y M(x)</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2">
+                <span>2 · Ecuaciones e Inecuaciones</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3">
+                <span>3 · Agujeros vs. A.V.</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4">
+                <span>4 · A.H. y Estudio Completo</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Submódulo Irracionales</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-5" data-sec="sec-5">
+                <span>5 · Dominio y Ecuaciones</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6">
+                <span>6 · Gráficas y Tramos</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Práctica y Síntesis</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso y Competencias</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="ri-hero">
+            <p class="ri-kicker">Unidad 07 · Programa Oficial UNMDP FCEyN</p>
+            <h1>Funciones y Ecuaciones Racionales e Irracionales</h1>
+            <p>
+              Explorá dos mundos gobernados por la aduana del dominio: en las expresiones racionales
+              <span class="eq">P(x)/Q(x)</span> jamás se divide por cero ni se pierden exclusiones al simplificar;
+              en las irracionales <span class="eq">k&middot;<sup>n</sup>&radic;g(x) + c</span> la paridad del índice y el signo
+              al elevar a la <span class="eq">n</span> deciden qué valores existen y cuáles son soluciones extraviadas.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · EXPRESIONES RACIONALES, SIMPLIFICACIÓN Y M(x)
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-1">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 1 · Racionales · Pizarrón 1 de 6</div>
+              <h2 class="seq-section__title">1. Expresiones Algebraicas Racionales, Simplificación con Dominio y M(x)</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> Simplificar una fracción polinómica consiste en factorizar arriba y abajo para cancelar factores comunes, conservando intactas en el dominio las raíces del denominador original.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Una <strong>expresión algebraica racional</strong> tiene la forma
+                <span class="eq"><span class="fr"><span class="top">P(x)</span><span class="bot">Q(x)</span></span></span>,
+                donde <span class="eq">P(x)</span> y <span class="eq">Q(x)</span> son polinomios y <span class="eq">Q(x)</span> no es el polinomio nulo.
+                Para simplificar, primero factorizás numerador y denominador y recién después suprimís los factores comunes,
+                declarando siempre el <strong>dominio de validez</strong> a partir del denominador original.
+              </p>
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Para sumar o restar fracciones con distinto denominador se factorizan los denominadores y se arma el
+                <strong>polinomio múltiplo común mínimo <span class="eq">M(x)</span></strong>: el producto de todos los
+                <span class="gloss-term" data-gloss="factor_primo">factores primos</span> comunes y no comunes elevados a su
+                <strong>mayor multiplicidad</strong>. Al dividir <span class="eq">(P/Q) : (R/S)</span> se invierte la segunda fracción
+                (<span class="eq">(P/Q) &middot; (S/R)</span>), por lo que quedan excluidas las raíces de <span class="eq">Q</span>, de <span class="eq">S</span> y de <span class="eq">R</span>.
+              </p>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Aduana de factores:</strong> Pensá la barra de fracción como un filtro multiplicativo.
+                  Si un paréntesis multiplica a todo el numerador y a todo el denominador, puede cancelarse dejando una etiqueta de advertencia en el dominio;
+                  si un término está separado por <span class="eq">+</span> o <span class="eq">&minus;</span>, la aduana bloquea cualquier tachadura.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="inspector-dominio"></div>
+            </div>
+
+            <div class="ri-worked-fading">
+              <h4>Ejemplo con retiro gradual · Estudio completo de f(x) = (x&sup2; &minus; 1) / (x&sup2; + x &minus; 2)</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="1">
+                <p><strong>1. Factorización:</strong> <span class="eq">P(x) = (x &minus; 1)(x + 1)</span> y <span class="eq">Q(x) = (x &minus; 1)(x + 2)</span>.</p>
+                <p><strong>2. Dominio original:</strong> <span class="eq">Dom(f) = &Ropf; &minus; {&minus;2; 1}</span> (se fijan ambas raíces de <span class="eq">Q</span> antes de simplificar).</p>
+                <p><strong>3. Simplificación y lectura:</strong> para <span class="eq">x &ne; 1</span> vale <span class="eq">(x + 1)/(x + 2)</span>; en <span class="eq">x = 1</span> queda agujero <span class="eq">(1; 2/3)</span>, en <span class="eq">x = &minus;2</span> A.V., A.H. <span class="eq">y = 1</span> y <span class="eq">C<sub>0</sub> = {&minus;1}</span>.</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> En <span class="eq">(4x&sup2; &minus; 8x) / (x&sup3; &minus; 2x&sup2; &minus; 5x + 10) = 4x(x &minus; 2) / ((x &minus; 2)(x&sup2; &minus; 5))</span>, ya sabés que <span class="eq">x = 2</span> se cancela. ¿Cuánto vale la ordenada del agujero en la fórmula simplificada y cuál es <span class="eq">C<sub>0</sub></span>?</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> Para <span class="eq">x/(x &minus; 3) &minus; 1/(x &minus; 5) = (2x &minus; 1)/(x&sup2; &minus; 8x + 15)</span>, primero factorizá <span class="eq">x&sup2; &minus; 8x + 15</span> para obtener <span class="eq">M(x)</span>, igualá los numeradores y verificá que ninguna raíz obtenida sea <span class="eq">3</span> ni <span class="eq">5</span>.</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Realizá el estudio completo (<span class="eq">Dom, C<sub>0</sub>, A.V., A.H., f(0)</span>) de <span class="eq">f(x) = (2x + 1)/(3 &minus; x)</span> y comprobalo luego en el Explorador de Asíntotas.</p>
+              </div>
+            </div>
+
+            <div class="ri-contrast-box">
+              <h4>Desafío de contraste · Igualdad funcional vs. equivalencia algebraica</h4>
+              <div class="ri-contrast-cols">
+                <div class="ri-contrast-col">
+                  <strong>f(x) = (x&sup2; &minus; 6x + 9) / (x &minus; 3)</strong>
+                  <p>Para <span class="eq">x &ne; 3</span> vale <span class="eq">x &minus; 3</span>, pero en <span class="eq">x = 3</span> divide por cero. <span class="eq">Dom(f) = &Ropf; &minus; {3}</span>.</p>
+                </div>
+                <div class="ri-contrast-col">
+                  <strong>g(x) = x &minus; 3</strong>
+                  <p>Está definida en <span class="eq">x = 3</span> (<span class="eq">g(3) = 0</span>). <span class="eq">Dom(g) = &Ropf;</span>. Como los dominios difieren, <strong><span class="eq">f &ne; g</span></strong>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con la tachadura ilegal:</strong> en <span class="eq">(x&sup2; + 2x + 1)/(x + 1)</span> nunca taches sumandos sueltos. Factorizá primero <span class="eq">(x + 1)&sup2;/(x + 1) = x + 1</span> (válido para <span class="eq">x &ne; &minus;1</span>).
+            </div>
+
+            <div data-check="sec-1"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · ECUACIONES E INECUACIONES RACIONALES
+               ================================================================ -->
+          <section class="seq-section" id="sec-2">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 1 · Racionales · Pizarrón 2 de 6</div>
+              <h2 class="seq-section__title">2. Ecuaciones e Inecuaciones Racionales</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> En ecuaciones racionales multiplicás por <span class="eq">M(x)</span> y descartás cualquier raíz prohibida por el denominador; en inecuaciones llevás todo a cero y estudiás signos dejando siempre abiertos los polos.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Para resolver una <strong>ecuación racional</strong> declarás primero las restricciones de cada denominador,
+                llevás todos los términos al múltiplo común mínimo <span class="eq">M(x)</span> e igualás a cero el numerador resultante <span class="eq">N(x) = 0</span>.
+                Al final, cualquier candidato que anule algún denominador original queda automáticamente descartado (incluso pudiendo quedar <span class="eq">S = &empty;</span>).
+              </p>
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En una <strong>inecuación racional</strong> como <span class="eq"><span class="fr"><span class="top">7</span><span class="bot">x + 6</span></span> &le; 1</span>,
+                nunca pases <span class="eq">(x + 6)</span> multiplicando porque no conocés su signo. Pasás el <span class="eq">1</span> restando, juntás en una única fracción
+                <span class="eq"><span class="fr"><span class="top">1 &minus; x</span><span class="bot">x + 6</span></span> &le; 0</span> y armás la tabla de signos:
+                los ceros del numerador pueden llevar corchete en <span class="eq">&le; / &ge;</span>, mientras que las raíces del denominador llevan <strong>paréntesis abierto siempre</strong>.
+              </p>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Por qué multiplicar por <span class="eq">(x &minus; a)</span> fabrica fantasmas:</strong> la ecuación
+                  <span class="eq">A(x) = B(x)</span> implica <span class="eq">(x &minus; a)A(x) = (x &minus; a)B(x)</span>, pero no a la inversa cuando <span class="eq">x = a</span>.
+                  Cuando <span class="eq">(x &minus; a)</span> estaba dividiendo, esa implicación es de un solo sentido y exige comprobar el dominio al cierre.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="ri-step-box">
+              <h4>Protocolo en 4 pasos para ecuaciones e inecuaciones racionales</h4>
+              <ol>
+                <li>Declarar el dominio de validez (<span class="eq">Q<sub>i</sub>(x) &ne; 0</span>) antes de despejar.</li>
+                <li>Llevar todo a un único denominador común <span class="eq">M(x)</span> (en inecuaciones, comparar siempre contra <span class="eq">0</span>).</li>
+                <li>Resolver <span class="eq">N(x) = 0</span> (ecuaciones) o analizar los signos de cada factor de <span class="eq">N</span> y <span class="eq">Q</span> (inecuaciones).</li>
+                <li>Excluir de la solución todas las raíces del denominador (y usar paréntesis abierto en polos).</li>
+              </ol>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con el corchete en el polo:</strong> en <span class="eq">(1 &minus; x)/(x + 6) &le; 0</span>, aunque el signo sea <span class="eq">&le;</span>, en <span class="eq">x = &minus;6</span> la expresión no existe. La solución es <span class="eq">(&minus;&infin;; &minus;6) &cup; [1; +&infin;)</span>.
+            </div>
+
+            <div data-check="sec-2"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · FUNCIÓN RACIONAL: DOMINIO, CEROS, AGUJEROS VS. A.V.
+               ================================================================ -->
+          <section class="seq-section" id="sec-3">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 1 · Racionales · Pizarrón 3 de 6</div>
+              <h2 class="seq-section__title">3. Función Racional: Dominio, Ceros, Puntos Agujero vs. Asíntotas Verticales</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> Cuando una raíz <span class="eq">x = a</span> anula el denominador, la multiplicidad decide el destino: si <span class="eq">mult<sub>P</sub>(a) &ge; mult<sub>Q</sub>(a)</span> deja un agujero finito; si <span class="eq">mult<sub>P</sub>(a) &lt; mult<sub>Q</sub>(a)</span> dispara una asíntota vertical.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                El <strong>dominio</strong> de <span class="eq">f(x) = P(x)/Q(x)</span> es <span class="eq">&Ropf; &minus; {x : Q(x) = 0}</span>.
+                Sus <strong>raíces o ceros (<span class="eq">C<sub>0</sub></span>)</strong> son las raíces reales de <span class="eq">P(x)</span> que <strong>pertenecen al dominio de <span class="eq">f</span></strong> (nunca una raíz común cancelada).
+                Para todo valor excluido <span class="eq">x = a</span>: si <span class="eq">mult<sub>P</sub>(a) &ge; mult<sub>Q</sub>(a)</span> hay un <strong>punto agujero</strong> cuya ordenada se calcula evaluando la expresión simplificada en <span class="eq">a</span> (no pertenece al gráfico);
+                si <span class="eq">mult<sub>P</sub>(a) &lt; mult<sub>Q</sub>(a)</span> hay una <strong>asíntota vertical</strong> de ecuación <span class="eq">x = a</span>.
+              </p>
+
+              <div data-ri-formula="rational" data-preset="hole-vs-va"></div>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Sonda numérica de cercanía:</strong> Podés mover la sonda hacia <span class="eq">x = a &plusmn; 0,01</span> en el pizarrón para observar en vivo cómo un agujero converge a un valor finito estable mientras una asíntota vertical explota en magnitud.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="agujero-asintota"></div>
+            </div>
+
+            <div class="ri-contrast-box">
+              <h4>Desafío de contraste · (x&sup2; &minus; 1)/(x &minus; 1) vs. (x &minus; 1)/(x &minus; 1)&sup2;</h4>
+              <div class="ri-contrast-cols">
+                <div class="ri-contrast-col">
+                  <strong>f(x) = (x&sup2; &minus; 1)/(x &minus; 1)</strong>
+                  <p><span class="eq">mult<sub>P</sub>(1) = 1 &ge; mult<sub>Q</sub>(1) = 1</span>. Se cancela <span class="eq">(x &minus; 1)</span> y queda <span class="eq">x + 1</span> para <span class="eq">x &ne; 1</span>: <strong>punto agujero en <span class="eq">(1; 2)</span></strong>.</p>
+                </div>
+                <div class="ri-contrast-col">
+                  <strong>g(x) = (x &minus; 1)/(x &minus; 1)&sup2;</strong>
+                  <p><span class="eq">mult<sub>P</sub>(1) = 1 &lt; mult<sub>Q</sub>(1) = 2</span>. Sobrevive un factor <span class="eq">(x &minus; 1)</span> abajo: queda <span class="eq">1/(x &minus; 1)</span> con <strong>asíntota vertical <span class="eq">x = 1</span></strong>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con el agujero sobre el eje X:</strong> en <span class="eq">f(x) = 2x&sup2;/(x&sup2; + x)</span>, <span class="eq">x = 0</span> tiene <span class="eq">mult<sub>P</sub>(0) = 2 &gt; mult<sub>Q</sub>(0) = 1</span>. Da un agujero en <span class="eq">(0; 0)</span>, pero como <span class="eq">0 &notin; Dom(f)</span>, entonces <span class="eq">C<sub>0</sub> = &empty;</span>.
+            </div>
+
+            <div data-check="sec-3"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · ASÍNTOTAS HORIZONTALES Y ESTUDIO COMPLETO
+               ================================================================ -->
+          <section class="seq-section" id="sec-4">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 1 · Racionales · Pizarrón 4 de 6</div>
+              <h2 class="seq-section__title">4. Asíntotas Horizontales, Estudio Completo y Reconstrucción Gráfica</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> Para valores muy grandes de <span class="eq">|x|</span> mandan los grados de <span class="eq">P(x)</span> y <span class="eq">Q(x)</span>: gana abajo <span class="eq">&rArr; y = 0</span>, empatan <span class="eq">&rArr; y = a<sub>n</sub>/b<sub>m</sub></span>, gana arriba <span class="eq">&rArr;</span> no hay asíntota horizontal.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Una función racional posee <span class="gloss-term" data-gloss="asintota_horizontal">asíntota horizontal</span> cuando <span class="eq">gr(P) &le; gr(Q)</span>:
+              </p>
+              <div class="ri-table-wrap">
+                <table class="ri-table">
+                  <thead>
+                    <tr><th>Comparación de grados</th><th>Asíntota horizontal</th><th>Ejemplo</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="eq">gr(P) &lt; gr(Q)</span></td><td><span class="eq">y = 0</span></td><td><span class="eq">(2x + 1)/(x&sup2; + 1) &rArr; y = 0</span></td></tr>
+                    <tr><td><span class="eq">gr(P) = gr(Q)</span></td><td><span class="eq">y = a<sub>n</sub> / b<sub>m</sub></span> (cociente de líderes)</td><td><span class="eq">(2x + 1)/(3 &minus; x) &rArr; y = 2/(&minus;1) = &minus;2</span></td></tr>
+                    <tr><td><span class="eq">gr(P) &gt; gr(Q)</span></td><td><strong>No tiene asíntota horizontal</strong></td><td><span class="eq">(x&sup2; &minus; 1)/(x + 2) &rArr;</span> sin A.H.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div data-ri-formula="rational" data-preset="homographic"></div>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica (fuera del programa de ingreso)</span>
+                  Cuando <span class="eq">gr(P) = gr(Q) + 1</span> la curva se aproxima a una recta inclinada llamada <em>asíntota oblicua</em> (cociente de la división polinómica).
+                  <strong>Aviso oficial:</strong> el programa de ingreso UNMDP llega únicamente hasta confirmar que <strong>no hay asíntota horizontal</strong> cuando <span class="eq">gr(P) &gt; gr(Q)</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="explorador-asintotas"></div>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con el denominador desordenado:</strong> en <span class="eq">(2x + 1)/(3 &minus; x)</span> no dividas <span class="eq">2/3</span>. Ordená por grado <span class="eq">(&minus;x + 3)</span> para leer correctamente el coeficiente principal <span class="eq">&minus;1</span> y obtener A.H. <span class="eq">y = &minus;2</span> y A.V. <span class="eq">x = 3</span>.
+            </div>
+
+            <div data-check="sec-4"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 5 · FUNCIÓN IRRACIONAL, DOMINIO Y ECUACIONES
+               ================================================================ -->
+          <section class="seq-section" id="sec-5">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 2 · Irracionales · Pizarrón 5 de 6</div>
+              <h2 class="seq-section__title">5. Función Irracional, Dominio Par vs. Impar y Ecuaciones con Soluciones Extraviadas</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> La paridad del índice fija el dominio (<span class="eq">g(x) &ge; 0</span> si <span class="eq">n</span> es par; todo <span class="eq">Dom(g)</span> si <span class="eq">n</span> es impar), y elevar a potencia par obliga siempre a verificar en la ecuación original para descartar soluciones extraviadas.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Una <strong>función irracional</strong> presenta la variable dentro de una operación de radicación:
+                <span class="eq">f(x) = k &middot; <sup>n</sup>&radic;g(x)</span>. Si el <span class="gloss-term" data-gloss="indice_raiz">índice</span> <span class="eq">n</span> es <strong>impar</strong>,
+                <span class="eq">Dom(f) = Dom(g)</span> (salvo si la raíz está en el denominador, donde se exige <span class="eq">g(x) &ne; 0</span>).
+                Si <span class="eq">n</span> es <strong>par</strong>, exigimos que el <span class="gloss-term" data-gloss="radicando">radicando</span> cumpla
+                <span class="eq">g(x) &ge; 0</span> (o estricto <span class="eq">g(x) &gt; 0</span> si la raíz divide en un denominador).
+              </p>
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Al resolver una <strong>ecuación irracional</strong> de índice par como <span class="eq">&radic;(x + 6) = x</span>, la
+                <span class="gloss-term" data-gloss="raiz_principal">raíz principal</span> exige además que el miembro derecho sea <span class="eq">&ge; 0</span>.
+                Elevar ambos miembros al cuadrado no es reversible y puede introducir <strong>soluciones extraviadas</strong> que anulan la ecuación polinómica pero fallan al reemplazarlas.
+              </p>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>El espejo de la rama fantasma:</strong> Al elevar <span class="eq">&radic;g(x) = R(x)</span> al cuadrado obtenés <span class="eq">g(x) = [R(x)]&sup2;</span>,
+                  que representa simultáneamente a la curva real <span class="eq">y = +&radic;g(x)</span> y a su reflejo fantasma <span class="eq">y = &minus;&radic;g(x)</span>.
+                  Toda raíz que corta al reflejo negativo es exactamente una solución extraviada.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec5">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec5-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="ecuaciones-irracionales"></div>
+            </div>
+
+            <div class="ri-worked-fading">
+              <h4>Ejemplo con retiro gradual · Ecuaciones irracionales y dominio radical</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="1">
+                <p><strong>1.</strong> En <span class="eq">&radic;(x + 6) = x</span> exigimos <span class="eq">x &ge; &minus;6</span> y <span class="eq">x &ge; 0</span>.</p>
+                <p><strong>2.</strong> Elevando al cuadrado: <span class="eq">x + 6 = x&sup2; &rArr; x&sup2; &minus; x &minus; 6 = 0</span>, candidatas <span class="eq">x = 3</span> y <span class="eq">x = &minus;2</span>.</p>
+                <p><strong>3.</strong> Verificación: <span class="eq">x = &minus;2</span> da <span class="eq">&radic;4 = 2 &ne; &minus;2</span> (extraviada); solo <span class="eq">x = 3</span> verifica <span class="eq">&rArr; S = {3}</span>.</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> Al resolver <span class="eq">&radic;(2x &minus; 3) = x &minus; 3</span> obtenés las candidatas <span class="eq">x = 2</span> y <span class="eq">x = 6</span>. Reemplazá ambas en la ecuación original y justificá por qué una se descarta.</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> Para <span class="eq">f(x) = 2 &minus; &radic;(3 &minus; x)</span>, planteá <span class="eq">3 &minus; x &ge; 0</span> (atención al signo al despejar), encontrá el vértice de inicio y deducí <span class="eq">Im(f)</span> y <span class="eq">C<sub>0</sub></span>.</p>
+              </div>
+              <div class="ri-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Estudiá <span class="eq">g(x) = { 1/x si x &lt; 0; &radic;x si x &isin; [0; 9] }</span> determinando dominio, <span class="eq">C<sub>0</sub>, C<sup>+</sup>, C<sup>&minus;</sup></span> e imagen.</p>
+              </div>
+            </div>
+
+            <div class="ri-contrast-box">
+              <h4>Desafío de contraste · Índice par vs. índice impar en ecuaciones</h4>
+              <div class="ri-contrast-cols">
+                <div class="ri-contrast-col">
+                  <strong>&radic;(x + 6) = x (índice par)</strong>
+                  <p>Exige miembro derecho <span class="eq">x &ge; 0</span>. Aunque <span class="eq">x = &minus;2</span> resuelve <span class="eq">x&sup2; &minus; x &minus; 6 = 0</span>, queda descartada porque <span class="eq">&radic;4 = +2 &ne; &minus;2</span>.</p>
+                </div>
+                <div class="ri-contrast-col">
+                  <strong><sup>3</sup>&radic;(x &minus; 2) = &minus;2 (índice impar)</strong>
+                  <p>La raíz cúbica admite resultados negativos en <span class="eq">&Ropf;</span>. Al elevar al cubo da <span class="eq">x &minus; 2 = &minus;8 &rArr; x = &minus;6</span>, solución perfectamente válida.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con distribuir raíces sobre sumas:</strong> jamás escribas <span class="eq">&radic;(x&sup2; + 9) = x + 3</span> ni <span class="eq">(&radic;x + 2)&sup2; = x + 4</span>. Recordá también invertir el sentido de la desigualdad al despejar <span class="eq">3 &minus; x &ge; 0 &rArr; x &le; 3</span>.
+            </div>
+
+            <div data-check="sec-5"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 6 · GRÁFICAS RADICALES DESPLAZADAS Y TRAMOS MIXTOS
+               ================================================================ -->
+          <section class="seq-section" id="sec-6">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Submódulo 2 · Irracionales · Pizarrón 6 de 6</div>
+              <h2 class="seq-section__title">6. Gráficas Radicales Desplazadas, Imagen, C₀ y Funciones por Tramos Mixtas</h2>
+            </header>
+
+            <p class="ri-phrase">
+              <strong>En una frase:</strong> El punto donde se anula el radicando marca el vértice inicial <span class="eq">(x<sub>0</sub>; c)</span> de la curva radical y fija simultáneamente el borde cerrado del dominio y del conjunto imagen.
+            </p>
+
+            <div class="ri-prose">
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En <span class="eq">f(x) = k &middot; &radic;(ax + b) + c</span>, como <span class="eq">&radic;(ax + b) &ge; 0</span> siempre,
+                el signo de <span class="eq">k</span> determina el <span class="gloss-term" data-gloss="conjunto_imagen">conjunto imagen</span>:
+                si <span class="eq">k &gt; 0</span>, <span class="eq">Im(f) = [c; +&infin;)</span>; si <span class="eq">k &lt; 0</span>, la curva se refleja hacia abajo y resulta
+                <span class="eq">Im(f) = (&minus;&infin;; c]</span>. El signo de <span class="eq">a</span> decide si el dominio corre a la derecha <span class="eq">[&minus;b/a; +&infin;)</span> o a la izquierda <span class="eq">(&minus;&infin;; &minus;b/a]</span>.
+              </p>
+              <p>
+                <span class="ri-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Las <strong>funciones definidas por tramos</strong> pueden combinar ramas racionales, cuadráticas, lineales y radicales sobre intervalos disjuntos.
+                Para leer dominio, ceros, positividad e imagen es indispensable respetar qué extremo lleva punto cerrado (corchete) y cuál punto abierto (paréntesis).
+              </p>
+
+              <div data-ri-formula="radical" data-preset="reflected"></div>
+
+              <div class="ri-extension-box">
+                <p>
+                  <span class="ri-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Exploración continua de traslaciones:</strong> Cambiá al <em>Modo 2</em> del pizarrón de ecuaciones irracionales (o usá los controles <span class="eq">k, a, b, c</span>) para ver cómo el vértice de partida mueve al mismo tiempo la frontera del dominio y de la imagen, y comparar las dos funciones por tramos clásicas.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec6">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec6-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="ri-warning-box">
+              <strong>Cuidado con la imagen de <span class="eq">&radic;</span>:</strong> nunca respondas <span class="eq">Im(f) = &Ropf;</span> para una raíz de índice par. Por ejemplo, <span class="eq">f(x) = 2 &minus; &radic;(x + 1)</span> parte en <span class="eq">(&minus;1; 2)</span> y desciende, por lo que <span class="eq">Im(f) = (&minus;&infin;; 2]</span>.
+            </div>
+
+            <div data-check="sec-6"></div>
+          </section>
+
+          <!-- ================================================================
+               ENTRENADOR PRNG + 5 TRAMPAS CLÁSICAS
+               ================================================================ -->
+          <section id="sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Entrenamiento Generativo · Unidad 07</div>
+              <h2 class="seq-section__title">Entrenador Infinito por Semilla y las 5 Trampas Clásicas de Examen</h2>
+            </header>
+            <div id="ri-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               HOJA DE REPASO IMPRIMIBLE + PANEL DE COMPETENCIAS
+               ================================================================ -->
+          <section id="sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis · Autoevaluación y Repaso</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible · Racionales e Irracionales</h2>
+            </header>
+
+            <div class="ri-no-print" style="margin-bottom: 14px;">
+              <button type="button" class="pr-btn" data-print-sheet="1">Imprimir hoja de repaso</button>
+            </div>
+
+            <div id="ri-competency-dashboard"></div>
+
+            <div class="ri-cheat-grid">
+              <article class="ri-cheat-card">
+                <h3>1. Simplificación y M(x)</h3>
+                <p>Factorizá numerador y denominador antes de cancelar. El dominio se fija sobre el denominador original (y al dividir, también sobre el numerador del divisor).</p>
+              </article>
+              <article class="ri-cheat-card">
+                <h3>2. Agujeros vs. Asíntotas Verticales</h3>
+                <p>Para <span class="eq">Q(a) = 0</span>: si <span class="eq">mult<sub>P</sub>(a) &ge; mult<sub>Q</sub>(a)</span> hay agujero en <span class="eq">(a; P<sub>s</sub>(a)/Q<sub>s</sub>(a))</span>; si <span class="eq">mult<sub>P</sub>(a) &lt; mult<sub>Q</sub>(a)</span> hay A.V. <span class="eq">x = a</span>.</p>
+              </article>
+              <article class="ri-cheat-card">
+                <h3>3. Asíntotas Horizontales</h3>
+                <p><span class="eq">gr(P) &lt; gr(Q) &rArr; y = 0</span>; <span class="eq">gr(P) = gr(Q) &rArr; y = a<sub>n</sub>/b<sub>m</sub></span>; <span class="eq">gr(P) &gt; gr(Q) &rArr;</span> no tiene A.H.</p>
+              </article>
+              <article class="ri-cheat-card">
+                <h3>4. Inecuaciones Racionales</h3>
+                <p>Llevar todo a cero, armar cuadro de signos y dejar <strong>paréntesis abierto siempre</strong> en todas las raíces del denominador.</p>
+              </article>
+              <article class="ri-cheat-card">
+                <h3>5. Radicales y Soluciones Extraviadas</h3>
+                <p>Índice par exige <span class="eq">g(x) &ge; 0</span> (<span class="eq">&gt; 0</span> en divisor) y miembro derecho <span class="eq">&ge; 0</span> antes de cuadrar; índice impar admite negativos.</p>
+              </article>
+              <article class="ri-cheat-card">
+                <h3>6. Gráfica Radical k&middot;&radic;(ax+b) + c</h3>
+                <p>Vértice de partida en <span class="eq">(&minus;b/a; c)</span>. Imagen <span class="eq">[c; +&infin;)</span> si <span class="eq">k &gt; 0</span> y <span class="eq">(&minus;&infin;; c]</span> si <span class="eq">k &lt; 0</span>.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
