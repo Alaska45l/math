@@ -215,19 +215,33 @@ export function initWidget(container, options = {}) {
       verdictBox.setAttribute('fill', 'rgba(142, 219, 159, 0.14)');
       verdictBox.setAttribute('stroke', 'var(--green)');
       verdictText.setAttribute('fill', 'var(--green)');
+      verdictText.setAttribute('font-size', '14px');
       setText(verdictText, `= IDENTIDAD VÁLIDA EN ℝ: ambos lados valen exactamente ${fmt(Number(res.lhs.toFixed(4)))}.`);
+    } else if (res.matchesAtPoint) {
+      const valFmt = fmt(Number(res.lhs.toFixed(4)));
+      rhsBar.setAttribute('fill', 'var(--orange, #f4a261)');
+      verdictBox.setAttribute('fill', 'rgba(244, 162, 97, 0.14)');
+      verdictBox.setAttribute('stroke', 'var(--orange, #f4a261)');
+      verdictText.setAttribute('fill', 'var(--orange, #f4a261)');
+      verdictText.setAttribute('font-size', '12px');
+      setText(verdictText, `= Coincidencia puntual: ${valFmt} = ${valFmt}, pero identidad FALSA — mové x o n para ver el contraejemplo.`);
     } else {
       rhsBar.setAttribute('fill', 'var(--pink)');
       verdictBox.setAttribute('fill', 'rgba(227, 161, 161, 0.14)');
       verdictBox.setAttribute('stroke', 'var(--pink)');
       verdictText.setAttribute('fill', 'var(--pink)');
+      verdictText.setAttribute('font-size', '14px');
       setText(verdictText, `≠ CONTRAEJEMPLO DETECTADO: ${fmt(Number(res.lhs.toFixed(4)))} ≠ ${fmt(Number(res.rhs.toFixed(4)))} (¡Falsa!).`);
     }
+
+    const verdictFormal = !res.isValidIdentity && res.matchesAtPoint
+      ? `Coincidencia puntual (${fmt(Number(res.lhs.toFixed(4)))} = ${fmt(Number(res.rhs.toFixed(4)))}), pero la identidad es FALSA — mové x o n para ver el contraejemplo. ${res.explanation}`
+      : res.explanation;
 
     const rows = [
       ['Fórmula analizada', res.formula],
       ['Evaluación numérica', `LHS = ${fmt(Number(res.lhs.toFixed(4)))}  |  RHS = ${fmt(Number(res.rhs.toFixed(4)))}`],
-      ['Veredicto formal', res.explanation],
+      ['Veredicto formal', verdictFormal],
     ];
     renderReadout(board.readout, 'Diagnóstico de Propiedades', rows);
   };

@@ -181,7 +181,7 @@ export const CHECKS_DATA = {
       prompt:
         'Resolvé en ℝ la ecuación racional 2x / (x − 1) = 2 / (x − 1) y escribí su conjunto solución:',
       expected: '∅',
-      placeholder: 'Ej: {2} o vacio',
+      placeholder: 'Ej: {7} (o sin solución)',
       diagContext: { target: 'rational_equation', excludedRoots: [1] },
       hints: [
         'Anotá primero la restricción obligatoria de dominio antes de despejar: x − 1 ≠ 0 ⇒ x ≠ 1.',
@@ -380,7 +380,7 @@ export const CHECKS_DATA = {
       prompt:
         'Para f(x) = 2x² / (x² + x), ¿cuál es su conjunto de ceros C₀?',
       expected: '∅',
-      placeholder: 'Ej: {0} o vacio',
+      placeholder: 'Ej: {5} (o sin solución)',
       diagContext: { target: 'rational_zeros', holeX: 0 },
       hints: [
         'Primero hallá el dominio factorizando el denominador: x(x + 1) ≠ 0 excluye x = 0 y x = −1.',
@@ -404,7 +404,7 @@ export const CHECKS_DATA = {
       prompt:
         'Si f(x) = (ax − 3) / (2x − b) tiene dominio ℝ − {1} y asíntota horizontal y = −2, calculá el valor real de a:',
       expected: -4,
-      placeholder: 'Ej: -4',
+      placeholder: 'Ej: 5',
       diagContext: { target: 'horizontal_asymptote', trapValues: [4, -2] },
       hints: [
         'La asíntota horizontal y = −2 proviene de igualar el cociente entre los coeficientes principales de P(x) y Q(x).',
@@ -608,7 +608,7 @@ function initBlackboardController() {
   const content = document.querySelector('.seq-content');
   if (!page || !sidebar || !content) return;
 
-  const isNarrow = () => (typeof window !== 'undefined' ? window.innerWidth < 1280 : false);
+  const isNarrow = () => (typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
   let savedSidebar = false;
   try {
     savedSidebar = localStorage.getItem('ri:sidebarCollapsed') === '1';
@@ -734,7 +734,7 @@ function initBlackboardController() {
       if (!focused) return;
       event.preventDefault();
       activate(link.dataset.sec);
-      if (typeof window !== 'undefined' && window.innerWidth < 1280) setSidebar(true, false);
+      if (typeof window !== 'undefined' && window.innerWidth <= 1024) setSidebar(true, false);
       if (typeof history !== 'undefined') history.replaceState(null, '', `#${link.dataset.sec}`);
     })
   );
@@ -742,8 +742,8 @@ function initBlackboardController() {
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', () => {
       const isCollapsed = page?.classList.contains('is-sidebar-collapsed');
-      if (window.innerWidth < 1280 && !isCollapsed) setSidebar(true, false);
-      else if (window.innerWidth >= 1280 && isCollapsed && !savedSidebar) setSidebar(false, false);
+      if (window.innerWidth <= 1024 && !isCollapsed) setSidebar(true, false);
+      else if (window.innerWidth > 1024 && isCollapsed && !savedSidebar) setSidebar(false, false);
     });
     const initial = location.hash.slice(1);
     const validIds = [...LESSON_SECTIONS.map((s) => s.id), 'sec-retos', 'sec-repaso'];

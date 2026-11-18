@@ -53,6 +53,9 @@ export function getProgress() {
 
 export function saveProgress(key, value = 'independent') {
   const state = getProgress();
+  if (state[key] === 'assisted' && value === 'independent') {
+    return state;
+  }
   state[key] = value;
   try {
     if (typeof localStorage !== 'undefined' && localStorage.setItem) {

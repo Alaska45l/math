@@ -198,7 +198,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'number',
         expected: k,
         displayAnswer: fmt(k),
-        placeholder: 'Ej: -2',
+        placeholder: 'Ej: -5',
         diagContext: { target: 'definition', base, expected: k },
         hints: [
           `Planteá la pregunta exponencial: ¿a qué exponente y hay que elevar la base ${base} para obtener ${argLabel}?`,
@@ -240,7 +240,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'number',
         expected: ans,
         displayAnswer: fmt(ans),
-        placeholder: 'Ej: -3',
+        placeholder: 'Ej: -5',
         diagContext: { target: 'definition', base: 1 / a, expected: ans },
         hints: [
           `Escribí la ecuación equivalente: (1/${a})^y = ${arg}.`,
@@ -275,7 +275,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'existence',
       expected: 'no_existe',
       displayAnswer: 'No existe en ℝ',
-      placeholder: 'Ej: no existe',
+      placeholder: 'Ej: 4',
       diagContext: {
         target: isBaseOne ? 'base' : 'argument',
         expectDoesNotExist: true,
@@ -325,7 +325,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'number',
       expected: ans,
       displayAnswer: fmt(ans),
-      placeholder: 'Ej: 49',
+      placeholder: 'Ej: 64',
       diagContext: {
         problemType: 'conversion',
         base,
@@ -375,7 +375,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'number_or_frac',
         expected: targetArg,
         displayAnswer: fracStr,
-        placeholder: 'Ej: 20 o 16/3',
+        placeholder: 'Ej: 11 o 17/5',
         diagContext: { target: 'properties', expected: targetArg },
         hints: [
           'Subí cada coeficiente multiplicativo como exponente de su propio argumento usando log_a(x^n) = n·log_a(x).',
@@ -413,7 +413,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'number_or_frac',
       expected: valClean,
       displayAnswer: fracStr,
-      placeholder: 'Ej: 5/6',
+      placeholder: 'Ej: 11/4',
       diagContext: { target: 'properties', expected: valClean },
       hints: [
         'Transformá las raíces en exponentes racionales: √e = e^(1/2) y ∛(e^q) = e^(q/3), o bien abrí con propiedades de producto y cociente.',
@@ -455,7 +455,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'number_or_frac',
         expected: ans,
         displayAnswer: fmt(ans),
-        placeholder: 'Ej: 4',
+        placeholder: 'Ej: 10',
         diagContext: {
           problemType: 'change_of_base',
           base: Math.sqrt(baseNum),
@@ -497,7 +497,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'number_or_frac',
       expected: ans,
       displayAnswer: fracStr,
-      placeholder: 'Ej: 3/2',
+      placeholder: 'Ej: 7/4',
       diagContext: {
         problemType: 'change_of_base',
         base: Math.pow(baseNum, p),
@@ -556,7 +556,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'solution_set',
         expected: solved.solutionSet,
         displayAnswer: solved.solutionSet,
-        placeholder: 'Ej: {9/8; 5}',
+        placeholder: 'Ej: {10/7; 12}',
         diagContext: {
           target: 'equation_quad_sub_log',
           expected: solved.solutionSet,
@@ -599,7 +599,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'solution_set',
       expected: solved.solutionSet,
       displayAnswer: solved.solutionSet,
-      placeholder: 'Ej: {3}',
+      placeholder: 'Ej: {11}',
       diagContext: {
         target: 'equation_log',
         expected: solved.solutionSet,
@@ -651,7 +651,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         expected: exactExpr,
         numericExpected: Math.log(u1),
         displayAnswer: `x = ln(${u1}) ≈ ${fmt(Number(Math.log(u1).toFixed(4)))}`,
-        placeholder: 'Ej: ln(3)',
+        placeholder: 'Ej: ln(7)',
         diagContext: {
           target: 'equation_exp_quad',
           expected: exactExpr,
@@ -688,7 +688,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       expected: exactExpr,
       numericExpected: solved.validSolutions[0],
       displayAnswer: `log_${base}(${target}) ≈ ${fmt(Number(solved.validSolutions[0].toFixed(4)))}`,
-      placeholder: 'Ej: ln(9)/ln(4)',
+      placeholder: 'Ej: ln(15)/ln(2)',
       diagContext: {
         target: 'equation_exp_non_common',
         expected: exactExpr,
@@ -769,7 +769,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'set_or_interval',
         expected: inv.domainAscii,
         displayAnswer: inv.domain,
-        placeholder: k > 0 ? 'Ej: (-3; +inf)' : 'Ej: (-inf; 2)',
+        placeholder: 'Ej: (-7; +inf)',
         diagContext: { target: 'domain', asymptoteX: c, expected: inv.domainAscii },
         hints: [
           'El dominio de la función inversa f⁻¹ coincide exactamente con la imagen de la función directa f.',
@@ -803,7 +803,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'expression',
       expected: invAscii,
       displayAnswer: inv.expression,
-      placeholder: 'Ej: ln((x + 3)/2)',
+      placeholder: 'Ej: ln((x + 7)/5)',
       diagContext: { target: 'inverse_formula', expected: invAscii },
       hints: [
         'Partí de y = f(x) y despejá el término exponencial eˣ antes de aplicar ningún logaritmo.',
@@ -853,7 +853,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
         inputKind: 'number_or_frac',
         expected: analysis.root,
         displayAnswer: toSimpleFraction(analysis.root),
-        placeholder: 'Ej: 3',
+        placeholder: 'Ej: 88',
         diagContext: { target: 'root', asymptoteX: analysis.asymptoteX, expected: analysis.root },
         hints: [
           `Igualá la función a cero: ${fTxt} = 0.`,
@@ -884,7 +884,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'set_or_interval',
       expected: analysis.domainAscii,
       displayAnswer: analysis.domain,
-      placeholder: m > 0 ? 'Ej: (-1; +inf)' : 'Ej: (-inf; 4)',
+      placeholder: 'Ej: (-9; +inf)',
       diagContext: {
         type: 'domain',
         target: 'domain',
@@ -930,7 +930,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
       inputKind: 'number',
       expected: ratio,
       displayAnswer: `${fmt(ratio)} veces`,
-      placeholder: 'Ej: 1000',
+      placeholder: 'Ej: 500',
       diagContext: {
         problemType: 'richter_ratio',
         linearTrapVal: Math.round((m2 / m1) * 100) / 100,
@@ -970,7 +970,7 @@ export function generateLogChallenge(seed, forcedType = 'all', problemIndex = 0)
     expected: tApprox,
     numericTolerance: 0.05,
     displayAnswer: `${fmt(tApprox)} años`,
-    placeholder: 'Ej: 3,00',
+    placeholder: 'Ej: 7,45',
     diagContext: { target: 'model_time', expected: tApprox },
     hints: [
       'Reemplazá y(t) = 0,5 · y₀ y simplificá y₀ de ambos miembros antes de aplicar logaritmos.',

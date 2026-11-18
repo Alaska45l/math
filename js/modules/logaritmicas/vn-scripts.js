@@ -99,9 +99,9 @@ export const STREAK_REACTIONS = {
     `¡Muy bien corregido! Tropezaste primero, leíste la pista sin apurarte a adivinar y reconstruiste el razonamiento paso por paso. Diagnosticar dónde estuvo el tropiezo y ajustar la cuenta es exactamente la forma en que se consolida la matemática de verdad.`
   ),
   repeatedError: line(
-    "enojada",
-    "Basta de adivinar",
-    `¡Frená un momento con el teclado! Ya van dos intentos fallidos seguidos y tirar respuestas al azar no te va a destrabar el ejercicio. Abrí la primera pista, chequeá la condición de existencia de los argumentos y planteá la transformación por escrito en un borrador.`
+    "empatia",
+    "Pausa para revisar juntos",
+    `Tomémonos un respiro antes de volver a intentar: cuando un ejercicio se traba dos veces seguidas, lo más útil es abrir la primera pista, revisar la condición de existencia de los argumentos y anotar el paso intermedio en un borrador.`
   ),
   flawlessRun: line(
     "sonrojada",

@@ -129,7 +129,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
         prompt: `Al simplificar f(x) = (${formatPoly(P)}) / (${formatPoly(Q)}), ¿cuál sigue siendo su dominio máximo en ℝ?`,
         inputKind: 'set_or_interval',
         expected: expectedDom,
-        placeholder: `Ej: R - {${rootsSorted[0]}; ${rootsSorted[1]}}`,
+        placeholder: 'Ej: R - {-1; 7}',
         diagContext: { target: 'domain_after_cancel', cancelledRoots: [r] },
         hints: [
           'Pista 1 (Orientación): Antes de cancelar ningún factor, buscá todas las raíces del denominador original Q(x).',
@@ -153,7 +153,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       requireSameDomain: false,
       requireSimplified: true,
       expected: expectedExpr,
-      placeholder: 'Ej: 2(x + 1)/(x + 3)',
+      placeholder: 'Ej: 5(x + 7)/(x + 9)',
       diagContext: { target: 'rational_simplify' },
       hints: [
         'Pista 1 (Orientación): Factorizá arriba por factor común y diferencia de cuadrados; abajo factorizá el producto de dos lineales.',
@@ -187,7 +187,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
         prompt: `Resolvé la inecuación racional: ${k} / (x + ${b}) ≤ 1`,
         inputKind: 'set_or_interval',
         expected: sol.formatted,
-        placeholder: 'Ej: (-inf; -6) U [1; +inf)',
+        placeholder: 'Ej: (-inf; -9) U [10; +inf)',
         diagContext: { target: 'rational_inequality', excludedRoots: [pole] },
         hints: [
           'Pista 1 (Orientación): No pases (x + b) multiplicando. Pasá el 1 restando y juntá en una única fracción comparada con 0.',
@@ -217,7 +217,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
         prompt: `Resolvé en ℝ la ecuación: ${r} / (x − ${r}) = x / (x − ${r})`,
         inputKind: 'solution_set',
         expected: eqSol.solutionFormatted,
-        placeholder: 'Ej: vacio o { ... }',
+        placeholder: 'Ej: {7} (o sin solución)',
         diagContext: { target: 'rational_equation', excludedRoots: [r] },
         hints: [
           `Pista 1 (Orientación): Declarar el dominio primero es obligatorio: x ≠ ${r}.`,
@@ -244,7 +244,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       prompt: `Resolvé en ℝ la ecuación: (x + ${a}) / (x − ${r}) = 2`,
       inputKind: 'solution_set',
       expected: eqSol.solutionFormatted,
-      placeholder: 'Ej: {5}',
+      placeholder: 'Ej: {15}',
       diagContext: { target: 'rational_equation', excludedRoots: [r] },
       hints: [
         `Pista 1 (Orientación): Anotá la restricción del dominio: x ≠ ${r}.`,
@@ -285,7 +285,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
         prompt: `La función f(x) = (${formatPoly(P)}) / (${formatPoly(Q)}) presenta una discontinuidad evitable en x = ${a}. Indicá el par ordenado (x; y) del agujero:`,
         inputKind: 'ordered_pair',
         expected: hole.formatted,
-        placeholder: `Ej: (${a}; y)`,
+        placeholder: 'Ej: (7; -9)',
         diagContext: { target: 'hole_coords' },
         hints: [
           `Pista 1 (Orientación): Como mult_P(${a}) = ${mP} ≥ mult_Q(${a}) = ${mQ}, se cancela (x ${a >= 0 ? `− ${a}` : `+ ${Math.abs(a)}`}) abajo.`,
@@ -308,7 +308,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       prompt: `En f(x) = (${formatPoly(P)}) / (${formatPoly(Q)}), ¿cuál es la ecuación de su asíntota vertical?`,
       inputKind: 'asymptote',
       expected: `x = ${a}`,
-      placeholder: `Ej: x = ${a}`,
+      placeholder: 'Ej: x = 7',
       diagContext: { target: 'vertical_asymptote' },
       hints: [
         `Pista 1 (Orientación): Compará cuántas veces aparece el factor (x ${a >= 0 ? `− ${a}` : `+ ${Math.abs(a)}`}) arriba y abajo.`,
@@ -391,7 +391,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       prompt: `Indicá la asíntota horizontal de f(x) = (${a}x ${b >= 0 ? `+ ${b}` : `− ${Math.abs(b)}`}) / (${c} − ${d === 1 ? '' : d}x):`,
       inputKind: 'asymptote',
       expected: haStr,
-      placeholder: 'Ej: y = -2',
+      placeholder: 'Ej: y = 5',
       diagContext: { target: 'horizontal_asymptote', trapValues: [trapVal, a / d] },
       hints: [
         'Pista 1 (Orientación): Ordená primero el denominador en forma decreciente antes de dividir coeficientes.',
@@ -426,7 +426,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
         prompt: `Hallá el dominio máximo en ℝ de f(x) = √(x²${bStr}${cStr}):`,
         inputKind: 'set_or_interval',
         expected: expectedDom,
-        placeholder: `Ej: (-inf; ${r1}] U [${r2}; +inf)`,
+        placeholder: 'Ej: (-inf; -9] U [9; +inf)',
         diagContext: { target: 'irrational_domain', isOddIndex: false, expectedNotAllReal: true },
         hints: [
           'Pista 1 (Orientación): Como el índice es par (2), el radicando debe ser ≥ 0.',
@@ -469,7 +469,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       prompt: `Resolvé en ℝ la ecuación irracional (descartando raíces extraviadas): √(${radStr}) = ${rhsStr}`,
       inputKind: 'solution_set',
       expected: eqRes.solutionFormatted,
-      placeholder: 'Ej: {3} o vacio',
+      placeholder: 'Ej: {9} (o sin solución)',
       diagContext: { target: 'irrational_equation', extraneousRoots: [spec.xe] },
       hints: [
         `Pista 1 (Orientación): Planteá la condición de signo del miembro derecho antes de elevar al cuadrado: ${rhsStr} ≥ 0.`,
@@ -517,7 +517,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
       prompt: `Indicá el conjunto imagen Im(f) de la función f(x) = ${formulaStr}:`,
       inputKind: 'set_or_interval',
       expected: fStudy.image.formatted,
-      placeholder: `Ej: ${kSign < 0 ? `(-inf; ${cVal}]` : `[${cVal}; +inf)`}`,
+      placeholder: 'Ej: [9; +inf)',
       diagContext: { target: 'irrational_image', wrongReflectionTrap: wrongTrap },
       hints: [
         'Pista 1 (Orientación): Recordá que √(...) siempre devuelve valores ≥ 0, con mínimo 0 en el inicio de la curva.',
@@ -539,7 +539,7 @@ export function generateRiChallenge(seed, forcedType = 'all', problemIndex = 0) 
     prompt: `Determiná el dominio máximo de f(x) = ${formulaStr}:`,
     inputKind: 'set_or_interval',
     expected: fStudy.domain.domainFormatted,
-    placeholder: aSign < 0 ? `Ej: (-inf; ${hVal}]` : `Ej: [${hVal}; +inf)`,
+    placeholder: 'Ej: [9; +inf)',
     diagContext: {
       target: 'irrational_domain',
       isOddIndex: false,
