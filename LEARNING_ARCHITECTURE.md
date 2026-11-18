@@ -657,16 +657,16 @@ Cada competencia posee correspondencia directa entre sección instruccional, wid
 #### Módulo de Función Cuadrática (`cuadraticas.html`)
 | Competencia | Sección & Widget | Familia Retos PRNG | Diagnósticos Clave | Evidencia de Dominio |
 |---|---|---|---|---|
-| `quadratics.area_model_and_products` | Sec 1 · Modelo de Áreas | `area_model_and_notable_products` | `distributed_square_over_sum` | Expansión geométrica de $(x+p)(x+q)$, cuadrados y diferencia de cuadrados. |
-| `quadratics.sum_product_factoring` | Sec 2 · Laboratorio de Raíces | `factor_trinomial` | `sign_error_in_factors`, `forgot_leading_a_in_factored_form` | Factorización de $x^2 + bx + c$ mediante $m \cdot n = c, m + n = b$. |
-| `quadratics.vertex_and_axis` | Sec 3 · Espejo de Simetría | `vertex_from_standard` | `inverted_vertex_h_sign`, `confused_h_with_c` | Cálculo exacto de $x_v = -b/(2a)$, eje $x = x_v$ y $y_v = f(x_v)$. |
-| `quadratics.three_forms_conversion` | Sec 4 · Traductor de Formas | `vertex_to_standard` | `swapped_canonical_parameters` | Conversión analítica canónica $\leftrightarrow$ polinómica $\leftrightarrow$ factorizada. |
-| `quadratics.complete_the_square` | Sec 5 · Completar Cuadrados | `complete_square_lead1` / `complete_square_lead_a` | `forgot_a_multiplier_in_square_completion` | Procedimiento de peaje algebraico con corchetes para $a \ne 1$. |
-| `quadratics.roots_and_discriminant` | Sec 6 · Explorador de Discriminante | `intercepts_and_sign` | `discriminant_sign_root_count_confusion` | Clasificación de regímenes $\Delta > 0, \Delta = 0, \Delta < 0$ y radicales exactos. |
-| `quadratics.line_parabola_intersection` | Sec 7 · Intersección Recta-Parábola | `linear_quadratic_system` | `ignored_tangency_multiplicity` | Resolución de sistemas $2 \times 2$, secantes, tangentes y exteriores. |
-| `quadratics.modeling_and_optimization` | Sec 8 · Optimización de Extremos | `optimization_context` | `used_yv_for_optimal_input_xv` | Maximización en dominios restringidos $[x_{\min}; x_{\max}]$. |
-| `quadratics.factoring_strategy` | Sec 9 · Taller de Factorización | `grouping_and_factoring_strategy` | `incomplete_factoring` | Estrategias combinadas: factor común, agrupación y raíces racionales. |
-| `quadratics.full_analysis_exactas` | Sec 10 · Radiografía Completa | `full_analysis_exactas` | `used_yv_for_monotonicity_or_open_image` | Dominio $\mathbb{R}$, monotonía con $x_v$, imagen cerrada con $y_v$, $C^+, C^-, C_0$. |
+| `quadratics.area_model_and_notable_products` | Sec 1 · Área y Binomios | `area_model_and_notable_products` | `distributed_square_over_sum` | Expansión geométrica de $(x+p)(x+q)$, productos notables y falsas cuadráticas ($a = 0$). |
+| `quadratics.sum_product_factoring` | Sec 2 · Suma-Producto | `factor_trinomial` | `confused_sum_product_signs_vieta` | Factor común y factorización de $x^2 + bx + c$ mediante $m \cdot n = c, m + n = b$. |
+| `quadratics.grouping_and_factoring_strategy` | Sec 3 · Agrupación y Estrategia | `grouping_and_factoring_strategy` | `forgot_leading_a_in_factored_form` | Brújula de 5 pasos y descomposición de $bx$ con $m \cdot n = a \cdot c$ ($a \ne 1$). |
+| `quadratics.canonical_form_and_vertex` | Sec 4 · Forma Canónica | `solve_quadratic_equation` | `inverted_vertex_h_sign`, `confused_c_with_canonical_k`, `omitted_plus_minus_in_square_root` | Forma canónica $a(x - x_v)^2 + y_v$, vértice, concavidad y despeje $\sqrt{u^2} = \lvert u \rvert$. |
+| `quadratics.factored_form_and_symmetry` | Sec 5 · Factorizada y Simetría | `reconstruct_from_graph_or_data` | `divided_by_x_lost_zero_root`, `forgot_leading_a_in_factored_form` | Producto nulo sin dividir por $x$, eje $x_v = (x_1 + x_2)/2$ y reconstrucción de $a$. |
+| `quadratics.completing_the_square` | Sec 6 · Completar Cuadrado | `convert_to_canonical` | `unbalanced_completing_square`, `inverted_vertex_h_sign` | Neutro aditivo $(+0)$, peaje algebraico con $a \ne 1$ y deducción de $x_v = -b/(2a)$. |
+| `quadratics.discriminant_and_vieta` | Sec 7 · Discriminante $\Delta$ y Vieta | `discriminant_parameter_k` | `neg_b_or_square_sign_in_resolvente`, `confused_sum_product_signs_vieta` | Regímenes $\Delta > 0, \Delta = 0, \Delta < 0$, resolvente, Cardano-Vieta y parámetros. |
+| `quadratics.full_analysis_exactas` | Sec 8 · Radiografía Completa | `full_exactas_radiografia` | `used_yv_for_monotonicity_or_open_image` | Dominio $\mathbb{R}$, monotonía con $x_v$, imagen cerrada con $y_v$, $C^+, C^-, C_0$ y biyectividad. |
+| `quadratics.parabola_line_tangency` | Sec 9 · Parábola y Recta | `parabola_line_intersection` | `neg_b_or_square_sign_in_resolvente` | Sistemas mixtos parábola-recta: secante, tangente ($\Delta_{\text{int}} = 0$) y exterior. |
+| `quadratics.extremum_optimization` | Sec 10 · Optimización de Extremos | `optimization_context` | `inverted_vertex_h_sign`, `used_yv_for_monotonicity_or_open_image` | Optimización en dominios restringidos $[x_{\min}; x_{\max}]$ con extremos en vértice y bordes. |
 
 ### 6.10. Compatibilidad y migración
 
