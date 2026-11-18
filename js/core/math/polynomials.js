@@ -1066,6 +1066,17 @@ export function factorPolynomial(P) {
   }
 
   // 3. Helper to decompose a monic rational-root-free core (handles deg 2, biquadratic deg 4, and repeated square-free factors)
+  const linearFactorKey = (lf) => {
+    if (lf.rootType === 'rational' && lf.root) {
+      return `Q:${lf.root.n}/${lf.root.d}`;
+    }
+    if (lf.rootType === 'quadratic_irrational' && lf.radical) {
+      const r = lf.radical;
+      return `QI:${r.rationalPart.n}/${r.rationalPart.d}:${r.sign}:${r.radicalCoeff.n}/${r.radicalCoeff.d}:${r.radicand}`;
+    }
+    return `F:${lf.formatted}`;
+  };
+
   const pushIrrationalOrQuad = (factorObj, mult = 1) => {
     if (factorObj.irreducible) {
       const existing = irreducibleQuadratics.find((iq) => polyEqual(iq.coeffs, factorObj.irreducible));
@@ -1082,10 +1093,17 @@ export function factorPolynomial(P) {
       }
     } else if (factorObj.roots) {
       for (const rt of factorObj.roots) {
-        linearFactors.push({
-          ...rt,
-          multiplicity: rt.multiplicity * mult,
-        });
+        const key = linearFactorKey(rt);
+        const existing = linearFactors.find((lf) => linearFactorKey(lf) === key);
+        const addMult = rt.multiplicity * mult;
+        if (existing) {
+          existing.multiplicity += addMult;
+        } else {
+          linearFactors.push({
+            ...rt,
+            multiplicity: addMult,
+          });
+        }
       }
     }
   };

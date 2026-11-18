@@ -379,7 +379,14 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'gt' || String(v).includes('estrictamente')
               ? { ok: true, feedback: '¡Correcto! Δ > 0 estricto descarta la raíz doble de Δ = 0.' }
-              : { ok: false, feedback: 'Si Δ = 0 las dos raíces coinciden en una raíz doble, no son distintas.' },
+              : {
+                  ok: false,
+                  diagnosticId:
+                    v === 'ge' || String(v).includes('>=')
+                      ? 'closed_bracket_on_excluded_point_or_extremum'
+                      : 'neg_b_or_square_sign_in_resolvente',
+                  feedback: 'Si Δ = 0 las dos raíces coinciden en una raíz doble, no son distintas.',
+                },
         },
         {
           id: 'boss1-enc3-predecir',
@@ -401,7 +408,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               '{0; 6}',
               '¡Muy bien! C₀ = {0; 6} (descartando el falso −6 y observando que f(−2) = f(2) = 4 impide la inyectividad).',
-              'Revisá cada rama respetando la frontera x <= 2 vs x > 2.'
+              'Revisá cada rama respetando la frontera x <= 2 vs x > 2.',
+              'piecewise_boundary_inclusion_error'
             ),
         },
         {
@@ -425,7 +433,8 @@ export const INTEGRADOR_1_CONFIG = {
               'x^2 + 2',
               null,
               '¡Exacto! f(x) = x² + 2.',
-              'Recordá que eje de simetría Y implica b = 0 y luego usá f(0) = 2 y f(1) = 3.'
+              'Recordá que eje de simetría Y implica b = 0 y luego usá f(0) = 2 y f(1) = 3.',
+              'confused_c_with_canonical_k'
             ),
         },
         {
@@ -507,7 +516,11 @@ export const INTEGRADOR_1_CONFIG = {
           validator: (v) =>
             v === 'group' || String(v).includes('grupos')
               ? { ok: true, feedback: '¡Exacto! El factor común por grupos lo resuelve en dos líneas sin siquiera listar Gauss.' }
-              : { ok: false, feedback: 'Como es de grado 3 con término independiente −25, buscá agrupar por parejas.' },
+              : {
+                  ok: false,
+                  diagnosticId: 'forgot_leading_coeff_factoring',
+                  feedback: 'Como es de grado 3 con término independiente −25, buscá agrupar por parejas.',
+                },
         },
         {
           id: 'boss1-enc4-predecir',
@@ -577,7 +590,8 @@ export const INTEGRADOR_1_CONFIG = {
               raw,
               -5,
               '¡Correcto! k = −5 (y la factorización completa es 2(x − 1/2)(x + 2)(x + 5)).',
-              'Verificá la cuenta 3(1 − k) = 18.'
+              'Verificá la cuenta 3(1 − k) = 18.',
+              'ruffini_sign_error'
             ),
         },
         {

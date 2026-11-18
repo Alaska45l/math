@@ -394,12 +394,93 @@ export function analyzeParametricSystem(spec) {
   const paramName = spec.paramName || 'k';
 
   const deltaPoly = subQuad(mulAffine(a1, b2), mulAffine(a2, b1));
-  const critRoots = solveQuadraticRationals(deltaPoly);
-
+  const deltaIdenticallyZero =
+    ratIsZero(deltaPoly.q2) && ratIsZero(deltaPoly.q1) && ratIsZero(deltaPoly.q0);
   const isExcluded = (val) => excluded.some((ex) => ratEq(ex, val));
 
   const sciValues = [];
   const siValues = [];
+
+  if (deltaIdenticallyZero) {
+    const deltaXPoly = subQuad(mulAffine(c1, b2), mulAffine(c2, b1));
+    const deltaYPoly = subQuad(mulAffine(a1, c2), mulAffine(a2, c1));
+    const candidateRoots = [
+      ...solveQuadraticRationals(deltaXPoly),
+      ...solveQuadraticRationals(deltaYPoly),
+      ...(!ratIsZero(a1.k) ? [ratDiv(ratNeg(a1.c), a1.k)] : []),
+      ...(!ratIsZero(b1.k) ? [ratDiv(ratNeg(b1.c), b1.k)] : []),
+      ...(!ratIsZero(a2.k) ? [ratDiv(ratNeg(a2.c), a2.k)] : []),
+      ...(!ratIsZero(b2.k) ? [ratDiv(ratNeg(b2.c), b2.k)] : []),
+    ].filter((v, idx, arr) => arr.findIndex((u) => ratEq(u, v)) === idx);
+
+    // Determine generic status at a non-excluded, non-candidate parameter value
+    let genericProbe = rat(0);
+    while (
+      isExcluded(genericProbe) ||
+      candidateRoots.some((cr) => ratEq(cr, genericProbe))
+    ) {
+      genericProbe = ratAdd(genericProbe, rat(1));
+    }
+    const genericRes = solveSystem2x2({
+      a1: evalAffine(a1, genericProbe),
+      b1: evalAffine(b1, genericProbe),
+      c1: evalAffine(c1, genericProbe),
+      a2: evalAffine(a2, genericProbe),
+      b2: evalAffine(b2, genericProbe),
+      c2: evalAffine(c2, genericProbe),
+    });
+
+    for (const r of candidateRoots) {
+      if (isExcluded(r)) continue;
+      const res = solveSystem2x2({
+        a1: evalAffine(a1, r),
+        b1: evalAffine(b1, r),
+        c1: evalAffine(c1, r),
+        a2: evalAffine(a2, r),
+        b2: evalAffine(b2, r),
+        c2: evalAffine(c2, r),
+      });
+      if (res.status !== genericRes.status) {
+        if (res.status === 'SCI') sciValues.push(r);
+        else if (res.status === 'SI') siValues.push(r);
+      }
+    }
+
+    sciValues.sort((u, v) => ratToNumber(u) - ratToNumber(v));
+    siValues.sort((u, v) => ratToNumber(u) - ratToNumber(v));
+
+    return {
+      paramName,
+      excludedParams: excluded,
+      deltaPoly,
+      deltaIdenticallyZero: true,
+      criticalValues: [],
+      sciValues,
+      siValues,
+      allKStatus: genericRes.status,
+      scdExcludedSet: [...excluded],
+      scdCondition: '∅ (nunca SCD)',
+      evaluateAt: (kVal) => {
+        const kr = toRat(kVal);
+        if (isExcluded(kr)) {
+          return { excluded: true, reason: `${paramName} = ${fmtRat(kr)} está excluido del dominio del parámetro.` };
+        }
+        return {
+          excluded: false,
+          ...solveSystem2x2({
+            a1: evalAffine(a1, kr),
+            b1: evalAffine(b1, kr),
+            c1: evalAffine(c1, kr),
+            a2: evalAffine(a2, kr),
+            b2: evalAffine(b2, kr),
+            c2: evalAffine(c2, kr),
+          }),
+        };
+      },
+    };
+  }
+
+  const critRoots = solveQuadraticRationals(deltaPoly);
 
   for (const r of critRoots) {
     if (isExcluded(r)) continue;
@@ -428,6 +509,7 @@ export function analyzeParametricSystem(spec) {
     paramName,
     excludedParams: excluded,
     deltaPoly,
+    deltaIdenticallyZero: false,
     criticalValues: critRoots,
     sciValues,
     siValues,

@@ -708,7 +708,32 @@ function isSegmentarySide(sideStr, varNames = ['x', 'y']) {
   if (terms.length !== 2) return false;
 
   const matchVarOverConst = (t, vChar) => {
-    const clean = t.replace(/^\+/, '');
+    let clean = t.replace(/^\+/, '');
+    let sign = '';
+    if (clean.startsWith('-')) {
+      sign = '-';
+      clean = clean.slice(1);
+    }
+    if (clean.startsWith('(') && clean.endsWith(')')) {
+      let d = 0;
+      let balanced = true;
+      for (let i = 0; i < clean.length - 1; i++) {
+        if (clean[i] === '(') d += 1;
+        else if (clean[i] === ')') d -= 1;
+        if (d === 0) {
+          balanced = false;
+          break;
+        }
+      }
+      if (balanced) {
+        clean = clean.slice(1, -1);
+      }
+    }
+    if (sign && clean.startsWith('-')) {
+      clean = clean.slice(1);
+    } else if (sign && !clean.startsWith('-')) {
+      clean = sign + clean;
+    }
     const re = new RegExp(`^-?${vChar}/\\(?[+-]?[0-9.]+(?:/[0-9.]+)?\\)?$`);
     if (re.test(clean)) return true;
     // También acepta x/a donde - está en denominador: +x/(-2)

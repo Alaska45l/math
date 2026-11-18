@@ -1112,22 +1112,50 @@ export function diagnoseLinear(userInput, context = {}) {
   // 5. Mediatriz pasando por extremo P o Q o con pendiente sin invertir
   if (target === 'mediatriz' && context.p1 && context.p2) {
     const parsed = parseLinearEquation(raw);
-    if (parsed.ok && !ratIsZero(parsed.B)) {
-      const userM = ratToNumber(ratDiv(ratNeg(parsed.A), parsed.B));
+    if (parsed.ok) {
       const dx = context.p2.x - context.p1.x;
       const dy = context.p2.y - context.p1.y;
-      const segM = dx !== 0 ? dy / dx : null;
-      const perpM = segM !== null && segM !== 0 ? -1 / segM : null;
+      const midX = (context.p1.x + context.p2.x) / 2;
+      const midY = (context.p1.y + context.p2.y) / 2;
 
-      if (segM !== null && Math.abs(userM - segM) < 1e-5) {
-        return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
-      }
-      if (perpM !== null && Math.abs(userM - perpM) < 1e-5) {
-        // Pendiente correcta pero no pasa por punto medio M -> probablemente pasó por P o Q
-        return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
-      }
-      if (perpM !== null && (Math.abs(userM + perpM) < 1e-5 || Math.abs(userM - segM) < 1e-5)) {
-        return LINEAR_DIAGNOSTIC_DEFINITIONS.confused_parallel_with_perpendicular;
+      if (Math.abs(dy) < 1e-9 && Math.abs(dx) >= 1e-9) {
+        // Segmento horizontal -> mediatriz vertical x = midX
+        if (ratIsZero(parsed.B)) {
+          const userX = ratToNumber(ratDiv(ratNeg(parsed.C), parsed.A));
+          if (Math.abs(userX - midX) >= 1e-5) {
+            return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+          }
+        } else {
+          const userM = ratToNumber(ratDiv(ratNeg(parsed.A), parsed.B));
+          if (Math.abs(userM) < 1e-5) {
+            return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+          }
+        }
+      } else if (Math.abs(dx) < 1e-9 && Math.abs(dy) >= 1e-9) {
+        // Segmento vertical -> mediatriz horizontal y = midY
+        if (ratIsZero(parsed.B)) {
+          return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+        }
+        const userM = ratToNumber(ratDiv(ratNeg(parsed.A), parsed.B));
+        const userB = ratToNumber(ratDiv(ratNeg(parsed.C), parsed.B));
+        if (Math.abs(userM) < 1e-5 && Math.abs(userB - midY) >= 1e-5) {
+          return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+        }
+      } else if (!ratIsZero(parsed.B)) {
+        const userM = ratToNumber(ratDiv(ratNeg(parsed.A), parsed.B));
+        const segM = dx !== 0 ? dy / dx : null;
+        const perpM = segM !== null && segM !== 0 ? -1 / segM : null;
+
+        if (segM !== null && Math.abs(userM - segM) < 1e-5) {
+          return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+        }
+        if (perpM !== null && Math.abs(userM - perpM) < 1e-5) {
+          // Pendiente correcta pero no pasa por punto medio M -> probablemente pasó por P o Q
+          return LINEAR_DIAGNOSTIC_DEFINITIONS.mediatriz_missing_midpoint_or_perp;
+        }
+        if (perpM !== null && (Math.abs(userM + perpM) < 1e-5 || Math.abs(userM - segM) < 1e-5)) {
+          return LINEAR_DIAGNOSTIC_DEFINITIONS.confused_parallel_with_perpendicular;
+        }
       }
     }
   }

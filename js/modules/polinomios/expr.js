@@ -92,6 +92,71 @@ function collectMulFactors(ast, out = []) {
   return out;
 }
 
+function trimFloatPoly(coeffs) {
+  const out = coeffs.slice();
+  while (out.length > 0 && Math.abs(out[out.length - 1]) <= 1e-12) {
+    out.pop();
+  }
+  return out;
+}
+
+function addFloatPoly(a, b, sign = 1) {
+  const len = Math.max(a.length, b.length);
+  const out = new Array(len).fill(0);
+  for (let i = 0; i < len; i++) {
+    out[i] = (a[i] || 0) + sign * (b[i] || 0);
+  }
+  return trimFloatPoly(out);
+}
+
+function mulFloatPoly(a, b) {
+  if (a.length === 0 || b.length === 0) return [];
+  const out = new Array(a.length + b.length - 1).fill(0);
+  for (let i = 0; i < a.length; i++) {
+    for (let j = 0; j < b.length; j++) {
+      out[i + j] += a[i] * b[j];
+    }
+  }
+  return trimFloatPoly(out);
+}
+
+function expandAstToFloatPoly(node) {
+  if (!node) return [];
+  if (node.type === 'number') return trimFloatPoly([node.value]);
+  if (node.type === 'variable') return [0, 1];
+  if (node.type === 'unary') return expandAstToFloatPoly(node.arg).map((c) => -c);
+  if (node.type === 'func') {
+    if (node.name === 'sqrt') {
+      const inner = expandAstToFloatPoly(node.arg);
+      if (inner.length > 1) throw new SyntaxError('Variable dentro de raíz.');
+      const val = inner[0] || 0;
+      if (val < 0) throw new SyntaxError('Radicando negativo.');
+      return trimFloatPoly([Math.sqrt(val)]);
+    }
+    throw new SyntaxError('Función no soportada.');
+  }
+  if (node.type === 'binary') {
+    const l = expandAstToFloatPoly(node.left);
+    const r = expandAstToFloatPoly(node.right);
+    if (node.op === '+') return addFloatPoly(l, r, 1);
+    if (node.op === '-') return addFloatPoly(l, r, -1);
+    if (node.op === '*') return mulFloatPoly(l, r);
+    if (node.op === '/') {
+      if (r.length !== 1 || Math.abs(r[0]) <= 1e-12) throw new SyntaxError('Divisor inválido.');
+      return trimFloatPoly(l.map((c) => c / r[0]));
+    }
+    if (node.op === '^') {
+      if (r.length > 1) throw new SyntaxError('Exponente variable.');
+      const exp = Math.round(r[0] || 0);
+      if (exp < 0 || Math.abs((r[0] || 0) - exp) > 1e-9) throw new SyntaxError('Exponente inválido.');
+      let acc = [1];
+      for (let i = 0; i < exp; i++) acc = mulFloatPoly(acc, l);
+      return acc;
+    }
+  }
+  throw new SyntaxError('Nodo AST no soportado.');
+}
+
 /**
  * Checks whether a polynomial factor AST is irreducible over R (constant, deg 1, or deg 2 with Δ < 0).
  */
@@ -109,22 +174,20 @@ function isPrimeFactorAstOverReals(factorAst) {
     return false;
   } catch (err) {
     if (err && err.code === 'irrational_constant') {
-      // e.g., (x - sqrt(7)) is a linear binomial over R; check by testing if factor has degree 1 numerically
-      // Only allow linear/constant irrational factors: inspect variable occurrences outside sqrt
-      const checkVars = (node) => {
-        if (!node) return 0;
-        if (node.type === 'variable') return 1;
-        if (node.type === 'unary') return checkVars(node.arg);
-        if (node.type === 'func') return 0;
-        if (node.type === 'binary') {
-          if (node.op === '+' || node.op === '-') return Math.max(checkVars(node.left), checkVars(node.right));
-          if (node.op === '*') return checkVars(node.left) + checkVars(node.right);
-          if (node.op === '/') return checkVars(node.left);
-          if (node.op === '^') return checkVars(node.left) * (node.right?.value ?? 1);
+      try {
+        const coeffs = expandAstToFloatPoly(factorAst);
+        const deg = coeffs.length - 1;
+        if (deg <= 1) return true;
+        if (deg === 2) {
+          const [c, b, a] = coeffs;
+          const disc = b * b - 4 * a * c;
+          const scale = Math.max(1, b * b, Math.abs(4 * a * c));
+          return disc < -1e-9 * scale;
         }
-        return 0;
-      };
-      return checkVars(factorAst) <= 1;
+        return false;
+      } catch {
+        return false;
+      }
     }
     return false;
   }
@@ -137,9 +200,20 @@ export function classifyPolySurfaceForm(ast) {
   if (!ast) return { form: 'mixed', isFactored: false, isExpanded: false };
   const isExp = isSingleSumOrDiffPoly(ast);
 
-  // Check top-level multiplicative form (not a top-level + or - unless inside parentheses)
-  const unwrapped = ast.type === 'unary' ? ast.arg : ast;
-  const topIsSum = unwrapped.type === 'binary' && (unwrapped.op === '+' || unwrapped.op === '-');
+  // Check top-level multiplicative form; a top-level unary '-' around a parenthesized group
+  // (e.g. -(x - 1) or -(x^2 + 1)) acts as leading factor -1, whereas -x + 1 is a binary sum.
+  const isUnaryNeg = ast.type === 'unary' && ast.op === '-';
+  const unwrapped = isUnaryNeg ? ast.arg : ast;
+  const isNegatedGroup =
+    isUnaryNeg &&
+    (unwrapped.type !== 'binary' ||
+      unwrapped.op === '*' ||
+      unwrapped.op === '^' ||
+      isSingleSumOrDiffPoly(unwrapped));
+  const topIsSum =
+    !isNegatedGroup &&
+    unwrapped.type === 'binary' &&
+    (unwrapped.op === '+' || unwrapped.op === '-');
 
   const factors = collectMulFactors(ast);
   const hasMultipleOrPowerFactors =

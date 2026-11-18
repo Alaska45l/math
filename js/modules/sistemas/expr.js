@@ -163,11 +163,93 @@ export function equivalentSystem2x2(sysA, sysB) {
   );
 }
 
+function parseParametricSciSet(s) {
+  if (!s.startsWith('{') || !s.endsWith('}')) return null;
+  const inner = s.slice(1, -1).trim();
+  if (!inner) return null;
+
+  // Split tuple from condition at the first top-level (depth 0) '|' or '/'
+  let depth = 0;
+  let splitIdx = -1;
+  for (let i = 0; i < inner.length; i++) {
+    const ch = inner[i];
+    if (ch === '(') depth += 1;
+    else if (ch === ')') {
+      depth -= 1;
+      if (depth < 0) return null;
+    } else if (depth === 0 && (ch === '|' || ch === '/')) {
+      splitIdx = i;
+      break;
+    }
+  }
+  if (depth !== 0) return null;
+
+  const tuplePart = (splitIdx >= 0 ? inner.slice(0, splitIdx) : inner).trim();
+  const condPart = (splitIdx >= 0 ? inner.slice(splitIdx + 1) : '').trim();
+
+  if (!tuplePart.startsWith('(') || !tuplePart.endsWith(')')) return null;
+
+  // Verify the outer parentheses of tuplePart enclose the entire tuple
+  let tupleDepth = 0;
+  for (let i = 0; i < tuplePart.length; i++) {
+    if (tuplePart[i] === '(') tupleDepth += 1;
+    else if (tuplePart[i] === ')') tupleDepth -= 1;
+    if (tupleDepth === 0 && i < tuplePart.length - 1) return null;
+  }
+  if (tupleDepth !== 0) return null;
+
+  const tupleInner = tuplePart.slice(1, -1).trim();
+  const semiIndices = [];
+  let td = 0;
+  for (let i = 0; i < tupleInner.length; i++) {
+    const ch = tupleInner[i];
+    if (ch === '(') td += 1;
+    else if (ch === ')') td -= 1;
+    else if (td === 0 && ch === ';') semiIndices.push(i);
+  }
+  if (semiIndices.length !== 1) return null;
+
+  const leftExpr = tupleInner.slice(0, semiIndices[0]).trim();
+  const rightExpr = tupleInner.slice(semiIndices[0] + 1).trim();
+  if (!leftExpr || !rightExpr) return null;
+
+  const leftIsX = leftExpr.toLowerCase() === 'x';
+  const rightIsY = rightExpr.toLowerCase() === 'y';
+
+  if (leftIsX && rightIsY) {
+    if (condPart.includes('=')) {
+      const parsed = parseSystemEquation(condPart, ['x', 'y']);
+      if (parsed.ok && (!ratIsZero(parsed.a) || !ratIsZero(parsed.b))) {
+        return { status: 'SCI', point: null, lineExpr: parsed };
+      }
+    }
+    return null;
+  }
+
+  if (leftIsX && !/\by\b/i.test(rightExpr)) {
+    const parsed = parseSystemEquation(`y = ${rightExpr}`, ['x', 'y']);
+    if (!parsed.ok) {
+      throw new SyntaxError(parsed.errorMessage || 'Expresión inválida en el conjunto solución.');
+    }
+    return { status: 'SCI', point: null, lineExpr: parsed };
+  }
+
+  if (rightIsY && !/\bx\b/i.test(leftExpr)) {
+    const parsed = parseSystemEquation(`x = ${leftExpr}`, ['x', 'y']);
+    if (!parsed.ok || (ratIsZero(parsed.a) && ratIsZero(parsed.b))) {
+      throw new SyntaxError(parsed.errorMessage || 'Expresión inválida en el conjunto solución.');
+    }
+    return { status: 'SCI', point: null, lineExpr: parsed };
+  }
+
+  return null;
+}
+
 /**
  * Parsea respuestas del conjunto solución de un sistema 2x2 en formato Exactas:
  *  - SCD: {(6; 1)}, (6; 1), S = {(14/5; -8/5)}, x=6, y=1
  *  - SI: ∅, vacio, vacío, {}, SI, incompatible
- *  - SCI: SCI, compatible indeterminado, {(x; 2x - 1) | x in R}
+ *  - SCI: SCI, compatible indeterminado, {(x; 2x - 1) | x in R}, {(3; y) / y ∈ ℝ}
  */
 export function parseSolutionSet2x2(raw) {
   if (raw && typeof raw === 'object' && typeof raw.status === 'string') {
@@ -190,16 +272,10 @@ export function parseSolutionSet2x2(raw) {
     return { status: 'SCI', point: null, lineExpr: null };
   }
 
-  // Formato parametrico {(x; mx+b) | x in R} o {(x; mx+b) / x ∈ ℝ}
-  const sciMatch = s.match(/^\{\s*\(\s*x\s*;\s*([^)|/]+?)\s*\)\s*(?:[|/].*)?\}$/i);
-  if (sciMatch) {
-    const exprPart = sciMatch[1].trim();
-    if (/[x]/i.test(exprPart)) {
-      const parsed = parseSystemEquation(`y = ${exprPart}`, ['x', 'y']);
-      if (parsed.ok) {
-        return { status: 'SCI', point: null, lineExpr: parsed };
-      }
-    }
+  // Formato parametrico {(x; expr) | x in R}, {(x; expr) / x ∈ ℝ} o vertical {(x0; y) / y ∈ ℝ}
+  const sciParsed = parseParametricSciSet(s);
+  if (sciParsed) {
+    return sciParsed;
   }
 
   // Formato x=6, y=1 o x=6; y=1
@@ -233,7 +309,8 @@ export function equivalentSolutionSet2x2(userStr, expectedSol) {
   if (parsedUser.status !== exp.status) return false;
   if (exp.status === 'SI') return true;
   if (exp.status === 'SCI') {
-    if (!parsedUser.lineExpr || !exp.lineExpr) return true;
+    if (!parsedUser.lineExpr && !exp.lineExpr) return true;
+    if (!parsedUser.lineExpr || !exp.lineExpr) return false;
     return sameLineRow(
       { a: parsedUser.lineExpr.a, b: parsedUser.lineExpr.b, c: parsedUser.lineExpr.c },
       { a: exp.lineExpr.a, b: exp.lineExpr.b, c: exp.lineExpr.c }

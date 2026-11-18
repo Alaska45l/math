@@ -807,7 +807,11 @@ export function parseSetOrIntervalExactas(input) {
   // 3. R - { x0 }
   const rMinusMatch = s.match(/^(?:r|ir|ℝ)\s*-\s*\{\s*([^}]+)\s*\}$/i);
   if (rMinusMatch) {
-    const pts = rMinusMatch[1].split(';').map((x) => parseNumberOrFraction(x)).sort((a, b) => a - b);
+    const rInner = rMinusMatch[1].trim();
+    if (rInner.includes(',') && !rInner.includes(';') && !/^\s*[+-]?\d+,\d+\s*$/.test(rInner)) {
+      throw syntaxError("Separá los elementos del conjunto con punto y coma ';', ej. {-1/2; 3}.", 'comma_instead_of_semicolon');
+    }
+    const pts = rInner.split(';').map((x) => parseNumberOrFraction(x)).sort((a, b) => a - b);
     const intervals = [];
     let prev = -Infinity;
     for (const p of pts) {
@@ -861,9 +865,11 @@ export function parseSetOrIntervalExactas(input) {
         values: [],
       };
     }
-    const separator = inner.includes(';') ? ';' : ',';
+    if (inner.includes(',') && !inner.includes(';') && !/^\s*[+-]?\d+,\d+\s*$/.test(inner)) {
+      throw syntaxError("Separá los elementos del conjunto con punto y coma ';', ej. {-1/2; 3}.", 'comma_instead_of_semicolon');
+    }
     const pts = inner
-      .split(separator)
+      .split(';')
       .map((x) => parseNumberOrFraction(x))
       .sort((a, b) => a - b);
     return {
