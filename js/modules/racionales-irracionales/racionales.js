@@ -681,6 +681,39 @@ export function solveRationalInequality(PInput, QInput, op, k = 0) {
 
   const kRat = ratFromNumber(actualK);
   const N = polySub(P, polyScale(Q, kRat));
+  const allowEquality = actualOp === '<=' || actualOp === '>=';
+  const wantPositive = actualOp === '>' || actualOp === '>=';
+
+  if (isZeroPoly(N)) {
+    const domain = rationalDomainFromPolys([Q]);
+    const criticalPoints = domain.excludedRoots.map((r) => ({
+      value: r.value,
+      exact: r.exact,
+      rootType: r.rootType,
+      rational: r.rational || null,
+      inN: false,
+      inQ: true,
+    }));
+    if (!allowEquality) {
+      return {
+        numerator: N,
+        denominator: Q,
+        criticalPoints,
+        intervals: [],
+        isolatedPoints: [],
+        formatted: '∅',
+      };
+    }
+    return {
+      numerator: N,
+      denominator: Q,
+      criticalPoints,
+      intervals: domain.domainIntervals,
+      isolatedPoints: [],
+      formatted: domain.domainFormatted,
+    };
+  }
+
   const facN = factorPolynomial(N);
   const facQ = factorPolynomial(Q);
 
@@ -706,9 +739,6 @@ export function solveRationalInequality(PInput, QInput, op, k = 0) {
   facQ.realRoots.forEach((r) => addCrit(r, 'Q'));
   facN.realRoots.forEach((r) => addCrit(r, 'N'));
   criticalMap.sort((a, b) => a.value - b.value);
-
-  const allowEquality = actualOp === '<=' || actualOp === '>=';
-  const wantPositive = actualOp === '>' || actualOp === '>=';
 
   const evalSign = (x) => {
     const nVal = evalPolyNumber(N, x);

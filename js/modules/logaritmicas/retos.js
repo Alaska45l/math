@@ -20,6 +20,7 @@ import {
   approxEq,
   toSimpleFraction,
   diagnoseLog,
+  isNonExistencePhrase,
   solveLogEquation,
   solveNonCommonExpEquation,
   solveLogSystem,
@@ -1182,7 +1183,7 @@ export const TRAPS = [
 // VALIDADOR DE RESPUESTAS DEL ENTRENADOR
 // =============================================================================
 
-function validateChallengeInput(ch, raw) {
+export function validateChallengeInput(ch, raw) {
   const trimmed = String(raw ?? '').trim();
   if (!trimmed) return { empty: true, ok: false, diagnostic: null };
 
@@ -1192,9 +1193,8 @@ function validateChallengeInput(ch, raw) {
   });
 
   if (ch.inputKind === 'existence') {
-    const low = trimmed.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const ok = /^(?:no\s*existe|inexistente|indefinid[oa]|vacio|∅|∄|no\s*esta\s*definid[oa]|no\s*pertenece)/.test(low);
-    return { empty: false, ok: ok && diag === null, diagnostic: ok ? null : diag };
+    const ok = isNonExistencePhrase(trimmed);
+    return { empty: false, ok, diagnostic: ok ? null : diag };
   }
 
   if (ch.inputKind === 'pair') {

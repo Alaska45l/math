@@ -1021,13 +1021,29 @@ export const LOG_DIAGNOSTICS = Object.freeze({
   },
 });
 
+const NON_EXISTENCE_RE =
+  /^(?:no[\s_]*existe(?:\s+en\s+(?:r|ℝ|los\s+(?:numeros\s+)?reales))?|inexistente|indefinid[oa]|vacio|∅|∄|no\s*esta\s*definid[oa]|no\s*pertenece)$/;
+
+function normalizeAsciiPhrase(str) {
+  return String(str ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+export function isNonExistencePhrase(raw) {
+  return NON_EXISTENCE_RE.test(normalizeAsciiPhrase(raw));
+}
+
 function buildDiagResult(id) {
   const d = LOG_DIAGNOSTICS[id];
   return d ? { ...d } : null;
 }
 
 function matchesExpected(rawInput, norm, ctx) {
-  if (ctx.expected === undefined && ctx.solutionSet === undefined) return false;
+  if (ctx.expected === undefined && ctx.solutionSet === undefined && !ctx.expectDoesNotExist) return false;
+  const normAscii = normalizeAsciiPhrase(norm);
   const numVal = Number(norm.replace(',', '.'));
   const isNum = Number.isFinite(numVal) && /^-?\d+(?:\.\d+)?$/.test(norm.replace(/\s+/g, ''));
 
@@ -1039,6 +1055,14 @@ function matchesExpected(rawInput, norm, ctx) {
       ctx.expected.length === rawInput.length &&
       ctx.expected.every((v, idx) => approxEq(Number(String(rawInput[idx]).replace(',', '.')), Number(v), 1e-4))
     ) {
+      return true;
+    }
+  }
+  if (typeof ctx.expected === 'string' || ctx.expectDoesNotExist) {
+    const expNorm = typeof ctx.expected === 'string'
+      ? normalizeLogString(ctx.expected).replace(/\s+/g, '').toLowerCase()
+      : '';
+    if ((expNorm === 'no_existe' || expNorm === 'noexiste' || ctx.expectDoesNotExist) && NON_EXISTENCE_RE.test(normAscii)) {
       return true;
     }
   }
@@ -1103,6 +1127,7 @@ export function diagnoseLog(userInput, context = {}) {
   if (!raw) return null;
 
   const norm = normalizeLogString(raw).toLowerCase();
+  const normAscii = normalizeAsciiPhrase(norm);
   const compact = norm.replace(/\s+/g, '');
 
   // Capa 1: guarda estricta para no dar falsos positivos sobre respuestas correctas
@@ -1115,7 +1140,10 @@ export function diagnoseLog(userInput, context = {}) {
 
   // 1. non_positive_argument_accepted
   if (ctx.target === 'argument' || ctx.checkExistence === 'argument') {
-    if ((isNum && numVal <= 0) || /^log.*\(\s*(?:0|-\d+)/.test(compact) || /existe|siempre|vale\s*0/i.test(norm)) {
+    const withoutNoExiste = normAscii.replace(/\bno[\s_]*existe\b/g, '');
+    const hasPositiveExistenceClaim =
+      !NON_EXISTENCE_RE.test(normAscii) && /\bexiste\b|siempre|vale\s*0/i.test(withoutNoExiste);
+    if ((isNum && numVal <= 0) || /^log.*\(\s*(?:0|-\d+)/.test(compact) || hasPositiveExistenceClaim) {
       if (ctx.expectDoesNotExist || ctx.expected === 'no_existe') {
         return buildDiagResult('non_positive_argument_accepted');
       }

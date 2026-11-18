@@ -542,11 +542,12 @@ export function parseIntervalExactas(input) {
         rawItems = [parseNumberOrFraction(inner)];
       } catch (err) {
         if (inner.includes(',')) {
-          const parts = inner.split(',').map((x) => x.trim()).filter(Boolean);
-          rawItems = parts.map((x) => parseNumberOrFraction(x));
-        } else {
-          throw err;
+          throw syntaxError(
+            "En Exactas los elementos de un conjunto se separan con punto y coma ';' (la coma es decimal).",
+            'missing_semicolon',
+          );
         }
+        throw err;
       }
     }
     const sorted = [...rawItems].sort((a, b) => a - b);

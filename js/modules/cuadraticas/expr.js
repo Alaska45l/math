@@ -751,10 +751,31 @@ function parseSingleInterval(rawPart) {
   };
 }
 
+function parseDiscreteSetInner(inner) {
+  const trimmed = inner.trim();
+  if (!trimmed) return [];
+  if (trimmed.includes(',') && !trimmed.includes(';') && !/^\s*[+-]?\d+,\d+\s*$/.test(trimmed)) {
+    throw syntaxError("Separá los elementos del conjunto con punto y coma ';', ej. {-1/2; 3}.", 'comma_instead_of_semicolon');
+  }
+  return trimmed
+    .split(';')
+    .map((x) => parseNumberOrFraction(x));
+}
+
+function compareIntervalsSafe(a, b) {
+  return (
+    (a.lo === b.lo ? 0 : a.lo < b.lo ? -1 : 1) ||
+    (a.hi === b.hi ? 0 : a.hi < b.hi ? -1 : 1) ||
+    (a.loOpen === b.loOpen ? 0 : a.loOpen ? 1 : -1) ||
+    (a.hiOpen === b.hiOpen ? 0 : a.hiOpen ? 1 : -1)
+  );
+}
+
 /**
  * Parsea notación completa de intervalos y conjuntos de Exactas:
  * - Intervalo simple: `[-3; +inf)`, `(-inf; 16]`, `(-1; 3)`
  * - Unión de intervalos: `(-inf; -1) U (3; +inf)` o `(-∞; -1) ∪ (3; +∞)`
+ * - Unión mixta de intervalos y conjunto finito: `(-∞; -2) ∪ {1}`
  * - Recta real menos conjunto: `R - {1}` o `ℝ − {-3}`
  * - Conjunto discreto de raíces: `{-1; 3}`, `{2}`
  * - Recta real: `R`, `ℝ`, `(-inf; +inf)`
@@ -807,11 +828,7 @@ export function parseSetOrIntervalExactas(input) {
   // 3. R - { x0 }
   const rMinusMatch = s.match(/^(?:r|ir|ℝ)\s*-\s*\{\s*([^}]+)\s*\}$/i);
   if (rMinusMatch) {
-    const rInner = rMinusMatch[1].trim();
-    if (rInner.includes(',') && !rInner.includes(';') && !/^\s*[+-]?\d+,\d+\s*$/.test(rInner)) {
-      throw syntaxError("Separá los elementos del conjunto con punto y coma ';', ej. {-1/2; 3}.", 'comma_instead_of_semicolon');
-    }
-    const pts = rInner.split(';').map((x) => parseNumberOrFraction(x)).sort((a, b) => a - b);
+    const pts = parseDiscreteSetInner(rMinusMatch[1]).sort((a, b) => a - b);
     const intervals = [];
     let prev = -Infinity;
     for (const p of pts) {
@@ -865,13 +882,7 @@ export function parseSetOrIntervalExactas(input) {
         values: [],
       };
     }
-    if (inner.includes(',') && !inner.includes(';') && !/^\s*[+-]?\d+,\d+\s*$/.test(inner)) {
-      throw syntaxError("Separá los elementos del conjunto con punto y coma ';', ej. {-1/2; 3}.", 'comma_instead_of_semicolon');
-    }
-    const pts = inner
-      .split(';')
-      .map((x) => parseNumberOrFraction(x))
-      .sort((a, b) => a - b);
+    const pts = parseDiscreteSetInner(inner).sort((a, b) => a - b);
     return {
       ok: true,
       kind: 'finite_set',
@@ -884,19 +895,76 @@ export function parseSetOrIntervalExactas(input) {
     };
   }
 
-  // 5. Unión de intervalos (separados por U o ∪)
-  if (/\s+(?:u|∪)\s+/i.test(s) || /[)\]]\s*(?:u|∪)\s*[(\[]/i.test(s)) {
-    const rawParts = s.split(/\s*(?:u|∪)\s*/i).filter(Boolean);
-    const intervals = rawParts.map((part) => parseSingleInterval(part)).filter((iv) => !iv.isEmpty);
+  // 5. Unión de intervalos y/o conjuntos finitos (separados por U o ∪)
+  if (/\s+(?:u|∪)\s+/i.test(s) || /[)\]}]\s*(?:u|∪)\s*[(\[{]/i.test(s)) {
+    const rawParts = s.split(/\s*(?:u|∪)\s*/i);
+    if (rawParts.length < 2 || rawParts.some((p) => !p.trim())) {
+      throw syntaxError(`Formato de unión inválido: '${input}'.`, 'invalid_interval_format');
+    }
+    const intervals = [];
+    const rawPoints = [];
+    for (const part of rawParts) {
+      const trimmedPart = part.trim();
+      const partSetMatch = trimmedPart.match(/^\{\s*([^}]*)\s*\}$/);
+      if (partSetMatch) {
+        const pts = parseDiscreteSetInner(partSetMatch[1]);
+        rawPoints.push(...pts);
+      } else {
+        const iv = parseSingleInterval(trimmedPart);
+        if (!iv.isEmpty) intervals.push(iv);
+      }
+    }
+    rawPoints.sort((a, b) => a - b);
+    const points = [];
+    for (const p of rawPoints) {
+      if (!points.some((u) => approxEq(u, p, 1e-9))) points.push(p);
+    }
+    intervals.sort(compareIntervalsSafe);
+
+    if (intervals.length === 0 && points.length === 0) {
+      return {
+        ok: true,
+        kind: 'empty',
+        isEmpty: true,
+        isAllReal: false,
+        intervals: [],
+        points: [],
+        values: [],
+      };
+    }
+    if (intervals.length === 0 && points.length > 0) {
+      return {
+        ok: true,
+        kind: 'finite_set',
+        subKind: 'discrete',
+        isEmpty: false,
+        isAllReal: false,
+        intervals: [],
+        points,
+        values: points,
+      };
+    }
+    if (points.length === 0) {
+      return {
+        ok: true,
+        kind: 'intervals',
+        subKind: 'union',
+        isEmpty: false,
+        isAllReal: false,
+        intervals,
+        points: [],
+        values: [],
+      };
+    }
     return {
       ok: true,
-      kind: 'intervals',
-      subKind: 'union',
-      isEmpty: intervals.length === 0,
+      kind: 'mixed_union',
+      subKind: 'mixed_union',
+      isEmpty: false,
       isAllReal: false,
       intervals,
-      points: [],
-      values: [],
+      points,
+      values: points,
     };
   }
 
@@ -931,22 +999,38 @@ export function equivalentSetExactas(inputA, inputB) {
     const b = typeof inputB === 'string' ? parseSetOrIntervalExactas(inputB) : inputB;
     if (a.isEmpty && b.isEmpty) return true;
     if (a.isAllReal && b.isAllReal) return true;
-    if (a.kind === 'finite_set' && b.kind === 'finite_set') {
-      if (a.values.length !== b.values.length) return false;
-      return a.values.every((v, idx) => approxEq(v, b.values[idx], 1e-6));
-    }
-    if (a.intervals.length > 0 && b.intervals.length > 0) {
-      if (a.intervals.length !== b.intervals.length) return false;
-      return a.intervals.every((ivA, idx) => {
-        const ivB = b.intervals[idx];
-        const sameLo =
-          (ivA.lo === -Infinity && ivB.lo === -Infinity) || approxEq(ivA.lo, ivB.lo, 1e-6);
-        const sameHi =
-          (ivA.hi === Infinity && ivB.hi === Infinity) || approxEq(ivA.hi, ivB.hi, 1e-6);
-        return sameLo && sameHi && ivA.loOpen === ivB.loOpen && ivA.hiOpen === ivB.hiOpen;
-      });
-    }
-    return false;
+    if (a.isEmpty !== b.isEmpty || a.isAllReal !== b.isAllReal) return false;
+
+    const getSortedUniqueVals = (spec) => {
+      const raw = Array.isArray(spec.values) && spec.values.length > 0
+        ? spec.values
+        : (Array.isArray(spec.points) ? spec.points : []);
+      const sorted = [...raw].sort((u, v) => u - v);
+      const unique = [];
+      for (const v of sorted) {
+        if (!unique.some((u) => approxEq(u, v, 1e-7))) unique.push(v);
+      }
+      return unique;
+    };
+
+    const valsA = getSortedUniqueVals(a);
+    const valsB = getSortedUniqueVals(b);
+    if (valsA.length !== valsB.length) return false;
+    if (!valsA.every((v, idx) => approxEq(v, valsB[idx], 1e-6))) return false;
+
+    const ivsA = [...(a.intervals || [])].sort(compareIntervalsSafe);
+    const ivsB = [...(b.intervals || [])].sort(compareIntervalsSafe);
+    if (ivsA.length !== ivsB.length) return false;
+    if (ivsA.length === 0 && valsA.length === 0) return false;
+
+    return ivsA.every((ivA, idx) => {
+      const ivB = ivsB[idx];
+      const sameLo =
+        (ivA.lo === -Infinity && ivB.lo === -Infinity) || approxEq(ivA.lo, ivB.lo, 1e-6);
+      const sameHi =
+        (ivA.hi === Infinity && ivB.hi === Infinity) || approxEq(ivA.hi, ivB.hi, 1e-6);
+      return sameLo && sameHi && ivA.loOpen === ivB.loOpen && ivA.hiOpen === ivB.hiOpen;
+    });
   } catch {
     return false;
   }
@@ -971,24 +1055,39 @@ export function formatSetExactas(spec, { style = 'unicode', digits = 2 } = {}) {
   if (spec.isEmpty || spec.kind === 'empty') return emptyStr;
   if (spec.isAllReal || spec.kind === 'all_real') return realStr;
 
-  if (spec.kind === 'discrete' || (Array.isArray(spec.points) && spec.points.length > 0)) {
-    const unique = [];
-    for (const p of spec.points) {
-      if (!unique.some((u) => approxEq(u, p, 1e-7))) unique.push(p);
+  const hasIntervals = Array.isArray(spec.intervals) && spec.intervals.length > 0;
+  const ptsSource = Array.isArray(spec.points) && spec.points.length > 0
+    ? spec.points
+    : (Array.isArray(spec.values) && spec.values.length > 0 ? spec.values : []);
+  const hasPoints = ptsSource.length > 0;
+
+  if (hasIntervals || hasPoints) {
+    const parts = [];
+    if (hasIntervals) {
+      parts.push(
+        spec.intervals
+          .map((iv) => {
+            const lB = iv.loOpen ? '(' : '[';
+            const rB = iv.hiOpen ? ')' : ']';
+            const lV = iv.lo === -Infinity ? negInf : fmtNum(iv.lo);
+            const rV = iv.hi === Infinity ? posInf : fmtNum(iv.hi);
+            return `${lB}${lV}; ${rV}${rB}`;
+          })
+          .join(unionSym),
+      );
     }
-    return `{${unique.map(fmtNum).join('; ')}}`;
+    if (hasPoints) {
+      const unique = [];
+      for (const p of ptsSource) {
+        if (!unique.some((u) => approxEq(u, p, 1e-7))) unique.push(p);
+      }
+      parts.push(`{${unique.map(fmtNum).join('; ')}}`);
+    }
+    return parts.join(unionSym);
   }
 
-  if (Array.isArray(spec.intervals) && spec.intervals.length > 0) {
-    return spec.intervals
-      .map((iv) => {
-        const lB = iv.loOpen ? '(' : '[';
-        const rB = iv.hiOpen ? ')' : ']';
-        const lV = iv.lo === -Infinity ? negInf : fmtNum(iv.lo);
-        const rV = iv.hi === Infinity ? posInf : fmtNum(iv.hi);
-        return `${lB}${lV}; ${rV}${rB}`;
-      })
-      .join(unionSym);
+  if (spec.kind === 'discrete') {
+    return '{}';
   }
 
   if ('lo' in spec && 'hi' in spec) {

@@ -30,6 +30,8 @@ import {
 import {
   parseIrrationalExpr,
   evalIrrationalAt,
+  extractPolyCoeffsFromIrrationalAst,
+  simplifyRadical,
   formatSetExactas,
   approxEq,
   cleanNumber,
@@ -396,11 +398,33 @@ export function analyzeIrrationalFunction({
       const iv = { lo, hi, loOpen: false, hiOpen: false };
       image = { intervals: [iv], formatted: formatIntervalsWithExact([iv]) };
     } else {
+      const xv = -coeffs[1] / (2 * coeffs[2]);
+      const gv = evalPolyArr(coeffs, xv);
+      const exactMap = new Map();
+      let yBound = c;
+      if (gv > 1e-12) {
+        // Δ < 0, a > 0: radicand never reaches 0; minimum radicand is gv at vertex xv
+        yBound = evalAt(xv);
+        if (
+          n === 2 &&
+          Number.isInteger(gv) &&
+          gv > 0 &&
+          Math.abs(c) < 1e-12 &&
+          Math.abs(Math.abs(k) - 1) < 1e-12
+        ) {
+          const sr = simplifyRadical(1, gv, {}, 2);
+          if (sr.insideInt > 1) {
+            const prefix = k < 0 ? MINUS_CHAR : '';
+            const coeffStr = sr.outsideCoeff === 1 ? '' : String(sr.outsideCoeff);
+            exactMap.set(yBound, `${prefix}${coeffStr}√${sr.insideInt}`);
+          }
+        }
+      }
       const iv =
         k > 0
-          ? { lo: c, hi: Infinity, loOpen: false, hiOpen: true }
-          : { lo: -Infinity, hi: c, loOpen: true, hiOpen: false };
-      image = { intervals: [iv], formatted: formatIntervalsWithExact([iv]) };
+          ? { lo: yBound, hi: Infinity, loOpen: false, hiOpen: true }
+          : { lo: -Infinity, hi: yBound, loOpen: true, hiOpen: false };
+      image = { intervals: [iv], formatted: formatIntervalsWithExact([iv], exactMap) };
     }
   } else {
     const y0 = evalAt(0);
@@ -494,24 +518,42 @@ export function solveIrrationalEquation(spec) {
   let gCoeffs;
   let rhsCoeffs;
 
-  if (typeof spec === 'string' && spec.includes('=')) {
-    const [lhsStr, rhsStr] = spec.split('=');
+  if (typeof spec === 'string') {
+    const eqParts = spec.split('=');
+    if (eqParts.length !== 2) {
+      const err = new SyntaxError('La ecuación irracional debe tener exactamente un signo "=".');
+      err.code = 'invalid_equation_format';
+      throw err;
+    }
+    const [lhsStr, rhsStr] = eqParts;
     const parsedL = parseIrrationalExpr(lhsStr.trim());
+    if (!parsedL.hasRadical || !Array.isArray(parsedL.radicandCoeffs)) {
+      const err = new RangeError('El miembro izquierdo debe contener un radical con radicando polinómico en x.');
+      err.code = 'unsupported_irrational_lhs';
+      throw err;
+    }
     index = parsedL.index || 2;
     k = parsedL.k ?? 1;
     d = parsedL.c ?? 0;
-    gCoeffs = parsedL.radicandCoeffs || [0, 1];
+    gCoeffs = parsedL.radicandCoeffs;
     const parsedR = parseIrrationalExpr(rhsStr.trim());
-    // Extract linear rhs via sampling at 0, 1
-    const y0 = evalIrrationalAt(parsedR, 0).value ?? 0;
-    const y1 = evalIrrationalAt(parsedR, 1).value ?? y0;
-    rhsCoeffs = [y0, cleanNumber(y1 - y0, 10)];
+    rhsCoeffs = extractPolyCoeffsFromIrrationalAst(parsedR.ast, parsedR.variable || 'x', 4);
+    if (rhsCoeffs === null) {
+      const err = new RangeError('El miembro derecho debe ser un polinomio en x.');
+      err.code = 'unsupported_irrational_rhs';
+      throw err;
+    }
   } else {
     index = Math.trunc(Number(spec?.index ?? 2));
     k = Number(spec?.k ?? 1);
     d = Number(spec?.d ?? 0);
     gCoeffs = toNumCoeffs(spec?.gCoeffs ?? spec?.radicandCoeffs ?? [0, 1]);
     rhsCoeffs = toNumCoeffs(spec?.rhsCoeffs ?? [0, 1]);
+  }
+
+  rhsCoeffs = [...rhsCoeffs];
+  while (rhsCoeffs.length > 1 && Math.abs(rhsCoeffs[rhsCoeffs.length - 1]) < 1e-12) {
+    rhsCoeffs.pop();
   }
 
   if (Math.abs(k) < 1e-12) {
@@ -522,22 +564,37 @@ export function solveIrrationalEquation(spec) {
   const domain = analyzeIrrationalDomain({ index, radicandCoeffs: gCoeffs, inDenominator: false });
 
   // Isolate root_n(g(x)) = R(x) where R(x) = (rhs(x) - d) / k
-  const r0 = ((rhsCoeffs[0] || 0) - d) / k;
-  const r1 = (rhsCoeffs[1] || 0) / k;
-  const RCoeffs = Math.abs(r1) < 1e-12 ? [r0] : [r0, r1];
+  const RCoeffs = rhsCoeffs.map((v, idx) => (idx === 0 ? (v - d) / k : v / k));
+  while (RCoeffs.length > 1 && Math.abs(RCoeffs[RCoeffs.length - 1]) < 1e-12) {
+    RCoeffs.pop();
+  }
+  const rDeg = RCoeffs.length - 1;
 
-  const signCondition =
-    parity === 'even'
-      ? Math.abs(r1) < 1e-12
-        ? r0 >= -1e-12
-          ? 'ℝ (constante ≥ 0)'
-          : '∅ (constante negativa: imposible para raíz de índice par)'
-        : formatIntervalsWithExact([
-            r1 > 0
-              ? { lo: cleanNumber(-r0 / r1, 10), hi: Infinity, loOpen: false, hiOpen: true }
-              : { lo: -Infinity, hi: cleanNumber(-r0 / r1, 10), loOpen: true, hiOpen: false },
-          ])
-      : 'ℝ (índice impar admite miembro derecho negativo)';
+  let signCondition;
+  if (parity !== 'even') {
+    signCondition = 'ℝ (índice impar admite miembro derecho negativo)';
+  } else if (rDeg === 0) {
+    signCondition =
+      RCoeffs[0] >= -1e-12
+        ? 'ℝ (constante ≥ 0)'
+        : '∅ (constante negativa: imposible para raíz de índice par)';
+  } else if (rDeg === 1) {
+    const r0 = RCoeffs[0];
+    const r1 = RCoeffs[1];
+    signCondition = formatIntervalsWithExact([
+      r1 > 0
+        ? { lo: cleanNumber(-r0 / r1, 10), hi: Infinity, loOpen: false, hiOpen: true }
+        : { lo: -Infinity, hi: cleanNumber(-r0 / r1, 10), loOpen: true, hiOpen: false },
+    ]);
+  } else if (rDeg === 2) {
+    signCondition = analyzeIrrationalDomain({
+      index: 2,
+      radicandCoeffs: RCoeffs,
+      inDenominator: false,
+    }).domainFormatted;
+  } else {
+    signCondition = 'R(x) ≥ 0';
+  }
 
   // Raise to power n: g(x) - (R(x))^n = 0 using exact rational polynomials
   const gRatPoly = normalizePoly(gCoeffs.map((v) => ratFromNumber(v)));
@@ -546,6 +603,14 @@ export function solveIrrationalEquation(spec) {
   const eqPoly = polySub(gRatPoly, rPowPoly);
 
   const fac = factorPolynomial(eqPoly);
+  if (!fac.fullyFactored) {
+    const err = new RangeError(
+      'La ecuación polinómica resultante excede los métodos exactos de factorización (raíces irracionales de grado ≥ 3).'
+    );
+    err.code = 'unfactored_irrational_equation';
+    throw err;
+  }
+
   const candidates = fac.realRoots.map((rr) => ({
     value: cleanNumber(rr.value, 10),
     exact: rr.exact,

@@ -456,32 +456,39 @@ function evalConstAst(ast) {
   return null;
 }
 
-function extractLinearOrQuadCoeffsFromPowRad(node, variable = 'x') {
+export function extractPolyCoeffsFromIrrationalAst(node, variable = 'x', maxDeg = 4) {
   if (!node) return null;
   if (node.type === 'number') return [node.value];
   if (node.type === 'variable') {
     return node.name === variable ? [0, 1] : null;
   }
   if (node.type === 'neg') {
-    const inner = extractLinearOrQuadCoeffsFromPowRad(node.value, variable);
+    const inner = extractPolyCoeffsFromIrrationalAst(node.value, variable, maxDeg);
     return inner ? inner.map((c) => -c) : null;
   }
   if (node.type === 'pow') {
     const expVal = evalConstAst(node.exponent);
-    if (!Number.isInteger(expVal) || expVal < 0 || expVal > 2) return null;
-    if (expVal === 0) return [1];
-    const base = extractLinearOrQuadCoeffsFromPowRad(node.base, variable);
+    if (!Number.isInteger(expVal) || expVal < 0 || expVal > maxDeg) return null;
+    const base = extractPolyCoeffsFromIrrationalAst(node.base, variable, maxDeg);
     if (!base) return null;
+    if (expVal === 0) return [1];
     if (expVal === 1) return base;
-    // square
-    if (base.length > 2) return null;
-    const b0 = base[0] || 0;
-    const b1 = base[1] || 0;
-    return [b0 * b0, 2 * b0 * b1, b1 * b1];
+    let acc = [1];
+    for (let k = 0; k < expVal; k++) {
+      if (acc.length - 1 + (base.length - 1) > maxDeg) return null;
+      const next = Array(acc.length + base.length - 1).fill(0);
+      for (let i = 0; i < acc.length; i++) {
+        for (let j = 0; j < base.length; j++) next[i + j] += acc[i] * base[j];
+      }
+      while (next.length > 1 && Math.abs(next[next.length - 1]) < 1e-12) next.pop();
+      if (next.length - 1 > maxDeg) return null;
+      acc = next;
+    }
+    return acc;
   }
   if (node.type === 'binary') {
-    const L = extractLinearOrQuadCoeffsFromPowRad(node.left, variable);
-    const R = extractLinearOrQuadCoeffsFromPowRad(node.right, variable);
+    const L = extractPolyCoeffsFromIrrationalAst(node.left, variable, maxDeg);
+    const R = extractPolyCoeffsFromIrrationalAst(node.right, variable, maxDeg);
     if (!L || !R) return null;
     const len = Math.max(L.length, R.length);
     if (node.op === '+' || node.op === '-') {
@@ -491,21 +498,32 @@ function extractLinearOrQuadCoeffsFromPowRad(node, variable = 'x') {
         const rv = R[i] || 0;
         out.push(node.op === '+' ? lv + rv : lv - rv);
       }
+      while (out.length > 1 && Math.abs(out[out.length - 1]) < 1e-12) out.pop();
       return out;
     }
     if (node.op === '*') {
-      if (L.length - 1 + (R.length - 1) > 2) return null;
+      if (L.length - 1 + (R.length - 1) > maxDeg) return null;
       const out = Array(L.length + R.length - 1).fill(0);
       for (let i = 0; i < L.length; i++) {
         for (let j = 0; j < R.length; j++) out[i + j] += L[i] * R[j];
       }
+      while (out.length > 1 && Math.abs(out[out.length - 1]) < 1e-12) out.pop();
       return out;
     }
-    if (node.op === '/' && R.length === 1 && R[0] !== 0) {
-      return L.map((c) => c / R[0]);
+    if (node.op === '/') {
+      const trimmedR = [...R];
+      while (trimmedR.length > 1 && Math.abs(trimmedR[trimmedR.length - 1]) < 1e-12) trimmedR.pop();
+      if (trimmedR.length === 1 && Math.abs(trimmedR[0]) > 1e-12) {
+        return L.map((c) => c / trimmedR[0]);
+      }
+      return null;
     }
   }
   return null;
+}
+
+function extractLinearOrQuadCoeffsFromPowRad(node, variable = 'x') {
+  return extractPolyCoeffsFromIrrationalAst(node, variable, 2);
 }
 
 function inspectRadicalStructure(ast, variable = 'x') {

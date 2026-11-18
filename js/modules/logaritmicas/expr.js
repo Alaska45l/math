@@ -436,6 +436,65 @@ export function evalLogExpr(astOrStr, xOrVars = 0) {
   return evalLogSafe(ast, xOrVars).value;
 }
 
+const EXTENDED_LOG_GRID = [-250, -100, -40, -20, 20, 40, 100, 250];
+const PROBE_OFFSETS = [-16, -8, -4, -2, -1, -0.5, -0.1, 0, 0.1, 0.5, 1, 2, 4, 8, 16];
+const LITERAL_OFFSETS = [-2, -0.5, 0.5, 2, 5, 10];
+
+function collectAdaptiveProbes(ast, varsExtra = {}) {
+  const probes = [];
+  const evalAt = (node, x) => evalLogSafe(node, { ...varsExtra, x, t: x, u: x });
+
+  const walk = (node) => {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'number' && Number.isFinite(node.value)) {
+      const absV = Math.abs(node.value);
+      if (absV >= 10 && absV <= 1e6) {
+        for (const d of LITERAL_OFFSETS) {
+          probes.push(absV + d, -(absV + d));
+        }
+      }
+      return;
+    }
+    if (hasVariable(node) && node.type !== 'log' && node.type !== 'root' && node.type !== 'pow') {
+      const r0 = evalAt(node, 0);
+      const r1 = evalAt(node, 1);
+      const r2 = evalAt(node, 2);
+      if (!r0.domainError && !r1.domainError && !r2.domainError) {
+        const g0 = r0.value;
+        const g1 = r1.value;
+        const g2 = r2.value;
+        const m = g1 - g0;
+        if (Math.abs((g2 - g1) - m) < 1e-7 && Math.abs(m) > 1e-12) {
+          const x0 = -g0 / m;
+          if (Number.isFinite(x0) && Math.abs(x0) <= 1e6) {
+            for (const d of PROBE_OFFSETS) {
+              probes.push(x0 + d);
+            }
+          }
+        }
+      }
+    }
+    if (node.type === 'paren') walk(node.expr);
+    else if (node.type === 'neg') walk(node.value);
+    else if (node.type === 'binary') {
+      walk(node.left);
+      walk(node.right);
+    } else if (node.type === 'pow') {
+      walk(node.base);
+      walk(node.exponent);
+    } else if (node.type === 'log') {
+      walk(node.base);
+      walk(node.arg);
+    } else if (node.type === 'root') {
+      walk(node.index);
+      walk(node.arg);
+    }
+  };
+
+  walk(ast);
+  return probes;
+}
+
 /**
  * Verifica equivalencia matemática Y alineación de dominio en ℝ.
  * Impide que log(x^2) pase por equivalente a 2*log(x) cuando x < 0.
@@ -454,7 +513,14 @@ export function equivalentLog(exprA, exprB, sampleDomain = null, varsExtra = {})
   const basePoints = [-10, -4, -2.5, -1, -0.5, 0, 0.25, 0.5, 1, 1.5, 2, 3, 4, 5, 8, 10, 16, 25];
   const testPoints = Array.isArray(sampleDomain) && sampleDomain.length
     ? Array.from(new Set([...basePoints, ...sampleDomain]))
-    : basePoints;
+    : Array.from(
+        new Set([
+          ...basePoints,
+          ...EXTENDED_LOG_GRID,
+          ...collectAdaptiveProbes(astA, varsExtra),
+          ...collectAdaptiveProbes(astB, varsExtra),
+        ]),
+      );
 
   let validMatches = 0;
 
