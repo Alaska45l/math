@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <meta name="theme-color" content="#1c2024" />
+    <meta
+      name="description"
+      content="Unidad 10 de Alaska Math Lab: Razones trigonométricas en el triángulo rectángulo (Pitágoras, SOHCAHTOA, cofunciones complementarias), ángulos de elevación y depresión, sistemas sexagesimal y circular con longitud de arco, polígonos regulares, cuerpos 3D y puente oblicuángulo."
+    />
+    <title>Unidad 10 · Razones Trigonométricas · Alaska Math Lab</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/modules/razones-trigonometricas.css" />
+    <link rel="preload" as="image" href="assets/vn/base.webp" />
+    <link rel="preload" as="image" href="assets/vn/explicando.webp" />
+    <link rel="preload" as="image" href="assets/vn/pensativa.webp" />
+    <script type="module" src="js/modules/razones-trigonometricas/index.js"></script>
+  </head>
+  <body data-page="razones-trigonometricas">
+    <header data-site-nav="razones-trigonometricas"></header>
+    <main class="page page--wide seq-page trigr-page">
+      <header class="page-header">
+        <h1>Razones Trigonométricas y Geometría Métrica</h1>
+        <p class="intro">
+          Unidad 10 · De la invariancia por semejanza y las razones SOHCAHTOA en triángulos rectángulos
+          a la medición indirecta, el puente angular sexagesimal-circular, polígonos regulares y cuerpos en el espacio.
+        </p>
+      </header>
+
+      <div class="seq-layout">
+        <aside class="seq-sidebar" aria-label="Índice de pizarrones">
+          <h2 class="seq-sidebar__title">Unidad 10 · Razones Trigonométricas</h2>
+          <p class="muted small" id="seq-progress-text">0/6 pizarrones (0%)</p>
+
+          <div class="seq-sidebar__chapter">Cap. 1 · Triángulo Rectángulo y SOHCAHTOA</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link is-active" href="#sec-1" data-sec="sec-1">
+                <span>1 · Pitágoras y Semejanza</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-2" data-sec="sec-2">
+                <span>2 · SOHCAHTOA y Cofunciones</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 2 · Mediciones y Puente Angular</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-3" data-sec="sec-3">
+                <span>3 · Elevación y Depresión</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-4" data-sec="sec-4">
+                <span>4 · Grados, Radianes y Arco</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 3 · Polígonos, 3D y Oblicuos</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-5" data-sec="sec-5">
+                <span>5 · Polígonos, Cuerdas y 3D</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-6" data-sec="sec-6">
+                <span>6 · Puente Oblicuángulo</span>
+                <span class="seq-sidebar__status"></span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="seq-sidebar__chapter">Cap. 4 · Práctica y Síntesis</div>
+          <ul class="seq-sidebar__list">
+            <li>
+              <a class="seq-sidebar__link" href="#sec-retos" data-sec="sec-retos">
+                <span>Entrenador y 5 Trampas</span>
+              </a>
+            </li>
+            <li>
+              <a class="seq-sidebar__link" href="#sec-repaso" data-sec="sec-repaso">
+                <span>Hoja de Repaso y Competencias</span>
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="seq-content mode-blackboard">
+          <section class="trigr-hero">
+            <p class="trigr-kicker">Unidad 10 · Programa Oficial UNMDP FCEyN</p>
+            <h1>Razones Trigonométricas y Geometría Métrica</h1>
+            <p>
+              Todo arranca con un hecho geométrico sorprendente: al escalar un triángulo rectángulo
+              los lados cambian, pero los cocientes entre ellos dependen únicamente de sus ángulos agudos.
+              Desde esa invariancia resolvemos mediciones topográficas, polígonos regulares, diagonales en 3D
+              y tendemos el puente hacia el radián y los triángulos oblicuángulos.
+            </p>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 1 · TRIÁNGULO RECTÁNGULO, PITÁGORAS Y COMPLEMENTARIOS
+               ================================================================ -->
+          <section class="seq-section is-active" id="sec-1">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 1 de 6</div>
+              <h2 class="seq-section__title">1. Triángulo Rectángulo, Pitágoras, Semejanza y Ángulos Complementarios</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> En todo triángulo rectángulo <span class="eq">ABC</span> recto en <span class="eq">A</span>, los lados quedan atados por <span class="eq">BC&sup2; = AB&sup2; + AC&sup2;</span>, los ángulos agudos suman <span class="eq">90&deg;</span> y las razones entre lados permanecen invariantes al escalar la figura.
+            </p>
+
+            <div class="trigr-prose">
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En un triángulo rectángulo en <span class="eq">A</span>, el lado opuesto al ángulo recto se denomina
+                <strong>hipotenusa (<span class="eq">BC</span>)</strong> y es siempre el mayor de los tres lados; los dos lados que forman el ángulo recto se llaman
+                <strong>catetos (<span class="eq">AB</span> y <span class="eq">AC</span>)</strong>.
+                Como la suma interior de cualquier triángulo es <span class="eq">180&deg;</span>, los dos ángulos agudos son necesariamente
+                <strong>complementarios</strong>: <span class="eq">B + C = 90&deg;</span>, expresados con precisión en sistema sexagesimal
+                (<span class="eq">gg&deg; mm' ss"</span>).
+              </p>
+
+              <div data-trigr-formula="pythagoras"></div>
+
+              <div class="trigr-extension-box">
+                <p>
+                  <span class="trigr-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Invariancia por semejanza:</strong> Si multiplicás todos los lados por un factor positivo <span class="eq">k</span>,
+                  la hipotenusa escala por el mismo <span class="eq">k</span>. Por eso conocer solo la razón entre catetos (por ejemplo <span class="eq">3 : 1</span>)
+                  determina completamente los ángulos agudos, pero deja indeterminada la longitud real de la hipotenusa.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec1-pitagoras">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec1-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="constructor-triangulos"></div>
+            </div>
+
+            <div class="trigr-contrast-box">
+              <h4>Desafío de contraste · Razón de lados vs. triángulo determinado</h4>
+              <div class="trigr-contrast-cols">
+                <div class="trigr-contrast-col">
+                  <strong>Solo razón de catetos 3 : 1</strong>
+                  <p>Sabemos <span class="eq">tg(B) = 3k / k = 3</span>, lo que fija <span class="eq">B &approx; 71&deg; 33' 54"</span> y <span class="eq">C &approx; 18&deg; 26' 6"</span>, pero <span class="eq">BC = k&radic;10</span> no tiene valor único.</p>
+                </div>
+                <div class="trigr-contrast-col">
+                  <strong>Hipotenusa c = 15 cm y B = 46&deg;</strong>
+                  <p>Con una longitud real y un ángulo agudo quedan fijos todos los datos: <span class="eq">C = 44&deg;</span>, <span class="eq">AC = 15&middot;sen(46&deg;) &approx; 10,79 cm</span> y <span class="eq">AB &approx; 10,42 cm</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado con la calculadora en modo RAD:</strong> antes de calcular cualquier razón trigonométrica en grados sexagesimales, verificá que la pantalla indique <strong>DEG</strong> (por ejemplo <span class="eq">sen(30&deg;) = 0,5</span>; en RAD daría <span class="eq">&minus;0,988</span>).
+            </div>
+
+            <div data-check="sec-1"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 2 · RAZONES SOHCAHTOA Y COFUNCIONES COMPLEMENTARIAS
+               ================================================================ -->
+          <section class="seq-section" id="sec-2">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 1 · Pizarrón 2 de 6</div>
+              <h2 class="seq-section__title">2. Razones SOHCAHTOA y Cofunciones Complementarias</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> Ningún cateto es opuesto o adyacente por su orientación en el dibujo; su nombre depende del vértice agudo elegido, y al pasar de <span class="eq">B</span> a <span class="eq">C = 90&deg; &minus; B</span> se cumple siempre <span class="eq">sen(B) = cos(C)</span>.
+            </p>
+
+            <div class="trigr-prose">
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Para un ángulo agudo elegido en un triángulo rectángulo definimos las tres razones fundamentales:
+                <strong>seno</strong> (<span class="eq">opuesto / hipotenusa</span>),
+                <strong>coseno</strong> (<span class="eq">adyacente / hipotenusa</span>) y
+                <strong>tangente</strong> (<span class="eq">opuesto / adyacente</span>).
+                A partir de dos datos independientes (dos lados, o un lado y un ángulo agudo) es posible calcular perímetro, área y alturas interiores.
+              </p>
+
+              <div data-trigr-formula="sohcahtoa"></div>
+
+              <div class="trigr-extension-box">
+                <p>
+                  <span class="trigr-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Intercambio vivo de roles (<span class="eq">B &harr; C</span>):</strong>
+                  Al cambiar la referencia del vértice <span class="eq">B</span> al vértice complementario <span class="eq">C = 90&deg; &minus; B</span>,
+                  el cateto opuesto y el adyacente intercambian su lugar mientras la hipotenusa queda intacta.
+                  Por eso el seno de un ángulo agudo coincide exactamente con el coseno de su complemento.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec2-sohcahtoa">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec2-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="laboratorio-sohcahtoa"></div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado con la cota en (0; 1):</strong> como la hipotenusa supera a cualquier cateto, tanto <span class="eq">sen</span> como <span class="eq">cos</span> de un ángulo agudo valen siempre entre <span class="eq">0</span> y <span class="eq">1</span>. Si una fracción te da mayor que <span class="eq">1</span>, invertiste el cociente.
+            </div>
+
+            <div data-check="sec-2"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 3 · ELEVACIÓN, DEPRESIÓN Y DOBLE OBSERVACIÓN
+               ================================================================ -->
+          <section class="seq-section" id="sec-3">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 3 de 6</div>
+              <h2 class="seq-section__title">3. Ángulos de Elevación, Depresión y Doble Observación</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> Tanto el ángulo de elevación como el de depresión nacen siempre desde la línea horizontal de vista; en problemas de doble observación, el croquis decide si las distancias horizontales se restan o se suman.
+            </p>
+
+            <div class="trigr-prose">
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                Cuando miramos hacia arriba desde la horizontal barremos un <strong>ángulo de elevación</strong>; cuando miramos hacia abajo desde la horizontal barremos un
+                <strong>ángulo de depresión</strong>. Como las horizontales del observador y del suelo son rectas paralelas cortadas por la línea visual,
+                forman una <strong>Z de ángulos alternos internos iguales</strong>: el ángulo de depresión desde la cima iguala al ángulo de elevación desde el objetivo.
+              </p>
+
+              <div class="trigr-extension-box">
+                <p>
+                  <span class="trigr-curriculum-tag is-extension">Ampliación didáctica</span>
+                  <strong>Constructor de sistemas en doble observación:</strong>
+                  Cuando no conocemos la distancia a la base de un árbol, torre o montaña pero sí medimos dos ángulos <span class="eq">&alpha;</span> y <span class="eq">&beta;</span>,
+                  planteamos dos triángulos rectángulos que comparten la altura <span class="eq">h</span>:
+                  si el observador retrocede <span class="eq">&Delta;d</span> del <strong>mismo lado</strong>, <span class="eq">&Delta;d = h(cotg &alpha; &minus; cotg &beta;)</span>;
+                  si el objeto queda <strong>entre</strong> dos observadores, <span class="eq">d = h(cotg &alpha; + cotg &beta;)</span>.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec3-elevacion">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec3-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="elevacion-depresion"></div>
+            </div>
+
+            <div class="trigr-worked-fading">
+              <h4>Ejemplo con retiro gradual · Doble observación de un árbol desde la orilla</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="1">
+                <p><strong>1. Planteo:</strong> Desde la orilla se mide <span class="eq">50&deg;</span> hacia la copa (<span class="eq">d<sub>1</sub> = h/tg 50&deg;</span>). Al retroceder <span class="eq">20 m</span> del mismo lado, se mide <span class="eq">30&deg;</span> (<span class="eq">d<sub>2</sub> = h/tg 30&deg;</span>).</p>
+                <p><strong>2. Relación de bases:</strong> Como ambos puntos están del mismo lado, <span class="eq">d<sub>2</sub> &minus; d<sub>1</sub> = 20</span>, es decir <span class="eq">h(cotg 30&deg; &minus; cotg 50&deg;) = 20</span>.</p>
+                <p><strong>3. Resultado:</strong> <span class="eq">h = 20 / (1,7321 &minus; 0,8391) &approx; 22,40 m</span> y ancho del río <span class="eq">d<sub>1</sub> &approx; 18,79 m</span>.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> Si el observador ve la base de un faro de <span class="eq">10 m</span> con elevación de <span class="eq">35&deg;</span> y la cima con <span class="eq">42&deg;</span> a distancia horizontal <span class="eq">d</span>, completá la ecuación <span class="eq">d&middot;tg(42&deg;) &minus; d&middot;tg(35&deg;) = ___</span> para despejar <span class="eq">d</span> y la altura del acantilado.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> Dos pueblos en lados opuestos de una montaña de <span class="eq">650 m</span> miden <span class="eq">24&deg;</span> y <span class="eq">36&deg;</span>. Decidí si las bases <span class="eq">d<sub>1</sub></span> y <span class="eq">d<sub>2</sub></span> se suman o se restan y calculá cada tramo por separado.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Resolvé el problema del árbol y del río con otro retroceso en el chequeo inferior o cambiando los parámetros en el pizarrón.</p>
+              </div>
+            </div>
+
+            <div class="trigr-contrast-box">
+              <h4>Desafío de contraste · Mismo lado vs. lados opuestos</h4>
+              <div class="trigr-contrast-cols">
+                <div class="trigr-contrast-col">
+                  <strong>Observador retrocede del mismo lado</strong>
+                  <p>El tramo conocido <span class="eq">&Delta;d</span> es la diferencia entre las dos distancias a la base: <span class="eq">&Delta;d = h(cotg &alpha; &minus; cotg &beta;)</span>.</p>
+                </div>
+                <div class="trigr-contrast-col">
+                  <strong>Objeto entre dos observadores</strong>
+                  <p>La separación total <span class="eq">d</span> suma las dos proyecciones hacia cada lado: <span class="eq">d = h(cotg &alpha; + cotg &beta;)</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado con medir desde la pared vertical:</strong> si un problema dice «ángulo de depresión de <span class="eq">35&deg;</span>», ese ángulo queda respecto de la horizontal superior (no dentro del edificio contra la pared vertical, donde iría <span class="eq">90&deg; &minus; 35&deg; = 55&deg;</span>).
+            </div>
+
+            <div data-check="sec-3"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 4 · SISTEMAS ANGULARES Y LONGITUD DE ARCO (PUENTE U11)
+               ================================================================ -->
+          <section class="seq-section" id="sec-4">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 2 · Pizarrón 4 de 6</div>
+              <h2 class="seq-section__title">4. Sistemas Sexagesimal y Circular, Radianes y Longitud de Arco</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> Un radián es el ángulo central cuyo arco mide exactamente igual que el radio (<span class="eq">s = r</span>); la equivalencia <span class="eq">&pi; rad &harr; 180&deg;</span> permite convertir con exactitud y aplicar <span class="eq">s = r &middot; &theta;<sub>rad</sub></span>.
+            </p>
+
+            <div class="trigr-prose">
+              <div class="trigr-extension-box">
+                <p>
+                  <span class="trigr-curriculum-tag is-extension">Puente curricular (hacia Unidad 11)</span>
+                  En el programa oficial, la definición formal del radián, las conversiones entre sistema sexagesimal y circular y la longitud de arco abren la unidad siguiente de
+                  <strong>Funciones trigonométricas</strong>. Los incorporamos aquí como puente directo para dominar la medida circular desde el trabajo con círculos y arcos.
+                </p>
+              </div>
+
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En el <strong>sistema sexagesimal</strong> un ángulo llano mide <span class="eq">180&deg;</span> (<span class="eq">1&deg; = 60'</span>, <span class="eq">1' = 60"</span>).
+                En el <strong>sistema circular</strong>, la medida en <strong>radianes</strong> de un ángulo central es el cociente adimensional
+                <span class="eq">&theta; = s / r</span>, donde <span class="eq">s</span> es el arco abarcado y <span class="eq">r</span> es el radio.
+                Como media vuelta de circunferencia tiene arco <span class="eq">&pi; r</span>, vale la equivalencia exacta
+                <strong><span class="eq">&pi; rad &harr; 180&deg;</span></strong>: para pasar de grados a radianes multiplicás por <span class="eq">&pi; / 180&deg;</span>,
+                y de radianes a grados por <span class="eq">180&deg; / &pi;</span>.
+              </p>
+
+              <div data-trigr-formula="arc"></div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec4-sistemas">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec4-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="conversor-angulos"></div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado mortal en <span class="eq">s = r &middot; &theta;</span>:</strong> jamás reemplaces <span class="eq">&theta;</span> en grados sexagesimales. Con <span class="eq">r = 3 cm</span> y <span class="eq">30&deg;</span>, calcular <span class="eq">3 &middot; 30 = 90 cm</span> es imposible (toda la circunferencia mide <span class="eq">18,85 cm</span>); primero convertís <span class="eq">30&deg; = &pi;/6 rad</span> para obtener <span class="eq">s = &pi;/2 &approx; 1,57 cm</span>.
+            </div>
+
+            <div data-check="sec-4"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 5 · POLÍGONOS REGULARES, CUERDAS Y CUERPOS 3D
+               ================================================================ -->
+          <section class="seq-section" id="sec-5">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 5 de 6</div>
+              <h2 class="seq-section__title">5. Polígonos Regulares, Cuerdas, Rombos, Trapecios y Cuerpos Geométricos</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> Toda figura simétrica o cuerpo en 3D se resuelve encontrando el triángulo rectángulo interior: en un polígono regular de <span class="eq">n</span> lados entran la apotema, el radio circunscripto, medio lado (<span class="eq">L/2</span>) y el semiángulo central (<span class="eq">180&deg;/n</span>).
+            </p>
+
+            <div class="trigr-prose">
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En un <strong>polígono regular</strong> de <span class="eq">n</span> lados, el ángulo central de cada lado vale <span class="eq">360&deg;/n</span>.
+                Al trazar la <strong>apotema</strong> perpendicular al punto medio del lado se forman dos triángulos rectángulos idénticos con:
+                hipotenusa = <strong>radio circunscripto <span class="eq">r</span></strong>, cateto adyacente = <strong>apotema</strong>,
+                cateto opuesto = <strong><span class="eq">L / 2</span></strong> y ángulo agudo = <strong><span class="eq">180&deg; / n</span></strong>.
+                Lo mismo ocurre en una <strong>cuerda</strong> de circunferencia: la perpendicular desde el centro divide la cuerda y el ángulo central a la mitad.
+              </p>
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En rombos y trapecios rectángulos o isósceles, las alturas y diagonales también generan triángulos rectángulos.
+                En cuerpos 3D como el <strong>prisma rectangular recto</strong> de aristas <span class="eq">a, b, c</span>, se encadenan dos Pitágoras:
+                primero la diagonal de la base <span class="eq">d = &radic;(a&sup2; + b&sup2;)</span> y luego la diagonal espacial <span class="eq">D = &radic;(d&sup2; + c&sup2;)</span>;
+                y en la <strong>pirámide de base cuadrada</strong> la altura, media base y la apotema lateral cierran un triángulo rectángulo para hallar <span class="eq">V = &frac13; &middot; A<sub>base</sub> &middot; h</span>.
+              </p>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec5-poligonos">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec5-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="pr-workbench">
+              <div class="pr-widget" data-widget="geometria-poligonos-arcos"></div>
+            </div>
+
+            <div class="trigr-worked-fading">
+              <h4>Ejemplo con retiro gradual · Apotema y área de un octógono regular</h4>
+              <div class="pr-chip-row">
+                <button type="button" class="pr-chip is-active" data-fade-btn="1">Nivel 1 · Completo</button>
+                <button type="button" class="pr-chip" data-fade-btn="2">Nivel 2 · Paso faltante</button>
+                <button type="button" class="pr-chip" data-fade-btn="3">Nivel 3 · Esqueleto guiado</button>
+                <button type="button" class="pr-chip" data-fade-btn="4">Nivel 4 · Resolución autónoma</button>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="1">
+                <p><strong>1. Triángulo interior:</strong> En un octógono (<span class="eq">n = 8</span>) de lado <span class="eq">L = 20 m</span>, el ángulo central es <span class="eq">360&deg;/8 = 45&deg;</span>. La apotema lo divide en dos semiángulos de <span class="eq">22,5&deg;</span> y medios lados de <span class="eq">10 m</span>.</p>
+                <p><strong>2. Apotema y área:</strong> <span class="eq">tg(22,5&deg;) = 10 / ap &rArr; ap &approx; 24,14 m</span>; perímetro <span class="eq">P = 8 &middot; 20 = 160 m</span> y área <span class="eq">(P &middot; ap)/2 &approx; 1931,37 m&sup2;</span>.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="2" hidden>
+                <p><strong>Tu paso faltante:</strong> En una circunferencia de radio <span class="eq">r = 10 cm</span> con cuerda de ángulo central <span class="eq">60&deg;</span>, completá <span class="eq">cuerda = 2 &middot; 10 &middot; sen(___&deg;)</span>.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="3" hidden>
+                <p><strong>Esqueleto guiado:</strong> En un prisma de <span class="eq">3 &times; 4 &times; 12 cm</span>, hallá primero la diagonal de la base <span class="eq">3 &times; 4</span> y usala como cateto junto con <span class="eq">12</span> para hallar la diagonal espacial.</p>
+              </div>
+              <div class="trigr-fade-panel" data-fade-panel="4" hidden>
+                <p><strong>Desafío autónomo:</strong> Resolvé los tres chequeos de polígono, cuerda y prisma 3D en esta sección.</p>
+              </div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado con el semiángulo y con la apotema vs. radio:</strong> dentro del triángulo rectángulo del polígono entra siempre <span class="eq">180&deg;/n</span> (jamás <span class="eq">360&deg;/n</span>), y el radio circunscripto es la hipotenusa (siempre mayor que la apotema).
+            </div>
+
+            <div data-check="sec-5"></div>
+          </section>
+
+          <!-- ================================================================
+               PIZARRÓN 6 · TRIÁNGULOS OBLICUÁNGULOS Y PUENTE COSENO/SENO
+               ================================================================ -->
+          <section class="seq-section" id="sec-6">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Capítulo 3 · Pizarrón 6 de 6</div>
+              <h2 class="seq-section__title">6. Triángulos Oblicuángulos: Alturas Auxiliares y Puentes del Coseno y del Seno</h2>
+            </header>
+
+            <p class="trigr-phrase">
+              <strong>En una frase:</strong> Cuando ningún ángulo del triángulo vale <span class="eq">90&deg;</span>, podés partirlo trazando una altura perpendicular o aplicar el Teorema del Coseno <span class="eq">c&sup2; = a&sup2; + b&sup2; &minus; 2ab&middot;cos(&gamma;)</span>, que generaliza a Pitágoras.
+            </p>
+
+            <div class="trigr-prose">
+              <p>
+                <span class="trigr-curriculum-tag is-official">Programa Oficial UNMDP</span>
+                En problemas reales de navegación o cruces de caminos donde dos trayectorias forman un ángulo distinto de <span class="eq">90&deg;</span>
+                (por ejemplo <span class="eq">125&deg;</span> entre dos barcos o <span class="eq">42&deg;</span> entre dos rutas),
+                el recurso básico consiste en trazar una <strong>altura auxiliar</strong> que descomponga el triángulo oblicuo en dos triángulos rectángulos.
+                También es fundamental <strong>unificar todas las unidades de longitud</strong> (como pasar <span class="eq">0,426 km</span> a <span class="eq">426 m</span>) antes de operar.
+              </p>
+
+              <div data-trigr-formula="cosine_law"></div>
+
+              <div class="trigr-extension-box">
+                <p>
+                  <span class="trigr-curriculum-tag is-extension">Ampliación puente (Teorema del Coseno y del Seno)</span>
+                  Aunque las leyes del Coseno y del Seno no figuran en el recuadro teórico inicial de triángulos rectángulos, se deducen directamente de aplicar Pitágoras a la altura auxiliar:
+                  <span class="eq">c&sup2; = a&sup2; + b&sup2; &minus; 2ab&middot;cos(&gamma;)</span> (con <span class="eq">&gamma; = 90&deg;</span> recuperás Pitágoras exacto) y
+                  <span class="eq">a / sen(A) = b / sen(B) = c / sen(C)</span>. Podés probar el modo <em>Puente Oblicuángulo</em> en el pizarrón del Pizarrón 5.
+                </p>
+              </div>
+            </div>
+
+            <div class="vn-trigger-row">
+              <button type="button" class="pr-btn" data-vn-trigger="sec6-oblicuangulos">¿Por qué pasa esto? · Explicación de Alaska</button>
+              <button type="button" class="pr-btn pr-btn-secondary" data-vn-trigger="sec6-base">Base desde cero: lo que nadie te explica</button>
+            </div>
+
+            <div class="trigr-contrast-box">
+              <h4>Desafío de contraste · Pitágoras vs. Teorema del Coseno</h4>
+              <div class="trigr-contrast-cols">
+                <div class="trigr-contrast-col">
+                  <strong>Triángulo rectángulo (&gamma; = 90&deg;)</strong>
+                  <p>Como <span class="eq">cos(90&deg;) = 0</span>, el corrector se anula y vale <span class="eq">c&sup2; = a&sup2; + b&sup2;</span> (ej. <span class="eq">30</span> y <span class="eq">40</span> dan <span class="eq">50</span>).</p>
+                </div>
+                <div class="trigr-contrast-col">
+                  <strong>Triángulo obtusángulo (&gamma; = 125&deg;)</strong>
+                  <p>Como <span class="eq">cos(125&deg;) &lt; 0</span>, el término <span class="eq">&minus;2ab&middot;cos(125&deg;)</span> suma positivo: <span class="eq">c &approx; 62,26 &gt; 50</span>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="trigr-warning-box">
+              <strong>Cuidado con unidades mezcladas y ángulos no rectos:</strong> nunca metas <span class="eq">0,426 km</span> junto con <span class="eq">368 m</span> sin convertir primero a la misma unidad, y jamás apliques Pitágoras directo cuando <span class="eq">&gamma; &ne; 90&deg;</span>.
+            </div>
+
+            <div data-check="sec-6"></div>
+          </section>
+
+          <!-- ================================================================
+               ENTRENADOR PRNG + 5 TRAMPAS CLÁSICAS
+               ================================================================ -->
+          <section id="sec-retos">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Entrenamiento Generativo · Unidad 10</div>
+              <h2 class="seq-section__title">Entrenador Infinito por Semilla y las 5 Trampas Clásicas de Examen</h2>
+            </header>
+            <div id="trigr-challenges"></div>
+          </section>
+
+          <!-- ================================================================
+               HOJA DE REPASO IMPRIMIBLE + PANEL DE COMPETENCIAS
+               ================================================================ -->
+          <section id="sec-repaso">
+            <header class="seq-section__header">
+              <div class="seq-section__tag">Síntesis · Autoevaluación y Repaso</div>
+              <h2 class="seq-section__title">Hoja de Repaso Imprimible · Razones Trigonométricas</h2>
+            </header>
+
+            <div class="trigr-no-print" style="margin-bottom: 14px;">
+              <button type="button" class="pr-btn" data-print-sheet="1">Imprimir hoja de repaso</button>
+            </div>
+
+            <div id="trigr-competency-dashboard"></div>
+
+            <div class="trigr-cheat-grid">
+              <article class="trigr-cheat-card">
+                <h3>1. Pitágoras y Complementarios</h3>
+                <p>En <span class="eq">&triangle;ABC</span> recto en <span class="eq">A</span>: <span class="eq">BC&sup2; = AB&sup2; + AC&sup2;</span> y <span class="eq">B + C = 90&deg;</span>. Las razones son invariantes por semejanza.</p>
+              </article>
+              <article class="trigr-cheat-card">
+                <h3>2. SOHCAHTOA y Cofunciones</h3>
+                <p><span class="eq">sen = Op/Hip</span>, <span class="eq">cos = Ady/Hip</span>, <span class="eq">tg = Op/Ady</span>. Al cambiar de vértice agudo: <span class="eq">sen(B) = cos(90&deg; &minus; B)</span>.</p>
+              </article>
+              <article class="trigr-cheat-card">
+                <h3>3. Elevación y Depresión</h3>
+                <p>Siempre desde la horizontal (Z paralela). Doble obs.: mismo lado <span class="eq">&Delta;d = h(cotg &alpha; &minus; cotg &beta;)</span>; lados opuestos <span class="eq">d = h(cotg &alpha; + cotg &beta;)</span>.</p>
+              </article>
+              <article class="trigr-cheat-card">
+                <h3>4. Sistemas Angulares y Arco (Puente U11)</h3>
+                <p><span class="eq">&pi; rad &harr; 180&deg;</span>. Multiplicá grados por <span class="eq">&pi;/180&deg;</span> y radianes por <span class="eq">180&deg;/&pi;</span>. En <span class="eq">s = r&middot;&theta;</span>, <span class="eq">&theta;</span> va siempre en radianes.</p>
+              </article>
+              <article class="trigr-cheat-card">
+                <h3>5. Polígonos, Cuerdas y Cuerpos 3D</h3>
+                <p>Polígono de <span class="eq">n</span> lados: semiángulo <span class="eq">180&deg;/n</span>, cateto <span class="eq">L/2</span>, adyacente <span class="eq">ap</span>, hipotenusa <span class="eq">r</span>. Prisma: <span class="eq">D = &radic;(a&sup2; + b&sup2; + c&sup2;)</span>; pirámide: <span class="eq">V = &frac13; A<sub>base</sub>&middot;h</span>.</p>
+              </article>
+              <article class="trigr-cheat-card">
+                <h3>6. Puente Oblicuángulo</h3>
+                <p>Con ángulo <span class="eq">&gamma; &ne; 90&deg;</span>: altura auxiliar o Teorema del Coseno <span class="eq">c&sup2; = a&sup2; + b&sup2; &minus; 2ab&middot;cos(&gamma;)</span>, unificando unidades antes de operar.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
