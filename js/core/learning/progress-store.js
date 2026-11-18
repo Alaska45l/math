@@ -90,6 +90,22 @@ export function createDefaultCompetencyEntry(competencyId) {
   };
 }
 
+export const MAX_OPEN_MYSTERIES = 5;
+
+/**
+ * Creates a clean default Open Mysteries Notebook state.
+ * @returns {object}
+ */
+export function createDefaultMysteriesState() {
+  return {
+    openIds: [],
+    exploredIds: [],
+    resolvedIds: [],
+    dismissedIds: [],
+    entries: {},
+  };
+}
+
 /**
  * Creates a clean default store state.
  * @returns {object}
@@ -100,6 +116,7 @@ export function createDefaultStoreState() {
     updatedAt: new Date().toISOString(),
     competencies: {},
     events: [],
+    mysteries: createDefaultMysteriesState(),
   };
 }
 
@@ -169,6 +186,19 @@ export const MODULE_COMPETENCY_IDS = Object.freeze({
     'sequences.geometric_explicit_and_models',
     'sequences.asymptotic_behavior_intuition',
   ],
+  lineal: [
+    'linear.definition_slope_and_intercept',
+    'linear.angle_and_three_equation_forms',
+    'linear.parallel_perpendicular_and_incidence',
+    'linear.analytic_geometry_distance_midpoint_bisector',
+    'linear.modeling_and_piecewise',
+  ],
+  sistemas: [
+    'systems.linear_2x2_graphical_and_analytical',
+    'systems.classification_scd_sci_si',
+    'systems.parametric_systems',
+    'systems.modeling_and_graph_reconstruction',
+  ],
   cuadraticas: [
     'quadratics.area_model_and_notable_products',
     'quadratics.sum_product_factoring',
@@ -181,6 +211,20 @@ export const MODULE_COMPETENCY_IDS = Object.freeze({
     'quadratics.parabola_line_tangency',
     'quadratics.extremum_optimization',
   ],
+  polinomios: [
+    'polynomials.structure_degree_and_equality',
+    'polynomials.arithmetic_and_degree_laws',
+    'polynomials.division_ruffini_and_remainder',
+    'polynomials.factoring_and_gauss_roots',
+    'polynomials.parameter_reconstruction_and_modeling',
+  ],
+  'racionales-irracionales': [
+    'rational.simplification_lcm_and_operations',
+    'rational.equations_and_inequalities',
+    'rational.domain_holes_and_asymptotes',
+    'irrational.domain_and_radical_equations',
+    'irrational.graphs_analysis_and_piecewise',
+  ],
   exponenciales: [
     'exponentials.tables_additive_vs_multiplicative',
     'exponentials.neutral_and_order_of_operations',
@@ -192,6 +236,25 @@ export const MODULE_COMPETENCY_IDS = Object.freeze({
     'exponentials.shifts_and_horizontal_asymptote',
     'exponentials.full_analytical_study',
     'exponentials.equations_three_methods_in_reals',
+  ],
+  logaritmicas: [
+    'logarithms.definition_existence_and_special_bases',
+    'logarithms.operative_properties_and_change_of_base',
+    'logarithms.equations_and_systems',
+    'logarithms.function_inverse_and_analysis',
+    'logarithms.real_world_time_and_scale_models',
+  ],
+  'razones-trigonometricas': [
+    'trig_ratios.right_triangle_sohcahtoa_and_pythagoras',
+    'trig_ratios.elevation_depression_and_indirect_measurement',
+    'trig_ratios.polygons_chords_and_solids_geometry',
+    'trig_ratios.angle_systems_and_arc_length',
+  ],
+  'funciones-trigonometricas': [
+    'trig_functions.congruence_classes_and_cartesian_def',
+    'trig_functions.six_functions_domains_graphs_and_bijectivity',
+    'trig_functions.pythagorean_identities_and_reduction',
+    'trig_functions.periodic_equations_and_domain_checks',
   ],
 });
 
@@ -212,6 +275,42 @@ const MODULE_COMPETENCY_PREFIXES = Object.freeze({
   'razones-trigonometricas': ['trig_ratios.'],
   'funciones-trigonometricas': ['trig_functions.'],
 });
+
+function sanitizeIdList(arr, maxLen = Infinity) {
+  if (!Array.isArray(arr)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const item of arr) {
+    if (typeof item === 'string' && item.trim().length > 0 && !seen.has(item)) {
+      seen.add(item);
+      out.push(item);
+      if (out.length >= maxLen) break;
+    }
+  }
+  return out;
+}
+
+function sanitizeMysteriesState(raw) {
+  const base = createDefaultMysteriesState();
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return base;
+  }
+  const entries = {};
+  if (raw.entries && typeof raw.entries === 'object' && !Array.isArray(raw.entries)) {
+    for (const [k, v] of Object.entries(raw.entries)) {
+      if (typeof k === 'string' && k && v && typeof v === 'object' && !Array.isArray(v)) {
+        entries[k] = { ...v };
+      }
+    }
+  }
+  return {
+    openIds: sanitizeIdList(raw.openIds, MAX_OPEN_MYSTERIES),
+    exploredIds: sanitizeIdList(raw.exploredIds),
+    resolvedIds: sanitizeIdList(raw.resolvedIds),
+    dismissedIds: sanitizeIdList(raw.dismissedIds),
+    entries,
+  };
+}
 
 /**
  * Core Learning Progress Store Class
@@ -250,6 +349,7 @@ export class ProgressStore {
         if (typeof parsed.schemaVersion !== 'number') {
           parsed.schemaVersion = SCHEMA_VERSION;
         }
+        parsed.mysteries = sanitizeMysteriesState(parsed.mysteries);
         return parsed;
       }
     } catch {
@@ -530,6 +630,36 @@ export class ProgressStore {
   }
 
   /**
+   * Returns a defensive copy of the Open Mysteries Notebook state.
+   * @returns {object}
+   */
+  getMysteriesState() {
+    const clean = sanitizeMysteriesState(this._state.mysteries);
+    return JSON.parse(JSON.stringify(clean));
+  }
+
+  /**
+   * Applies a pure updater to the Open Mysteries Notebook state, persists, and notifies subscribers.
+   * Never mutates competencies or mastery counters.
+   *
+   * @param {function} updaterFn - (currentMysteries) => nextMysteries
+   * @returns {object} Defensive copy of updated mysteries state
+   */
+  updateMysteriesState(updaterFn) {
+    if (typeof updaterFn !== 'function') {
+      throw new TypeError('updateMysteriesState requires an updater function');
+    }
+    const current = this.getMysteriesState();
+    const nextRaw = updaterFn(current);
+    const nextClean = sanitizeMysteriesState(nextRaw !== undefined ? nextRaw : current);
+    this._state.mysteries = nextClean;
+    this._saveState();
+    const snapshot = this.getMysteriesState();
+    this._notifySubscribers({ type: 'mysteries_updated', mysteries: snapshot });
+    return snapshot;
+  }
+
+  /**
    * Resets the store state and storage backing for testing.
    */
   resetStore() {
@@ -563,6 +693,7 @@ export class ProgressStore {
       updatedAt: state.updatedAt || new Date().toISOString(),
       competencies: state.competencies || {},
       events: Array.isArray(state.events) ? state.events.slice(-MAX_EVENT_LOG_SIZE) : [],
+      mysteries: sanitizeMysteriesState(state.mysteries),
     };
     this._saveState();
     this._notifySubscribers({ type: 'state_imported' });

@@ -48,15 +48,50 @@ import {
   SEQ_COMPETENCY_ALIASES,
 } from '../../modules/sucesiones/competencies-map.js';
 import {
+  LIN_COMPETENCIES,
+  LIN_DIAGNOSTIC_TAXONOMY,
+  LIN_COMPETENCY_ALIASES,
+} from '../../modules/lineal/competencies-map.js';
+import {
+  SYS_COMPETENCIES,
+  SYS_DIAGNOSTIC_TAXONOMY,
+  SYS_COMPETENCY_ALIASES,
+} from '../../modules/sistemas/competencies-map.js';
+import {
   QUAD_COMPETENCIES,
   QUAD_DIAGNOSTIC_TAXONOMY,
   QUAD_COMPETENCY_ALIASES,
 } from '../../modules/cuadraticas/competencies-map.js';
 import {
+  POLY_COMPETENCIES,
+  POLY_DIAGNOSTIC_TAXONOMY,
+  POLY_COMPETENCY_ALIASES,
+} from '../../modules/polinomios/competencies-map.js';
+import {
+  RI_COMPETENCIES,
+  RI_DIAGNOSTIC_TAXONOMY,
+  RI_COMPETENCY_ALIASES,
+} from '../../modules/racionales-irracionales/competencies-map.js';
+import {
   EXP_COMPETENCIES,
   EXP_DIAGNOSTIC_TAXONOMY,
   EXP_COMPETENCY_ALIASES,
 } from '../../modules/exponenciales/competencies-map.js';
+import {
+  LOG_COMPETENCIES,
+  LOG_DIAGNOSTIC_TAXONOMY,
+  LOG_COMPETENCY_ALIASES,
+} from '../../modules/logaritmicas/competencies-map.js';
+import {
+  TRIG_RATIOS_COMPETENCIES,
+  TRIG_RATIOS_DIAGNOSTIC_TAXONOMY,
+  TRIG_RATIOS_COMPETENCY_ALIASES,
+} from '../../modules/razones-trigonometricas/competencies-map.js';
+import {
+  TRIG_FUNCTIONS_COMPETENCIES,
+  TRIG_FUNCTIONS_DIAGNOSTIC_TAXONOMY,
+  TRIG_FUNCTIONS_COMPETENCY_ALIASES,
+} from '../../modules/funciones-trigonometricas/competencies-map.js';
 
 export const ACTIVE_CURRICULUM_MODULES = Object.freeze([
   Object.freeze({
@@ -108,6 +143,22 @@ export const ACTIVE_CURRICULUM_MODULES = Object.freeze([
     }),
   }),
   Object.freeze({
+    moduleId: MODULE_IDS.LINEAL,
+    data: Object.freeze({
+      competencies: LIN_COMPETENCIES,
+      diagnosticTaxonomy: LIN_DIAGNOSTIC_TAXONOMY,
+      aliases: LIN_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.SISTEMAS,
+    data: Object.freeze({
+      competencies: SYS_COMPETENCIES,
+      diagnosticTaxonomy: SYS_DIAGNOSTIC_TAXONOMY,
+      aliases: SYS_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
     moduleId: MODULE_IDS.CUADRATICAS,
     data: Object.freeze({
       competencies: QUAD_COMPETENCIES,
@@ -116,11 +167,51 @@ export const ACTIVE_CURRICULUM_MODULES = Object.freeze([
     }),
   }),
   Object.freeze({
+    moduleId: MODULE_IDS.POLINOMIOS,
+    data: Object.freeze({
+      competencies: POLY_COMPETENCIES,
+      diagnosticTaxonomy: POLY_DIAGNOSTIC_TAXONOMY,
+      aliases: POLY_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.RACIONALES_IRRACIONALES,
+    data: Object.freeze({
+      competencies: RI_COMPETENCIES,
+      diagnosticTaxonomy: RI_DIAGNOSTIC_TAXONOMY,
+      aliases: RI_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
     moduleId: MODULE_IDS.EXPONENCIALES,
     data: Object.freeze({
       competencies: EXP_COMPETENCIES,
       diagnosticTaxonomy: EXP_DIAGNOSTIC_TAXONOMY,
       aliases: EXP_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.LOGARITMICAS,
+    data: Object.freeze({
+      competencies: LOG_COMPETENCIES,
+      diagnosticTaxonomy: LOG_DIAGNOSTIC_TAXONOMY,
+      aliases: LOG_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.RAZONES_TRIGONOMETRICAS,
+    data: Object.freeze({
+      competencies: TRIG_RATIOS_COMPETENCIES,
+      diagnosticTaxonomy: TRIG_RATIOS_DIAGNOSTIC_TAXONOMY,
+      aliases: TRIG_RATIOS_COMPETENCY_ALIASES,
+    }),
+  }),
+  Object.freeze({
+    moduleId: MODULE_IDS.FUNCIONES_TRIGONOMETRICAS,
+    data: Object.freeze({
+      competencies: TRIG_FUNCTIONS_COMPETENCIES,
+      diagnosticTaxonomy: TRIG_FUNCTIONS_DIAGNOSTIC_TAXONOMY,
+      aliases: TRIG_FUNCTIONS_COMPETENCY_ALIASES,
     }),
   }),
 ]);
@@ -228,7 +319,7 @@ export const CROSS_MODULE_PREREQUISITES = Object.freeze({
 export function initCurriculumRegistry({
   modules = ACTIVE_CURRICULUM_MODULES,
   crossEdges = CROSS_MODULE_PREREQUISITES,
-  ignoreMissingCrossPrereqs = true,
+  ignoreMissingCrossPrereqs = false,
   reset = false,
   strictEvidence = true,
 } = {}) {
