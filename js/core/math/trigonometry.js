@@ -252,19 +252,24 @@ export function parseExactRadical(input) {
 
   if (!s) throw new SyntaxError('Expresión vacía.');
 
-  // Strip outer redundant parens
-  while (s.startsWith('(') && s.endsWith(')')) {
-    const inner = s.slice(1, -1);
-    let depth = 0;
-    let balanced = true;
-    for (let i = 0; i < inner.length; i++) {
-      if (inner[i] === '(') depth++;
-      else if (inner[i] === ')') depth--;
-      if (depth < 0) { balanced = false; break; }
+  const stripOuterParens = (str) => {
+    let cur = str;
+    while (cur.startsWith('(') && cur.endsWith(')')) {
+      const inner = cur.slice(1, -1);
+      let depth = 0;
+      let balanced = true;
+      for (let i = 0; i < inner.length; i++) {
+        if (inner[i] === '(') depth++;
+        else if (inner[i] === ')') depth--;
+        if (depth < 0) { balanced = false; break; }
+      }
+      if (balanced && depth === 0) cur = inner;
+      else break;
     }
-    if (balanced && depth === 0) s = inner;
-    else break;
-  }
+    return cur;
+  };
+
+  s = stripOuterParens(s);
 
   if (!s.includes('sqrt')) {
     return exactRadical(parseRational(s), 1);
@@ -284,27 +289,24 @@ export function parseExactRadical(input) {
   }
 
   const parseTerm = (part) => {
-    let p = part.trim();
-    while (p.startsWith('(') && p.endsWith(')')) p = p.slice(1, -1);
+    const p = stripOuterParens(part.trim());
     if (!p.includes('sqrt')) {
       return exactRadical(parseRational(p), 1);
     }
-    const m = p.match(/^([+-]?(?:\d+(?:\.\d+)?)?)?\*?sqrt\(?(\d+)\)?$/i);
+    const m = p.match(/^([+-]?)(?:\(([^)]+)\)|(\d+(?:\.\d+)?))?\*?sqrt\(?(\d+)\)?$/i);
     if (!m) {
       // Also support sqrt(R) * coeff
-      const m2 = p.match(/^([+-]?)\*?sqrt\(?(\d+)\)?\*([+-]?\d+(?:\.\d+)?)$/i);
+      const m2 = p.match(/^([+-]?)\*?sqrt\(?(\d+)\)?\*(?:\(([^)]+)\)|([+-]?\d+(?:\.\d+)?))$/i);
       if (m2) {
         const sign = m2[1] === '-' ? -1 : 1;
-        return exactRadical(ratMul(rat(sign, 1), parseRational(m2[3])), Number(m2[2]));
+        return exactRadical(ratMul(rat(sign, 1), parseRational(m2[3] || m2[4])), Number(m2[2]));
       }
       throw new SyntaxError(`Formato radical no reconocido: "${part}"`);
     }
-    let prefix = m[1] || '';
-    let coeff = rat(1, 1);
-    if (prefix === '-') coeff = rat(-1, 1);
-    else if (prefix === '+' || prefix === '') coeff = rat(1, 1);
-    else coeff = parseRational(prefix);
-    return exactRadical(coeff, Number(m[2]));
+    const sign = m[1] === '-' ? -1 : 1;
+    const coeffStr = m[2] || m[3] || '';
+    const coeff = coeffStr ? ratMul(rat(sign, 1), parseRational(coeffStr)) : rat(sign, 1);
+    return exactRadical(coeff, Number(m[4]));
   };
 
   if (slashIdx === -1) {
@@ -521,11 +523,12 @@ export function parseAngleInput(raw, { defaultSystem = null } = {}) {
     const sign = signMatch && signMatch[1] === '-' ? -1 : 1;
     const rest = (signMatch ? signMatch[2] : clean).trim();
 
+    const dmsFullRe = /^(?:\d+(?:\.\d+)?\s*°\s*)?(?:\d+(?:\.\d+)?\s*'\s*)?(?:\d+(?:\.\d+)?\s*"\s*)?$/;
     const dMatch = rest.match(/(\d+(?:\.\d+)?)\s*°/);
     const mMatch = rest.match(/(\d+(?:\.\d+)?)\s*'/);
     const sMatch = rest.match(/(\d+(?:\.\d+)?)\s*"/);
 
-    if (!dMatch && !mMatch && !sMatch) {
+    if (!dmsFullRe.test(rest) || (!dMatch && !mMatch && !sMatch)) {
       throw new SyntaxError(`Formato sexagesimal inválido: "${raw}"`);
     }
     const degVal = dMatch ? Number(dMatch[1]) : 0;
@@ -542,8 +545,15 @@ export function parseAngleInput(raw, { defaultSystem = null } = {}) {
     });
   }
 
-  // 2. Check pi multiples ("7π/4", "-3pi/2", "pi", "-2*pi/3")
-  const normPi = s.replace(/\s+/g, '').replace(/pi/gi, PI_CHAR);
+  const radUnitRe = /\s*rad(?:ianes|s)?\.?\s*$/i;
+  const hasRadSuffix = radUnitRe.test(s);
+  const sNoUnit = s.replace(radUnitRe, '').trim();
+  if (!sNoUnit) {
+    throw new SyntaxError(`Formato de ángulo inválido: "${raw}"`);
+  }
+
+  // 2. Check pi multiples ("7π/4", "-3pi/2", "pi", "-2*pi/3", "241π/360 rad")
+  const normPi = sNoUnit.replace(/\s+/g, '').replace(/pi/gi, PI_CHAR);
   if (normPi.includes(PI_CHAR)) {
     const slashParts = normPi.split('/');
     if (slashParts.length > 2) {
@@ -581,10 +591,9 @@ export function parseAngleInput(raw, { defaultSystem = null } = {}) {
   }
 
   // 3. Radians (e.g. "3 rad", "2.103", "-1/2")
-  const strippedRad = s.replace(/\s*rad(?:ianes|s)?\.?\s*$/i, '').trim();
-  const rNum = parseRational(strippedRad);
+  const rNum = parseRational(sNoUnit);
   const val = ratToNumber(rNum);
-  if (defaultSystem === 'deg') {
+  if (defaultSystem === 'deg' && !hasRadSuffix) {
     const piRat = ratDiv(rNum, rat(180, 1));
     return Object.freeze({
       system: 'deg',

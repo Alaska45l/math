@@ -83,10 +83,10 @@ export function parseNumberOrFraction(raw) {
     .trim();
   if (!s) throw new SyntaxError('Ingresá un valor numérico.');
 
-  // Strip thousands dots if es-AR decimal comma or large integer ("2.354,57" or "5 339")
-  if (/^\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(s)) {
+  // Strip thousands dots if es-AR decimal comma or large integer ("2.354,57", "1.250.000", or "5 339")
+  if (/^[+-]?[1-9]\d{0,2}(?:\.\d{3})+,\d+$/.test(s) || /^[+-]?[1-9]\d{0,2}(?:\.\d{3}){2,}$/.test(s)) {
     s = s.replace(/\./g, '').replace(',', '.');
-  } else if (/^\d{1,3}(?:\s+\d{3})+(?:[.,]\d+)?$/.test(s)) {
+  } else if (/^[+-]?[1-9]\d{0,2}(?:\s+\d{3})+(?:[.,]\d+)?$/.test(s)) {
     s = s.replace(/\s+/g, '').replace(',', '.');
   } else {
     s = s.replace(/(\d),(\d)/g, '$1.$2');

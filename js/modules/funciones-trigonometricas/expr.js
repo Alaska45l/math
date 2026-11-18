@@ -82,8 +82,28 @@ export function fmtNumberEsAR(n, digits = 2) {
   return getNf(digits).format(v).replace('-', MINUS_CHAR);
 }
 
+function isNumericRadicalAst(ast) {
+  if (!ast) return false;
+  switch (ast.type) {
+    case 'num':
+      return true;
+    case 'var':
+      return false;
+    case 'neg':
+      return isNumericRadicalAst(ast.arg);
+    case 'bin':
+      return isNumericRadicalAst(ast.left) && isNumericRadicalAst(ast.right);
+    case 'pow':
+      return isNumericRadicalAst(ast.base) && isNumericRadicalAst(ast.exp);
+    case 'call':
+      return ast.fn === 'sqrt' && isNumericRadicalAst(ast.arg);
+    default:
+      return false;
+  }
+}
+
 /**
- * Parses integers, es-AR decimals, fractions ("3/4"), exact radicals ("-4√7/7"), or π-multiples ("5π/3").
+ * Parses integers, es-AR decimals, fractions ("3/4"), exact radicals ("-4√7/7"), compound radicals ("(−1 + √3)/2"), or π-multiples ("5π/3").
  * Zero eval.
  */
 export function parseNumberOrFraction(raw) {
@@ -106,17 +126,29 @@ export function parseNumberOrFraction(raw) {
     .trim();
   if (!s) throw new SyntaxError('Ingresá un valor numérico.');
 
-  if (/^\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(s)) {
+  if (/^[+-]?[1-9]\d{0,2}(?:\.\d{3})+,\d+$/.test(s) || /^[+-]?[1-9]\d{0,2}(?:\.\d{3}){2,}$/.test(s)) {
     s = s.replace(/\./g, '').replace(',', '.');
-  } else if (/^\d{1,3}(?:\s+\d{3})+(?:[.,]\d+)?$/.test(s)) {
+  } else if (/^[+-]?[1-9]\d{0,2}(?:\s+\d{3})+(?:[.,]\d+)?$/.test(s)) {
     s = s.replace(/\s+/g, '').replace(',', '.');
   } else {
     s = s.replace(/(\d),(\d)/g, '$1.$2');
   }
 
   if (s.includes(SQRT_CHAR) || /sqrt/i.test(s)) {
-    const er = parseExactRadical(s);
-    return er.num;
+    try {
+      const er = parseExactRadical(s);
+      return er.num;
+    } catch {
+      const ast = parseTrigExpr(s);
+      if (!isNumericRadicalAst(ast)) {
+        throw new SyntaxError('La expresión numérica no puede contener variables ni funciones trigonométricas.');
+      }
+      const val = evalTrigAst(ast, 0);
+      if (!Number.isFinite(val)) {
+        throw new SyntaxError('La expresión con radicales no produce un número real finito.');
+      }
+      return val;
+    }
   }
   if (s.includes(PI_CHAR) || /\bpi\b/i.test(s) || /\d*pi/i.test(s)) {
     const ang = parseAngleInput(s, { defaultSystem: 'rad' });
@@ -129,10 +161,7 @@ export function parseNumberOrFraction(raw) {
 export function hasRadicalInDenominator(raw) {
   if (typeof raw !== 'string') return false;
   const s = raw.replace(/\s+/g, '');
-  const slashIdx = s.indexOf('/');
-  if (slashIdx === -1) return false;
-  const den = s.slice(slashIdx + 1);
-  return den.includes(SQRT_CHAR) || /sqrt/i.test(den);
+  return /\/(?:\([^)]*(?:\u221A|sqrt)[^)]*\)|[^+\-*/()]*(?:\u221A|sqrt))/i.test(s);
 }
 
 export function equivalentNumber(userRaw, expectedVal, tol = 1e-3) {

@@ -170,6 +170,7 @@ export function initAnalizadorDominioImagen(host) {
 
   const domainBand = s('rect', { y: plane.box.y, height: plane.box.h, fill: 'rgba(142, 219, 159, 0.1)', stroke: 'var(--green)', 'stroke-width': 1, 'stroke-dasharray': '3 3' });
   const imageBand = s('line', { stroke: 'var(--blue)', 'stroke-width': 5, 'stroke-linecap': 'round' });
+  const imageBandLower = s('line', { stroke: 'var(--blue)', 'stroke-width': 5, 'stroke-linecap': 'round', visibility: 'hidden' });
   const asymGroup = s('g', { class: 'trigf-dom-asym' });
   const curveMain = s('path', { fill: 'none', stroke: 'var(--yellow)', 'stroke-width': 2.8, 'stroke-linecap': 'round' });
   const curveComp = s('path', { fill: 'none', stroke: 'var(--pink)', 'stroke-width': 2.4, 'stroke-dasharray': '6 3', 'stroke-linecap': 'round' });
@@ -182,7 +183,7 @@ export function initAnalizadorDominioImagen(host) {
   plane.layers.shade.append(domainBand);
   plane.layers.under.append(asymGroup, horizLine);
   plane.layers.curve.append(curveMain, curveComp);
-  plane.layers.marks.append(imageBand, intersectionsGroup, bDot, bHit);
+  plane.layers.marks.append(imageBand, imageBandLower, intersectionsGroup, bDot, bHit);
 
   const mapper = {
     xMin: X_MIN,
@@ -235,6 +236,7 @@ export function initAnalizadorDominioImagen(host) {
       });
       domainBand.setAttribute('visibility', 'hidden');
       imageBand.setAttribute('visibility', 'hidden');
+      imageBandLower.setAttribute('visibility', 'hidden');
       horizLine.setAttribute('visibility', 'hidden');
       bHit.setAttribute('cx', String(plane.sx(bRad)));
       bHit.setAttribute('cy', String(plane.sy(0)));
@@ -297,7 +299,25 @@ export function initAnalizadorDominioImagen(host) {
       prevDiff = curDiff;
     }
 
-    const isInjective = hits.length <= 1 && (bRad - aRad) <= spec.periodPi * Math.PI / (st.fn === 'tan' || st.fn === 'cot' ? 1 : 2) + 0.08;
+    const width = bRad - aRad;
+    const eps = 1e-4;
+    let isInjective = false;
+    if (hits.length <= 1) {
+      if (st.fn === 'tan' || st.fn === 'cot') {
+        const startIsPole = st.fn === 'tan'
+          ? Math.abs(Math.cos(aRad)) < 1e-4
+          : Math.abs(Math.sin(aRad)) < 1e-4;
+        isInjective = width < Math.PI - eps || (Math.abs(width - Math.PI) <= eps && startIsPole);
+      } else if (st.fn === 'sin' || st.fn === 'csc') {
+        const kMin = Math.floor((aRad + eps) / Math.PI - 0.5) + 1;
+        const critX = (kMin + 0.5) * Math.PI;
+        isInjective = width <= Math.PI + eps && !(critX < bRad - eps);
+      } else {
+        const kMin = Math.floor((aRad + eps) / Math.PI) + 1;
+        const critX = kMin * Math.PI;
+        isInjective = width <= Math.PI + eps && !(critX < bRad - eps);
+      }
+    }
     hits.forEach((hx) => {
       const pos = clampToPlane(plane, plane.sx(hx), py0, 5);
       intersectionsGroup.append(
@@ -320,20 +340,40 @@ export function initAnalizadorDominioImagen(host) {
         imageBand.setAttribute('x2', String(yAxisX));
         imageBand.setAttribute('y1', String(plane.sy(1)));
         imageBand.setAttribute('y2', String(plane.sy(-1)));
+        imageBandLower.setAttribute('visibility', 'hidden');
+      } else if (st.fn === 'sec' || st.fn === 'csc') {
+        imageBand.setAttribute('x1', String(yAxisX));
+        imageBand.setAttribute('x2', String(yAxisX));
+        imageBand.setAttribute('y1', String(plane.box.y));
+        imageBand.setAttribute('y2', String(plane.sy(1)));
+        imageBandLower.removeAttribute('visibility');
+        imageBandLower.setAttribute('x1', String(yAxisX));
+        imageBandLower.setAttribute('x2', String(yAxisX));
+        imageBandLower.setAttribute('y1', String(plane.sy(-1)));
+        imageBandLower.setAttribute('y2', String(plane.box.y + plane.box.h));
       } else {
         imageBand.setAttribute('x1', String(yAxisX));
         imageBand.setAttribute('x2', String(yAxisX));
         imageBand.setAttribute('y1', String(plane.box.y));
         imageBand.setAttribute('y2', String(plane.box.y + plane.box.h));
+        imageBandLower.setAttribute('visibility', 'hidden');
       }
     } else {
       imageBand.setAttribute('visibility', 'hidden');
+      imageBandLower.setAttribute('visibility', 'hidden');
     }
 
     renderReadout(board.readout, `Análisis de ${spec.label}`, [
       ['Dominio / Imagen', `Dom = ${spec.domainText} · Im = ${spec.imageText}`],
       ['Período / Suryectividad en ℝ', `T = ${spec.periodText} · ${spec.isSurjectiveOnRealCodomain ? 'Suryectiva sobre ℝ' : 'NO suryectiva sobre ℝ'}`],
-      ['Prueba recta horizontal', hits.length > 1 ? `${hits.length} cortes en [a; b] → No inyectiva` : hits.length === 1 ? '1 corte único en [a; b] → Inyectiva en la zona' : `0 cortes en y₀ = ${fmtNumberEsAR(y0, 1)} (fuera de imagen)`],
+      ['Prueba recta horizontal',
+        hits.length > 1
+          ? `${hits.length} cortes en [a; b] → No inyectiva`
+          : hits.length === 1
+            ? (isInjective
+              ? '1 corte único en [a; b] → Inyectiva en la zona'
+              : '1 corte en y₀, pero [a; b] supera el tramo monótono → No inyectiva en todo [a; b]')
+            : `0 cortes en y₀ = ${fmtNumberEsAR(y0, 1)} (fuera de imagen)`],
       ['Restricción biyectiva estándar', `${spec.bijectiveRestriction.domainText} → ${spec.bijectiveRestriction.codomainText}`],
     ]);
   };
